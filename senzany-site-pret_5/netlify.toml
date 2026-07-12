@@ -1,7 +1,11 @@
 [build]
-  base = "senzany-site-pret_5"
   functions = "netlify/functions"
   publish = "."
+
+[[redirects]]
+  from = "/api/discord/stats"
+  to = "/.netlify/functions/discord-stats"
+  status = 200
 
 [[redirects]]
   from = "/api/steam/login"
