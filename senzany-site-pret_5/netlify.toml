@@ -1,4 +1,5 @@
 [build]
+  base = "senzany-site-pret_5"
   functions = "netlify/functions"
   publish = "."
 
