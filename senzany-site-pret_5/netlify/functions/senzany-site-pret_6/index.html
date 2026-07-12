@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SENZANY — PVE Server DayZ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#0a0908; --panel:#141110; --panel-2:#1c1716;
+  --paper:#ece5da; --paper-dim:#928a80;
+  --blood:#8c1f1f; --blood-bright:#d1272c; --line:#2a2220;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--paper); font-family:'Oswald',sans-serif; font-weight:300; line-height:1.6;}
+a{color:inherit; text-decoration:none;}
+.wrap{max-width:1240px; margin:0 auto; padding:0 24px;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+
+/* ---- DATA LAYER ----
+   Toutes les valeurs "live" sont ici. Remplacer window.SENZANY_DATA
+   par un fetch() vers une vraie API plus tard ne touche à rien d'autre. */
+
+/* NAV */
+header{position:sticky; top:0; z-index:100; background:rgba(10,9,8,0.95); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+nav.wrap{display:flex; align-items:center; justify-content:space-between; height:72px;}
+.brand{display:flex; align-items:center; gap:12px;}
+.badge{width:42px; height:42px; border-radius:50%; object-fit:contain; flex-shrink:0; filter:drop-shadow(0 0 5px rgba(0,0,0,0.6));}
+.brand-name{font-family:'Anton',sans-serif; font-size:20px; letter-spacing:0.04em;}
+.navlinks{display:flex; gap:26px; font-size:12.5px; letter-spacing:0.05em; text-transform:uppercase; font-weight:500;}
+.navlinks a{color:var(--paper-dim); padding:4px 0; border-bottom:2px solid transparent;}
+.navlinks a:hover, .navlinks a.active{color:var(--paper); border-color:var(--blood-bright);}
+.nav-right{display:flex; align-items:center; gap:16px;}
+.btn-join{background:var(--blood); color:var(--paper); font-family:'Oswald',sans-serif; font-weight:600; font-size:12px; letter-spacing:0.04em; text-transform:uppercase; padding:11px 20px; border:none; cursor:pointer;}
+.btn-join:hover{background:var(--blood-bright);}
+.burger{display:none; background:none; border:1px solid var(--line); color:var(--paper); width:38px; height:38px; font-size:18px; cursor:pointer;}
+.mobile-menu{display:none; flex-direction:column; padding:16px 24px; border-bottom:1px solid var(--line); background:var(--panel);}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{padding:10px 0; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; color:var(--paper-dim); border-bottom:1px solid var(--line);}
+
+@media (max-width:920px){
+  .navlinks{display:none;}
+  .burger{display:block;}
+}
+
+/* HERO */
+.hero{position:relative; height:78vh; min-height:480px; display:flex; align-items:flex-end; overflow:hidden; border-bottom:1px solid var(--line);}
+.hero svg.scene{position:absolute; inset:0; width:100%; height:100%; z-index:0;}
+.hero::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,9,8,0.15) 0%, rgba(10,9,8,0.5) 55%, rgba(10,9,8,0.97) 100%); z-index:1;}
+.hero-inner{position:relative; z-index:2; padding-bottom:64px; width:100%;}
+.hero-title{font-family:'Anton',sans-serif; font-size:clamp(38px,6.4vw,74px); text-transform:uppercase; line-height:0.98;}
+.hero-title .accent{color:var(--blood-bright);}
+.hero-sub{max-width:480px; margin-top:16px; font-size:15px; color:var(--paper-dim); font-weight:300;}
+.hero-actions{margin-top:26px;}
+.btn-cta{background:var(--blood); color:var(--paper); font-family:'Oswald',sans-serif; font-weight:600; font-size:14px; letter-spacing:0.04em; text-transform:uppercase; padding:15px 30px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:10px;}
+.btn-cta:hover{background:var(--blood-bright);}
+
+/* STATS BAR */
+.statsbar{background:var(--panel); border-bottom:1px solid var(--line);}
+.statsbar .wrap{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line);}
+.statitem{background:var(--panel); padding:20px 24px; text-align:left;}
+.statitem .lab{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--paper-dim);}
+.statitem .val{font-family:'Anton',sans-serif; font-size:26px; margin-top:6px;}
+.statitem .val.live{color:var(--blood-bright);}
+@media (max-width:700px){.statsbar .wrap{grid-template-columns:repeat(2,1fr);}}
+
+/* SECTION SHARED */
+section{padding:72px 0; border-bottom:1px solid var(--line);}
+.section-tag{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--blood-bright); margin-bottom:10px;}
+.section-title{font-family:'Anton',sans-serif; font-size:clamp(28px,4vw,38px); text-transform:uppercase;}
+.section-head{margin-bottom:40px; max-width:600px;}
+
+/* POURQUOI */
+.why-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+.why-card{background:var(--panel); padding:28px 22px;}
+.why-icon{width:34px; height:34px; border:1px solid var(--blood); display:flex; align-items:center; justify-content:center; color:var(--blood-bright); margin-bottom:16px;}
+.why-card h3{font-family:'Anton',sans-serif; font-size:16px; text-transform:uppercase; margin-bottom:8px;}
+.why-card p{font-size:12.5px; color:var(--paper-dim); font-weight:300;}
+@media (max-width:800px){.why-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* EVENT */
+.event-panel{border:1px solid var(--blood); background:var(--panel); display:grid; grid-template-columns:1.3fr 1fr; overflow:hidden;}
+.event-info{padding:32px;}
+.event-date{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--blood-bright); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:10px;}
+.event-title{font-family:'Anton',sans-serif; font-size:28px; text-transform:uppercase; margin-bottom:12px;}
+.event-desc{color:var(--paper-dim); font-size:14px; max-width:440px; font-weight:300;}
+.countdown{display:flex; gap:14px; margin-top:22px;}
+.cd-block{text-align:center;}
+.cd-num{font-family:'Anton',sans-serif; font-size:30px; background:var(--panel-2); border:1px solid var(--line); padding:10px 14px; min-width:56px;}
+.cd-lab{font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--paper-dim); margin-top:6px;}
+.event-side{background:var(--panel-2); padding:32px; border-left:1px solid var(--line); display:flex; flex-direction:column; justify-content:center; gap:14px;}
+.event-side .row{display:flex; justify-content:space-between; font-size:13px; padding:10px 0; border-bottom:1px solid var(--line);}
+.event-side .row:last-child{border-bottom:none;}
+.event-side .row span:first-child{color:var(--paper-dim);}
+@media (max-width:800px){.event-panel{grid-template-columns:1fr;} .event-side{border-left:none; border-top:1px solid var(--line);}}
+
+/* NEWS */
+.news-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+.news-card{background:var(--panel); border:1px solid var(--line);}
+.news-thumb{height:130px; position:relative; overflow:hidden;}
+.news-tag{position:absolute; top:12px; left:12px; background:var(--blood); color:var(--paper); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; padding:4px 10px;}
+.news-body{padding:18px;}
+.news-body h3{font-family:'Anton',sans-serif; font-size:16px; text-transform:uppercase; margin-bottom:8px;}
+.news-body p{font-size:12.5px; color:var(--paper-dim); font-weight:300; margin-bottom:10px;}
+.news-body .date{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--paper-dim); opacity:0.7;}
+@media (max-width:800px){.news-grid{grid-template-columns:1fr;}}
+
+/* COMMUNITY */
+.comm-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+.comm-card{background:var(--panel); padding:26px 22px; text-align:center;}
+.comm-card .n{font-family:'Anton',sans-serif; font-size:22px; color:var(--blood-bright);}
+.comm-card .l{font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--paper-dim); margin-top:6px;}
+@media (max-width:800px){.comm-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* QUICK ACCESS */
+.quick-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+.quick-card{display:block; background:var(--panel); border:1px solid var(--line); padding:22px; text-align:center; cursor:pointer; transition:border-color .2s;}
+.quick-card:hover{border-color:var(--blood);}
+.quick-card .qi{font-size:20px; color:var(--blood-bright); margin-bottom:10px;}
+.quick-card h4{font-family:'Anton',sans-serif; font-size:14px; text-transform:uppercase;}
+@media (max-width:800px){.quick-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* FOOTER */
+footer{padding:50px 0 30px;}
+.footer-grid{display:flex; justify-content:space-between; flex-wrap:wrap; gap:30px; padding-bottom:30px; border-bottom:1px solid var(--line);}
+.footer-brand p{color:var(--paper-dim); font-size:12.5px; max-width:260px; margin-top:10px; font-weight:300;}
+.footer-links{display:flex; gap:50px; flex-wrap:wrap;}
+.footer-col h4{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--paper-dim); margin-bottom:12px;}
+.footer-col a{display:block; font-size:13px; margin-bottom:8px; opacity:0.85;}
+.footer-col a:hover{color:var(--blood-bright);}
+.footer-bottom{padding-top:20px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--paper-dim);}
+
+::selection{background:var(--blood); color:var(--paper);}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <div class="brand">
+      <img class="badge" src="logo.png" alt="Senzany">
+      <div class="brand-name">SENZANY</div>
+    </div>
+    <div class="navlinks">
+      <a href="index.html" class="active">Accueil</a>
+      <a href="senzany-jouer.html">Jouer</a>
+      <a href="senzany-communaute.html">Communauté</a>
+      <a href="senzany-wiki.html">Wiki</a>
+      <a href="senzany-evenements.html">Événements</a>
+      <a href="senzany-boutique.html">Boutique</a>
+      <a href="senzany-support.html">Support</a>
+      <a href="senzany-profil.html">Mon profil</a>
+    </div>
+    <div class="nav-right">
+      <button class="btn-join">Rejoindre le serveur</button>
+      <button class="burger" id="burgerBtn" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Accueil</a><a href="senzany-jouer.html">Jouer</a><a href="senzany-communaute.html">Communauté</a><a href="senzany-wiki.html">Wiki</a>
+    <a href="senzany-evenements.html">Événements</a><a href="senzany-boutique.html">Boutique</a><a href="senzany-support.html">Support</a><a href="senzany-profil.html">Mon profil</a>
+  </div>
+</header>
+
+<section class="hero" style="border-bottom:none; padding:0;">
+  <svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#1b0f0d"/><stop offset="45%" stop-color="#271410"/>
+        <stop offset="80%" stop-color="#150c0a"/><stop offset="100%" stop-color="#0a0908"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#e8b06a" stop-opacity="0.85"/>
+        <stop offset="60%" stop-color="#a15a34" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#a15a34" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1600" height="900" fill="url(#sky)"/>
+    <circle cx="1280" cy="180" r="150" fill="url(#glow)"/>
+    <circle cx="1280" cy="180" r="50" fill="#f0d9b5" opacity="0.8"/>
+    <path d="M0 480 L140 430 L260 470 L400 400 L540 460 L700 380 L860 450 L1020 400 L1180 460 L1340 410 L1500 460 L1600 420 L1600 900 L0 900 Z" fill="#1c1310"/>
+    <path d="M0 540 L200 500 L360 550 L560 500 L740 555 L940 505 L1120 560 L1320 510 L1600 550 L1600 900 L0 900 Z" fill="#120b09"/>
+    <g fill="#0a0706">
+      <path d="M760 620 L800 400 L840 620 Z"/>
+      <rect x="785" y="345" width="30" height="60" fill="#0a0706"/>
+      <path d="M770 345 L800 300 L830 345 Z"/>
+      <line x1="800" y1="300" x2="800" y2="250" stroke="#0a0706" stroke-width="3"/>
+      <path d="M800 252 L850 262 L800 274 Z" fill="#8c1f1f" opacity="0.85"/>
+    </g>
+    <g fill="#050403">
+      <ellipse cx="300" cy="700" rx="18" ry="20"/>
+      <path d="M275 715 Q300 700 325 715 L330 830 L270 830 Z"/>
+      <rect x="258" y="740" width="14" height="70" rx="5"/>
+    </g>
+    <path d="M0 900 L0 800 Q300 760 600 790 Q900 820 1200 780 Q1400 755 1600 790 L1600 900 Z" fill="#0a0908"/>
+  </svg>
+  <div class="wrap hero-inner">
+    <h1 class="hero-title">SURVIVEZ. EXPLOREZ.<br><span class="accent">ÉCRIVEZ VOTRE LÉGENDE.</span></h1>
+    <p class="hero-sub">Serveur PVE immersif sur Chernarus. Une communauté française, un monde qui ne vous fera pas de cadeau — mais jamais dans le dos.</p>
+    <div class="hero-actions">
+      <button class="btn-cta">Rejoindre l'aventure →</button>
+    </div>
+  </div>
+</section>
+
+<div class="statsbar">
+  <div class="wrap">
+    <div class="statitem"><div class="lab">Joueurs connectés</div><div class="val live" id="statPlayers">— / —</div></div>
+    <div class="statitem"><div class="lab">Votes du mois</div><div class="val" id="statVotes">—</div></div>
+    <div class="statitem"><div class="lab">Uptime</div><div class="val" id="statUptime">—</div></div>
+    <div class="statitem"><div class="lab">Prochain wipe</div><div class="val" id="statWipe">—</div></div>
+  </div>
+</div>
+
+<div class="wrap" style="padding:28px 24px; text-align:center; border-bottom:1px solid var(--line);">
+  <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--paper-dim); margin-bottom:12px;">Statut en direct — Top-Serveurs</div>
+  <a href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" target="_blank" rel="noopener">
+    <img src="https://cdn.top-serveurs.net/banners/6972ba2576379.gif" alt="Bannière live Senzany sur Top-Serveurs" style="max-width:100%; height:auto; border:1px solid var(--line);">
+  </a>
+  <div style="margin-top:10px;"><a href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" target="_blank" rel="noopener" class="btn btn-solid btn-sm">Voter pour Senzany (n°1 PVE FR)</a></div>
+</div>
+
+<section id="pourquoi">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Pourquoi Senzany</div>
+      <h2 class="section-title">Ce qui nous différencie</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card"><div class="why-icon">◆</div><h3>PVE immersif</h3><p>Une expérience PVE riche et équilibrée, sans agressions entre joueurs.</p></div>
+      <div class="why-card"><div class="why-icon">●</div><h3>Communauté active</h3><p>Une communauté soudée et respectueuse, présente au quotidien.</p></div>
+      <div class="why-card"><div class="why-icon">■</div><h3>Contenu exclusif</h3><p>Missions, zones et systèmes de jeu uniques à Senzany.</p></div>
+      <div class="why-card"><div class="why-icon">▲</div><h3>Équipe passionnée</h3><p>Un staff réactif, à l'écoute et impliqué dans chaque décision.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="evenement">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">En ce moment</div>
+      <h2 class="section-title">Événement en cours</h2>
+    </div>
+    <div class="event-panel">
+      <div class="event-info">
+        <div class="event-date">DIMANCHE 20 JUILLET · 20H00</div>
+        <div class="event-title">Course de voitures — Grand Prix Senzany</div>
+        <p class="event-desc">Affrontez les meilleurs pilotes de Chernarus sur un circuit extrême. Vitesse, adrénaline et gros lots à la clé pour les vainqueurs.</p>
+        <div class="countdown" id="countdown">
+          <div class="cd-block"><div class="cd-num" id="cd-d">--</div><div class="cd-lab">Jours</div></div>
+          <div class="cd-block"><div class="cd-num" id="cd-h">--</div><div class="cd-lab">Heures</div></div>
+          <div class="cd-block"><div class="cd-num" id="cd-m">--</div><div class="cd-lab">Min</div></div>
+          <div class="cd-block"><div class="cd-num" id="cd-s">--</div><div class="cd-lab">Sec</div></div>
+        </div>
+      </div>
+      <div class="event-side">
+        <div class="row"><span>Participants</span><span>42 / 60</span></div>
+        <div class="row"><span>Inscription</span><span style="color:var(--blood-bright)">Ouverte</span></div>
+        <div class="row"><span>Récompenses</span><span>Véhicule, skins, coins</span></div>
+        <button class="btn-cta" style="margin-top:6px;">S'inscrire</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="actus">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Suivez-nous</div>
+      <h2 class="section-title">Dernières actualités</h2>
+    </div>
+    <div class="news-grid">
+      <div class="news-card">
+        <div class="news-thumb" style="background:linear-gradient(135deg,#2a1613,#0a0908);"><div class="news-tag">Mise à jour</div></div>
+        <div class="news-body"><h3>Mise à jour 1.26</h3><p>Nouveaux objets, optimisations serveur et corrections de bugs.</p><div class="date">15 juillet 2026</div></div>
+      </div>
+      <div class="news-card">
+        <div class="news-thumb" style="background:linear-gradient(135deg,#2a1613,#0a0908);"><div class="news-tag">Événement</div></div>
+        <div class="news-body"><h3>Aperçu Saison 5</h3><p>Découvrez les nouveautés de la saison à venir sur Senzany.</p><div class="date">10 juillet 2026</div></div>
+      </div>
+      <div class="news-card">
+        <div class="news-thumb" style="background:linear-gradient(135deg,#2a1613,#0a0908);"><div class="news-tag">Raid</div></div>
+        <div class="news-body"><h3>Event spécial raid</h3><p>Retour sur l'événement du week-end dernier et ses vainqueurs.</p><div class="date">7 juillet 2026</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="communaute">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Rejoignez-nous</div>
+      <h2 class="section-title">Notre communauté</h2>
+    </div>
+    <div class="comm-grid">
+      <div class="comm-card"><div class="n" id="commDiscord">—</div><div class="l">Membres Discord</div></div>
+      <div class="comm-card"><div class="n">2 382</div><div class="l">Votes ce mois-ci</div></div>
+      <div class="comm-card"><div class="n">18</div><div class="l">Avis joueurs</div></div>
+      <div class="comm-card"><div class="n">N°1</div><div class="l">Classement PVE FR</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="acces" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Accès rapides</div>
+      <h2 class="section-title">Tout ce dont vous avez besoin</h2>
+    </div>
+    <div class="quick-grid">
+      <a class="quick-card" href="senzany-wiki.html"><div class="qi">📖</div><h4>Wiki</h4></a>
+      <a class="quick-card" href="senzany-boutique.html"><div class="qi">🛒</div><h4>Boutique</h4></a>
+      <a class="quick-card" href="senzany-support.html"><div class="qi">🎧</div><h4>Support</h4></a>
+      <a class="quick-card" href="senzany-communaute.html"><div class="qi">★</div><h4>Voter</h4></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="brand"><img class="badge" style="width:34px;height:34px;font-size:13px;" src="logo.png" alt="Senzany"><div class="brand-name" style="font-size:17px;">SENZANY</div></div>
+        <p>Serveur PVE DayZ sur Chernarus. Communauté 100% française.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col"><h4>Liens utiles</h4><a href="index.html">Accueil</a><a href="senzany-wiki.html">Wiki</a><a href="senzany-evenements.html">Événements</a><a href="senzany-boutique.html">Boutique</a><a href="senzany-support.html">Support</a></div>
+        <div class="footer-col"><h4>Informations</h4><a href="#">Règlement</a><a href="#">Conditions d'utilisation</a><a href="#">Politique de confidentialité</a></div>
+        <div class="footer-col"><h4>Nous contacter</h4><a href="mailto:support@senzany.com">support@senzany.com</a><a href="https://discord.gg/aJ2eGmqAQv" target="_blank" rel="noopener">Discord</a></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Senzany. Serveur communautaire non affilié à Bohemia Interactive.</span>
+      <span>IP : 208.115.196.109:2302</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---------------------------------------------------------------
+   COUCHE DE DONNÉES
+   Remplacer ce bloc par un fetch() vers une vraie API (BattleMetrics,
+   ou un petit backend maison qui interroge le serveur DayZ) pour
+   passer en données 100% live. Le reste du script ne bouge pas.
+--------------------------------------------------------------- */
+const SENZANY_DATA = {
+  players: { current: 32, max: 50 },
+  votesThisMonth: 1256,
+  uptime: 99.8,
+  nextWipeDate: "2026-08-24",
+  eventDate: "2026-07-20T20:00:00"
+};
+
+function renderStats(d){
+  document.getElementById('statPlayers').textContent = d.players.current + ' / ' + d.players.max;
+  document.getElementById('statVotes').textContent = d.votesThisMonth.toLocaleString('fr-FR');
+  document.getElementById('statUptime').textContent = d.uptime + '%';
+  const wipe = new Date(d.nextWipeDate);
+  document.getElementById('statWipe').textContent = wipe.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
+}
+renderStats(SENZANY_DATA);
+
+/* ---------------------------------------------------------------
+   DONNÉES LIVE — Discord Widget
+   API publique de Discord, sans authentification, toujours à jour.
+--------------------------------------------------------------- */
+/* ---------------------------------------------------------------
+   DONNÉES LIVE — Bot Discord
+   Le bot (token gardé secret côté Netlify) donne le vrai nombre
+   total de membres, pas seulement ceux en ligne.
+--------------------------------------------------------------- */
+async function fetchDiscordStats(){
+  try{
+    const res = await fetch('/api/discord/stats');
+    if(!res.ok) throw new Error('reponse non ok');
+    const data = await res.json();
+    document.getElementById('commDiscord').textContent = data.memberCount.toLocaleString('fr-FR');
+  } catch(err){
+    console.warn('Stats Discord indisponibles.', err);
+  }
+}
+fetchDiscordStats();
+setInterval(fetchDiscordStats, 120000);
+
+/* ---------------------------------------------------------------
+   DONNÉES LIVE — BattleMetrics
+   Le serveur Senzany est indexé sur BattleMetrics (ID 33855262).
+   On interroge leur API publique en direct depuis le navigateur.
+   Si ça échoue (CORS, API down, etc.), on garde les valeurs
+   statiques ci-dessus — aucune erreur visible pour le visiteur.
+--------------------------------------------------------------- */
+const BATTLEMETRICS_SERVER_ID = "33855262";
+
+async function fetchLiveServerData(){
+  try{
+    const res = await fetch(`https://api.battlemetrics.com/servers/${BATTLEMETRICS_SERVER_ID}`);
+    if(!res.ok) throw new Error('reponse non ok');
+    const json = await res.json();
+    const attrs = json.data.attributes;
+    SENZANY_DATA.players.current = attrs.players;
+    SENZANY_DATA.players.max = attrs.maxPlayers;
+    const isOnline = attrs.status === 'online';
+    document.getElementById('statPlayers').textContent = isOnline
+      ? (attrs.players + ' / ' + attrs.maxPlayers)
+      : 'Hors ligne';
+  } catch(err){
+    /* API injoignable depuis ce navigateur (souvent un souci de CORS) :
+       on reste sur les valeurs statiques définies dans SENZANY_DATA. */
+    console.warn('Stats live BattleMetrics indisponibles, valeurs statiques utilisées.', err);
+  }
+}
+// Désactivé : la fiche BattleMetrics trouvée pour ce serveur est perimee (mauvaise IP).
+// Reactiver une fois le serveur "revendique" sur BattleMetrics avec la bonne fiche.
+// fetchLiveServerData();
+// setInterval(fetchLiveServerData, 60000);
+
+function updateCountdown(){
+  const target = new Date(SENZANY_DATA.eventDate).getTime();
+  const now = Date.now();
+  const diff = target - now;
+  if(diff <= 0){
+    document.getElementById('countdown').innerHTML = '<div class="cd-block"><div class="cd-num">—</div><div class="cd-lab">Terminé</div></div>';
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+document.getElementById('burgerBtn').addEventListener('click', function(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+});
+</script>
+
+</body>
+</html>
