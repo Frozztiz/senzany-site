@@ -157,11 +157,11 @@ input:focus, textarea:focus{outline:1px solid var(--blood-bright);}
       <h2 class="section-title">Senzany aujourd'hui</h2>
     </div>
     <div class="grid-5">
-      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">1 247</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Membres Discord</div></div>
-      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">80/100</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Joueurs actifs</div></div>
-      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">25 861</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Messages échangés</div></div>
-      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">126</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Événements organisés</div></div>
-      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">98%</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Satisfaction</div></div>
+      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);" id="commDiscordFull">—</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Membres Discord</div></div>
+      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">32/50</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Joueurs actifs</div></div>
+      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">2 382</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Votes ce mois-ci</div></div>
+      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">18</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Avis joueurs</div></div>
+      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">N°1</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Classement PVE FR</div></div>
     </div>
   </div>
 </section>
@@ -223,6 +223,19 @@ input:focus, textarea:focus{outline:1px solid var(--blood-bright);}
 document.getElementById('burgerBtn').addEventListener('click', function(){
   document.getElementById('mobileMenu').classList.toggle('open');
 });
+
+async function fetchDiscordStats(){
+  try{
+    const res = await fetch("/api/discord/stats");
+    if(!res.ok) throw new Error("reponse non ok");
+    const data = await res.json();
+    document.getElementById("commDiscordFull").textContent = data.memberCount.toLocaleString("fr-FR");
+  } catch(err){
+    console.warn("Stats Discord indisponibles.", err);
+  }
+}
+fetchDiscordStats();
+setInterval(fetchDiscordStats, 120000);
 </script>
 
 </body>

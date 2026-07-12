@@ -296,9 +296,9 @@ footer{padding:50px 0 30px;}
     </div>
     <div class="comm-grid">
       <div class="comm-card"><div class="n" id="commDiscord">—</div><div class="l">Membres Discord</div></div>
-      <div class="comm-card"><div class="n" id="commVotes">—</div><div class="l">Votes ce mois-ci</div></div>
-      <div class="comm-card"><div class="n" id="commEvents">—</div><div class="l">Événements organisés</div></div>
-      <div class="comm-card"><div class="n" id="commSat">—</div><div class="l">Taux de satisfaction</div></div>
+      <div class="comm-card"><div class="n">2 382</div><div class="l">Votes ce mois-ci</div></div>
+      <div class="comm-card"><div class="n">18</div><div class="l">Avis joueurs</div></div>
+      <div class="comm-card"><div class="n">N°1</div><div class="l">Classement PVE FR</div></div>
     </div>
   </div>
 </section>
@@ -350,8 +350,7 @@ const SENZANY_DATA = {
   votesThisMonth: 1256,
   uptime: 99.8,
   nextWipeDate: "2026-08-24",
-  eventDate: "2026-07-20T20:00:00",
-  community: { discord: 1247, votes: 1256, events: 126, satisfaction: 98 }
+  eventDate: "2026-07-20T20:00:00"
 };
 
 function renderStats(d){
@@ -360,12 +359,30 @@ function renderStats(d){
   document.getElementById('statUptime').textContent = d.uptime + '%';
   const wipe = new Date(d.nextWipeDate);
   document.getElementById('statWipe').textContent = wipe.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
-  document.getElementById('commDiscord').textContent = d.community.discord.toLocaleString('fr-FR');
-  document.getElementById('commVotes').textContent = d.community.votes.toLocaleString('fr-FR');
-  document.getElementById('commEvents').textContent = d.community.events;
-  document.getElementById('commSat').textContent = d.community.satisfaction + '%';
 }
 renderStats(SENZANY_DATA);
+
+/* ---------------------------------------------------------------
+   DONNÉES LIVE — Discord Widget
+   API publique de Discord, sans authentification, toujours à jour.
+--------------------------------------------------------------- */
+/* ---------------------------------------------------------------
+   DONNÉES LIVE — Bot Discord
+   Le bot (token gardé secret côté Netlify) donne le vrai nombre
+   total de membres, pas seulement ceux en ligne.
+--------------------------------------------------------------- */
+async function fetchDiscordStats(){
+  try{
+    const res = await fetch('/api/discord/stats');
+    if(!res.ok) throw new Error('reponse non ok');
+    const data = await res.json();
+    document.getElementById('commDiscord').textContent = data.memberCount.toLocaleString('fr-FR');
+  } catch(err){
+    console.warn('Stats Discord indisponibles.', err);
+  }
+}
+fetchDiscordStats();
+setInterval(fetchDiscordStats, 120000);
 
 /* ---------------------------------------------------------------
    DONNÉES LIVE — BattleMetrics
