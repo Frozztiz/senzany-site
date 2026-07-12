@@ -1,0 +1,23 @@
+[build]
+  functions = "netlify/functions"
+  publish = "."
+
+[[redirects]]
+  from = "/api/steam/login"
+  to = "/.netlify/functions/steam-login"
+  status = 200
+
+[[redirects]]
+  from = "/api/steam/callback"
+  to = "/.netlify/functions/steam-callback"
+  status = 200
+
+[[redirects]]
+  from = "/api/steam/me"
+  to = "/.netlify/functions/steam-me"
+  status = 200
+
+[[redirects]]
+  from = "/api/steam/logout"
+  to = "/.netlify/functions/steam-logout"
+  status = 200
