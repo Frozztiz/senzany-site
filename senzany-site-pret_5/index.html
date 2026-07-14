@@ -385,36 +385,24 @@ fetchDiscordStats();
 setInterval(fetchDiscordStats, 120000);
 
 /* ---------------------------------------------------------------
-   DONNÉES LIVE — BattleMetrics
-   Le serveur Senzany est indexé sur BattleMetrics (ID 33855262).
-   On interroge leur API publique en direct depuis le navigateur.
-   Si ça échoue (CORS, API down, etc.), on garde les valeurs
-   statiques ci-dessus — aucune erreur visible pour le visiteur.
+   DONNÉES LIVE — Steam GetServerList
+   Interroge Steam en direct (via Netlify Function, clé gardée
+   secrète) pour le vrai nombre de joueurs sur le serveur DayZ.
 --------------------------------------------------------------- */
-const BATTLEMETRICS_SERVER_ID = "33855262";
-
 async function fetchLiveServerData(){
   try{
-    const res = await fetch(`https://api.battlemetrics.com/servers/${BATTLEMETRICS_SERVER_ID}`);
+    const res = await fetch('/api/game/stats');
     if(!res.ok) throw new Error('reponse non ok');
-    const json = await res.json();
-    const attrs = json.data.attributes;
-    SENZANY_DATA.players.current = attrs.players;
-    SENZANY_DATA.players.max = attrs.maxPlayers;
-    const isOnline = attrs.status === 'online';
-    document.getElementById('statPlayers').textContent = isOnline
-      ? (attrs.players + ' / ' + attrs.maxPlayers)
+    const data = await res.json();
+    document.getElementById('statPlayers').textContent = data.online
+      ? (data.players + ' / ' + data.maxPlayers)
       : 'Hors ligne';
   } catch(err){
-    /* API injoignable depuis ce navigateur (souvent un souci de CORS) :
-       on reste sur les valeurs statiques définies dans SENZANY_DATA. */
-    console.warn('Stats live BattleMetrics indisponibles, valeurs statiques utilisées.', err);
+    console.warn('Stats live indisponibles, valeurs statiques utilisées.', err);
   }
 }
-// Désactivé : la fiche BattleMetrics trouvée pour ce serveur est perimee (mauvaise IP).
-// Reactiver une fois le serveur "revendique" sur BattleMetrics avec la bonne fiche.
-// fetchLiveServerData();
-// setInterval(fetchLiveServerData, 60000);
+fetchLiveServerData();
+setInterval(fetchLiveServerData, 60000);
 
 function updateCountdown(){
   const target = new Date(SENZANY_DATA.eventDate).getTime();
