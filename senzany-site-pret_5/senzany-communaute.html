@@ -158,8 +158,8 @@ input:focus, textarea:focus{outline:1px solid var(--blood-bright);}
     </div>
     <div class="grid-5">
       <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);" id="commDiscordFull">—</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Membres Discord</div></div>
-      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">32/50</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Joueurs actifs</div></div>
-      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">2 382</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Votes ce mois-ci</div></div>
+      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);" id="commPlayers">—</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Joueurs actifs</div></div>
+      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">2 662</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Votes ce mois-ci</div></div>
       <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">18</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Avis joueurs</div></div>
       <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">N°1</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Classement PVE FR</div></div>
     </div>
@@ -236,6 +236,21 @@ async function fetchDiscordStats(){
 }
 fetchDiscordStats();
 setInterval(fetchDiscordStats, 120000);
+
+async function fetchGameStats(){
+  try{
+    const res = await fetch("/api/game/stats");
+    if(!res.ok) throw new Error("reponse non ok");
+    const data = await res.json();
+    document.getElementById("commPlayers").textContent = data.online
+      ? (data.players + "/" + data.maxPlayers)
+      : "Hors ligne";
+  } catch(err){
+    console.warn("Stats de jeu indisponibles.", err);
+  }
+}
+fetchGameStats();
+setInterval(fetchGameStats, 60000);
 </script>
 
 </body>

@@ -234,22 +234,20 @@ document.getElementById('copyIpBtn').addEventListener('click', function(){
   });
 });
 
-/* Stats live BattleMetrics (même serveur que la page d'accueil) */
+/* Stats live via Steam (Netlify Function, clé gardée secrète) */
 async function fetchLiveSlots(){
   try{
-    const res = await fetch('https://api.battlemetrics.com/servers/33855262');
+    const res = await fetch('/api/game/stats');
     if(!res.ok) throw new Error('reponse non ok');
-    const json = await res.json();
-    const attrs = json.data.attributes;
+    const data = await res.json();
     document.getElementById('slotsInfo').textContent =
-      attrs.status === 'online' ? (attrs.players + ' / ' + attrs.maxPlayers) : 'Hors ligne';
+      data.online ? (data.players + ' / ' + data.maxPlayers) : 'Hors ligne';
   } catch(err){
-    console.warn('Stats live BattleMetrics indisponibles, valeurs statiques utilisées.', err);
+    console.warn('Stats live indisponibles.', err);
   }
 }
-// Désactivé : la fiche BattleMetrics trouvée pour ce serveur est perimee (mauvaise IP).
-// fetchLiveSlots();
-// setInterval(fetchLiveSlots, 60000);
+fetchLiveSlots();
+setInterval(fetchLiveSlots, 60000);
 </script>
 
 </body>
