@@ -1,6 +1,11 @@
 [build]
   functions = "netlify/functions"
   publish = "."
+  
+[[redirects]]
+  from = "/api/topserveurs/stats"
+  to = "/.netlify/functions/topserveurs-stats"
+  status = 200
 
 [[redirects]]
   from = "/api/game/stats"
