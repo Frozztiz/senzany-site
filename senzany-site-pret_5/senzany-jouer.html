@@ -92,6 +92,16 @@ input, textarea{background:var(--panel-2); border:1px solid var(--line); color:v
 input:focus, textarea:focus{outline:1px solid var(--blood-bright);}
 
 
+
+/* VIDÉOS OFFICIELLES */
+.official-video{margin-top:24px;background:var(--panel);border:1px solid var(--line);overflow:hidden;}
+.official-video-frame{position:relative;aspect-ratio:16/9;background:#090808;}
+.official-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.official-video-body{padding:22px;}
+.official-video-kicker{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--blood-bright);margin-bottom:8px;}
+.official-video-title{font-family:'Anton',sans-serif;font-size:23px;letter-spacing:.025em;text-transform:uppercase;margin-bottom:9px;}
+.official-video-body p{color:var(--paper-dim);font-size:14px;line-height:1.65;margin-bottom:18px;}
+
 </style>
 </head>
 <body>
@@ -162,7 +172,18 @@ input:focus, textarea:focus{outline:1px solid var(--blood-bright);}
         <div class="section-tag">Vue d'ensemble</div>
         <h2 class="section-title" style="margin-bottom:20px;">Un serveur pensé pour l'immersion</h2>
         <p style="color:var(--paper-dim); font-size:14px; max-width:480px;">Senzany est un serveur PVE unique, pensé pour la survie, l'entraide et la découverte. Pas de combats entre joueurs — vos seuls ennemis sont les infectés, la faim et l'hiver.</p>
-        <button class="btn btn-solid" style="margin-top:20px;">Voir la vidéo de présentation</button>
+
+        <article class="official-video">
+          <div class="official-video-frame">
+            <iframe src="https://www.youtube-nocookie.com/embed/3Uf5WygzmrI" title="Les 1 an de Senzany" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+          <div class="official-video-body">
+            <div class="official-video-kicker">Vidéo officielle</div>
+            <h3 class="official-video-title">Les 1 an de Senzany</h3>
+            <p>Revivez une année d'aventure, d'événements et de moments forts vécus avec toute la communauté Senzany.</p>
+            <a class="btn btn-solid btn-sm" href="https://www.youtube.com/watch?v=3Uf5WygzmrI" target="_blank" rel="noopener">Regarder sur YouTube</a>
+          </div>
+        </article>
       </div>
     </div>
   </div>
