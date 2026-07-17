@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Événements — SENZANY</title>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+:root{
+  --bg:#0a0908; --panel:rgba(20,17,16,0.9); --panel-2:rgba(28,23,22,0.9); --panel-3:rgba(36,29,27,0.9);
+  --paper:#ece5da; --paper-dim:#928a80;
+  --blood:#8c1f1f; --blood-bright:#d1272c; --line:#2a2220;
+  --green:#3f8c4a; --amber:#b8862f; --blue:#3a6f9c; --purple:#6a4f9c;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background-color:var(--bg); background-image:url('hero-bg.jpg'); background-size:cover; background-position:65% 35%; background-attachment:fixed; background-repeat:no-repeat; color:var(--paper); font-family:'Oswald',sans-serif; font-weight:300; line-height:1.6;}
+@media (max-width:900px){ body{background-attachment:scroll;} }
+a{color:inherit; text-decoration:none;}
+.wrap{max-width:1240px; margin:0 auto; padding:0 24px;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+button{font-family:inherit;}
+
+header{position:sticky; top:0; z-index:100; background:rgba(10,9,8,0.95); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+nav.wrap{display:flex; align-items:center; justify-content:space-between; height:72px;}
+.brand{display:flex; align-items:center; gap:12px;}
+.badge{width:42px; height:42px; border-radius:50%; object-fit:contain; flex-shrink:0; filter:drop-shadow(0 0 5px rgba(0,0,0,0.6));}
+.brand-name{font-family:'Anton',sans-serif; font-size:21px; letter-spacing:0.05em;}
+.navlinks{display:flex; gap:24px; font-size:13.5px; letter-spacing:0.045em; text-transform:uppercase; font-weight:500;}
+.navlinks a{color:var(--paper-dim); padding:4px 0; border-bottom:2px solid transparent; white-space:nowrap;}
+.navlinks a:hover, .navlinks a.active{color:var(--paper); border-color:var(--blood-bright);}
+.nav-right{display:flex; align-items:center; gap:16px;}
+.btn-join{background:var(--blood); color:var(--paper); font-weight:600; font-size:13.5px; letter-spacing:0.05em; text-transform:uppercase; padding:11px 20px; border:none; cursor:pointer; white-space:nowrap;}
+.btn-join:hover{background:var(--blood-bright);}
+.burger{display:none; background:none; border:1px solid var(--line); color:var(--paper); width:38px; height:38px; font-size:18px; cursor:pointer;}
+.mobile-menu{display:none; flex-direction:column; padding:16px 24px; border-bottom:1px solid var(--line); background:var(--panel);}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{padding:10px 0; font-size:14.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--paper-dim); border-bottom:1px solid var(--line);}
+@media (max-width:1100px){ .navlinks{display:none;} .burger{display:block;} }
+
+.page-header{position:relative; overflow:hidden; height:56vh; min-height:380px; border-bottom:1px solid var(--line); display:flex; align-items:flex-end; background-image:url('hero-bg.jpg'); background-size:cover; background-position:65% 35%; background-attachment:fixed;}
+@media (max-width:900px){.page-header{background-attachment:scroll;}}
+.page-header::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,9,8,0.15) 0%, rgba(10,9,8,0.55) 55%, rgba(10,9,8,0.96) 100%); z-index:1;}
+.page-header .wrap{position:relative; z-index:2; padding-bottom:44px; padding-top:40px;}
+.page-tag{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--blood-bright); margin-bottom:10px;}
+.page-title{font-family:'Anton',sans-serif; font-size:clamp(32px,5.2vw,50px); letter-spacing:0.01em; text-transform:uppercase;}
+.page-sub{color:var(--paper-dim); font-size:15.5px; margin-top:10px; max-width:560px; font-weight:300;}
+
+.layout{display:grid; grid-template-columns:1fr; gap:0;}
+section{padding:56px 0; border-bottom:1px solid var(--line);}
+.section-tag{font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--blood-bright); margin-bottom:10px;}
+.section-title{font-family:'Anton',sans-serif; font-size:clamp(26px,3.6vw,34px); letter-spacing:0.015em; text-transform:uppercase;}
+.section-head{margin-bottom:32px; max-width:600px;}
+
+.card{background:var(--panel); border:1px solid var(--line); padding:24px;}
+.card h3{font-family:'Anton',sans-serif; font-size:19px; letter-spacing:0.025em; text-transform:uppercase; margin-bottom:8px;}
+.card p{font-size:14.5px; color:var(--paper-dim); font-weight:300;}
+
+.grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:16px;}
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+.grid-4{display:grid; grid-template-columns:repeat(4,1fr); gap:16px;}
+.grid-5{display:grid; grid-template-columns:repeat(5,1fr); gap:14px;}
+@media (max-width:900px){ .grid-3,.grid-4,.grid-5{grid-template-columns:repeat(2,1fr);} }
+@media (max-width:560px){ .grid-2,.grid-3,.grid-4,.grid-5{grid-template-columns:1fr;} }
+
+.btn{display:inline-block; font-weight:600; font-size:13.5px; letter-spacing:0.05em; text-transform:uppercase; padding:12px 22px; border:1px solid var(--blood); cursor:pointer; background:transparent; color:var(--paper);}
+.btn-solid{background:var(--blood); border-color:var(--blood);}
+.btn-solid:hover{background:var(--blood-bright);}
+.btn:hover{border-color:var(--blood-bright); color:var(--paper);}
+.btn-sm{padding:8px 16px; font-size:12.5px;}
+
+.pill{display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.06em; text-transform:uppercase; padding:4px 10px; border:1px solid var(--line); color:var(--paper-dim);}
+.pill.ok{color:#8fd19e; border-color:#2f5c38;}
+.pill.warn{color:#e0b45a; border-color:#6b4f1e;}
+.pill.new{background:var(--blood); color:var(--paper); border-color:var(--blood);}
+
+.stat-row{display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line); font-size:14.5px;}
+.stat-row:last-child{border-bottom:none;}
+.stat-row span:first-child{color:var(--paper-dim);}
+
+footer{padding:50px 0 30px;}
+.footer-grid{display:flex; justify-content:space-between; flex-wrap:wrap; gap:30px; padding-bottom:30px; border-bottom:1px solid var(--line);}
+.footer-brand p{color:var(--paper-dim); font-size:14px; max-width:260px; margin-top:10px; font-weight:300;}
+.footer-links{display:flex; gap:50px; flex-wrap:wrap;}
+.footer-col h4{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.13em; text-transform:uppercase; color:var(--paper-dim); margin-bottom:12px;}
+.footer-col a{display:block; font-size:14.5px; margin-bottom:8px; opacity:0.9;}
+.footer-col a:hover{color:var(--blood-bright);}
+.footer-bottom{padding-top:20px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--paper-dim);}
+::selection{background:var(--blood); color:var(--paper);}
+input, textarea{background:var(--panel-2); border:1px solid var(--line); color:var(--paper); font-family:'Oswald',sans-serif; padding:10px 12px; font-size:13px;}
+input:focus, textarea:focus{outline:1px solid var(--blood-bright);}
+
+
+</style>
+</head>
+<body>
+<header>
+  <nav class="wrap">
+    <div class="brand">
+      <img class="badge" src="logo.png" alt="Senzany">
+      <div class="brand-name">SENZANY</div>
+    </div>
+    <div class="navlinks">
+      <a href="index.html">Accueil</a>
+      <a href="senzany-jouer.html">Jouer</a>
+      <a href="senzany-communaute.html">Communauté</a>
+      <a href="senzany-wiki.html">Wiki</a>
+      <a href="senzany-evenements.html" class="active">Événements</a>
+      <a href="senzany-boutique.html">Boutique</a>
+      <a href="senzany-support.html">Support</a>
+      <a href="senzany-profil.html">Mon profil</a>
+    </div>
+    <div class="nav-right">
+      <button class="btn-join">Rejoindre le serveur</button>
+      <button class="burger" id="burgerBtn" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Accueil</a>
+    <a href="senzany-jouer.html">Jouer</a>
+    <a href="senzany-communaute.html">Communauté</a>
+    <a href="senzany-wiki.html">Wiki</a>
+    <a href="senzany-evenements.html">Événements</a>
+    <a href="senzany-boutique.html">Boutique</a>
+    <a href="senzany-support.html">Support</a>
+    <a href="senzany-profil.html">Mon profil</a>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="wrap">
+    <div class="page-tag">Ne manquez rien</div>
+    <h1 class="page-title">Événements</h1>
+    <p class="page-sub">Calendrier, inscriptions et suivi de vos participations, en un seul endroit.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="card" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+      <div>
+        <div class="pill new">Événement majeur</div>
+        <h2 style="font-family:'Anton',sans-serif; text-transform:uppercase; font-size:26px; margin:12px 0;">Course de voitures — Grand Prix Senzany</h2>
+        <p style="color:var(--paper-dim); font-size:13px;">Dimanche 20 juillet 2026 · 20h00 · Affrontez les meilleurs pilotes de Chernarus.</p>
+        <button class="btn btn-solid" style="margin-top:16px;">Voir détails</button>
+      </div>
+      <div>
+        <div class="stat-row"><span>Participants</span><span>42 / 60</span></div>
+        <div class="stat-row"><span>Inscription</span><span style="color:var(--blood-bright)">Ouverte</span></div>
+        <div class="stat-row"><span>Récompenses</span><span>Véhicule, armes, coins</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Agenda</div>
+      <h2 class="section-title">Prochains événements</h2>
+    </div>
+    <div class="grid-4">
+      <div class="card"><div class="pill">Communauté</div><h3 style="margin-top:10px;">Raid sur base fortifiée</h3><p>26 juillet · 20h00</p><div class="pill" style="margin-top:8px;">24/80 inscrits</div></div>
+      <div class="card"><div class="pill">Saisonnier</div><h3 style="margin-top:10px;">Airdrop géant</h3><p>2 août · 18h00</p><div class="pill" style="margin-top:8px;">36/70 inscrits</div></div>
+      <div class="card"><div class="pill">Spécial</div><h3 style="margin-top:10px;">Tournoi de pétanque</h3><p>9 août · 15h00</p><div class="pill" style="margin-top:8px;">16/32 inscrits</div></div>
+      <div class="card"><div class="pill warn">Bientôt</div><h3 style="margin-top:10px;">Nuit des survivants</h3><p>16 août · 21h00</p><div class="pill" style="margin-top:8px;">Verrouillé</div></div>
+    </div>
+  </div>
+</section>
+
+<section style="border-bottom:none;">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Votre suivi</div>
+      <h2 class="section-title">Mes participations</h2>
+    </div>
+    <div class="card" style="padding:0;">
+      <div class="stat-row" style="padding:16px 24px;"><span>Course de voitures — 20/07</span><span class="pill ok">Inscrit</span></div>
+      <div class="stat-row" style="padding:16px 24px;"><span>Airdrop géant — 05/07</span><span class="pill">Participé</span></div>
+      <div class="stat-row" style="padding:16px 24px;"><span>Tournoi pétanque — 15/06</span><span class="pill ok">2ème place</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="brand"><img class="badge" style="width:34px;height:34px;font-size:13px;" src="logo.png" alt="Senzany"><div class="brand-name" style="font-size:17px;">SENZANY</div></div>
+        <p>Serveur PVE DayZ sur Chernarus. Communauté 100% française.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col"><h4>Liens utiles</h4><a href="index.html">Accueil</a><a href="senzany-wiki.html">Wiki</a><a href="senzany-evenements.html">Événements</a><a href="senzany-boutique.html">Boutique</a><a href="senzany-support.html">Support</a></div>
+        <div class="footer-col"><h4>Informations</h4><a href="#">Règlement</a><a href="#">Conditions d'utilisation</a><a href="#">Politique de confidentialité</a></div>
+        <div class="footer-col"><h4>Nous contacter</h4><a href="mailto:support@senzany.com">support@senzany.com</a><a href="https://discord.gg/aJ2eGmqAQv" target="_blank" rel="noopener">Discord</a></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Senzany. Serveur communautaire non affilié à Bohemia Interactive.</span>
+      <span>IP : 208.115.196.109:2302</span>
+    </div>
+  </div>
+</footer>
+<script>
+document.getElementById('burgerBtn').addEventListener('click', function(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+});
+</script>
+
+</body>
+</html>
