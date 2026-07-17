@@ -93,14 +93,18 @@ input:focus, textarea:focus{outline:1px solid var(--blood-bright);}
 
 
 
-/* VIDÉOS OFFICIELLES */
-.official-video{margin-top:24px;background:var(--panel);border:1px solid var(--line);overflow:hidden;}
-.official-video-frame{position:relative;aspect-ratio:16/9;background:#090808;}
-.official-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
-.official-video-body{padding:22px;}
-.official-video-kicker{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--blood-bright);margin-bottom:8px;}
-.official-video-title{font-family:'Anton',sans-serif;font-size:23px;letter-spacing:.025em;text-transform:uppercase;margin-bottom:9px;}
-.official-video-body p{color:var(--paper-dim);font-size:14px;line-height:1.65;margin-bottom:18px;}
+/* === PAGE JOUER VALIDÉE === */
+.join-layout{display:grid;grid-template-columns:1.35fr .85fr;gap:20px;align-items:stretch;}
+.server-panel,.join-reasons,.steps-panel,.official-video{background:rgba(15,13,12,.94);border:1px solid var(--line);padding:24px;}
+.server-panel{border-top-color:var(--blood-bright);}
+.info-line{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}.info-line:last-child{border-bottom:0}.info-line span:first-child{color:var(--paper-dim);text-transform:uppercase;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.04em}
+.join-reasons h3,.steps-panel h3,.official-video h3{font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:.02em;}
+.reason{display:grid;grid-template-columns:42px 1fr;gap:12px;margin-top:20px}.reason-icon{font-size:28px;color:var(--blood-bright);text-align:center}.reason h4{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:16px}.reason p{color:var(--paper-dim);font-size:13px;margin-top:3px}
+.steps-panel{margin-top:20px;background:linear-gradient(rgba(15,13,12,.92),rgba(15,13,12,.92)),url('dayz-update-129.jpg') center/cover;}
+.join-step{display:flex;gap:12px;align-items:center;margin-top:12px;font-size:14px}.step-num{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--blood-bright);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;flex:0 0 auto}
+.video-section{padding-top:10px;}.official-video{display:grid;grid-template-columns:1.35fr .75fr;gap:24px;border-top-color:var(--blood-bright)}
+.video-frame{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000}.video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.video-copy{display:flex;flex-direction:column;justify-content:center}.video-copy h3{font-size:27px}.video-copy p{color:var(--paper-dim);font-size:14px;margin-top:10px}.video-list{list-style:none;margin:16px 0}.video-list li{margin:8px 0;font-size:13px}.video-list li:before{content:'✓';color:var(--blood-bright);margin-right:9px;font-weight:700}
+@media(max-width:850px){.join-layout,.official-video{grid-template-columns:1fr}.page-header{padding-top:60px}}
 
 </style>
 </head>
@@ -141,81 +145,62 @@ input:focus, textarea:focus{outline:1px solid var(--blood-bright);}
 <div class="page-header">
   <div class="wrap">
     <div class="page-tag">Rejoindre l'aventure</div>
-    <h1 class="page-title">Comment jouer</h1>
-    <p class="page-sub">Tout ce dont vous avez besoin pour installer DayZ et rejoindre Senzany en quelques minutes.</p>
+    <h1 class="page-title">Rejoignez Senzany</h1>
+    <p class="page-sub">Senzany est un serveur PVE unique, pensé pour la survie, l’entraide et la découverte. Pas de combats entre joueurs : vos seuls ennemis sont les infectés, la faim et l’hiver.</p>
   </div>
 </div>
 
 <section>
-  <div class="wrap">
-    <div class="grid-2" style="align-items:start; gap:32px;">
-      <div>
-        <div class="section-tag">Informations serveur</div>
-        <h2 class="section-title" style="margin-bottom:20px;">Connexion directe</h2>
-        <div class="card">
-          <div class="stat-row"><span>IP du serveur</span><span class="mono" id="serverIp">208.115.196.109:2302</span></div>
-          <div class="stat-row"><span>Mode</span><span>PVE</span></div>
-          <div class="stat-row"><span>Carte</span><span>Chernarusplus</span></div>
-          <div class="stat-row"><span>Slots</span><span id="slotsInfo">32 / 50</span></div>
-          <div class="stat-row"><span>Wipe</span><span>Tous les 3 mois</span></div>
-          <div class="stat-row"><span>Uptime</span><span id="uptimeInfo">99.8%</span></div>
-          <button class="btn btn-solid btn-sm" style="margin-top:16px;" id="copyIpBtn">Copier l'IP</button>
-          <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--line);">
-            <div class="mono" style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--paper-dim); margin-bottom:10px;">Statut en direct — Top-Serveurs</div>
-            <a href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" target="_blank" rel="noopener">
-              <img src="https://cdn.top-serveurs.net/banners/6972ba2576379.gif" alt="Banniere live Senzany" style="max-width:100%; height:auto; border:1px solid var(--line);">
-            </a>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div class="section-tag">Vue d'ensemble</div>
-        <h2 class="section-title" style="margin-bottom:20px;">Un serveur pensé pour l'immersion</h2>
-        <p style="color:var(--paper-dim); font-size:14px; max-width:480px;">Senzany est un serveur PVE unique, pensé pour la survie, l'entraide et la découverte. Pas de combats entre joueurs — vos seuls ennemis sont les infectés, la faim et l'hiver.</p>
-
-        <article class="official-video">
-          <div class="official-video-frame">
-            <iframe src="https://www.youtube-nocookie.com/embed/3Uf5WygzmrI" title="Les 1 an de Senzany" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-          </div>
-          <div class="official-video-body">
-            <div class="official-video-kicker">Vidéo officielle</div>
-            <h3 class="official-video-title">Les 1 an de Senzany</h3>
-            <p>Revivez une année d'aventure, d'événements et de moments forts vécus avec toute la communauté Senzany.</p>
-            <a class="btn btn-solid btn-sm" href="https://www.youtube.com/watch?v=3Uf5WygzmrI" target="_blank" rel="noopener">Regarder sur YouTube</a>
-          </div>
-        </article>
-      </div>
+ <div class="wrap">
+  <div class="join-layout">
+   <div>
+    <div class="server-panel">
+      <div class="section-tag">Informations du serveur</div>
+      <h2 class="section-title" style="font-size:30px;margin-bottom:10px;">Connexion directe</h2>
+      <div class="info-line"><span>IP du serveur</span><strong class="mono" id="serverIp">208.115.196.109:2302</strong></div>
+      <div class="info-line"><span>Mode de jeu</span><strong>PVE</strong></div>
+      <div class="info-line"><span>Carte</span><strong>Chernarusplus</strong></div>
+      <div class="info-line"><span>Slots</span><strong id="slotsInfo">26 / 50</strong></div>
+      <div class="info-line"><span>Prochain wipe</span><strong>21/07</strong></div>
+      <div class="info-line"><span>Fréquence des wipes</span><strong>Tous les 3 mois</strong></div>
+      <div class="info-line"><span>Uptime</span><strong>99.8%</strong></div>
+      <button class="btn btn-solid btn-sm" style="margin-top:18px;" id="copyIpBtn">Copier l'IP</button>
     </div>
+    <div class="steps-panel">
+      <div class="section-tag">Comment nous rejoindre ?</div>
+      <div class="join-step"><span class="step-num">1</span><span>Lancez DayZ.</span></div>
+      <div class="join-step"><span class="step-num">2</span><span>Allez dans l’onglet Multijoueur.</span></div>
+      <div class="join-step"><span class="step-num">3</span><span>Recherchez « Senzany » dans la liste.</span></div>
+      <div class="join-step"><span class="step-num">4</span><span>Cliquez sur Rejoindre et suivez les instructions.</span></div>
+    </div>
+   </div>
+   <aside class="join-reasons">
+      <h3>Pourquoi nous rejoindre ?</h3>
+      <div class="reason"><div class="reason-icon">♨</div><div><h4>Expérience PVE unique</h4><p>Un monde sans joueurs ennemis, axé sur la survie et l’immersion.</p></div></div>
+      <div class="reason"><div class="reason-icon">◉</div><div><h4>Économie avancée</h4><p>Traders, véhicules, coffres-forts et système économique complet.</p></div></div>
+      <div class="reason"><div class="reason-icon">◆</div><div><h4>Événements réguliers</h4><p>Des événements immersifs organisés par notre équipe.</p></div></div>
+      <div class="reason"><div class="reason-icon">●</div><div><h4>Communauté active</h4><p>Une communauté mature, entraide et 100 % française.</p></div></div>
+      <div class="reason"><div class="reason-icon">★</div><div><h4>Staff réactif</h4><p>Une équipe présente et à l’écoute pour vous accompagner.</p></div></div>
+   </aside>
   </div>
+ </div>
 </section>
-
-<section>
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">Parcours joueur</div>
-      <h2 class="section-title">Étapes pour rejoindre le serveur</h2>
-    </div>
-    <div class="grid-5">
-      <div class="card"><div class="mono" style="color:var(--blood-bright); font-size:12px; margin-bottom:8px;">01</div><h3>Télécharger DayZ</h3><p>Achetez et téléchargez DayZ sur Steam.</p></div>
-      <div class="card"><div class="mono" style="color:var(--blood-bright); font-size:12px; margin-bottom:8px;">02</div><h3>Installer DZSA Launcher</h3><p>Téléchargez et installez DZSA Launcher.</p></div>
-      <div class="card"><div class="mono" style="color:var(--blood-bright); font-size:12px; margin-bottom:8px;">03</div><h3>Ajouter le serveur</h3><p>Ajoutez l'IP du serveur dans l'onglet Serveurs.</p></div>
-      <div class="card"><div class="mono" style="color:var(--blood-bright); font-size:12px; margin-bottom:8px;">04</div><h3>Télécharger les mods</h3><p>Lancez le téléchargement des mods nécessaires.</p></div>
-      <div class="card"><div class="mono" style="color:var(--blood-bright); font-size:12px; margin-bottom:8px;">05</div><h3>Rejoindre</h3><p>Cliquez sur Rejoindre et entrez en jeu.</p></div>
-    </div>
+<section class="video-section">
+ <div class="wrap">
+  <div class="official-video">
+   <div>
+    <div class="section-tag">Vidéos officielles</div>
+    <div class="video-frame"><iframe src="https://www.youtube.com/embed/3Uf5WygzmrI" title="Les 1 an de Senzany" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+   </div>
+   <div class="video-copy">
+    <h3>Les 1 an de Senzany</h3>
+    <p>Revivez une année d’aventure, d’événements et de moments forts vécus avec toute la communauté Senzany.</p>
+    <ul class="video-list"><li>Les plus beaux événements</li><li>Les meilleurs moments de la communauté</li><li>Des rencontres inoubliables</li><li>Et bien plus encore…</li></ul>
+    <a class="btn btn-solid" href="https://www.youtube.com/watch?v=3Uf5WygzmrI" target="_blank" rel="noopener">Regarder sur YouTube ↗</a>
+   </div>
   </div>
+ </div>
 </section>
-
-<section>
-  <div class="wrap">
-    <div class="grid-4">
-      <div class="card"><h3>Liste des mods</h3><p>Le serveur utilise des mods pour une expérience unique et optimisée.</p><button class="btn btn-sm" style="margin-top:12px;">Voir la liste</button></div>
-      <div class="card"><h3>Tutoriels vidéo</h3><p>Des guides pas à pas pour vous accompagner à chaque étape.</p><button class="btn btn-sm" style="margin-top:12px;">Voir les tutoriels</button></div>
-      <div class="card"><h3>Configuration minimale</h3><p>Windows 10 64-bit · i5-6600K / Ryzen 5 1600 · 16 Go RAM · GTX 1060 · 25 Go libres</p></div>
-      <div class="card"><h3>FAQ connexion</h3><p>Un problème de connexion ? Retrouvez les réponses aux questions fréquentes.</p><button class="btn btn-sm" style="margin-top:12px;">Voir la FAQ</button></div>
-    </div>
-  </div>
-</section>
-
 <section style="border-bottom:none;">
   <div class="wrap" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; background:var(--panel); border:1px solid var(--blood); padding:24px 32px;">
     <div>
