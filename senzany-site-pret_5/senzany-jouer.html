@@ -38,7 +38,10 @@ nav.wrap{display:flex; align-items:center; justify-content:space-between; height
 .mobile-menu a{padding:10px 0; font-size:14.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--paper-dim); border-bottom:1px solid var(--line);}
 @media (max-width:1100px){ .navlinks{display:none;} .burger{display:block;} }
 
-.page-header{padding:40px 0 32px; border-bottom:1px solid var(--line); background:var(--panel);}
+.page-header{position:relative; overflow:hidden; padding:70px 0 48px; border-bottom:1px solid var(--line); background:var(--panel); min-height:200px; display:flex; align-items:center;}
+.page-header-bg{position:absolute; top:0; left:0; width:100%; height:calc(100% + 80px); object-fit:cover; object-position:65% 35%; z-index:0; will-change:transform;}
+.page-header::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,9,8,0.6) 0%, rgba(10,9,8,0.8) 100%); z-index:1;}
+.page-header .wrap{position:relative; z-index:2;}
 .page-tag{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--blood-bright); margin-bottom:10px;}
 .page-title{font-family:'Anton',sans-serif; font-size:clamp(32px,5.2vw,50px); letter-spacing:0.01em; text-transform:uppercase;}
 .page-sub{color:var(--paper-dim); font-size:15.5px; margin-top:10px; max-width:560px; font-weight:300;}
@@ -125,6 +128,7 @@ input:focus, textarea:focus{outline:1px solid var(--blood-bright);}
 </header>
 
 <div class="page-header">
+  <img class="page-header-bg" src="hero-bg.jpg" alt="" aria-hidden="true">
   <div class="wrap">
     <div class="page-tag">Rejoindre l'aventure</div>
     <h1 class="page-title">Comment jouer</h1>
@@ -221,6 +225,23 @@ input:focus, textarea:focus{outline:1px solid var(--blood-bright);}
   </div>
 </footer>
 <script>
+(function(){
+  var bg = document.querySelector('.page-header-bg');
+  var header = document.querySelector('.page-header');
+  if(!bg || !header) return;
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var maxShift = 40;
+  function update(){
+    var h = header.offsetHeight || 1;
+    var scrolled = window.scrollY || window.pageYOffset || 0;
+    var progress = Math.min(Math.max(scrolled / h, 0), 1);
+    bg.style.transform = 'translateY(' + (-progress * maxShift) + 'px)';
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  window.addEventListener('resize', update);
+  update();
+})();
+
 document.getElementById('burgerBtn').addEventListener('click', function(){
   document.getElementById('mobileMenu').classList.toggle('open');
 });
