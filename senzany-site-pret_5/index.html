@@ -86,7 +86,8 @@ section{padding:72px 0;}
 /* POURQUOI */
 .why-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
 .why-card{background:var(--panel); padding:28px 22px;}
-.why-icon{width:34px; height:34px; border:1px solid var(--blood); display:flex; align-items:center; justify-content:center; color:var(--blood-bright); margin-bottom:16px;}
+.why-icon{width:38px; height:38px; display:flex; align-items:center; justify-content:center; color:var(--paper); margin-bottom:16px;}
+.why-icon svg{width:34px;height:34px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 2px 4px rgba(0,0,0,.85));}
 .why-card h3{font-family:'Anton',sans-serif; font-size:19px; letter-spacing:0.025em; text-transform:uppercase; margin-bottom:8px; text-shadow:0 2px 3px rgba(0,0,0,1),0 0 8px rgba(0,0,0,.9);}
 .why-card p{font-size:14.5px; color:var(--paper-dim); font-weight:300;}
 @media (max-width:800px){.why-grid{grid-template-columns:repeat(2,1fr);}}
@@ -213,10 +214,10 @@ footer{padding:50px 0 30px; background:#070606; border-top:1px solid var(--line)
       <h2 class="section-title">Ce qui nous différencie</h2>
     </div>
     <div class="why-grid">
-      <div class="why-card"><div class="why-icon">◆</div><h3>Volcan exclusif</h3><p>Un volcan actif créé spécialement pour Senzany, entouré de dangers et de trésors à découvrir.</p></div>
-      <div class="why-card"><div class="why-icon">▲</div><h3>Bunkers & airdrops</h3><p>Bunkers secrets et largages aériens protégés par des hordes d'infectés, pour les plus téméraires.</p></div>
-      <div class="why-card"><div class="why-icon">●</div><h3>Économie complète</h3><p>Traders, plus de 80 véhicules et coffres verrouillés à débloquer : une vraie économie de survie.</p></div>
-      <div class="why-card"><div class="why-icon">■</div><h3>Staff & communauté actifs</h3><p>Événements réguliers, staff réactif et accompagnement des nouveaux survivants dès leur arrivée.</p></div>
+      <div class="why-card"><div class="why-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M5 39h38L31 19l-5 8-5-13z"/><path d="M21 14l4 6 4-5"/><path d="M24 8c-2-3 1-5 0-7M30 10c3-3 1-6 3-8"/></svg></div><h3>Volcan exclusif</h3><p>Un volcan actif créé spécialement pour Senzany, entouré de dangers et de trésors à découvrir.</p></div>
+      <div class="why-card"><div class="why-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 39V22l16-10 16 10v17"/><path d="M14 39V25h20v14M20 39V29h8v10"/><path d="M6 39h36"/></svg></div><h3>Bunkers & airdrops</h3><p>Bunkers secrets et largages aériens protégés par des hordes d'infectés, pour les plus téméraires.</p></div>
+      <div class="why-card"><div class="why-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="18" cy="14" rx="10" ry="4"/><path d="M8 14v8c0 2 4 4 10 4s10-2 10-4v-8M8 22v8c0 2 4 4 10 4 2 0 4-.2 6-.8"/><ellipse cx="33" cy="29" rx="9" ry="4"/><path d="M24 29v8c0 2 4 4 9 4s9-2 9-4v-8"/></svg></div><h3>Économie complète</h3><p>Traders, plus de 80 véhicules et coffres verrouillés à débloquer : une vraie économie de survie.</p></div>
+      <div class="why-card"><div class="why-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="16" r="6"/><circle cx="11" cy="20" r="4"/><circle cx="37" cy="20" r="4"/><path d="M14 39v-5c0-5 4-9 10-9s10 4 10 9v5M3 39v-4c0-4 3-7 8-7 2 0 4 .6 5 1.7M45 39v-4c0-4-3-7-8-7-2 0-4 .6-5 1.7"/></svg></div><h3>Staff & communauté actifs</h3><p>Événements réguliers, staff réactif et accompagnement des nouveaux survivants dès leur arrivée.</p></div>
     </div>
     <div style="margin-top:16px; background:var(--panel); border:1px solid var(--line); padding:20px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
       <div style="flex-shrink:0; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:#8fd19e; border:1px solid #2f5c38; padding:4px 10px;">✓ Officiel</div>
@@ -235,7 +236,7 @@ footer{padding:50px 0 30px; background:#070606; border-top:1px solid var(--line)
     <div class="why-grid" style="grid-template-columns:repeat(2,1fr);">
       <div class="why-card">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-          <div class="why-icon" style="margin-bottom:0;">◆</div>
+          <div class="why-icon" style="margin-bottom:0;"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="12" width="28" height="24" rx="4"/><circle cx="19" cy="24" r="2"/><circle cx="29" cy="24" r="2"/><path d="M18 31h12M24 12V7M20 7h8M6 20h4M38 20h4M6 29h4M38 29h4"/></svg></div>
           <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; background:var(--blood); color:var(--paper); padding:4px 10px;">Bientôt</div>
         </div>
         <h3>IA & PNJ interactifs</h3>
@@ -243,7 +244,7 @@ footer{padding:50px 0 30px; background:#070606; border-top:1px solid var(--line)
       </div>
       <div class="why-card">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-          <div class="why-icon" style="margin-bottom:0;">▲</div>
+          <div class="why-icon" style="margin-bottom:0;"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5l14 6v10c0 9-5 17-14 22C15 38 10 30 10 21V11z"/><path d="M24 13l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg></div>
           <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; background:var(--blood); color:var(--paper); padding:4px 10px;">Bientôt</div>
         </div>
         <h3>Battle Pass saisonnier</h3>
@@ -305,36 +306,6 @@ footer{padding:50px 0 30px; background:#070606; border-top:1px solid var(--line)
   </div>
 </section>
 
-<section id="communaute">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">Rejoignez-nous</div>
-      <h2 class="section-title">Notre communauté</h2>
-    </div>
-    <div class="comm-grid">
-      <div class="comm-card"><div class="n" id="commDiscord">—</div><div class="l">Membres Discord</div></div>
-      <div class="comm-card"><div class="n" id="commVotes">—</div><div class="l">Votes ce mois-ci</div></div>
-      <div class="comm-card"><div class="n" id="commAvis">—</div><div class="l">Avis joueurs</div></div>
-      <div class="comm-card"><div class="n">N°1</div><div class="l">Classement PVE FR</div></div>
-    </div>
-  </div>
-</section>
-
-<section id="acces" style="border-bottom:none;">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">Accès rapides</div>
-      <h2 class="section-title">Tout ce dont vous avez besoin</h2>
-    </div>
-    <div class="quick-grid">
-      <a class="quick-card" href="senzany-wiki.html"><div class="qi">📖</div><h4>Wiki</h4></a>
-      <a class="quick-card" href="senzany-boutique.html"><div class="qi">🛒</div><h4>Boutique</h4></a>
-      <a class="quick-card" href="senzany-support.html"><div class="qi">🎧</div><h4>Support</h4></a>
-      <a class="quick-card" href="senzany-communaute.html"><div class="qi">★</div><h4>Voter</h4></a>
-    </div>
-  </div>
-</section>
-
 <footer>
   <div class="wrap">
     <div class="footer-grid">
@@ -391,7 +362,8 @@ async function fetchDiscordStats(){
     const res = await fetch('/api/discord/stats');
     if(!res.ok) throw new Error('reponse non ok');
     const data = await res.json();
-    document.getElementById('commDiscord').textContent = data.memberCount.toLocaleString('fr-FR');
+    const commDiscord = document.getElementById('commDiscord');
+    if(commDiscord) commDiscord.textContent = data.memberCount.toLocaleString('fr-FR');
   } catch(err){
     console.warn('Stats Discord indisponibles.', err);
   }
@@ -405,9 +377,11 @@ async function fetchTopServeursStats(){
     if(!res.ok) throw new Error('reponse non ok');
     const data = await res.json();
     document.getElementById('statVotes').textContent = data.monthlyVotes.toLocaleString('fr-FR');
-    document.getElementById('commVotes').textContent = data.monthlyVotes.toLocaleString('fr-FR');
+    const commVotes = document.getElementById('commVotes');
+    if(commVotes) commVotes.textContent = data.monthlyVotes.toLocaleString('fr-FR');
     if(data.avicesCount !== null){
-      document.getElementById('commAvis').textContent = data.avicesCount;
+      const commAvis = document.getElementById('commAvis');
+      if(commAvis) commAvis.textContent = data.avicesCount;
     }
   } catch(err){
     console.warn('Stats Top-Serveurs indisponibles.', err);
