@@ -68,12 +68,13 @@ nav.wrap{display:flex; align-items:center; justify-content:space-between; height
 
 /* STATS BAR */
 .statsbar{background:var(--panel); border-bottom:1px solid var(--line);}
-.statsbar .wrap{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line);}
+.statsbar .wrap{display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--line);}
 .statitem{background:var(--panel); padding:20px 24px; text-align:left;}
 .statitem .lab{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--paper-dim);}
 .statitem .val{font-family:'Anton',sans-serif; font-size:26px; margin-top:6px;}
 .statitem .val.live{color:var(--blood-bright);}
-@media (max-width:700px){.statsbar .wrap{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:900px){.statsbar .wrap{grid-template-columns:repeat(3,1fr);}}
+@media (max-width:560px){.statsbar .wrap{grid-template-columns:repeat(2,1fr);}}
 
 /* SECTION SHARED */
 section{padding:72px 0; border-bottom:1px solid var(--line);}
@@ -190,8 +191,9 @@ footer{padding:50px 0 30px;}
 <div class="statsbar">
   <div class="wrap">
     <div class="statitem"><div class="lab">Joueurs connectés</div><div class="val live" id="statPlayers">— / —</div></div>
+    <div class="statitem"><div class="lab">Carte</div><div class="val">Chernarusplus</div></div>
+    <div class="statitem"><div class="lab">Mode</div><div class="val">PVE</div></div>
     <div class="statitem"><div class="lab">Votes du mois</div><div class="val" id="statVotes">—</div></div>
-    <div class="statitem"><div class="lab">Uptime</div><div class="val" id="statUptime">—</div></div>
     <div class="statitem"><div class="lab">Prochain wipe</div><div class="val" id="statWipe">—</div></div>
   </div>
 </div>
@@ -330,15 +332,13 @@ footer{padding:50px 0 30px;}
 const SENZANY_DATA = {
   players: { current: 32, max: 50 },
   votesThisMonth: 1256,
-  uptime: 99.8,
-  nextWipeDate: "2026-08-24",
+  nextWipeDate: "2026-07-21",
   eventDate: "2026-07-20T20:00:00"
 };
 
 function renderStats(d){
   document.getElementById('statPlayers').textContent = d.players.current + ' / ' + d.players.max;
   document.getElementById('statVotes').textContent = d.votesThisMonth.toLocaleString('fr-FR');
-  document.getElementById('statUptime').textContent = d.uptime + '%';
   const wipe = new Date(d.nextWipeDate);
   document.getElementById('statWipe').textContent = wipe.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
 }
@@ -371,6 +371,7 @@ async function fetchTopServeursStats(){
     const res = await fetch('/api/topserveurs/stats');
     if(!res.ok) throw new Error('reponse non ok');
     const data = await res.json();
+    document.getElementById('statVotes').textContent = data.monthlyVotes.toLocaleString('fr-FR');
     document.getElementById('commVotes').textContent = data.monthlyVotes.toLocaleString('fr-FR');
     if(data.avicesCount !== null){
       document.getElementById('commAvis').textContent = data.avicesCount;
