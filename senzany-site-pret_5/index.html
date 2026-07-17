@@ -47,9 +47,18 @@ nav.wrap{display:flex; align-items:center; justify-content:space-between; height
 
 /* HERO */
 .hero{position:relative; height:78vh; min-height:480px; display:flex; align-items:flex-end; overflow:hidden; border-bottom:1px solid var(--line);}
-.hero svg.scene{position:absolute; inset:0; width:100%; height:100%; z-index:0;}
-.hero::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,9,8,0.15) 0%, rgba(10,9,8,0.5) 55%, rgba(10,9,8,0.97) 100%); z-index:1;}
-.hero-inner{position:relative; z-index:2; padding-bottom:64px; width:100%;}
+.hero-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:65% 35%; z-index:0;}
+.hero-fog{position:absolute; left:-15%; right:-15%; bottom:0; pointer-events:none; z-index:1;}
+.hero-fog.f1{height:55%; background:linear-gradient(180deg, rgba(20,15,14,0) 0%, rgba(30,20,18,0.55) 70%, rgba(10,9,8,0.9) 100%); filter:blur(6px); animation:fogDrift1 26s ease-in-out infinite;}
+.hero-fog.f2{height:38%; background:linear-gradient(180deg, rgba(40,25,22,0) 0%, rgba(50,30,26,0.35) 100%); filter:blur(10px); animation:fogDrift2 34s ease-in-out infinite;}
+@keyframes fogDrift1{0%{transform:translateX(-4%);}50%{transform:translateX(4%);}100%{transform:translateX(-4%);}}
+@keyframes fogDrift2{0%{transform:translateX(3%);}50%{transform:translateX(-3%);}100%{transform:translateX(3%);}}
+.hero-ash{position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden;}
+.hero-ash span{position:absolute; bottom:0; width:3px; height:3px; border-radius:50%; background:rgba(210,180,150,0.5); animation:ashFloat linear infinite;}
+@keyframes ashFloat{0%{transform:translateY(0) translateX(0); opacity:0;}10%{opacity:0.5;}90%{opacity:0.3;}100%{transform:translateY(-70vh) translateX(20px); opacity:0;}}
+.hero::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,9,8,0.15) 0%, rgba(10,9,8,0.5) 55%, rgba(10,9,8,0.97) 100%); z-index:2;}
+.hero-inner{position:relative; z-index:3; padding-bottom:64px; width:100%;}
+@media (prefers-reduced-motion:reduce){.hero-fog, .hero-ash span{animation:none;}}
 .hero-title{font-family:'Anton',sans-serif; font-size:clamp(38px,6.4vw,74px); text-transform:uppercase; line-height:0.98;}
 .hero-title .accent{color:var(--blood-bright);}
 .hero-sub{max-width:480px; margin-top:16px; font-size:15px; color:var(--paper-dim); font-weight:300;}
@@ -165,37 +174,10 @@ footer{padding:50px 0 30px;}
 </header>
 
 <section class="hero" style="border-bottom:none; padding:0;">
-  <svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#1b0f0d"/><stop offset="45%" stop-color="#271410"/>
-        <stop offset="80%" stop-color="#150c0a"/><stop offset="100%" stop-color="#0a0908"/>
-      </linearGradient>
-      <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#e8b06a" stop-opacity="0.85"/>
-        <stop offset="60%" stop-color="#a15a34" stop-opacity="0.2"/>
-        <stop offset="100%" stop-color="#a15a34" stop-opacity="0"/>
-      </radialGradient>
-    </defs>
-    <rect width="1600" height="900" fill="url(#sky)"/>
-    <circle cx="1280" cy="180" r="150" fill="url(#glow)"/>
-    <circle cx="1280" cy="180" r="50" fill="#f0d9b5" opacity="0.8"/>
-    <path d="M0 480 L140 430 L260 470 L400 400 L540 460 L700 380 L860 450 L1020 400 L1180 460 L1340 410 L1500 460 L1600 420 L1600 900 L0 900 Z" fill="#1c1310"/>
-    <path d="M0 540 L200 500 L360 550 L560 500 L740 555 L940 505 L1120 560 L1320 510 L1600 550 L1600 900 L0 900 Z" fill="#120b09"/>
-    <g fill="#0a0706">
-      <path d="M760 620 L800 400 L840 620 Z"/>
-      <rect x="785" y="345" width="30" height="60" fill="#0a0706"/>
-      <path d="M770 345 L800 300 L830 345 Z"/>
-      <line x1="800" y1="300" x2="800" y2="250" stroke="#0a0706" stroke-width="3"/>
-      <path d="M800 252 L850 262 L800 274 Z" fill="#8c1f1f" opacity="0.85"/>
-    </g>
-    <g fill="#050403">
-      <ellipse cx="300" cy="700" rx="18" ry="20"/>
-      <path d="M275 715 Q300 700 325 715 L330 830 L270 830 Z"/>
-      <rect x="258" y="740" width="14" height="70" rx="5"/>
-    </g>
-    <path d="M0 900 L0 800 Q300 760 600 790 Q900 820 1200 780 Q1400 755 1600 790 L1600 900 Z" fill="#0a0908"/>
-  </svg>
+  <img class="hero-bg" src="hero-bg.jpg" alt="" aria-hidden="true">
+  <div class="hero-fog f2"></div>
+  <div class="hero-fog f1"></div>
+  <div class="hero-ash" id="heroAsh"></div>
   <div class="wrap hero-inner">
     <h1 class="hero-title">SURVIVEZ. EXPLOREZ.<br><span class="accent">ÉCRIVEZ VOTRE LÉGENDE.</span></h1>
     <p class="hero-sub">Serveur PVE immersif sur Chernarus. Une communauté française, un monde qui ne vous fera pas de cadeau — mais jamais dans le dos.</p>
@@ -443,6 +425,23 @@ setInterval(updateCountdown, 1000);
 document.getElementById('burgerBtn').addEventListener('click', function(){
   document.getElementById('mobileMenu').classList.toggle('open');
 });
+
+(function(){
+  const ash = document.getElementById('heroAsh');
+  if(!ash) return;
+  const count = 22;
+  for(let i=0;i<count;i++){
+    const s = document.createElement('span');
+    const size = 2 + Math.random()*2;
+    s.style.left = (Math.random()*100) + '%';
+    s.style.bottom = (Math.random()*40) + '%';
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.animationDuration = (8 + Math.random()*10) + 's';
+    s.style.animationDelay = (Math.random()*10) + 's';
+    ash.appendChild(s);
+  }
+})();
 </script>
 
 </body>
