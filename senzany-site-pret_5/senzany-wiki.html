@@ -44,13 +44,13 @@ nav.wrap{display:flex; align-items:center; justify-content:space-between; height
 .page-header::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,9,8,0.15) 0%, rgba(10,9,8,0.55) 55%, rgba(10,9,8,0.96) 100%); z-index:1;}
 .page-header .wrap{position:relative; z-index:2; padding-bottom:44px; padding-top:40px;}
 .page-tag{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--blood-bright); margin-bottom:10px;}
-.page-title{font-family:'Anton',sans-serif; font-size:clamp(32px,5.2vw,50px); letter-spacing:0.01em; text-transform:uppercase;}
+.page-title{font-family:'Anton',sans-serif; font-size:clamp(32px,5.2vw,50px); letter-spacing:0.01em; text-transform:uppercase; text-shadow:0 3px 4px rgba(0,0,0,1),0 0 12px rgba(0,0,0,.95),0 0 22px rgba(0,0,0,.82); -webkit-text-stroke:.4px rgba(0,0,0,.75);}
 .page-sub{color:var(--paper-dim); font-size:15.5px; margin-top:10px; max-width:560px; font-weight:300;}
 
 .layout{display:grid; grid-template-columns:1fr; gap:0;}
 section{padding:56px 0;}
 .section-tag{font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--blood-bright); margin-bottom:10px;}
-.section-title{font-family:'Anton',sans-serif; font-size:clamp(26px,3.6vw,34px); letter-spacing:0.015em; text-transform:uppercase;}
+.section-title{font-family:'Anton',sans-serif; font-size:clamp(26px,3.6vw,34px); letter-spacing:0.015em; text-transform:uppercase; text-shadow:0 2px 3px rgba(0,0,0,1),0 0 9px rgba(0,0,0,.95),0 0 18px rgba(0,0,0,.8); -webkit-text-stroke:.35px rgba(0,0,0,.72);}
 .section-head{margin-bottom:32px; max-width:600px;}
 
 .card{background:var(--panel); border:1px solid var(--line); padding:24px;}
@@ -79,7 +79,7 @@ section{padding:56px 0;}
 .stat-row:last-child{border-bottom:none;}
 .stat-row span:first-child{color:var(--paper-dim);}
 
-footer{padding:50px 0 30px;}
+footer{padding:50px 0 30px; background:#070606; border-top:1px solid var(--line); box-shadow:0 -14px 34px rgba(0,0,0,0.58);}
 .footer-grid{display:flex; justify-content:space-between; flex-wrap:wrap; gap:30px; padding-bottom:30px; border-bottom:1px solid var(--line);}
 .footer-brand p{color:var(--paper-dim); font-size:14px; max-width:260px; margin-top:10px; font-weight:300;}
 .footer-links{display:flex; gap:50px; flex-wrap:wrap;}
