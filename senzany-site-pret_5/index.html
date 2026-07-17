@@ -109,7 +109,7 @@ section{padding:72px 0;}
 @media (max-width:800px){.event-panel{grid-template-columns:1fr;} .event-side{border-left:none; border-top:1px solid var(--line);}}
 
 /* NEWS */
-.news-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+.news-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px;}
 .news-card{background:var(--panel); border:1px solid var(--line);}
 .news-thumb{height:130px; position:relative; overflow:hidden;}
 .news-tag{position:absolute; top:12px; left:12px; background:var(--blood); color:var(--paper); font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:4px 10px;}
@@ -255,33 +255,6 @@ footer{padding:50px 0 30px; background:#070606; border-top:1px solid var(--line)
   </div>
 </section>
 
-<section id="evenement">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">En ce moment</div>
-      <h2 class="section-title">Événement en cours</h2>
-    </div>
-    <div class="event-panel">
-      <div class="event-info">
-        <div class="event-date">DIMANCHE 20 JUILLET · 20H00</div>
-        <div class="event-title">Course de voitures — Grand Prix Senzany</div>
-        <p class="event-desc">Affrontez les meilleurs pilotes de Chernarus sur un circuit extrême. Vitesse, adrénaline et gros lots à la clé pour les vainqueurs.</p>
-        <div class="countdown" id="countdown">
-          <div class="cd-block"><div class="cd-num" id="cd-d">--</div><div class="cd-lab">Jours</div></div>
-          <div class="cd-block"><div class="cd-num" id="cd-h">--</div><div class="cd-lab">Heures</div></div>
-          <div class="cd-block"><div class="cd-num" id="cd-m">--</div><div class="cd-lab">Min</div></div>
-          <div class="cd-block"><div class="cd-num" id="cd-s">--</div><div class="cd-lab">Sec</div></div>
-        </div>
-      </div>
-      <div class="event-side">
-        <div class="row"><span>Participants</span><span>42 / 60</span></div>
-        <div class="row"><span>Inscription</span><span style="color:var(--blood-bright)">Ouverte</span></div>
-        <div class="row"><span>Récompenses</span><span>Véhicule, skins, coins</span></div>
-        <button class="btn-cta" style="margin-top:6px;">S'inscrire</button>
-      </div>
-    </div>
-  </div>
-</section>
 
 <section id="actus">
   <div class="wrap">
@@ -290,18 +263,32 @@ footer{padding:50px 0 30px; background:#070606; border-top:1px solid var(--line)
       <h2 class="section-title">Dernières actualités</h2>
     </div>
     <div class="news-grid">
-      <div class="news-card">
-        <div class="news-thumb" style="background:linear-gradient(135deg,#2a1613,#0a0908);"><div class="news-tag">Mise à jour</div></div>
-        <div class="news-body"><h3>Mise à jour 1.26</h3><p>Nouveaux objets, optimisations serveur et corrections de bugs.</p><div class="date">15 juillet 2026</div></div>
-      </div>
-      <div class="news-card">
-        <div class="news-thumb" style="background:linear-gradient(135deg,#2a1613,#0a0908);"><div class="news-tag">Événement</div></div>
-        <div class="news-body"><h3>Aperçu Saison 5</h3><p>Découvrez les nouveautés de la saison à venir sur Senzany.</p><div class="date">10 juillet 2026</div></div>
-      </div>
-      <div class="news-card">
-        <div class="news-thumb" style="background:linear-gradient(135deg,#2a1613,#0a0908);"><div class="news-tag">Raid</div></div>
-        <div class="news-body"><h3>Event spécial raid</h3><p>Retour sur l'événement du week-end dernier et ses vainqueurs.</p><div class="date">7 juillet 2026</div></div>
-      </div>
+      <article class="news-card">
+        <div class="news-thumb" style="background:linear-gradient(135deg,rgba(42,22,19,.35),rgba(10,9,8,.9)),url('dayz-update-129.jpg');">
+          <div class="news-tag">Mise à jour officielle</div>
+        </div>
+        <div class="news-body">
+          <h3>Mise à jour 1.29 — Road to Badlands</h3>
+          <p>Nouvelle arme SCR-17, viseur holographique, équipements désertiques, convois militaires de Nasdara, ajustements de l'économie centrale et nombreux correctifs.</p>
+          <div class="date">15 juillet 2026</div>
+          <div class="news-actions">
+            <a class="news-link" href="https://steamcommunity.com/app/221100/announcements/?l=french" target="_blank" rel="noopener">Voir les changements officiels</a>
+          </div>
+        </div>
+      </article>
+      <article class="news-card">
+        <div class="news-thumb" style="background-image:linear-gradient(135deg,rgba(42,22,19,.10),rgba(10,9,8,.30)),url('senzany-summer-vibes-2026.png');">
+          <div class="news-tag">Événement spécial été</div>
+        </div>
+        <div class="news-body">
+          <h3>Senzany Summer Vibes 2026</h3>
+          <p>Découvre notre collection estivale avec des skins exclusifs et uniques, disponibles uniquement pendant cette période limitée.</p>
+          <div class="date">Offre estivale limitée</div>
+          <div class="news-actions">
+            <a class="news-link" href="https://senzany.tip4serv.com/" target="_blank" rel="noopener">Voir la boutique</a>
+          </div>
+        </div>
+      </article>
     </div>
   </div>
 </section>
