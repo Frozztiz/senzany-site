@@ -296,8 +296,8 @@ footer{padding:50px 0 30px;}
     </div>
     <div class="comm-grid">
       <div class="comm-card"><div class="n" id="commDiscord">—</div><div class="l">Membres Discord</div></div>
-      <div class="comm-card"><div class="n">2 382</div><div class="l">Votes ce mois-ci</div></div>
-      <div class="comm-card"><div class="n">18</div><div class="l">Avis joueurs</div></div>
+      <div class="comm-card"><div class="n" id="commVotes">—</div><div class="l">Votes ce mois-ci</div></div>
+      <div class="comm-card"><div class="n" id="commAvis">—</div><div class="l">Avis joueurs</div></div>
       <div class="comm-card"><div class="n">N°1</div><div class="l">Classement PVE FR</div></div>
     </div>
   </div>
@@ -383,6 +383,22 @@ async function fetchDiscordStats(){
 }
 fetchDiscordStats();
 setInterval(fetchDiscordStats, 120000);
+
+async function fetchTopServeursStats(){
+  try{
+    const res = await fetch('/api/topserveurs/stats');
+    if(!res.ok) throw new Error('reponse non ok');
+    const data = await res.json();
+    document.getElementById('commVotes').textContent = data.monthlyVotes.toLocaleString('fr-FR');
+    if(data.avicesCount !== null){
+      document.getElementById('commAvis').textContent = data.avicesCount;
+    }
+  } catch(err){
+    console.warn('Stats Top-Serveurs indisponibles.', err);
+  }
+}
+fetchTopServeursStats();
+setInterval(fetchTopServeursStats, 300000);
 
 /* ---------------------------------------------------------------
    DONNÉES LIVE — Steam GetServerList
