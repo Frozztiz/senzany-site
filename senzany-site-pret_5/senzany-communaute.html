@@ -159,8 +159,8 @@ input:focus, textarea:focus{outline:1px solid var(--blood-bright);}
     <div class="grid-5">
       <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);" id="commDiscordFull">—</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Membres Discord</div></div>
       <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);" id="commPlayers">—</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Joueurs actifs</div></div>
-      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">2 662</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Votes ce mois-ci</div></div>
-      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">18</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Avis joueurs</div></div>
+      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);" id="commVotesFull">—</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Votes ce mois-ci</div></div>
+      <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);" id="commAvisFull">—</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Avis joueurs</div></div>
       <div class="card" style="text-align:center;"><div class="mono" style="font-size:22px; color:var(--blood-bright);">N°1</div><div style="font-size:11px; color:var(--paper-dim); text-transform:uppercase; margin-top:6px;">Classement PVE FR</div></div>
     </div>
   </div>
@@ -251,6 +251,22 @@ async function fetchGameStats(){
 }
 fetchGameStats();
 setInterval(fetchGameStats, 60000);
+
+async function fetchTopServeursStats(){
+  try{
+    const res = await fetch("/api/topserveurs/stats");
+    if(!res.ok) throw new Error("reponse non ok");
+    const data = await res.json();
+    document.getElementById("commVotesFull").textContent = data.monthlyVotes.toLocaleString("fr-FR");
+    if(data.avicesCount !== null){
+      document.getElementById("commAvisFull").textContent = data.avicesCount;
+    }
+  } catch(err){
+    console.warn("Stats Top-Serveurs indisponibles.", err);
+  }
+}
+fetchTopServeursStats();
+setInterval(fetchTopServeursStats, 300000);
 </script>
 
 </body>
