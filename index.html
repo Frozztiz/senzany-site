@@ -1,361 +1,103 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>SENZANY — PVE Server DayZ</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-:root{
-  --bg:#0a0908; --panel:rgba(20,17,16,0.9); --panel-2:rgba(28,23,22,0.9);
-  --paper:#ece5da; --paper-dim:#928a80;
-  --blood:#8c1f1f; --blood-bright:#d1272c; --line:#2a2220;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{background-color:var(--bg); background-image:url('hero-bg.jpg'); background-size:cover; background-position:65% 35%; background-attachment:fixed; background-repeat:no-repeat; color:var(--paper); font-family:'Oswald',sans-serif; font-weight:300; line-height:1.6;}
-@media (max-width:900px){ body{background-attachment:scroll;} }
-a{color:inherit; text-decoration:none;}
-.wrap{max-width:1240px; margin:0 auto; padding:0 24px;}
-.mono{font-family:'IBM Plex Mono',monospace;}
-
-/* ---- DATA LAYER ----
-   Toutes les valeurs "live" sont ici. Remplacer window.SENZANY_DATA
-   par un fetch() vers une vraie API plus tard ne touche à rien d'autre. */
-
-/* NAV */
-header{position:sticky; top:0; z-index:100; background:rgba(10,9,8,0.95); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
-nav.wrap{display:flex; align-items:center; justify-content:space-between; height:72px;}
-.brand{display:flex; align-items:center; gap:12px;}
-.badge{width:42px; height:42px; border-radius:50%; object-fit:contain; flex-shrink:0; filter:drop-shadow(0 0 5px rgba(0,0,0,0.6));}
-.brand-name{font-family:'Anton',sans-serif; font-size:21px; letter-spacing:0.05em;}
-.navlinks{display:flex; gap:26px; font-size:14px; letter-spacing:0.05em; text-transform:uppercase; font-weight:500;}
-.navlinks a{color:var(--paper-dim); padding:4px 0; border-bottom:2px solid transparent;}
-.navlinks a:hover, .navlinks a.active{color:var(--paper); border-color:var(--blood-bright);}
-.nav-right{display:flex; align-items:center; gap:16px;}
-.btn-join{background:var(--blood); color:var(--paper); font-family:'Oswald',sans-serif; font-weight:600; font-size:13.5px; letter-spacing:0.05em; text-transform:uppercase; padding:11px 20px; border:none; cursor:pointer;}
-.btn-join:hover{background:var(--blood-bright);}
-.burger{display:none; background:none; border:1px solid var(--line); color:var(--paper); width:38px; height:38px; font-size:18px; cursor:pointer;}
-.mobile-menu{display:none; flex-direction:column; padding:16px 24px; border-bottom:1px solid var(--line); background:var(--panel);}
-.mobile-menu.open{display:flex;}
-.mobile-menu a{padding:10px 0; font-size:14.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--paper-dim); border-bottom:1px solid var(--line);}
-
-@media (max-width:920px){
-  .navlinks{display:none;}
-  .burger{display:block;}
-}
-
-/* HERO */
-.hero{position:relative; height:78vh; min-height:480px; display:flex; align-items:flex-end; overflow:hidden; border-bottom:1px solid var(--line); background-image:url('hero-bg.jpg'); background-size:cover; background-position:65% 35%; background-attachment:fixed;}
-@media (max-width:900px){.hero{background-attachment:scroll;}}
-.hero-fog{position:absolute; left:-15%; right:-15%; bottom:0; pointer-events:none; z-index:1;}
-.hero-fog.f1{height:55%; background:linear-gradient(180deg, rgba(20,15,14,0) 0%, rgba(30,20,18,0.55) 70%, rgba(10,9,8,0.9) 100%); filter:blur(6px); animation:fogDrift1 26s ease-in-out infinite;}
-.hero-fog.f2{height:38%; background:linear-gradient(180deg, rgba(40,25,22,0) 0%, rgba(50,30,26,0.35) 100%); filter:blur(10px); animation:fogDrift2 34s ease-in-out infinite;}
-@keyframes fogDrift1{0%{transform:translateX(-4%);}50%{transform:translateX(4%);}100%{transform:translateX(-4%);}}
-@keyframes fogDrift2{0%{transform:translateX(3%);}50%{transform:translateX(-3%);}100%{transform:translateX(3%);}}
-.hero-ash{position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden;}
-.hero-ash span{position:absolute; bottom:0; width:3px; height:3px; border-radius:50%; background:rgba(210,180,150,0.5); animation:ashFloat linear infinite;}
-@keyframes ashFloat{0%{transform:translateY(0) translateX(0); opacity:0;}10%{opacity:0.5;}90%{opacity:0.3;}100%{transform:translateY(-70vh) translateX(20px); opacity:0;}}
-.hero::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,9,8,0.15) 0%, rgba(10,9,8,0.5) 55%, rgba(10,9,8,0.97) 100%); z-index:2;}
-.hero-inner{position:relative; z-index:3; padding-bottom:64px; width:100%;}
-@media (prefers-reduced-motion:reduce){.hero-fog, .hero-ash span{animation:none;}}
-.hero-title{font-family:'Anton',sans-serif; font-size:clamp(40px,6.6vw,76px); letter-spacing:0.005em; text-transform:uppercase; line-height:1.02;}
-.hero-title .accent{color:var(--blood-bright);}
-.hero-sub{max-width:480px; margin-top:16px; font-size:15px; color:var(--paper-dim); font-weight:300;}
-.hero-actions{margin-top:26px;}
-.btn-cta{background:var(--blood); color:var(--paper); font-family:'Oswald',sans-serif; font-weight:600; font-size:14px; letter-spacing:0.04em; text-transform:uppercase; padding:15px 30px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:10px;}
-.btn-cta:hover{background:var(--blood-bright);}
-
-/* STATS BAR */
-.statsbar{background:var(--panel); border-bottom:1px solid var(--line);}
-.statsbar .wrap{display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--line);}
-.statitem{background:var(--panel); padding:20px 24px; text-align:left;}
-.statitem .lab{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--paper-dim);}
-.statitem .val{font-family:'Anton',sans-serif; font-size:29px; letter-spacing:0.01em; margin-top:6px;}
-.statitem .val.live{color:var(--blood-bright);}
-@media (max-width:900px){.statsbar .wrap{grid-template-columns:repeat(3,1fr);}}
-@media (max-width:560px){.statsbar .wrap{grid-template-columns:repeat(2,1fr);}}
-
-/* SECTION SHARED */
-section{padding:72px 0; border-bottom:1px solid var(--line);}
-.section-tag{font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--blood-bright); margin-bottom:10px;}
-.section-title{font-family:'Anton',sans-serif; font-size:clamp(30px,4.2vw,40px); letter-spacing:0.015em; text-transform:uppercase;}
-.section-head{margin-bottom:40px; max-width:600px;}
-
-/* POURQUOI */
-.why-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
-.why-card{background:var(--panel); padding:28px 22px;}
-.why-icon{width:34px; height:34px; border:1px solid var(--blood); display:flex; align-items:center; justify-content:center; color:var(--blood-bright); margin-bottom:16px;}
-.why-card h3{font-family:'Anton',sans-serif; font-size:19px; letter-spacing:0.025em; text-transform:uppercase; margin-bottom:8px;}
-.why-card p{font-size:14.5px; color:var(--paper-dim); font-weight:300;}
-@media (max-width:800px){.why-grid{grid-template-columns:repeat(2,1fr);}}
-
-/* EVENT */
-.event-panel{border:1px solid var(--blood); background:var(--panel); display:grid; grid-template-columns:1.3fr 1fr; overflow:hidden;}
-.event-info{padding:32px;}
-.event-date{font-family:'IBM Plex Mono',monospace; font-size:13.5px; color:var(--blood-bright); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px;}
-.event-title{font-family:'Anton',sans-serif; font-size:30px; letter-spacing:0.015em; text-transform:uppercase; margin-bottom:12px;}
-.event-desc{color:var(--paper-dim); font-size:15.5px; max-width:440px; font-weight:300;}
-.countdown{display:flex; gap:14px; margin-top:22px;}
-.cd-block{text-align:center;}
-.cd-num{font-family:'Anton',sans-serif; font-size:32px; letter-spacing:0.01em; background:var(--panel-2); border:1px solid var(--line); padding:10px 14px; min-width:56px;}
-.cd-lab{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--paper-dim); margin-top:6px;}
-.event-side{background:var(--panel-2); padding:32px; border-left:1px solid var(--line); display:flex; flex-direction:column; justify-content:center; gap:14px;}
-.event-side .row{display:flex; justify-content:space-between; font-size:14.5px; padding:10px 0; border-bottom:1px solid var(--line);}
-.event-side .row:last-child{border-bottom:none;}
-.event-side .row span:first-child{color:var(--paper-dim);}
-@media (max-width:800px){.event-panel{grid-template-columns:1fr;} .event-side{border-left:none; border-top:1px solid var(--line);}}
-
-/* NEWS */
-.news-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
-.news-card{background:var(--panel); border:1px solid var(--line);}
-.news-thumb{height:130px; position:relative; overflow:hidden;}
-.news-tag{position:absolute; top:12px; left:12px; background:var(--blood); color:var(--paper); font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:4px 10px;}
-.news-body{padding:18px;}
-.news-body h3{font-family:'Anton',sans-serif; font-size:19px; letter-spacing:0.025em; text-transform:uppercase; margin-bottom:8px;}
-.news-body p{font-size:14.5px; color:var(--paper-dim); font-weight:300; margin-bottom:10px;}
-.news-body .date{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--paper-dim); opacity:0.75;}
-@media (max-width:800px){.news-grid{grid-template-columns:1fr;}}
-
-/* COMMUNITY */
-.comm-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
-.comm-card{background:var(--panel); padding:26px 22px; text-align:center;}
-.comm-card .n{font-family:'Anton',sans-serif; font-size:26px; letter-spacing:0.01em; color:var(--blood-bright);}
-.comm-card .l{font-family:'IBM Plex Mono',monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:0.08em; color:var(--paper-dim); margin-top:6px;}
-@media (max-width:800px){.comm-grid{grid-template-columns:repeat(2,1fr);}}
-
-/* QUICK ACCESS */
-.quick-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
-.quick-card{display:block; background:var(--panel); border:1px solid var(--line); padding:22px; text-align:center; cursor:pointer; transition:border-color .2s;}
-.quick-card:hover{border-color:var(--blood);}
-.quick-card .qi{font-size:20px; color:var(--blood-bright); margin-bottom:10px;}
-.quick-card h4{font-family:'Anton',sans-serif; font-size:16.5px; letter-spacing:0.02em; text-transform:uppercase;}
-@media (max-width:800px){.quick-grid{grid-template-columns:repeat(2,1fr);}}
-
-/* FOOTER */
-footer{padding:50px 0 30px;}
-.footer-grid{display:flex; justify-content:space-between; flex-wrap:wrap; gap:30px; padding-bottom:30px; border-bottom:1px solid var(--line);}
-.footer-brand p{color:var(--paper-dim); font-size:14px; max-width:260px; margin-top:10px; font-weight:300;}
-.footer-links{display:flex; gap:50px; flex-wrap:wrap;}
-.footer-col h4{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.13em; text-transform:uppercase; color:var(--paper-dim); margin-bottom:12px;}
-.footer-col a{display:block; font-size:14.5px; margin-bottom:8px; opacity:0.9;}
-.footer-col a:hover{color:var(--blood-bright);}
-.footer-bottom{padding-top:20px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--paper-dim);}
-
-::selection{background:var(--blood); color:var(--paper);}
-</style>
-</head>
-<body>
-
-<header>
-  <nav class="wrap">
-    <div class="brand">
-      <img class="badge" src="logo.png" alt="Senzany">
-      <div class="brand-name">SENZANY</div>
-    </div>
-    <div class="navlinks">
-      <a href="index.html" class="active">Accueil</a>
-      <a href="senzany-jouer.html">Jouer</a>
-      <a href="senzany-communaute.html">Communauté</a>
-      <a href="senzany-wiki.html">Wiki</a>
-      <a href="senzany-evenements.html">Événements</a>
-      <a href="senzany-boutique.html">Boutique</a>
-      <a href="senzany-support.html">Support</a>
-      <a href="senzany-profil.html">Mon profil</a>
-    </div>
-    <div class="nav-right">
-      <button class="btn-join">Rejoindre le serveur</button>
-      <button class="burger" id="burgerBtn" aria-label="Menu">☰</button>
-    </div>
-  </nav>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="index.html">Accueil</a><a href="senzany-jouer.html">Jouer</a><a href="senzany-communaute.html">Communauté</a><a href="senzany-wiki.html">Wiki</a>
-    <a href="senzany-evenements.html">Événements</a><a href="senzany-boutique.html">Boutique</a><a href="senzany-support.html">Support</a><a href="senzany-profil.html">Mon profil</a>
-  </div>
-</header>
-
-<section class="hero" style="border-bottom:none; padding:0;">
-  <div class="hero-fog f2"></div>
-  <div class="hero-fog f1"></div>
-  <div class="hero-ash" id="heroAsh"></div>
-  <div class="wrap hero-inner">
-    <h1 class="hero-title">SURVIVEZ. EXPLOREZ.<br><span class="accent">ÉCRIVEZ VOTRE LÉGENDE.</span></h1>
-    <p class="hero-sub">Serveur PVE immersif sur Chernarus. Une communauté française, un monde qui ne vous fera pas de cadeau — mais jamais dans le dos.</p>
-    <div class="hero-actions">
-      <button class="btn-cta">Rejoindre l'aventure →</button>
-    </div>
-  </div>
-</section>
-
+<link href="assets/css/pages/accueil.css" rel="stylesheet"/></head>
+<body data-page="accueil">
+<div data-site-header=""></div>
+<main class="home-main">
+<div class="home-status">
+<div class="wrap">
+<a class="home-status-card" href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" rel="noopener" style="display:block;" target="_blank">
+<div class="home-status-main"><span class="live-dot"></span><span>Statut en direct</span><span class="separator"></span><span class="top-name">Top-Serveurs</span></div>
+<div class="home-status-sub">Voter pour Senzany (n°1 PVE FR)</div>
+</a>
+</div>
+</div>
 <div class="statsbar">
-  <div class="wrap">
-    <div class="statitem"><div class="lab">Joueurs connectés</div><div class="val live" id="statPlayers">— / —</div></div>
-    <div class="statitem"><div class="lab">Carte</div><div class="val">Chernarusplus</div></div>
-    <div class="statitem"><div class="lab">Mode</div><div class="val">PVE</div></div>
-    <div class="statitem"><div class="lab">Votes du mois</div><div class="val" id="statVotes">—</div></div>
-    <div class="statitem"><div class="lab">Prochain wipe</div><div class="val" id="statWipe">—</div></div>
-  </div>
+<div class="wrap">
+<div class="statitem"><div class="lab">Joueurs connectés</div><div class="val live" id="statPlayers">— / —</div></div>
+<div class="statitem"><div class="lab">Carte</div><div class="val">Chernarusplus</div></div>
+<div class="statitem"><div class="lab">Mode</div><div class="val">PVE</div></div>
+<div class="statitem"><div class="lab">Votes du mois</div><div class="val" id="statVotes">—</div></div>
+<div class="statitem"><div class="lab">Prochain wipe</div><div class="val" id="statWipe">—</div></div>
 </div>
-
-<div class="wrap" style="padding:28px 24px; text-align:center; border-bottom:1px solid var(--line);">
-  <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--paper-dim); margin-bottom:12px;">Statut en direct — Top-Serveurs</div>
-  <a href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" target="_blank" rel="noopener">
-    <img src="https://cdn.top-serveurs.net/banners/6972ba2576379.gif" alt="Bannière live Senzany sur Top-Serveurs" style="max-width:100%; height:auto; border:1px solid var(--line);">
-  </a>
-  <div style="margin-top:10px;"><a href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" target="_blank" rel="noopener" class="btn btn-solid btn-sm">Voter pour Senzany (n°1 PVE FR)</a></div>
 </div>
-
+<section style="padding-top:10px;padding-bottom:58px;">
+<div class="wrap">
+<div class="season-countdown">
+<div class="season-title">◆ La Saison 4 arrive ! ◆</div>
+<div class="season-sub">Ouverture prévue le 21 juillet 2026 à 20h00</div>
+<div class="season-time" id="countdown">
+<div class="season-unit"><div class="season-num" id="cd-d">00</div><div class="season-label">Jours</div></div>
+<div class="season-unit"><div class="season-num" id="cd-h">00</div><div class="season-label">Heures</div></div>
+<div class="season-unit"><div class="season-num" id="cd-m">00</div><div class="season-label">Minutes</div></div>
+<div class="season-unit"><div class="season-num" id="cd-s">00</div><div class="season-label">Secondes</div></div>
+</div>
+</div>
+</div>
+</section>
 <section id="pourquoi">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">Pourquoi Senzany</div>
-      <h2 class="section-title">Ce qui nous différencie</h2>
-    </div>
-    <div class="why-grid">
-      <div class="why-card"><div class="why-icon">◆</div><h3>Volcan exclusif</h3><p>Un volcan actif créé spécialement pour Senzany, entouré de dangers et de trésors à découvrir.</p></div>
-      <div class="why-card"><div class="why-icon">▲</div><h3>Bunkers & airdrops</h3><p>Bunkers secrets et largages aériens protégés par des hordes d'infectés, pour les plus téméraires.</p></div>
-      <div class="why-card"><div class="why-icon">●</div><h3>Économie complète</h3><p>Traders, plus de 80 véhicules et coffres verrouillés à débloquer : une vraie économie de survie.</p></div>
-      <div class="why-card"><div class="why-icon">■</div><h3>Staff & communauté actifs</h3><p>Événements réguliers, staff réactif et accompagnement des nouveaux survivants dès leur arrivée.</p></div>
-    </div>
-    <div style="margin-top:16px; background:var(--panel); border:1px solid var(--line); padding:20px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
-      <div style="flex-shrink:0; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:#8fd19e; border:1px solid #2f5c38; padding:4px 10px;">✓ Officiel</div>
-      <p style="color:var(--paper-dim); font-size:14.5px; margin:0; flex:1; min-width:220px;">Senzany fait partie des serveurs <strong style="color:var(--paper);">officiellement autorisés à la monétisation par Bohemia Interactive</strong>.</p>
-      <a href="https://www.bohemia.net/monetization/approved/dayz" target="_blank" rel="noopener" style="font-family:'Oswald',sans-serif; font-weight:600; font-size:12.5px; letter-spacing:0.04em; text-transform:uppercase; padding:10px 18px; border:1px solid var(--blood); color:var(--paper); white-space:nowrap;">Voir la liste officielle</a>
-    </div>
-  </div>
+<div class="wrap">
+<div class="section-head">
+<div class="section-tag">Pourquoi Senzany</div>
+<h2 class="section-title">Ce qui nous différencie</h2>
+</div>
+<div class="why-grid">
+<div class="why-card"><div class="why-icon"><svg aria-hidden="true" viewbox="0 0 48 48"><path d="M5 39h38L31 19l-5 8-5-13z"></path><path d="M21 14l4 6 4-5"></path><path d="M24 8c-2-3 1-5 0-7M30 10c3-3 1-6 3-8"></path></svg></div><h3>Volcan exclusif</h3><p>Un volcan actif créé spécialement pour Senzany, entouré de dangers et de trésors à découvrir.</p><a class="btn btn-solid btn-sm" href="senzany-jouer.html">En savoir plus</a></div>
+<div class="why-card"><div class="why-icon"><svg aria-hidden="true" viewbox="0 0 48 48"><path d="M8 39V22l16-10 16 10v17"></path><path d="M14 39V25h20v14M20 39V29h8v10"></path><path d="M6 39h36"></path></svg></div><h3>Bunkers &amp; airdrops</h3><p>Bunkers secrets et largages aériens protégés par des hordes d'infectés, pour les plus téméraires.</p><a class="btn btn-solid btn-sm" href="senzany-jouer.html">En savoir plus</a></div>
+<div class="why-card"><div class="why-icon"><svg aria-hidden="true" viewbox="0 0 48 48"><ellipse cx="18" cy="14" rx="10" ry="4"></ellipse><path d="M8 14v8c0 2 4 4 10 4s10-2 10-4v-8M8 22v8c0 2 4 4 10 4 2 0 4-.2 6-.8"></path><ellipse cx="33" cy="29" rx="9" ry="4"></ellipse><path d="M24 29v8c0 2 4 4 9 4s9-2 9-4v-8"></path></svg></div><h3>Économie complète</h3><p>Traders, plus de 80 véhicules et coffres verrouillés à débloquer : une vraie économie de survie.</p><a class="btn btn-solid btn-sm" href="senzany-jouer.html">En savoir plus</a></div>
+<div class="why-card"><div class="why-icon"><svg aria-hidden="true" viewbox="0 0 48 48"><circle cx="24" cy="16" r="6"></circle><circle cx="11" cy="20" r="4"></circle><circle cx="37" cy="20" r="4"></circle><path d="M14 39v-5c0-5 4-9 10-9s10 4 10 9v5M3 39v-4c0-4 3-7 8-7 2 0 4 .6 5 1.7M45 39v-4c0-4-3-7-8-7-2 0-4 .6-5 1.7"></path></svg></div><h3>Staff &amp; communauté actifs</h3><p>Événements réguliers, staff réactif et accompagnement des nouveaux survivants dès leur arrivée.</p><a class="btn btn-solid btn-sm" href="senzany-communaute.html">En savoir plus</a></div>
+</div>
+<div style="margin-top:16px; background:var(--panel); border:1px solid var(--line); padding:20px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+<div style="flex-shrink:0; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:#8fd19e; border:1px solid #2f5c38; padding:4px 10px;">✓ Officiel</div>
+<p style="color:var(--paper-dim); font-size:14.5px; margin:0; flex:1; min-width:220px;">Senzany fait partie des serveurs <strong style="color:var(--paper);">officiellement autorisés à la monétisation par Bohemia Interactive</strong>.</p>
+<a href="https://www.bohemia.net/monetization/approved/dayz" rel="noopener" style="font-family:'Oswald',sans-serif; font-weight:600; font-size:12.5px; letter-spacing:0.04em; text-transform:uppercase; padding:10px 18px; border:1px solid var(--blood); color:var(--paper); white-space:nowrap;" target="_blank">Voir la liste officielle</a>
+</div>
+</div>
 </section>
-
-<section id="a-venir">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">À venir — 21/07</div>
-      <h2 class="section-title">Ce qui arrive sur Senzany</h2>
-    </div>
-    <div class="why-grid" style="grid-template-columns:repeat(2,1fr);">
-      <div class="why-card">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-          <div class="why-icon" style="margin-bottom:0;">◆</div>
-          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; background:var(--blood); color:var(--paper); padding:4px 10px;">Bientôt</div>
-        </div>
-        <h3>IA & PNJ interactifs</h3>
-        <p>Quêtes, missions et contrats proposés par des PNJ, pour des objectifs qui se renouvellent à chaque connexion.</p>
-      </div>
-      <div class="why-card">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-          <div class="why-icon" style="margin-bottom:0;">▲</div>
-          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; background:var(--blood); color:var(--paper); padding:4px 10px;">Bientôt</div>
-        </div>
-        <h3>Battle Pass saisonnier</h3>
-        <p>Une progression continue sur toute la saison, avec des récompenses exclusives à débloquer.</p>
-      </div>
-    </div>
-    <div style="margin-top:20px; font-size:13px; color:var(--paper-dim);">Lancement prévu le <strong style="color:var(--paper);">21 juillet 2026</strong>, en même temps que le prochain wipe.</div>
-  </div>
-</section>
-
-<section id="evenement">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">En ce moment</div>
-      <h2 class="section-title">Événement en cours</h2>
-    </div>
-    <div class="event-panel">
-      <div class="event-info">
-        <div class="event-date">DIMANCHE 20 JUILLET · 20H00</div>
-        <div class="event-title">Course de voitures — Grand Prix Senzany</div>
-        <p class="event-desc">Affrontez les meilleurs pilotes de Chernarus sur un circuit extrême. Vitesse, adrénaline et gros lots à la clé pour les vainqueurs.</p>
-        <div class="countdown" id="countdown">
-          <div class="cd-block"><div class="cd-num" id="cd-d">--</div><div class="cd-lab">Jours</div></div>
-          <div class="cd-block"><div class="cd-num" id="cd-h">--</div><div class="cd-lab">Heures</div></div>
-          <div class="cd-block"><div class="cd-num" id="cd-m">--</div><div class="cd-lab">Min</div></div>
-          <div class="cd-block"><div class="cd-num" id="cd-s">--</div><div class="cd-lab">Sec</div></div>
-        </div>
-      </div>
-      <div class="event-side">
-        <div class="row"><span>Participants</span><span>42 / 60</span></div>
-        <div class="row"><span>Inscription</span><span style="color:var(--blood-bright)">Ouverte</span></div>
-        <div class="row"><span>Récompenses</span><span>Véhicule, skins, coins</span></div>
-        <button class="btn-cta" style="margin-top:6px;">S'inscrire</button>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section id="actus">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">Suivez-nous</div>
-      <h2 class="section-title">Dernières actualités</h2>
-    </div>
-    <div class="news-grid">
-      <div class="news-card">
-        <div class="news-thumb" style="background:linear-gradient(135deg,#2a1613,#0a0908);"><div class="news-tag">Mise à jour</div></div>
-        <div class="news-body"><h3>Mise à jour 1.26</h3><p>Nouveaux objets, optimisations serveur et corrections de bugs.</p><div class="date">15 juillet 2026</div></div>
-      </div>
-      <div class="news-card">
-        <div class="news-thumb" style="background:linear-gradient(135deg,#2a1613,#0a0908);"><div class="news-tag">Événement</div></div>
-        <div class="news-body"><h3>Aperçu Saison 5</h3><p>Découvrez les nouveautés de la saison à venir sur Senzany.</p><div class="date">10 juillet 2026</div></div>
-      </div>
-      <div class="news-card">
-        <div class="news-thumb" style="background:linear-gradient(135deg,#2a1613,#0a0908);"><div class="news-tag">Raid</div></div>
-        <div class="news-body"><h3>Event spécial raid</h3><p>Retour sur l'événement du week-end dernier et ses vainqueurs.</p><div class="date">7 juillet 2026</div></div>
-      </div>
-    </div>
-  </div>
+<div class="wrap">
+<div class="section-head">
+<div class="section-tag">Suivez-nous</div>
+<h2 class="section-title">Dernières actualités</h2>
+</div>
+<div class="news-grid">
+<article class="news-card">
+<div class="news-thumb" style="background:linear-gradient(135deg,rgba(42,22,19,.35),rgba(10,9,8,.9)),url('assets/images/news/dayz-update-129.jpg');">
+<div class="news-tag">Mise à jour officielle</div>
+</div>
+<div class="news-body">
+<h3>Mise à jour 1.29 — Road to Badlands</h3>
+<p>Nouvelle arme SCR-17, viseur holographique, équipements désertiques, convois militaires de Nasdara, ajustements de l'économie centrale et nombreux correctifs.</p>
+<div class="date">15 juillet 2026</div>
+<div class="news-actions">
+<a class="news-link" href="https://steamcommunity.com/app/221100/announcements/?l=french" rel="noopener" target="_blank">Lire la suite</a>
+</div>
+</div>
+</article>
+<article class="news-card">
+<div class="news-thumb" style="background-image:linear-gradient(135deg,rgba(42,22,19,.10),rgba(10,9,8,.30)),url('assets/images/news/senzany-summer-vibes-2026.png');">
+<div class="news-tag">Événement spécial été</div>
+</div>
+<div class="news-body">
+<h3>Senzany Summer Vibes 2026</h3>
+<p>Découvre notre collection estivale avec des skins exclusifs et uniques, disponibles uniquement pendant cette période limitée.</p>
+<div class="date">Offre estivale limitée</div>
+<div class="news-actions">
+<a class="news-link" href="https://senzany.tip4serv.com/" rel="noopener" target="_blank">Lire la suite</a>
+</div>
+</div>
+</article>
+</div>
+</div>
 </section>
-
-<section id="communaute">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">Rejoignez-nous</div>
-      <h2 class="section-title">Notre communauté</h2>
-    </div>
-    <div class="comm-grid">
-      <div class="comm-card"><div class="n" id="commDiscord">—</div><div class="l">Membres Discord</div></div>
-      <div class="comm-card"><div class="n" id="commVotes">—</div><div class="l">Votes ce mois-ci</div></div>
-      <div class="comm-card"><div class="n" id="commAvis">—</div><div class="l">Avis joueurs</div></div>
-      <div class="comm-card"><div class="n">N°1</div><div class="l">Classement PVE FR</div></div>
-    </div>
-  </div>
-</section>
-
-<section id="acces" style="border-bottom:none;">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">Accès rapides</div>
-      <h2 class="section-title">Tout ce dont vous avez besoin</h2>
-    </div>
-    <div class="quick-grid">
-      <a class="quick-card" href="senzany-wiki.html"><div class="qi">📖</div><h4>Wiki</h4></a>
-      <a class="quick-card" href="senzany-boutique.html"><div class="qi">🛒</div><h4>Boutique</h4></a>
-      <a class="quick-card" href="senzany-support.html"><div class="qi">🎧</div><h4>Support</h4></a>
-      <a class="quick-card" href="senzany-communaute.html"><div class="qi">★</div><h4>Voter</h4></a>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <div class="brand"><img class="badge" style="width:34px;height:34px;font-size:13px;" src="logo.png" alt="Senzany"><div class="brand-name" style="font-size:17px;">SENZANY</div></div>
-        <p>Serveur PVE DayZ sur Chernarus. Communauté 100% française.</p>
-      </div>
-      <div class="footer-links">
-        <div class="footer-col"><h4>Liens utiles</h4><a href="index.html">Accueil</a><a href="senzany-wiki.html">Wiki</a><a href="senzany-evenements.html">Événements</a><a href="senzany-boutique.html">Boutique</a><a href="senzany-support.html">Support</a></div>
-        <div class="footer-col"><h4>Informations</h4><a href="#">Règlement</a><a href="#">Conditions d'utilisation</a><a href="#">Politique de confidentialité</a></div>
-        <div class="footer-col"><h4>Nous contacter</h4><a href="mailto:support@senzany.com">support@senzany.com</a><a href="https://discord.gg/aJ2eGmqAQv" target="_blank" rel="noopener">Discord</a></div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 Senzany. Serveur communautaire non affilié à Bohemia Interactive.</span>
-      <span>IP : 208.115.196.109:2302</span>
-    </div>
-  </div>
-</footer>
-
-<script>
+</main>
+<div data-site-footer=""></div>
+<script defer="True" src="assets/js/components.js"></script><script defer="True" src="assets/js/app.js"></script><script>
 /* ---------------------------------------------------------------
    COUCHE DE DONNÉES
    Remplacer ce bloc par un fetch() vers une vraie API (BattleMetrics,
@@ -366,7 +108,7 @@ const SENZANY_DATA = {
   players: { current: 32, max: 50 },
   votesThisMonth: 1256,
   nextWipeDate: "2026-07-21",
-  eventDate: "2026-07-20T20:00:00"
+  eventDate: "2026-07-21T20:00:00"
 };
 
 function renderStats(d){
@@ -391,7 +133,8 @@ async function fetchDiscordStats(){
     const res = await fetch('/api/discord/stats');
     if(!res.ok) throw new Error('reponse non ok');
     const data = await res.json();
-    document.getElementById('commDiscord').textContent = data.memberCount.toLocaleString('fr-FR');
+    const commDiscord = document.getElementById('commDiscord');
+    if(commDiscord) commDiscord.textContent = data.memberCount.toLocaleString('fr-FR');
   } catch(err){
     console.warn('Stats Discord indisponibles.', err);
   }
@@ -405,9 +148,11 @@ async function fetchTopServeursStats(){
     if(!res.ok) throw new Error('reponse non ok');
     const data = await res.json();
     document.getElementById('statVotes').textContent = data.monthlyVotes.toLocaleString('fr-FR');
-    document.getElementById('commVotes').textContent = data.monthlyVotes.toLocaleString('fr-FR');
+    const commVotes = document.getElementById('commVotes');
+    if(commVotes) commVotes.textContent = data.monthlyVotes.toLocaleString('fr-FR');
     if(data.avicesCount !== null){
-      document.getElementById('commAvis').textContent = data.avicesCount;
+      const commAvis = document.getElementById('commAvis');
+      if(commAvis) commAvis.textContent = data.avicesCount;
     }
   } catch(err){
     console.warn('Stats Top-Serveurs indisponibles.', err);
@@ -456,9 +201,7 @@ function updateCountdown(){
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-document.getElementById('burgerBtn').addEventListener('click', function(){
-  document.getElementById('mobileMenu').classList.toggle('open');
-});
+
 
 (function(){
   const ash = document.getElementById('heroAsh');
@@ -477,6 +220,5 @@ document.getElementById('burgerBtn').addEventListener('click', function(){
   }
 })();
 </script>
-
 </body>
 </html>

@@ -1,0 +1,57 @@
+{
+  "month": "Juin 2026",
+  "voters": [
+    "Falconeye",
+    "skarlatan",
+    "twixie",
+    "dedex",
+    "darkwolf",
+    "Keldor",
+    "Kiroaz_",
+    "stackoss",
+    "blackfenrir",
+    "Black_Widow",
+    "Ore"
+  ],
+  "leaderboards": {
+    "animaux": [
+      {
+        "name": "Black_Widow",
+        "score": "13 448 pts"
+      },
+      {
+        "name": "Negan",
+        "score": "4 556 pts"
+      },
+      {
+        "name": "Y1Y1",
+        "score": "4 348 pts"
+      }
+    ],
+    "zombies": [
+      {
+        "name": "Y1Y1",
+        "score": "30 985 pts"
+      },
+      {
+        "name": "Black_Widow",
+        "score": "29 516 pts"
+      },
+      {
+        "name": "Ore",
+        "score": "22 708 pts"
+      }
+    ],
+    "mutants": [
+      {
+        "name": "peter dlcrt"
+      },
+      {
+        "name": "Y1Y1"
+      },
+      {
+        "name": "Mykii"
+      }
+    ]
+  }
+}

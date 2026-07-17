@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Toad",
+    "role": "Owner",
+    "steamId": "76561198072963309",
+    "avatar": "assets/images/staff/staff-toad.png"
+  },
+  {
+    "name": "Twixie",
+    "role": "Administrateur",
+    "steamId": "76561199273698198",
+    "avatar": "assets/images/staff/staff-twixie.png"
+  },
+  {
+    "name": "Soon",
+    "role": "Administrateur",
+    "steamId": "76561198287646967",
+    "avatar": "assets/images/staff/staff-soon.png"
+  },
+  {
+    "name": "Frozzz",
+    "role": "Support",
+    "steamId": "76561197985997015",
+    "avatar": "assets/images/staff/staff-frozzz.png"
+  },
+  {
+    "name": "Crevette",
+    "role": "Support",
+    "steamId": "76561199849256902",
+    "avatar": "assets/images/staff/staff-crevette.png"
+  },
+  {
+    "name": "DrMoji",
+    "role": "Garagiste",
+    "steamId": "76561198280114119",
+    "avatar": "assets/images/staff/staff-drmoji.png"
+  },
+  {
+    "name": "LeLoupSolitaire",
+    "role": "Garagiste",
+    "steamId": null,
+    "avatar": "assets/images/staff/staff-leloupsolitaire.png"
+  },
+  {
+    "name": "Kyroz",
+    "role": "Garagiste",
+    "steamId": "76561198882286039",
+    "avatar": "assets/images/staff/staff-kyroz.png"
+  }
+]
