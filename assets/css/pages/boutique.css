@@ -47,3 +47,137 @@ body{background-color:var(--bg)!important;background-image:url('../../images/bac
 .commitment-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.commitment-card{min-height:390px;position:relative;padding:26px 28px;background:linear-gradient(145deg,rgba(27,20,18,.94),rgba(10,9,8,.91));border:1px solid rgba(232,221,203,.16);overflow:hidden;transition:.25s}.commitment-card:hover{transform:translateY(-4px);border-color:rgba(209,39,44,.55)}.commitment-card:before{content:"";position:absolute;left:0;top:0;width:3px;height:100%;background:linear-gradient(var(--blood-bright),transparent)}.commitment-top{display:flex;justify-content:space-between}.commitment-top b{font:24px 'Anton';color:var(--blood-bright)}.commitment-top span,.commitment-card small{font:9px 'IBM Plex Mono';letter-spacing:.15em;color:var(--paper-dim)}.commitment-symbol{height:100px;display:flex;align-items:center;font:76px 'Anton';color:rgba(209,39,44,.22)}.commitment-card small{color:var(--blood-bright)}.commitment-card h3{font:30px 'Anton';margin:7px 0 12px}.commitment-card strong{display:block;margin-bottom:9px}.commitment-card p{color:var(--paper-dim);font-size:14px;line-height:1.65}.commitment-status{position:absolute;bottom:20px;left:28px;font:9px 'IBM Plex Mono';letter-spacing:.12em;color:#9c9288}.rules-strip{background:rgba(15,11,10,.88)!important}
 .shop-support{padding:85px 0 95px}.support-intro{max-width:760px;margin-bottom:42px}.support-intro h2{font:clamp(44px,5vw,70px)/.95 'Anton';margin:10px 0 16px}.support-intro p{color:var(--paper-dim);line-height:1.7}.support-flow{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.14)}.support-flow article{min-height:350px;padding:25px;background:rgba(12,10,9,.82);border-right:1px solid rgba(255,255,255,.12);transition:.25s}.support-flow article:first-child{border-left:1px solid rgba(255,255,255,.12)}.support-flow article:hover{background:rgba(31,18,17,.92)}.flow-head{display:flex;justify-content:space-between;border-bottom:1px solid rgba(209,39,44,.45);padding-bottom:12px}.flow-head b{font:24px 'Anton';color:var(--blood-bright)}.flow-head span{font:9px 'IBM Plex Mono';letter-spacing:.15em;color:#aaa}.flow-icon{height:85px;display:flex;align-items:center;font:52px 'Anton';color:rgba(209,39,44,.42)}.support-flow h3{font:26px 'Anton';margin-bottom:13px}.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px}.chips i{font:8px 'IBM Plex Mono';font-style:normal;border:1px solid rgba(255,255,255,.13);padding:5px 6px;color:#b9aea3}.support-flow p{font-size:13.5px;line-height:1.65;color:var(--paper-dim)}.manifesto{margin-top:22px;display:flex;align-items:center;gap:24px;padding:26px 30px;border:1px solid rgba(209,39,44,.38);background:linear-gradient(90deg,rgba(72,13,16,.35),rgba(11,9,8,.86))}.manifesto span{font:10px 'IBM Plex Mono';letter-spacing:.16em;color:var(--blood-bright)}.manifesto>b{font-size:28px;color:var(--blood-bright)}.manifesto strong{font:24px 'Anton'}.manifesto em{margin-left:auto;font:31px 'Anton';font-style:normal}
 @media(max-width:980px){.commitment-grid{grid-template-columns:1fr}.support-flow{grid-template-columns:1fr 1fr}.manifesto{flex-wrap:wrap}.manifesto em{margin-left:0;width:100%}}@media(max-width:900px){body{background-attachment:scroll!important}}@media(max-width:620px){.support-flow{grid-template-columns:1fr}}
+
+
+/* ============================================================
+   V3.8.2 — CORRECTIONS CIBLÉES : MANIFESTO + BANDEAU RÈGLES
+   ============================================================ */
+
+/* Bloc "Votre soutien -> Une seule ambition -> Faire grandir Senzany" */
+.manifesto{
+  display:grid!important;
+  grid-template-columns:auto minmax(120px,1fr) auto minmax(160px,1.15fr);
+  align-items:center!important;
+  gap:18px!important;
+  padding:26px 30px!important;
+}
+.manifesto span{
+  white-space:nowrap;
+  margin:0!important;
+}
+.manifesto>b{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:120px;
+  color:var(--blood-bright)!important;
+  font-size:0!important;
+}
+.manifesto>b::before{
+  content:"";
+  height:1px;
+  width:100%;
+  background:linear-gradient(90deg,rgba(209,39,44,.15),rgba(209,39,44,.95),rgba(209,39,44,.15));
+}
+.manifesto>b::after{
+  content:"➜";
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  padding:0 10px;
+  background:#130d0c;
+  color:var(--blood-bright);
+  font-size:22px;
+  line-height:1;
+}
+.manifesto strong{
+  white-space:nowrap;
+  text-align:center;
+  margin:0!important;
+}
+.manifesto em{
+  margin:0!important;
+  text-align:right;
+  white-space:nowrap;
+}
+
+/* Bandeau Bohemia : hiérarchie claire et aucune collision */
+.rules-strip{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center!important;
+  gap:34px!important;
+  padding:26px 28px!important;
+}
+.rules-strip>div{
+  min-width:0;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  grid-template-areas:
+    "label title"
+    "text  text";
+  column-gap:18px;
+  row-gap:8px;
+  align-items:baseline;
+}
+.rules-strip>div>span{
+  grid-area:label;
+  display:block;
+  margin:0!important;
+  color:var(--blood-bright)!important;
+  font-family:'IBM Plex Mono',monospace!important;
+  font-size:9px!important;
+  line-height:1.3!important;
+  letter-spacing:.13em!important;
+  white-space:nowrap;
+}
+.rules-strip>div>strong{
+  grid-area:title;
+  display:block;
+  margin:0!important;
+  font-family:'Anton',sans-serif!important;
+  font-size:clamp(22px,2vw,31px)!important;
+  line-height:1!important;
+  letter-spacing:.01em!important;
+  color:var(--paper)!important;
+  white-space:normal!important;
+}
+.rules-strip>div>p{
+  grid-area:text;
+  margin:0!important;
+  max-width:800px;
+  color:var(--paper-dim)!important;
+  font-size:13.5px!important;
+  line-height:1.65!important;
+}
+.rules-strip>a{
+  flex:none;
+  white-space:nowrap;
+  align-self:center;
+  margin:0!important;
+}
+
+@media(max-width:980px){
+  .manifesto{
+    grid-template-columns:auto 1fr!important;
+  }
+  .manifesto strong,
+  .manifesto em{
+    white-space:normal;
+    text-align:left;
+  }
+  .rules-strip{
+    grid-template-columns:1fr!important;
+  }
+  .rules-strip>div{
+    grid-template-columns:1fr!important;
+    grid-template-areas:
+      "label"
+      "title"
+      "text"!important;
+  }
+  .rules-strip>a{
+    justify-self:start;
+  }
+}
