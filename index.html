@@ -134,7 +134,14 @@ async function fetchDiscordStats(){
     if(!res.ok) throw new Error('reponse non ok');
     const data = await res.json();
     const commDiscord = document.getElementById('commDiscord');
-    if(commDiscord) commDiscord.textContent = data.memberCount.toLocaleString('fr-FR');
+    if (commDiscord) {
+    commDiscord.textContent = data.members.toLocaleString('fr-FR');
+}
+const commOnline = document.getElementById('commOnline');
+
+if (commOnline) {
+    commOnline.textContent = data.onlineMembers.toLocaleString('fr-FR');
+}
   } catch(err){
     console.warn('Stats Discord indisponibles.', err);
   }
