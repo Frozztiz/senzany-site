@@ -58,6 +58,53 @@ async function fetchJson(url) {
   return response.json();
 }
 
+async function getDiscordMemberRoles(discordId) {
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  const guildId = process.env.DISCORD_GUILD_ID;
+
+  if (!botToken || !guildId || !discordId) {
+    return { available: false, roles: [] };
+  }
+
+  const headers = {
+    Authorization: `Bot ${botToken}`,
+    Accept: "application/json",
+  };
+
+  const [memberResponse, rolesResponse] = await Promise.all([
+    fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${encodeURIComponent(discordId)}`, { headers }),
+    fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers }),
+  ]);
+
+  if (memberResponse.status === 404) {
+    return { available: true, member: false, roles: [] };
+  }
+
+  if (!memberResponse.ok || !rolesResponse.ok) {
+    throw new Error(`Discord HTTP member=${memberResponse.status} roles=${rolesResponse.status}`);
+  }
+
+  const member = await memberResponse.json();
+  const guildRoles = await rolesResponse.json();
+  const memberRoleIds = new Set(Array.isArray(member.roles) ? member.roles : []);
+
+  const roles = (Array.isArray(guildRoles) ? guildRoles : [])
+    .filter((role) => role.name !== "@everyone" && memberRoleIds.has(role.id))
+    .sort((a, b) => Number(b.position || 0) - Number(a.position || 0))
+    .map((role) => ({
+      id: role.id,
+      name: role.name,
+      color: Number(role.color || 0),
+    }));
+
+  return {
+    available: true,
+    member: true,
+    nickname: member.nick || null,
+    roles,
+  };
+}
+
 async function getDayzPlaytime(apiKey, steamId) {
   const params = new URLSearchParams({
     key: apiKey,
@@ -135,6 +182,14 @@ exports.handler = async function handler(event) {
       }),
     ]);
 
+    let discordGuild = null;
+    if (discordLink?.discord_id) {
+      discordGuild = await getDiscordMemberRoles(discordLink.discord_id).catch((error) => {
+        console.error("Discord member roles lookup", error?.message || error);
+        return { available: false, roles: [] };
+      });
+    }
+
     const player = summaryData?.response?.players?.[0];
     if (!player) {
       return json(200, { loggedIn: false });
@@ -156,6 +211,10 @@ exports.handler = async function handler(event) {
         username: discordLink.discord_username,
         avatar: discordLink.discord_avatar,
         linkedAt: discordLink.created_at,
+        serverMember: discordGuild?.member === true,
+        nickname: discordGuild?.nickname || null,
+        rolesAvailable: discordGuild?.available === true,
+        roles: Array.isArray(discordGuild?.roles) ? discordGuild.roles : [],
       } : { linked: false },
     });
   } catch (error) {

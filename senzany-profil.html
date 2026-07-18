@@ -6,7 +6,7 @@
 <title>Mon profil — SENZANY</title>
 <link href="assets/css/pages/profil.css" rel="stylesheet"/>
 </head>
-<body data-page="profil" data-build="v3.3-discord-verifie">
+<body data-page="profil" data-build="v3.4-discord-roles">
 <div data-site-header=""></div>
 
 <main>
@@ -123,9 +123,15 @@
               </div>
             </div>
 
+            <div class="discord-roles" id="discordRoles" hidden>
+              <div class="mono discord-roles__title">RÔLES SENZANY</div>
+              <div class="discord-roles__list" id="discordRolesList"></div>
+              <p class="discord-roles__empty" id="discordRolesEmpty" hidden>Aucun rôle spécifique détecté sur le serveur.</p>
+            </div>
+
             <div class="discord-actions">
               <a class="profile-button profile-button--discord" id="discordLinkButton" href="/api/discord/login">Associer mon Discord <span>↗</span></a>
-              <button class="profile-button profile-button--danger" id="discordUnlinkButton" type="button" hidden>Dissocier Discord</button>
+              <button class="profile-button profile-button--danger" id="discordUnlinkButton" type="button" hidden>Dissocier mon Discord</button>
             </div>
             <p class="discord-feedback" id="discordFeedback" hidden></p>
           </section>
@@ -243,6 +249,29 @@
       document.getElementById("discordId").textContent = discord.id || "—";
       const avatar = document.getElementById("discordAvatar");
       if (discord.avatar) { avatar.src = discord.avatar; avatar.hidden = false; } else { avatar.hidden = true; }
+
+      const rolesBox = document.getElementById("discordRoles");
+      const rolesList = document.getElementById("discordRolesList");
+      const rolesEmpty = document.getElementById("discordRolesEmpty");
+      rolesList.innerHTML = "";
+
+      if (discord.rolesAvailable) {
+        rolesBox.hidden = false;
+        const roles = Array.isArray(discord.roles) ? discord.roles : [];
+        if (roles.length) {
+          rolesEmpty.hidden = true;
+          roles.forEach(function (role) {
+            const badge = document.createElement("span");
+            badge.className = "discord-role-badge";
+            badge.textContent = role.name;
+            rolesList.appendChild(badge);
+          });
+        } else {
+          rolesEmpty.hidden = false;
+        }
+      } else {
+        rolesBox.hidden = true;
+      }
     } else {
       state.textContent = "Non associé";
       state.classList.add("panel-state--pending");
