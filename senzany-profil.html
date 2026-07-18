@@ -6,7 +6,7 @@
 <title>Mon profil — SENZANY</title>
 <link href="assets/css/pages/profil.css" rel="stylesheet"/>
 </head>
-<body data-page="profil">
+<body data-page="profil" data-build="v3.3-discord-verifie">
 <div data-site-header=""></div>
 
 <main>
@@ -103,17 +103,31 @@
                 <div class="section-tag">03 // Communauté</div>
                 <h3>Compte Discord</h3>
               </div>
-              <span class="panel-state panel-state--pending">Non associé</span>
+              <span class="panel-state panel-state--pending" id="discordState">Non associé</span>
             </div>
 
-            <div class="discord-placeholder">
+            <div class="discord-placeholder" id="discordUnlinked">
               <div class="discord-placeholder__mark">D</div>
               <div>
-                <strong>Association Discord en préparation</strong>
-                <p>Cette future connexion pourra réunir votre identité Steam et vos rôles Discord dans un même compte Senzany.</p>
+                <strong>Associez votre compte Discord</strong>
+                <p>Reliez votre identité Steam à votre compte Discord pour créer votre compte Senzany unifié. La liaison est maintenant disponible.</p>
               </div>
             </div>
-            <button class="profile-button profile-button--disabled" type="button" disabled>Associer Discord — bientôt</button>
+
+            <div class="discord-linked" id="discordLinked" hidden>
+              <img class="discord-linked__avatar" id="discordAvatar" alt="Avatar Discord" src=""/>
+              <div>
+                <div class="mono discord-linked__label">DISCORD ASSOCIÉ</div>
+                <strong id="discordUsername">—</strong>
+                <div class="mono discord-linked__id" id="discordId">—</div>
+              </div>
+            </div>
+
+            <div class="discord-actions">
+              <a class="profile-button profile-button--discord" id="discordLinkButton" href="/api/discord/login">Associer mon Discord <span>↗</span></a>
+              <button class="profile-button profile-button--danger" id="discordUnlinkButton" type="button" hidden>Dissocier Discord</button>
+            </div>
+            <p class="discord-feedback" id="discordFeedback" hidden></p>
           </section>
         </div>
 
@@ -209,6 +223,70 @@
     }
   }
 
+
+  function renderDiscord(discord) {
+    const state = document.getElementById("discordState");
+    const unlinked = document.getElementById("discordUnlinked");
+    const linked = document.getElementById("discordLinked");
+    const linkButton = document.getElementById("discordLinkButton");
+    const unlinkButton = document.getElementById("discordUnlinkButton");
+
+    if (discord && discord.linked) {
+      state.textContent = "Associé";
+      state.classList.remove("panel-state--pending");
+      state.classList.add("panel-state--online");
+      unlinked.hidden = true;
+      linked.hidden = false;
+      linkButton.hidden = true;
+      unlinkButton.hidden = false;
+      document.getElementById("discordUsername").textContent = discord.username || "Compte Discord";
+      document.getElementById("discordId").textContent = discord.id || "—";
+      const avatar = document.getElementById("discordAvatar");
+      if (discord.avatar) { avatar.src = discord.avatar; avatar.hidden = false; } else { avatar.hidden = true; }
+    } else {
+      state.textContent = "Non associé";
+      state.classList.add("panel-state--pending");
+      unlinked.hidden = false;
+      linked.hidden = true;
+      linkButton.hidden = false;
+      unlinkButton.hidden = true;
+    }
+  }
+
+  function showDiscordFeedback() {
+    const code = new URLSearchParams(window.location.search).get("discord");
+    if (!code) return;
+    const messages = {
+      linked: "Compte Discord associé avec succès.",
+      cancelled: "Association Discord annulée.",
+      already_linked: "Ce compte Discord est déjà associé à un autre compte Steam.",
+      steam_required: "Reconnectez-vous à Steam avant d’associer Discord.",
+      invalid_state: "La demande d’association a expiré. Recommencez.",
+      invalid_callback: "Réponse Discord invalide.",
+      token_error: "Discord n’a pas pu finaliser l’autorisation.",
+      user_error: "Impossible de lire votre profil Discord.",
+      server_error: "Impossible d’enregistrer l’association pour le moment."
+    };
+    const feedback = document.getElementById("discordFeedback");
+    feedback.textContent = messages[code] || "État Discord mis à jour.";
+    feedback.hidden = false;
+    if (code !== "linked") feedback.classList.add("discord-feedback--error");
+    history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  document.getElementById("discordUnlinkButton").addEventListener("click", function () {
+    if (!confirm("Dissocier votre compte Discord de votre compte Steam Senzany ?")) return;
+    fetch("/api/discord/unlink", { method: "POST", credentials: "same-origin", cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function () { window.location.reload(); })
+      .catch(function () {
+        const feedback = document.getElementById("discordFeedback");
+        feedback.textContent = "Impossible de dissocier Discord pour le moment.";
+        feedback.hidden = false;
+        feedback.classList.add("discord-feedback--error");
+      });
+  });
+
   fetch("/api/steam/me", { credentials: "same-origin", cache: "no-store" })
     .then(function (response) {
       if (!response.ok) throw new Error("Steam API indisponible");
@@ -232,7 +310,9 @@
       profileLink.href = data.profileUrl || ("https://steamcommunity.com/profiles/" + data.steamId);
 
       renderDayz(data.dayz);
+      renderDiscord(data.discord);
       reveal("in");
+      showDiscordFeedback();
     })
     .catch(function () {
       reveal("out");

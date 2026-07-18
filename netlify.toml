@@ -36,3 +36,18 @@
   from = "/api/steam/logout"
   to = "/.netlify/functions/steam-logout"
   status = 200
+
+[[redirects]]
+  from = "/api/discord/login"
+  to = "/.netlify/functions/discord-login"
+  status = 200
+
+[[redirects]]
+  from = "/api/discord/callback"
+  to = "/.netlify/functions/discord-callback"
+  status = 200
+
+[[redirects]]
+  from = "/api/discord/unlink"
+  to = "/.netlify/functions/discord-unlink"
+  status = 200
