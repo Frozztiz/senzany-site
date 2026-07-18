@@ -14,9 +14,15 @@ exports.status = async (req, res) => {
 };
 
 exports.stats = async (req, res) => {
-  res.json({
-    online: true,
-    members: null,
-    message: "Discord stats route prête",
-  });
+  try {
+    const result = await discordService.getStats();
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Erreur Discord",
+      message: err.message
+    });
+  }
 };
