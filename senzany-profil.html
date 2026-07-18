@@ -4,58 +4,240 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Mon profil — SENZANY</title>
-
-<link href="assets/css/pages/profil.css" rel="stylesheet"/></head>
+<link href="assets/css/pages/profil.css" rel="stylesheet"/>
+</head>
 <body data-page="profil">
 <div data-site-header=""></div>
-<div class="page-header">
-<div class="wrap">
-<div class="page-tag" id="profileTag">Connexion</div>
-<h1 class="page-title">Mon profil</h1>
-<p class="page-sub">Connectez-vous avec Steam pour accéder à votre profil Senzany.</p>
-</div>
-</div>
-<section style="border-bottom:none;">
-<div class="wrap">
-<div class="card" id="loggedOutView" style="text-align:center; padding:48px 32px; border-color:var(--blood);">
-<h2 style="font-family:'Anton',sans-serif; text-transform:uppercase; font-size:24px; margin-bottom:14px;">Connectez-vous avec Steam</h2>
-<p style="color:var(--paper-dim); font-size:14px; max-width:460px; margin:0 auto 24px;">Votre pseudo et votre avatar Steam s'affichent instantanément. Les statistiques de jeu détaillées arriveront dans une prochaine mise à jour.</p>
-<a class="btn btn-solid" href="/api/steam/login" style="display:inline-block;">Se connecter avec Steam</a>
-</div>
-<div class="card" id="loggedInView" style="display:none; padding:32px;">
-<div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
-<img alt="Avatar Steam" id="steamAvatar" src="" style="width:64px; height:64px; border-radius:50%; border:2px solid var(--blood);"/>
-<div style="flex:1;">
-<div id="steamName" style="font-family:'Anton',sans-serif; font-size:20px; text-transform:uppercase;"></div>
-<div class="pill ok" style="margin-top:6px;">Connecté via Steam</div>
-</div>
-<a class="btn btn-sm" href="/api/steam/logout" style="display:inline-block;">Se déconnecter</a>
-</div>
-</div>
-<div class="grid-3" style="margin-top:24px;">
-<div class="card"><h3>Statistiques</h3><p>Heures de jeu, zombies éliminés, distance parcourue — bientôt disponible.</p></div>
-<div class="card"><h3>Succès &amp; récompenses</h3><p>Débloquez des succès et suivez votre progression — bientôt disponible.</p></div>
-<div class="card"><h3>Historique</h3><p>Retrouvez vos événements et actions récentes — bientôt disponible.</p></div>
-</div>
-</div>
-</section>
-<script defer="True" src="assets/js/components.js"></script><script defer="True" src="assets/js/app.js"></script><script>
-fetch("/api/steam/me")
-  .then(r => r.json())
-  .then(data => {
-    if (data.loggedIn) {
-      document.getElementById("loggedOutView").style.display = "none";
-      document.getElementById("loggedInView").style.display = "block";
-      document.getElementById("steamAvatar").src = data.avatar;
-      document.getElementById("steamName").textContent = data.name;
-      document.getElementById("profileTag").textContent = "Connecté";
-    }
-  })
-  .catch(() => { /* API pas encore configurée : on reste sur la vue déconnectée */ });
-</script>
-<div data-site-footer=""></div>
-<script>
 
+<main>
+  <section class="profile-hero">
+    <div class="wrap profile-hero__inner">
+      <div class="profile-kicker" id="profileTag">Terminal survivant</div>
+      <h1>Mon profil</h1>
+      <p>Votre identité Steam et les premiers services connectés au portail Senzany.</p>
+      <div class="profile-hero__signal" aria-hidden="true"><span></span><span></span><span></span></div>
+    </div>
+  </section>
+
+  <section class="profile-shell">
+    <div class="wrap">
+      <div id="profileLoading" class="profile-loading">
+        <span class="profile-loading__dot"></span>
+        Vérification de la session Steam…
+      </div>
+
+      <div id="loggedOutView" class="login-panel" hidden>
+        <div class="login-panel__code mono">AUTH // STEAM REQUIRED</div>
+        <div class="login-panel__body">
+          <div>
+            <div class="section-tag">Accès au terminal</div>
+            <h2>Identifiez votre survivant</h2>
+            <p>Connectez-vous avec Steam pour afficher votre identité, votre SteamID64 et votre temps de jeu total sur DayZ lorsque vos détails de jeux sont publics.</p>
+          </div>
+          <a class="profile-button profile-button--primary" href="/api/steam/login">
+            Se connecter avec Steam <span>↗</span>
+          </a>
+        </div>
+      </div>
+
+      <div id="loggedInView" hidden>
+        <article class="identity-card">
+          <div class="identity-card__scan" aria-hidden="true"></div>
+          <div class="identity-card__avatar-wrap">
+            <img alt="Avatar Steam" id="steamAvatar" class="identity-card__avatar" src=""/>
+            <span class="identity-card__online" title="Session Steam active"></span>
+          </div>
+
+          <div class="identity-card__main">
+            <div class="identity-card__eyebrow mono">DOSSIER // STEAM AUTHENTIFIÉ</div>
+            <h2 id="steamName">Survivant</h2>
+            <div class="identity-card__status"><span></span> Connecté via Steam</div>
+          </div>
+
+          <div class="identity-card__actions">
+            <a id="steamProfileLink" class="profile-button" href="#" target="_blank" rel="noopener noreferrer">
+              Profil Steam <span>↗</span>
+            </a>
+            <a class="profile-button profile-button--danger" href="/api/steam/logout">Se déconnecter</a>
+          </div>
+        </article>
+
+        <div class="profile-layout">
+          <section class="profile-panel profile-panel--identity">
+            <div class="panel-heading">
+              <div>
+                <div class="section-tag">01 // Identité</div>
+                <h3>Compte Steam</h3>
+              </div>
+              <span class="panel-state panel-state--online">Synchronisé</span>
+            </div>
+
+            <dl class="identity-data">
+              <div><dt>Pseudo Steam</dt><dd id="identityName">—</dd></div>
+              <div><dt>SteamID64</dt><dd id="steamIdValue" class="mono">—</dd></div>
+              <div><dt>Statut Steam</dt><dd id="steamStatusValue">—</dd></div>
+              <div><dt>Dernière activité Steam</dt><dd id="lastLogoffValue">—</dd></div>
+            </dl>
+          </section>
+
+          <section class="profile-panel profile-panel--dayz">
+            <div class="panel-heading">
+              <div>
+                <div class="section-tag">02 // DayZ</div>
+                <h3>Expérience globale</h3>
+              </div>
+              <span class="panel-state" id="dayzState">Lecture Steam</span>
+            </div>
+
+            <div class="dayz-stat">
+              <div class="dayz-stat__value" id="dayzHours">—</div>
+              <div class="dayz-stat__label">heures sur DayZ</div>
+            </div>
+            <p id="dayzExplanation" class="panel-copy">Chargement des données publiques Steam…</p>
+            <div class="privacy-note mono">TOTAL STEAM — TOUS SERVEURS CONFONDUS</div>
+          </section>
+
+          <section class="profile-panel profile-panel--discord">
+            <div class="panel-heading">
+              <div>
+                <div class="section-tag">03 // Communauté</div>
+                <h3>Compte Discord</h3>
+              </div>
+              <span class="panel-state panel-state--pending">Non associé</span>
+            </div>
+
+            <div class="discord-placeholder">
+              <div class="discord-placeholder__mark">D</div>
+              <div>
+                <strong>Association Discord en préparation</strong>
+                <p>Cette future connexion pourra réunir votre identité Steam et vos rôles Discord dans un même compte Senzany.</p>
+              </div>
+            </div>
+            <button class="profile-button profile-button--disabled" type="button" disabled>Associer Discord — bientôt</button>
+          </section>
+        </div>
+
+        <section class="future-zone">
+          <div class="future-zone__heading">
+            <div>
+              <div class="section-tag">Extensions du portail</div>
+              <h2>Modules serveur à connecter</h2>
+            </div>
+            <p>Aucune statistique Senzany n’est inventée : ces modules s’activeront uniquement lorsqu’une source de données fiable sera disponible.</p>
+          </div>
+
+          <div class="future-grid">
+            <article class="future-card">
+              <span class="future-card__number">01</span>
+              <h3>Statistiques Senzany</h3>
+              <p>Temps joué sur le serveur, zombies, animaux et mutants.</p>
+              <span class="future-card__state mono">SOURCE SERVEUR REQUISE</span>
+            </article>
+            <article class="future-card">
+              <span class="future-card__number">02</span>
+              <h3>Progression</h3>
+              <p>Rangs, récompenses et systèmes de progression futurs.</p>
+              <span class="future-card__state mono">EN DÉVELOPPEMENT</span>
+            </article>
+            <article class="future-card">
+              <span class="future-card__number">03</span>
+              <h3>Historique</h3>
+              <p>Activités et événements synchronisés avec le serveur.</p>
+              <span class="future-card__state mono">SOURCE SERVEUR REQUISE</span>
+            </article>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div data-site-footer=""></div>
+<script defer src="assets/js/components.js"></script>
+<script defer src="assets/js/app.js"></script>
+<script>
+(function () {
+  const personaStates = {
+    0: "Hors ligne",
+    1: "En ligne",
+    2: "Occupé",
+    3: "Absent",
+    4: "En pause",
+    5: "Recherche une partie",
+    6: "Recherche un échange"
+  };
+
+  const loading = document.getElementById("profileLoading");
+  const loggedOut = document.getElementById("loggedOutView");
+  const loggedIn = document.getElementById("loggedInView");
+
+  function reveal(view) {
+    loading.hidden = true;
+    loggedOut.hidden = view !== "out";
+    loggedIn.hidden = view !== "in";
+  }
+
+  function formatLastActivity(timestamp) {
+    if (!timestamp) return "Non communiquée";
+    return new Intl.DateTimeFormat("fr-FR", {
+      dateStyle: "medium",
+      timeStyle: "short"
+    }).format(new Date(timestamp * 1000));
+  }
+
+  function renderDayz(dayz) {
+    const hours = document.getElementById("dayzHours");
+    const explanation = document.getElementById("dayzExplanation");
+    const state = document.getElementById("dayzState");
+
+    if (dayz && dayz.available) {
+      hours.textContent = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 }).format(dayz.hours);
+      explanation.textContent = "Temps de jeu total enregistré par Steam pour DayZ. Cette valeur inclut tous les serveurs fréquentés par le joueur.";
+      state.textContent = "Donnée publique";
+      state.classList.add("panel-state--online");
+      return;
+    }
+
+    hours.textContent = "Privé";
+    state.textContent = "Indisponible";
+    state.classList.add("panel-state--pending");
+
+    if (dayz && dayz.reason === "not_found") {
+      explanation.textContent = "DayZ n’apparaît pas dans les jeux visibles de ce compte Steam.";
+    } else {
+      explanation.textContent = "Steam ne permet pas d’afficher cette donnée lorsque les détails de jeux du profil sont privés ou indisponibles.";
+    }
+  }
+
+  fetch("/api/steam/me", { credentials: "same-origin", cache: "no-store" })
+    .then(function (response) {
+      if (!response.ok) throw new Error("Steam API indisponible");
+      return response.json();
+    })
+    .then(function (data) {
+      if (!data.loggedIn) {
+        reveal("out");
+        return;
+      }
+
+      document.getElementById("profileTag").textContent = "Steam connecté";
+      document.getElementById("steamAvatar").src = data.avatar || "";
+      document.getElementById("steamName").textContent = data.name || "Survivant";
+      document.getElementById("identityName").textContent = data.name || "—";
+      document.getElementById("steamIdValue").textContent = data.steamId || "—";
+      document.getElementById("steamStatusValue").textContent = personaStates[data.personaState] || "Statut inconnu";
+      document.getElementById("lastLogoffValue").textContent = formatLastActivity(data.lastLogoff);
+
+      const profileLink = document.getElementById("steamProfileLink");
+      profileLink.href = data.profileUrl || ("https://steamcommunity.com/profiles/" + data.steamId);
+
+      renderDayz(data.dayz);
+      reveal("in");
+    })
+    .catch(function () {
+      reveal("out");
+    });
+})();
 </script>
 </body>
 </html>
