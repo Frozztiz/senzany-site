@@ -2,6 +2,7 @@
 // total sur DayZ lorsque les détails de jeux Steam sont visibles publiquement.
 
 const crypto = require("crypto");
+const { getLinkBySteamId } = require("./_supabase");
 
 const DAYZ_APP_ID = 221100;
 
@@ -120,7 +121,7 @@ exports.handler = async function handler(event) {
       "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?" +
       new URLSearchParams({ key: apiKey, steamids: steamId }).toString();
 
-    const [summaryData, dayzPlaytime] = await Promise.all([
+    const [summaryData, dayzPlaytime, discordLink] = await Promise.all([
       fetchJson(summaryUrl),
       getDayzPlaytime(apiKey, steamId).catch(() => ({
         available: false,
@@ -128,6 +129,10 @@ exports.handler = async function handler(event) {
         minutes: null,
         hours: null,
       })),
+      getLinkBySteamId(steamId).catch((error) => {
+        console.error("Supabase profile lookup", error?.message || error);
+        return null;
+      }),
     ]);
 
     const player = summaryData?.response?.players?.[0];
@@ -145,6 +150,13 @@ exports.handler = async function handler(event) {
       personaState: player.personastate,
       lastLogoff: player.lastlogoff || null,
       dayz: dayzPlaytime,
+      discord: discordLink ? {
+        linked: true,
+        id: discordLink.discord_id,
+        username: discordLink.discord_username,
+        avatar: discordLink.discord_avatar,
+        linkedAt: discordLink.created_at,
+      } : { linked: false },
     });
   } catch (error) {
     console.error("steam-me error", error);

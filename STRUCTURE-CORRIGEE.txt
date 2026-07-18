@@ -1,0 +1,11 @@
+SENZANY - STRUCTURE CORRIGEE
+
+Les fichiers Netlify Functions ont ete places dans netlify/functions/.
+Les ZIP de deploiement inutiles ont ete retires de la racine.
+
+moved_to_netlify_functions: ['_auth-utils.js', '_supabase.js', 'discord-callback.js', 'discord-login.js', 'discord-stats.js', 'discord-unlink.js', 'game-stats.js', 'steam-callback.js', 'steam-login.js', 'steam-logout.js', 'steam-me.js', 'topserveurs-stats.js']
+already_in_correct_folder: []
+missing_expected_files: []
+removed_repo_zip_files: []
+netlify_toml_present: True
+functions_now_present: ['_auth-utils.js', '_supabase.js', 'discord-callback.js', 'discord-login.js', 'discord-stats.js', 'discord-unlink.js', 'game-stats.js', 'steam-callback.js', 'steam-login.js', 'steam-logout.js', 'steam-me.js', 'topserveurs-stats.js']
