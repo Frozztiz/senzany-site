@@ -31,8 +31,16 @@ jobs:
 
               mkdir -p /var/www/senzany/server/routes
               cp -f /var/www/senzany/backend/server.js /var/www/senzany/server/server.js
+              mkdir -p /var/www/senzany/server/routes
+              mkdir -p /var/www/senzany/server/services
+              mkdir -p /var/www/senzany/server/controllers
+
+              cp -f /var/www/senzany/backend/server.js /var/www/senzany/server/server.js
               cp -f /var/www/senzany/backend/package.json /var/www/senzany/server/package.json
+
               cp -rf /var/www/senzany/backend/routes/. /var/www/senzany/server/routes/
+              cp -rf /var/www/senzany/backend/services/. /var/www/senzany/server/services/
+              cp -rf /var/www/senzany/backend/controllers/. /var/www/senzany/server/controllers/
 
               cd /var/www/senzany/server
               npm install --omit=dev
