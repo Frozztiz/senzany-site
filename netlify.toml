@@ -1,15 +1,16 @@
 [build]
   functions = "netlify/functions"
   publish = "."
-  
-[[redirects]]
-  from = "/api/topserveurs/stats"
-  to = "/.netlify/functions/topserveurs-stats"
-  status = 200
 
 [[redirects]]
   from = "/api/game/stats"
-  to = "/.netlify/functions/game-stats"
+  to = "http://213.32.88.222/api/game/stats"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/topserveurs/stats"
+  to = "/.netlify/functions/topserveurs-stats"
   status = 200
 
 [[redirects]]

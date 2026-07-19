@@ -1,11 +1,30 @@
-SENZANY — INTRO CINÉMATIQUE V4
+CORRECTION JOUEURS CONNECTÉS - SENZANY
 
-Remplacer uniquement :
-- assets/js/shared/ambient-player.js
-- assets/css/shared/ambient-player.css
+FICHIERS À REMPLACER :
+1. backend/routes/game.js
+2. backend/.env.example
+3. netlify.toml
 
-Après déploiement : Ctrl + F5 puis cliquer une fois sur la page.
-La clé V4 force l'affichage une fois même si les anciennes intros ont déjà été vues.
+IMPORTANT :
+Le fichier backend/.env.example est seulement un modèle.
+Sur le VPS, il faut modifier le vrai fichier :
+/var/www/senzany/server/.env
 
-Pour relancer manuellement :
-localStorage.removeItem('senzanyAmbientIntroSeenV4'); location.reload();
+Ajouter :
+DAYZ_SERVER_IP=208.115.196.109
+DAYZ_GAME_PORT=2302
+DAYZ_QUERY_PORT=2305
+DAYZ_MAX_PLAYERS=50
+
+Puis :
+pm2 restart senzany-api --update-env
+
+Test OVH :
+curl http://127.0.0.1:3000/api/game/stats
+
+Résultat attendu :
+{"online":true,"players":19,"maxPlayers":50,...}
+
+Ensuite pousser les 3 fichiers sur GitHub pour que :
+- GitHub Actions mette à jour le backend OVH
+- Netlify redirige /api/game/stats vers le backend OVH
