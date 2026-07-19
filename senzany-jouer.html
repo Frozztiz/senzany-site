@@ -79,42 +79,6 @@
 <script defer="True" src="assets/js/components.js"></script><script defer="True" src="assets/js/app.js"></script><script>
 
 </script>
-<script>
-document.getElementById('copyIpBtn').addEventListener('click', function(){
-  navigator.clipboard.writeText('208.115.196.109:2302').then(()=>{
-    this.textContent = 'IP copiée ✓';
-    setTimeout(()=>{ this.textContent = "Copier l'IP"; }, 2000);
-  });
-});
-
-/* Stats live du serveur DayZ via le backend Express */
-async function fetchLiveSlots(){
-  const slotsElement = document.getElementById('slotsInfo');
-
-  try{
-    const res = await fetch('/api/game/stats');
-    if(!res.ok) throw new Error('reponse non ok');
-    const data = await res.json();
-
-    if (
-      slotsElement &&
-      data.online &&
-      data.players !== null &&
-      data.players !== undefined &&
-      data.maxPlayers !== null &&
-      data.maxPlayers !== undefined
-    ) {
-      slotsElement.textContent = `${data.players} / ${data.maxPlayers}`;
-    } else if (slotsElement) {
-      slotsElement.textContent = data.online ? 'Bientôt disponible' : 'Hors ligne';
-    }
-  } catch(err){
-    if (slotsElement) slotsElement.textContent = 'Bientôt disponible';
-    console.warn('Stats live indisponibles.', err);
-  }
-}
-fetchLiveSlots();
-setInterval(fetchLiveSlots, 60000);
-</script>
+<script defer src="assets/js/api.js"></script><script defer src="assets/js/pages/jouer.js"></script>
 </body>
 </html>
