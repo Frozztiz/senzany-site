@@ -4,56 +4,128 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Wiki — SENZANY</title>
-
-<link href="assets/css/pages/wiki.css" rel="stylesheet"/></head>
+<link href="assets/css/pages/wiki.css" rel="stylesheet"/>
+</head>
 <body data-page="wiki">
 <div data-site-header=""></div>
-<div class="page-header">
-<div class="wrap">
-<div class="page-tag">Base de connaissances</div>
-<h1 class="page-title">Wiki Senzany</h1>
-<p class="page-sub">Toutes les informations essentielles pour survivre et comprendre l'univers Senzany.</p>
-<div style="margin-top:20px; max-width:420px;">
-<input placeholder="Rechercher dans le wiki..." style="width:100%;" type="text"/>
-</div>
-</div>
-</div>
-<section>
-<div class="wrap">
-<div class="section-head">
-<div class="section-tag">Explorer</div>
-<h2 class="section-title">Catégories du wiki</h2>
-</div>
-<div class="grid-4">
-<div class="card"><h3>Débuter sur Senzany</h3><p>Tout ce qu'il faut savoir pour bien commencer.</p><div class="pill" style="margin-top:10px;">12 articles</div></div>
-<div class="card"><h3>Survie &amp; gameplay</h3><p>Mécaniques, nourriture, santé, météo et astuces.</p><div class="pill" style="margin-top:10px;">24 articles</div></div>
-<div class="card"><h3>Lieux &amp; exploration</h3><p>Villes, zones d'intérêt, points de loot de la carte.</p><div class="pill" style="margin-top:10px;">36 articles</div></div>
-<div class="card"><h3>Véhicules</h3><p>Spawns, réparations, accessoires et astuces.</p><div class="pill" style="margin-top:10px;">18 articles</div></div>
-<div class="card"><h3>Craft &amp; équipements</h3><p>Recettes, matériaux et améliorations.</p><div class="pill" style="margin-top:10px;">28 articles</div></div>
-<div class="card"><h3>Factions &amp; groupes</h3><p>Alliances, zones de contrôle et diplomatie.</p><div class="pill" style="margin-top:10px;">14 articles</div></div>
-<div class="card"><h3>Règles &amp; sécurité</h3><p>Règlement du serveur et sanctions.</p><div class="pill" style="margin-top:10px;">10 articles</div></div>
-<div class="card"><h3>FAQ &amp; problèmes</h3><p>Réponses aux questions fréquentes.</p><div class="pill" style="margin-top:10px;">20 articles</div></div>
-</div>
-</div>
-</section>
-<section style="border-bottom:none;">
-<div class="wrap grid-2">
-<div class="card">
-<h3>Mis à jour récemment</h3>
-<div class="stat-row"><span>Guide des bunkers</span><span class="pill new">Nouveau</span></div>
-<div class="stat-row"><span>Système de factions</span><span class="pill">MAJ</span></div>
-<div class="stat-row"><span>Craft avancé</span><span class="pill">MAJ</span></div>
-</div>
-<div class="card">
-<h3>Proposer un article</h3>
-<p>Vous avez une idée ou des informations à partager ? Contribuez au wiki.</p>
-<a class="btn btn-solid btn-sm" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" style="margin-top:12px; display:inline-block;" target="_blank">Rejoindre Discord</a>
-</div>
-</div>
-</section>
-<div data-site-footer=""></div>
-<script defer="True" src="assets/js/components.js"></script><script defer="True" src="assets/js/app.js"></script><script>
 
-</script>
+<main>
+  <header class="page-header">
+    <div class="wiki-grid-overlay" aria-hidden="true"></div>
+    <div class="wrap page-header-inner">
+      <div class="wiki-status"><span></span> Archives en cours de classification</div>
+      <div class="page-tag">Base de connaissances</div>
+      <h1 class="page-title">Wiki <span>Senzany</span></h1>
+      <p class="page-sub">Toutes les informations essentielles pour survivre et comprendre l'univers Senzany.</p>
+
+      <div class="wiki-search-shell" role="search">
+        <div class="search-code">DB // SEARCH</div>
+        <input aria-label="Rechercher dans le wiki" placeholder="Rechercher dans le wiki..." type="text"/>
+        <div class="search-state">INDEXATION EN COURS</div>
+      </div>
+    </div>
+  </header>
+
+  <section class="wiki-categories">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <div class="section-tag">Explorer</div>
+          <h2 class="section-title">Catégories du wiki</h2>
+        </div>
+        <div class="archive-counter" aria-hidden="true"><span>ARCHIVES</span><strong>08</strong></div>
+      </div>
+
+      <div class="grid-4 wiki-grid">
+        <article class="card wiki-card" data-code="01" data-accent="green">
+          <div class="card-icon" aria-hidden="true">⌁</div>
+          <div class="card-code">DOSSIER // 01</div>
+          <h3>Débuter sur Senzany</h3>
+          <p>Tout ce qu'il faut savoir pour bien commencer.</p>
+          <div class="pill">12 articles</div>
+        </article>
+
+        <article class="card wiki-card" data-code="02" data-accent="amber">
+          <div class="card-icon" aria-hidden="true">✚</div>
+          <div class="card-code">DOSSIER // 02</div>
+          <h3>Survie &amp; gameplay</h3>
+          <p>Mécaniques, nourriture, santé, météo et astuces.</p>
+          <div class="pill">24 articles</div>
+        </article>
+
+        <article class="card wiki-card" data-code="03" data-accent="blue">
+          <div class="card-icon" aria-hidden="true">⌖</div>
+          <div class="card-code">DOSSIER // 03</div>
+          <h3>Lieux &amp; exploration</h3>
+          <p>Villes, zones d'intérêt, points de loot de la carte.</p>
+          <div class="pill">36 articles</div>
+        </article>
+
+        <article class="card wiki-card" data-code="04" data-accent="red">
+          <div class="card-icon" aria-hidden="true">⬡</div>
+          <div class="card-code">DOSSIER // 04</div>
+          <h3>Véhicules</h3>
+          <p>Spawns, réparations, accessoires et astuces.</p>
+          <div class="pill">18 articles</div>
+        </article>
+
+        <article class="card wiki-card" data-code="05" data-accent="purple">
+          <div class="card-icon" aria-hidden="true">⚒</div>
+          <div class="card-code">DOSSIER // 05</div>
+          <h3>Craft &amp; équipements</h3>
+          <p>Recettes, matériaux et améliorations.</p>
+          <div class="pill">28 articles</div>
+        </article>
+
+        <article class="card wiki-card" data-code="06" data-accent="amber">
+          <div class="card-icon" aria-hidden="true">⌬</div>
+          <div class="card-code">DOSSIER // 06</div>
+          <h3>Factions &amp; groupes</h3>
+          <p>Alliances, zones de contrôle et diplomatie.</p>
+          <div class="pill">14 articles</div>
+        </article>
+
+        <article class="card wiki-card" data-code="07" data-accent="red">
+          <div class="card-icon" aria-hidden="true">⚠</div>
+          <div class="card-code">DOSSIER // 07</div>
+          <h3>Règles &amp; sécurité</h3>
+          <p>Règlement du serveur et sanctions.</p>
+          <div class="pill">10 articles</div>
+        </article>
+
+        <article class="card wiki-card" data-code="08" data-accent="blue">
+          <div class="card-icon" aria-hidden="true">?</div>
+          <div class="card-code">DOSSIER // 08</div>
+          <h3>FAQ &amp; problèmes</h3>
+          <p>Réponses aux questions fréquentes.</p>
+          <div class="pill">20 articles</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="wiki-bottom-section">
+    <div class="wrap grid-2 wiki-bottom-grid">
+      <article class="card update-panel">
+        <div class="panel-kicker">Journal des archives</div>
+        <h3>Mis à jour récemment</h3>
+        <div class="stat-row"><span>Guide des bunkers</span><span class="pill new">Nouveau</span></div>
+        <div class="stat-row"><span>Système de factions</span><span class="pill">MAJ</span></div>
+        <div class="stat-row"><span>Craft avancé</span><span class="pill">MAJ</span></div>
+      </article>
+
+      <article class="card contribution-panel">
+        <div class="panel-kicker">Canal communautaire</div>
+        <h3>Proposer un article</h3>
+        <p>Vous avez une idée ou des informations à partager ? Contribuez au wiki.</p>
+        <a class="btn btn-solid btn-sm" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Rejoindre Discord</a>
+      </article>
+    </div>
+  </section>
+</main>
+
+<div data-site-footer=""></div>
+<script defer="True" src="assets/js/components.js"></script>
+<script defer="True" src="assets/js/app.js"></script>
 </body>
 </html>
