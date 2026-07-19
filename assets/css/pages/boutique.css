@@ -1099,3 +1099,141 @@ body{background-color:var(--bg)!important;background-image:url('../../images/bac
 @media (prefers-reduced-motion:reduce){
   .shop-framework .section-head--center h2::after{animation:none;display:none}
 }
+
+/* ============================================================
+   V8.0 — RAFFINEMENT AAA / FONDS FIXES / CTA SOUTIEN
+   ============================================================ */
+.shop-hero--v6::after,
+.shop-framework::after,
+.shop-support::after{
+  animation:none!important;
+  transform:none!important;
+}
+
+.shop-hero--v6::after{opacity:.82}
+.shop-framework::after,.shop-support::after{opacity:.62}
+
+.manifesto--v8{
+  min-height:138px;
+  display:grid;
+  grid-template-columns:1.05fr 1.25fr 1.15fr;
+  align-items:center;
+  gap:28px;
+  padding:28px 30px;
+  border:1px solid rgba(209,39,44,.5);
+  background:
+    linear-gradient(100deg,rgba(88,15,18,.40),rgba(12,9,9,.94) 43%,rgba(23,11,11,.94)),
+    radial-gradient(circle at 15% 50%,rgba(209,39,44,.15),transparent 28%);
+  box-shadow:0 24px 60px rgba(0,0,0,.46),inset 0 1px rgba(255,255,255,.04);
+  transition:transform .32s ease,border-color .32s ease,box-shadow .38s ease;
+}
+.manifesto--v8:hover{
+  transform:translateY(-4px);
+  border-color:rgba(255,73,78,.78);
+  box-shadow:0 30px 72px rgba(0,0,0,.54),0 0 32px rgba(209,39,44,.14),inset 0 1px rgba(255,255,255,.055);
+}
+.manifesto--v8::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:3px;
+  background:linear-gradient(180deg,transparent,var(--blood-bright),#ff8836,transparent);
+  box-shadow:0 0 18px rgba(255,65,70,.48);
+}
+.manifesto__intro{display:flex;flex-direction:column;gap:8px}
+.manifesto__intro span{
+  font:10px 'IBM Plex Mono',monospace;
+  letter-spacing:.18em;
+  color:var(--blood-bright);
+}
+.manifesto__intro strong{
+  font:clamp(22px,2vw,31px)/1.02 'Anton',sans-serif;
+  color:#f5ede3;
+  text-transform:uppercase;
+  text-shadow:0 8px 24px rgba(0,0,0,.62);
+}
+.manifesto__uses{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  padding:0 28px;
+  border-left:1px solid rgba(255,255,255,.09);
+  border-right:1px solid rgba(255,255,255,.09);
+}
+.manifesto__uses i{
+  position:relative;
+  padding:10px 11px 10px 27px;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.025);
+  color:#cfc3b7;
+  font:9px 'IBM Plex Mono',monospace;
+  font-style:normal;
+  letter-spacing:.08em;
+  transition:border-color .25s ease,color .25s ease,background .25s ease;
+}
+.manifesto__uses i::before{
+  content:"";
+  position:absolute;
+  left:11px;top:50%;
+  width:6px;height:6px;
+  border:1px solid var(--blood-bright);
+  transform:translateY(-50%) rotate(45deg);
+  box-shadow:0 0 9px rgba(239,52,57,.28);
+}
+.manifesto--v8:hover .manifesto__uses i{
+  border-color:rgba(209,39,44,.28);
+  color:#f0e7dc;
+  background:rgba(90,17,20,.11);
+}
+.manifesto__cta{
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  column-gap:16px;
+}
+.manifesto__cta small{
+  grid-column:1/-1;
+  margin-bottom:5px;
+  color:#a99d93;
+  font:9px 'IBM Plex Mono',monospace;
+  letter-spacing:.16em;
+}
+.manifesto__cta em{
+  margin:0;
+  width:auto;
+  color:#fff;
+  font:clamp(25px,2.25vw,36px)/1 'Anton',sans-serif;
+  font-style:normal;
+  text-shadow:0 0 20px rgba(209,39,44,.22);
+}
+.manifesto__cta b{
+  display:grid;
+  place-items:center;
+  width:46px;height:46px;
+  border:1px solid rgba(209,39,44,.5);
+  background:rgba(93,15,18,.28);
+  color:#ff474c;
+  font-size:25px;
+  transition:transform .3s ease,box-shadow .3s ease,background .3s ease;
+}
+.manifesto--v8:hover .manifesto__cta b{
+  transform:translateX(5px);
+  background:rgba(142,25,29,.42);
+  box-shadow:0 0 22px rgba(209,39,44,.22);
+}
+
+@media(max-width:980px){
+  .manifesto--v8{grid-template-columns:1fr 1fr}
+  .manifesto__intro{grid-column:1/-1}
+  .manifesto__uses{padding-left:0;border-left:0}
+}
+@media(max-width:680px){
+  .manifesto--v8{grid-template-columns:1fr;padding:24px 20px;gap:22px}
+  .manifesto__intro,.manifesto__uses,.manifesto__cta{grid-column:auto}
+  .manifesto__uses{padding:0;border:0;grid-template-columns:1fr}
+  .manifesto__cta{padding-top:18px;border-top:1px solid rgba(255,255,255,.09)}
+}
+@media(prefers-reduced-motion:reduce){
+  .manifesto--v8,.manifesto__cta b{transition:none!important}
+}
