@@ -9,7 +9,7 @@
     muted: 'senzanyAmbientMuted',
     volume: 'senzanyAmbientVolume',
     position: 'senzanyAmbientPosition',
-    introSeen: 'senzanyAmbientIntroSeenGSAPV1'
+    introSeen: 'senzanyAmbientIntroSeenGSAPV2'
   };
 
   const DEFAULT_VOLUME = 0.22;
@@ -71,7 +71,10 @@
     <div class="senzany-audio-intro__fog senzany-audio-intro__fog--front" aria-hidden="true"></div>
     <div class="senzany-audio-intro__content">
       <div class="senzany-audio-intro__overline">PORTAIL OFFICIEL</div>
-      <div class="senzany-audio-intro__brand" data-text="SENZANY">SENZANY</div>
+      <div class="senzany-audio-intro__identity">
+        <img class="senzany-audio-intro__logo" src="assets/images/branding/logo.png" alt="" aria-hidden="true">
+        <div class="senzany-audio-intro__brand" data-text="SENZANY">SENZANY</div>
+      </div>
       <div class="senzany-audio-intro__line"><span></span></div>
       <div class="senzany-audio-intro__tagline">
         <span>VOICI LE RÉCIT</span>
@@ -143,7 +146,7 @@
     }
 
     const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/gsap@3.15/dist/gsap.min.js';
+    script.src = 'https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js';
     script.async = true;
     script.dataset.senzanyGsap = 'true';
     script.addEventListener('load', () => resolve(window.gsap), { once: true });
@@ -185,35 +188,37 @@
     intro.style.pointerEvents = 'all';
     document.documentElement.classList.add('senzany-intro-running');
 
+    gsap.killTweensOf('*');
     gsap.set(intro, { autoAlpha: 0 });
-    gsap.set(q('.senzany-audio-intro__scene'), { scale: 1.16, filter: 'brightness(0.35) saturate(0.65)' });
-    gsap.set(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 0.25 });
+    gsap.set(q('.senzany-audio-intro__scene'), { scale: 1.22, filter: 'brightness(0.18) saturate(0.5)' });
+    gsap.set(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 0.18 });
     gsap.set([fogBack, fogMiddle, fogFront], { autoAlpha: 0 });
-    gsap.set(q('.senzany-audio-intro__overline'), { autoAlpha: 0, y: 14, letterSpacing: '0.9em' });
-    gsap.set(q('.senzany-audio-intro__brand'), { autoAlpha: 0, y: 34, scale: 0.88, filter: 'blur(18px)' });
+    gsap.set(q('.senzany-audio-intro__overline'), { autoAlpha: 0, y: 18, letterSpacing: '1.05em' });
+    gsap.set(q('.senzany-audio-intro__logo'), { autoAlpha: 0, scale: 0.55, rotation: -2, filter: 'blur(20px) brightness(0.35)' });
+    gsap.set(q('.senzany-audio-intro__brand'), { autoAlpha: 0, y: 42, scale: 0.82, filter: 'blur(24px)' });
     gsap.set(q('.senzany-audio-intro__line span'), { scaleX: 0, transformOrigin: '50% 50%' });
-    gsap.set(q('.senzany-audio-intro__tagline span'), { autoAlpha: 0, y: 28, filter: 'blur(12px)' });
-    gsap.set(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 0, y: 36, filter: 'blur(16px)', letterSpacing: '0.12em' });
-    gsap.set(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: 12 });
+    gsap.set(q('.senzany-audio-intro__tagline span'), { autoAlpha: 0, y: 36, filter: 'blur(18px)' });
+    gsap.set(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 0, y: 48, scale: 1.08, filter: 'blur(24px)', letterSpacing: '0.16em' });
+    gsap.set(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: 14 });
     gsap.set(q('.senzany-audio-intro__vignette'), { autoAlpha: 0 });
 
     embers.forEach((ember) => {
-      gsap.set(ember, { autoAlpha: 0, scale: 0.4 });
+      gsap.set(ember, { autoAlpha: 0, scale: 0.35 });
       gsap.to(ember, {
         y: () => `-${ember.dataset.rise}vh`,
         x: () => Number(ember.dataset.drift),
-        autoAlpha: 0.8,
-        scale: () => 0.7 + Math.random() * 1.6,
-        duration: () => Number(ember.dataset.duration),
+        autoAlpha: 0.95,
+        scale: () => 0.8 + Math.random() * 1.9,
+        duration: () => Number(ember.dataset.duration) + 2,
         delay: () => Number(ember.dataset.delay),
-        repeat: 1,
+        repeat: 2,
         ease: 'none'
       });
     });
 
-    gsap.to(fogBack, { xPercent: 16, duration: 12, ease: 'sine.inOut' });
-    gsap.to(fogMiddle, { xPercent: -18, duration: 13, ease: 'sine.inOut' });
-    gsap.to(fogFront, { xPercent: 12, duration: 11, ease: 'sine.inOut' });
+    gsap.to(fogBack, { xPercent: 24, scale: 1.2, duration: 16, ease: 'sine.inOut' });
+    gsap.to(fogMiddle, { xPercent: -28, scale: 1.28, duration: 15, ease: 'sine.inOut' });
+    gsap.to(fogFront, { xPercent: 20, scale: 1.38, duration: 14, ease: 'sine.inOut' });
 
     const timeline = gsap.timeline({
       defaults: { ease: 'power2.out' },
@@ -226,25 +231,30 @@
     });
 
     timeline
-      .to(intro, { autoAlpha: 1, duration: 0.9 }, 0)
-      .to(q('.senzany-audio-intro__scene'), { scale: 1.06, filter: 'brightness(0.62) saturate(0.8)', duration: 9.4, ease: 'power1.out' }, 0)
-      .to(q('.senzany-audio-intro__vignette'), { autoAlpha: 1, duration: 1.2 }, 0)
-      .to(fogBack, { autoAlpha: 0.46, duration: 1.8 }, 0.35)
-      .to(fogMiddle, { autoAlpha: 0.38, duration: 2.2 }, 0.55)
-      .to(fogFront, { autoAlpha: 0.62, duration: 2.5 }, 0.75)
-      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 1, scale: 1, duration: 2.1, ease: 'power3.out' }, 0.7)
-      .to(q('.senzany-audio-intro__overline'), { autoAlpha: 1, y: 0, letterSpacing: '0.52em', duration: 1.2 }, 1.2)
-      .to(q('.senzany-audio-intro__brand'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 1.8, ease: 'expo.out' }, 1.55)
-      .to(q('.senzany-audio-intro__brand'), { textShadow: '0 0 26px rgba(241,43,54,.42), 0 0 80px rgba(153,0,13,.22)', duration: 1.1, yoyo: true, repeat: 1 }, 2.4)
-      .to(q('.senzany-audio-intro__line span'), { scaleX: 1, duration: 1.05, ease: 'expo.inOut' }, 2.75)
-      .to(q('.senzany-audio-intro__tagline span'), { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1.25 }, 3.05)
-      .to(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 1, y: 0, filter: 'blur(0px)', letterSpacing: '0.035em', duration: 1.55, ease: 'expo.out' }, 3.35)
-      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 1, y: 0, duration: 0.9 }, 4.35)
-      .to({}, { duration: 2.45 })
-      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: -8, duration: 0.65 }, 7.05)
-      .to(q('.senzany-audio-intro__content'), { autoAlpha: 0, scale: 1.035, filter: 'blur(10px)', duration: 1.4, ease: 'power2.in' }, 7.25)
-      .to([fogBack, fogMiddle, fogFront], { autoAlpha: 0.92, scale: 1.2, duration: 1.25, ease: 'power2.in' }, 7.25)
-      .to(intro, { autoAlpha: 0, duration: 1.55, ease: 'power2.inOut' }, 8.15);
+      .to(intro, { autoAlpha: 1, duration: 1.05 }, 0)
+      .to(q('.senzany-audio-intro__scene'), { scale: 1.04, filter: 'brightness(0.48) saturate(0.76)', duration: 11.8, ease: 'power1.out' }, 0)
+      .to(q('.senzany-audio-intro__vignette'), { autoAlpha: 1, duration: 1.25 }, 0)
+      .to(fogBack, { autoAlpha: 0.78, duration: 2.0 }, 0.25)
+      .to(fogMiddle, { autoAlpha: 0.72, duration: 2.2 }, 0.45)
+      .to(fogFront, { autoAlpha: 0.9, duration: 2.4 }, 0.65)
+      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 1, scale: 1.15, duration: 2.8, ease: 'power3.out' }, 0.75)
+      .to(q('.senzany-audio-intro__overline'), { autoAlpha: 1, y: 0, letterSpacing: '0.58em', duration: 1.3 }, 1.15)
+      .to(q('.senzany-audio-intro__logo'), { autoAlpha: 1, scale: 1, rotation: 0, filter: 'blur(0px) brightness(1)', duration: 2.05, ease: 'expo.out' }, 1.45)
+      .to(q('.senzany-audio-intro__brand'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 2.15, ease: 'expo.out' }, 1.7)
+      .to(q('.senzany-audio-intro__identity'), { scale: 1.025, duration: 1.7, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 2.6)
+      .to(q('.senzany-audio-intro__line span'), { scaleX: 1, duration: 1.15, ease: 'expo.inOut' }, 3.25)
+      .to(q('.senzany-audio-intro__tagline span'), { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1.45 }, 3.65)
+      .to(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', letterSpacing: '0.028em', duration: 1.85, ease: 'expo.out' }, 4.0)
+      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 1, y: 0, duration: 1.0 }, 5.1)
+      .to(q('.senzany-audio-intro__glow'), { scale: 1.35, autoAlpha: 0.78, duration: 2.6, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 5.0)
+      .to({}, { duration: 2.2 })
+      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: -10, duration: 0.7 }, 8.2)
+      .to(fogFront, { autoAlpha: 1, scale: 1.58, filter: 'blur(28px)', duration: 1.15, ease: 'power2.in' }, 8.35)
+      .to(fogMiddle, { autoAlpha: 1, scale: 1.42, duration: 1.25, ease: 'power2.in' }, 8.4)
+      .to(q('.senzany-audio-intro__content'), { autoAlpha: 0, scale: 1.07, filter: 'blur(18px)', duration: 1.5, ease: 'power2.in' }, 8.65)
+      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 1.7, duration: 1.2 }, 9.0)
+      .to([fogBack, fogMiddle, fogFront], { autoAlpha: 0, xPercent: '+=12', duration: 2.0, ease: 'power2.inOut' }, 9.55)
+      .to(intro, { autoAlpha: 0, duration: 1.85, ease: 'power2.inOut' }, 10.0);
 
     return true;
   };
