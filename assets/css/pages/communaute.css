@@ -141,3 +141,130 @@ main{display:block;position:relative;z-index:1}
 
 @media(max-width:1000px){.honors-layout{grid-template-columns:1fr}.honors-grid{grid-template-columns:repeat(2,1fr)}.community-command{max-width:680px}}
 @media(max-width:700px){.community-command__metrics{grid-template-columns:1fr}.community-command__metrics>div+div{border-left:0;border-top:1px solid rgba(255,255,255,.09)}.honors-grid{grid-template-columns:1fr}.honors-champion{min-height:540px}.honor-card{min-height:92px}.gallery-section{padding-top:72px}}
+
+/* === Finition visuelle v3 === */
+/* Le panneau live devient un HUD intégré au décor, plus large et moins "boîte rouge". */
+.community-command{
+  max-width:420px;
+  justify-self:end;
+  border:1px solid rgba(255,255,255,.12);
+  border-left:2px solid rgba(224,45,52,.9);
+  background:
+    linear-gradient(145deg,rgba(10,10,10,.86),rgba(18,10,11,.76)),
+    radial-gradient(circle at 85% 12%,rgba(213,35,43,.20),transparent 34%);
+  box-shadow:0 32px 80px rgba(0,0,0,.62),0 0 0 1px rgba(255,255,255,.025) inset;
+  clip-path:polygon(0 0,96% 0,100% 5%,100% 100%,4% 100%,0 95%);
+}
+.community-command:after{inset:8px;border-color:rgba(255,255,255,.025)}
+.community-command__top{padding:17px 20px;background:rgba(0,0,0,.18)}
+.community-command__online{padding:27px 21px 24px;background:linear-gradient(90deg,transparent,rgba(179,25,32,.10))}
+.community-command__online>strong{font-size:clamp(66px,6vw,92px);letter-spacing:-.025em}
+.community-command__metrics>div{padding:16px 12px}
+.community-command__metrics strong{font-size:23px}
+.community-command__join{background:linear-gradient(90deg,#a51e24,#6f1116)}
+.community-command__glow{opacity:.62}
+
+/* Hero : meilleur équilibre entre le texte et le panneau. */
+.community-hero__grid{grid-template-columns:minmax(0,1.35fr) minmax(330px,.65fr);gap:58px}
+.community-hero__copy{max-width:780px}
+
+/* Bannière histoire : composition propre et disparition complète du mini-plan visible dans la capture. */
+.story-panel{
+  min-height:570px;
+  background-image:url('../../images/gallery/gallery-convoi.png');
+  background-position:center 38%;
+  background-size:cover;
+  background-attachment:scroll;
+  overflow:hidden;
+}
+.story-panel:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(4,4,4,.96) 0%,rgba(4,4,4,.72) 52%,rgba(4,4,4,.38) 76%,rgba(4,4,4,.78) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.82));
+  z-index:1;
+}
+.story-panel__overlay{z-index:1;background:radial-gradient(circle at 52% 48%,rgba(136,21,27,.11),transparent 42%)}
+.story-panel__content{z-index:2;max-width:900px;padding-left:42px}
+.story-panel h2{margin:18px 0 25px;line-height:.86;letter-spacing:-.018em}
+.story-title__solid,.story-title__outline{display:block}
+.story-title__solid{font-size:clamp(58px,6.4vw,96px);color:var(--paper)}
+.story-title__outline{font-size:clamp(49px,5.6vw,84px);margin-top:5px;color:transparent;-webkit-text-stroke:1px rgba(241,235,228,.72)}
+.story-panel__content>p:not(.eyebrow),.story-panel .text-link{margin-left:2px}
+
+/* Hall of Fame : cartes plus lumineuses, plus vivantes et plus prestigieuses. */
+.honors-grid{gap:14px}
+.honor-card{
+  min-height:112px;
+  border-color:rgba(100,77,70,.66);
+  background:
+    radial-gradient(circle at 100% 0%,rgba(190,29,36,.12),transparent 36%),
+    linear-gradient(135deg,rgba(23,18,17,.96),rgba(8,8,8,.96));
+  box-shadow:0 12px 30px rgba(0,0,0,.25),0 0 0 1px rgba(255,255,255,.015) inset;
+}
+.honor-card:after{
+  content:"";
+  position:absolute;
+  width:90px;height:160%;
+  top:-30%;left:-120px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.09),transparent);
+  transform:rotate(18deg);
+  transition:left .7s ease;
+}
+.honor-card:hover:after{left:115%}
+.honor-card:hover{transform:translateY(-6px) scale(1.012);border-color:rgba(231,45,52,.82);box-shadow:0 22px 52px rgba(0,0,0,.48),0 0 28px rgba(209,39,44,.14)}
+.honor-card__rank{font-size:46px;color:rgba(255,255,255,.105);text-shadow:0 0 20px rgba(255,255,255,.04)}
+.honor-card__medal{filter:drop-shadow(0 0 7px currentColor)}
+.honor-card strong{font-size:21px;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+.honor-card small{color:#9b8e86;letter-spacing:.07em}
+.honor-card--silver{background:radial-gradient(circle at 88% 12%,rgba(206,220,231,.15),transparent 34%),linear-gradient(135deg,rgba(68,76,84,.30),rgba(8,8,8,.96));box-shadow:0 0 28px rgba(190,207,221,.08)}
+.honor-card--bronze{background:radial-gradient(circle at 88% 12%,rgba(224,137,82,.16),transparent 34%),linear-gradient(135deg,rgba(112,61,31,.31),rgba(8,8,8,.96));box-shadow:0 0 28px rgba(213,126,72,.08)}
+.honors-champion:after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 25%,rgba(255,219,135,.10) 45%,transparent 62%);
+  transform:translateX(-120%);animation:championShine 6.5s ease-in-out infinite;
+}
+@keyframes championShine{0%,55%{transform:translateX(-120%)}78%,100%{transform:translateX(120%)}}
+
+/* Classements : davantage de contraste, de profondeur et d'effets "récompense". */
+.leaderboards{gap:18px}
+.leader-card{
+  position:relative;isolation:isolate;overflow:hidden;
+  padding:32px;
+  background:linear-gradient(160deg,rgba(22,17,16,.98),rgba(7,7,7,.98));
+  border:1px solid rgba(91,70,65,.72);
+  box-shadow:0 16px 38px rgba(0,0,0,.3);
+}
+.leader-card:before{
+  content:"";position:absolute;z-index:-1;inset:-40%;
+  background:conic-gradient(from 180deg,transparent,rgba(202,34,42,.08),transparent 28%);
+  animation:leaderGlow 11s linear infinite;
+}
+.leader-card:after{
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(220,42,49,.92),transparent);
+  opacity:.5;
+}
+.leader-card:hover{transform:translateY(-8px);border-color:rgba(220,42,49,.82);box-shadow:0 28px 64px rgba(0,0,0,.52),0 0 34px rgba(199,31,38,.13)}
+.leader-card--featured{background:radial-gradient(circle at 82% 8%,rgba(215,37,45,.20),transparent 31%),linear-gradient(155deg,rgba(84,17,21,.47),rgba(8,7,7,.98));box-shadow:0 20px 54px rgba(120,12,18,.18)}
+.leader-card h3{font-size:46px;text-shadow:0 0 24px rgba(255,255,255,.06)}
+.leader-card__head b{font-size:28px;filter:drop-shadow(0 0 10px rgba(220,42,49,.35))}
+.podium-row{position:relative;padding:17px 10px;border-color:rgba(255,255,255,.085);transition:.25s}
+.podium-row:hover{padding-left:16px;background:linear-gradient(90deg,rgba(211,37,44,.11),transparent)}
+.podium-row.first{background:linear-gradient(90deg,rgba(190,30,37,.13),transparent)}
+.podium-row.first:before{content:"";position:absolute;left:0;top:20%;bottom:20%;width:2px;background:var(--red);box-shadow:0 0 12px var(--red)}
+@keyframes leaderGlow{to{transform:rotate(360deg)}}
+
+@media(max-width:1000px){
+  .community-hero__grid{grid-template-columns:1fr;gap:42px}
+  .community-command{justify-self:start;max-width:650px;width:100%}
+  .story-panel__content{padding-left:0}
+}
+@media(max-width:700px){
+  .story-title__solid{font-size:clamp(48px,15vw,70px)}
+  .story-title__outline{font-size:clamp(42px,13vw,62px)}
+  .community-command{clip-path:none}
+}
