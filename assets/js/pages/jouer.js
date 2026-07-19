@@ -84,4 +84,46 @@
     element.style.transitionDelay = `${Math.min(index % 4, 3) * 70}ms`;
     observer.observe(element);
   });
+
+  const preview = document.getElementById('featurePreview');
+  const previewBox = document.querySelector('.systems-showcase__media');
+  const previewKicker = document.getElementById('featureKicker');
+  const previewTitle = document.getElementById('featureTitle');
+  const previewCurrent = document.getElementById('featureCurrent');
+  document.querySelectorAll('.feature-switch').forEach((button, index) => {
+    const activate = () => {
+      document.querySelectorAll('.feature-switch').forEach((item) => item.classList.remove('is-active'));
+      button.classList.add('is-active');
+      previewBox?.classList.add('is-changing');
+      setTimeout(() => {
+        if (preview) preview.src = button.dataset.image;
+        if (previewKicker) previewKicker.textContent = button.dataset.kicker;
+        if (previewTitle) previewTitle.textContent = button.dataset.title;
+        if (previewCurrent) previewCurrent.textContent = String(index + 1).padStart(2, '0');
+        previewBox?.classList.remove('is-changing');
+      }, 180);
+    };
+    button.addEventListener('mouseenter', activate);
+    button.addEventListener('focus', activate);
+    button.addEventListener('click', activate);
+  });
+
+  const filmModal = document.getElementById('filmModal');
+  const filmFrame = document.getElementById('filmFrame');
+  const openFilm = document.getElementById('openFilm');
+  const closeFilm = () => {
+    filmModal?.classList.remove('is-open');
+    filmModal?.setAttribute('aria-hidden', 'true');
+    if (filmFrame) filmFrame.innerHTML = '';
+    document.body.style.overflow = '';
+  };
+  openFilm?.addEventListener('click', () => {
+    if (filmFrame) filmFrame.innerHTML = '<iframe src="https://www.youtube.com/embed/3Uf5WygzmrI?autoplay=1&rel=0" title="Film Senzany" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+    filmModal?.classList.add('is-open');
+    filmModal?.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  });
+  document.getElementById('closeFilm')?.addEventListener('click', closeFilm);
+  filmModal?.querySelector('[data-close-film]')?.addEventListener('click', closeFilm);
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeFilm(); });
 })();
