@@ -349,3 +349,14 @@ box-shadow:0 0 0 1px rgba(255,75,58,.08),0 0 42px rgba(220,33,33,.18),inset 0 0 
 @media(max-width:1050px){.doomsday-countdown{grid-template-columns:1fr 1.8fr}.doomsday-countdown__status{grid-column:1/-1;border-left:0;border-top:1px solid rgba(255,255,255,.09)}.chernarus-intel{grid-template-columns:1fr}.chernarus-intel__visual{border-right:0;border-bottom:1px solid rgba(255,255,255,.1);min-height:520px}.chernarus-intel__data{min-height:540px}}
 @media(max-width:760px){.doomsday-countdown{grid-template-columns:1fr}.doomsday-countdown__event,.doomsday-countdown__status{border:0;border-top:1px solid rgba(255,255,255,.08)}.doomsday-countdown__event{order:1}.doomsday-countdown__clock{order:2;padding:12px 8px;grid-template-columns:repeat(4,1fr);gap:6px}.doomsday-countdown__clock>i{display:none}.doomsday-countdown__status{order:3}.doomsday-unit strong{font-size:38px}.chernarus-intel__visual{min-height:420px}.map-markers text{display:none}.chernarus-intel__legend{left:12px;right:12px;bottom:12px;justify-content:center;gap:10px;flex-wrap:wrap}.chernarus-intel__data{padding:28px 22px}}
 @media(prefers-reduced-motion:reduce){.doomsday-countdown__clock>i,.chernarus-intel__scan{animation:none}}
+
+/* === V2.5 — ChernarusPlus corrigé === */
+.map-sea{fill:url(#seaFade)}
+.map-land--chernarus{fill:rgba(44,54,43,.72);stroke:rgba(187,164,119,.72);stroke-width:2.2;filter:drop-shadow(0 14px 22px rgba(0,0,0,.45))}
+.map-coast-inlet{fill:none;stroke:rgba(112,151,167,.72);stroke-width:4}
+.map-island{fill:rgba(44,54,43,.72);stroke:rgba(187,164,119,.62);stroke-width:1.5}.map-island--small{opacity:.85}
+.map-river--thin{stroke-width:2.4;opacity:.46}
+.map-airfield rect{fill:rgba(188,169,128,.18);stroke:rgba(214,192,143,.78);stroke-width:1.2}
+.map-city-labels text{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;fill:rgba(224,215,201,.55)}
+.map-markers circle:first-child{r:8}
+.chernarus-intel__visual:after{content:'CHERNARUSPLUS // REPRÉSENTATION TACTIQUE';position:absolute;right:28px;bottom:24px;font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.16em;color:rgba(238,229,216,.46)}

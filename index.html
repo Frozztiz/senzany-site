@@ -93,28 +93,52 @@
 <p class="home-kicker">Chernarus // Dossier opérationnel</p>
 <h2 id="world-title">Le territoire vous observe.</h2>
 </div>
-<p>Une lecture immersive de l’univers Senzany : zones sensibles, progression, saison active et activité communautaire. Ici, pas de raccourci vers le menu — seulement ce qui rend notre Chernarus unique.</p>
+<p>Une représentation tactique de ChernarusPlus, avec ses côtes sud et est, ses grands axes, ses villes majeures et les zones propres à Senzany.</p>
 </header>
 <div class="chernarus-intel home-reveal">
-  <div class="chernarus-intel__visual" aria-label="Carte stylisée de Chernarus">
+  <div class="chernarus-intel__visual" aria-label="Représentation tactique de ChernarusPlus">
     <div class="chernarus-intel__grid" aria-hidden="true"></div>
-    <svg class="chernarus-intel__map" viewBox="0 0 1000 560" role="img" aria-label="Carte topographique stylisée de Chernarus">
+    <svg class="chernarus-intel__map" viewBox="0 0 1000 560" role="img" aria-label="Représentation tactique de ChernarusPlus">
       <defs>
         <filter id="mapGlow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <linearGradient id="seaFade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#142229" stop-opacity=".7"/><stop offset="1" stop-color="#071015" stop-opacity=".95"/></linearGradient>
       </defs>
-      <path class="map-land" d="M92 92 L190 48 316 74 405 38 535 84 666 58 828 120 913 222 888 335 933 428 842 518 665 496 554 532 423 492 286 522 177 455 74 364 105 256 58 172 Z"/>
-      <path class="map-road" d="M120 360 C240 310 287 218 397 230 S585 372 714 310 826 204 900 224"/>
-      <path class="map-road map-road--secondary" d="M160 126 C252 190 341 154 430 196 S618 244 726 176 822 172 874 266"/>
-      <path class="map-river" d="M86 280 C214 252 286 322 392 294 S584 184 708 250 817 398 910 370"/>
+      <rect class="map-sea" x="0" y="0" width="1000" height="560"/>
+      <!-- Silhouette générale : continent au nord/ouest, côtes à l'est et au sud -->
+      <path class="map-land map-land--chernarus" d="M40 28 H880 L905 58 L920 112 L902 160 L930 208 L910 260 L936 310 L916 354 L936 405 L900 438 L842 446 L820 470 L760 472 L724 502 L650 500 L612 522 L530 516 L486 535 L418 522 L370 540 L300 512 L250 520 L210 495 L150 490 L112 460 L70 452 L44 412 L52 364 L34 320 L48 266 L28 220 L42 170 L26 120 Z"/>
+      <!-- Baies sud et est -->
+      <path class="map-coast-inlet" d="M242 520 C276 490 320 486 354 508 C385 527 405 528 426 520"/>
+      <path class="map-coast-inlet" d="M760 472 C790 438 830 430 874 440"/>
+      <!-- Îles du sud-est -->
+      <path class="map-island" d="M897 470 l28 -10 22 16 -9 27 -31 5 -19 -18 z"/>
+      <path class="map-island map-island--small" d="M944 425 l14 -7 13 9 -5 14 -16 3 -10 -9 z"/>
+      <!-- Axe côtier principal -->
+      <path class="map-road" d="M92 452 C170 430 214 442 282 460 S398 490 480 482 602 452 702 450 820 420 900 360"/>
+      <path class="map-road map-road--secondary" d="M892 340 C842 312 824 260 852 210 876 166 864 118 824 78"/>
+      <path class="map-road map-road--secondary" d="M150 448 C170 380 216 340 290 322 S438 312 520 268 650 200 774 156"/>
+      <path class="map-road map-road--secondary" d="M260 320 C290 230 368 180 470 150 S660 112 822 78"/>
+      <!-- Rivières -->
+      <path class="map-river" d="M504 80 C480 138 498 194 548 232 S620 300 598 360 548 418 520 480"/>
+      <path class="map-river map-river--thin" d="M736 112 C690 168 688 226 720 270 S760 342 744 422"/>
+      <!-- Aérodrome nord-ouest -->
+      <g class="map-airfield" transform="translate(235 118) rotate(-11)">
+        <rect x="0" y="0" width="168" height="22" rx="2"/>
+        <rect x="18" y="38" width="116" height="13" rx="2"/>
+      </g>
       <g class="map-contours">
-        <path d="M185 392 C246 360 270 294 336 282 S454 335 501 312"/><path d="M210 420 C282 380 306 326 364 318 S449 365 528 338"/>
-        <path d="M580 150 C644 116 716 126 756 176 S808 258 866 276"/><path d="M604 178 C662 146 706 158 738 199 S786 272 842 292"/>
+        <path d="M120 110 C180 78 248 74 314 96 S436 132 510 96"/><path d="M92 148 C174 114 254 120 332 144 S474 172 560 126"/>
+        <path d="M580 92 C648 64 734 70 804 108 S862 174 890 214"/><path d="M550 128 C630 100 704 116 772 150 S830 212 866 252"/>
+        <path d="M340 350 C406 314 480 326 534 362 S644 410 700 380"/>
+      </g>
+      <g class="map-city-labels">
+        <text x="160" y="458">CHERNOGORSK</text><text x="390" y="486">ELEKTROZAVODSK</text><text x="790" y="320">BEREZINO</text>
+        <text x="720" y="102">NOVODMITROVSK</text><text x="300" y="205">NWAF</text><text x="510" y="255">STARY SOBOR</text>
       </g>
       <g class="map-markers">
-        <g transform="translate(252 172)"><circle r="10"/><circle r="24"/><text x="34" y="-4">BUNKER ALPHA</text><text x="34" y="14" class="map-marker-sub">Accès verrouillé</text></g>
-        <g transform="translate(682 202)"><circle r="10"/><circle r="24"/><text x="34" y="-4">ZONE VOLCANIQUE</text><text x="34" y="14" class="map-marker-sub">Risque extrême</text></g>
-        <g transform="translate(454 394)"><circle r="10"/><circle r="24"/><text x="34" y="-4">CENTRE COMMERCIAL</text><text x="34" y="14" class="map-marker-sub">Économie active</text></g>
-        <g transform="translate(794 424)"><circle r="10"/><circle r="24"/><text x="-34" y="-4" text-anchor="end">ZONE ÉVÉNEMENT</text><text x="-34" y="14" text-anchor="end" class="map-marker-sub">Activité programmée</text></g>
+        <g transform="translate(308 132)"><circle r="8"/><circle r="20"/><text x="30" y="-3">AÉRODROME NORD-OUEST</text><text x="30" y="14" class="map-marker-sub">Zone stratégique</text></g>
+        <g transform="translate(690 178)"><circle r="8"/><circle r="20"/><text x="30" y="-3">ZONE VOLCANIQUE</text><text x="30" y="14" class="map-marker-sub">Risque extrême</text></g>
+        <g transform="translate(505 330)"><circle r="8"/><circle r="20"/><text x="30" y="-3">CENTRE COMMERCIAL</text><text x="30" y="14" class="map-marker-sub">Économie active</text></g>
+        <g transform="translate(812 402)"><circle r="8"/><circle r="20"/><text x="-30" y="-3" text-anchor="end">ZONE ÉVÉNEMENT</text><text x="-30" y="14" text-anchor="end" class="map-marker-sub">Activité programmée</text></g>
       </g>
     </svg>
     <div class="chernarus-intel__scan" aria-hidden="true"></div>
@@ -123,7 +147,7 @@
   </div>
   <aside class="chernarus-intel__data">
     <div class="intel-data__top"><span>Dossier 04-CHN</span><b>ACTIF</b></div>
-    <h3>Une carte qui évolue avec la saison.</h3>
+    <h3>ChernarusPlus, sous surveillance.</h3>
     <p>Nos zones, événements et systèmes ne sont pas de simples décors : ils structurent la progression et donnent un rythme différent à chaque session.</p>
     <div class="intel-metrics">
       <div><strong>60 m</strong><span>Territoires</span></div>
