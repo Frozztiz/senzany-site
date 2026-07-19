@@ -76,6 +76,7 @@
           </div>
           <div class="survivor-pass__actions">
             <a id="steamProfileLink" class="terminal-button" href="#" target="_blank" rel="noopener noreferrer">Ouvrir Steam <b>↗</b></a>
+            <button class="terminal-button terminal-button--discord-unlink js-discord-unlink" type="button" hidden>Dissocier Discord</button>
             <a class="terminal-button terminal-button--danger" href="/api/steam/logout">Fermer la session</a>
           </div>
         </section>
@@ -130,7 +131,7 @@
 
             <div class="discord-actions">
               <a id="discordLinkButton" class="terminal-button terminal-button--discord" href="/api/discord/login">Associer Discord <b>↗</b></a>
-              <button id="discordUnlinkButton" class="terminal-button terminal-button--danger" type="button" hidden>Dissocier Discord</button>
+              <button id="discordUnlinkButton" class="terminal-button terminal-button--danger js-discord-unlink" type="button" hidden>Dissocier Discord</button>
             </div>
             <p id="discordFeedback" class="discord-feedback" hidden></p>
           </article>

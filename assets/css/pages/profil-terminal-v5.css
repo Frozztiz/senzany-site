@@ -96,3 +96,7 @@ main,header,footer{position:relative;z-index:2}
 @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+
+/* Bouton Discord visible dans le panneau principal */
+.terminal-button--discord-unlink{border-color:rgba(114,137,218,.72);background:rgba(75,88,145,.12);color:#dfe4ff}
+.terminal-button--discord-unlink:hover{border-color:#8ea1f0;background:rgba(114,137,218,.2);box-shadow:0 0 22px rgba(114,137,218,.14)}
