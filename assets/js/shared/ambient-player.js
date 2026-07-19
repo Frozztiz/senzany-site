@@ -9,7 +9,7 @@
     muted: 'senzanyAmbientMuted',
     volume: 'senzanyAmbientVolume',
     position: 'senzanyAmbientPosition',
-    introSeen: 'senzanyAmbientIntroSeenV4'
+    introSeen: 'senzanyAmbientIntroSeenGSAPV1'
   };
 
   const DEFAULT_VOLUME = 0.22;
@@ -129,24 +129,136 @@
     status.textContent = isPlaying ? 'En lecture' : (waitingForInteraction ? 'Cliquer pour écouter' : 'Désactivée');
   };
 
-  const showIntroOnce = () => {
-    if (localStorage.getItem(STORAGE.introSeen) === 'true') return false;
-    if (!document.body.contains(intro)) document.body.appendChild(intro);
+  const loadGsap = () => new Promise((resolve, reject) => {
+    if (window.gsap) {
+      resolve(window.gsap);
+      return;
+    }
 
-    intro.classList.remove('is-leaving');
-    // Deux frames garantissent que le navigateur applique d'abord l'état caché,
-    // puis l'état visible et lance bien la transition CSS.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => intro.classList.add('is-visible'));
+    const existing = document.querySelector('script[data-senzany-gsap]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve(window.gsap), { once: true });
+      existing.addEventListener('error', reject, { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/gsap@3.15/dist/gsap.min.js';
+    script.async = true;
+    script.dataset.senzanyGsap = 'true';
+    script.addEventListener('load', () => resolve(window.gsap), { once: true });
+    script.addEventListener('error', reject, { once: true });
+    document.head.appendChild(script);
+  });
+
+  const createEmbers = () => {
+    const container = intro.querySelector('.senzany-audio-intro__embers');
+    container.innerHTML = '';
+    for (let index = 0; index < 34; index += 1) {
+      const ember = document.createElement('i');
+      ember.style.left = `${Math.random() * 100}%`;
+      ember.style.bottom = `${-5 - Math.random() * 18}%`;
+      ember.style.width = `${1 + Math.random() * 3}px`;
+      ember.style.height = ember.style.width;
+      ember.dataset.drift = String((Math.random() - 0.5) * 180);
+      ember.dataset.rise = String(65 + Math.random() * 55);
+      ember.dataset.duration = String(3.8 + Math.random() * 4.5);
+      ember.dataset.delay = String(Math.random() * 3.2);
+      container.appendChild(ember);
+    }
+  };
+
+  const playGsapIntro = async () => {
+    const gsap = await loadGsap();
+    if (!gsap) throw new Error('GSAP indisponible');
+
+    if (!document.body.contains(intro)) document.body.appendChild(intro);
+    createEmbers();
+
+    const q = gsap.utils.selector(intro);
+    const embers = q('.senzany-audio-intro__embers i');
+    const fogBack = q('.senzany-audio-intro__fog--back');
+    const fogMiddle = q('.senzany-audio-intro__fog--middle');
+    const fogFront = q('.senzany-audio-intro__fog--front');
+
+    intro.style.visibility = 'visible';
+    intro.style.pointerEvents = 'all';
+    document.documentElement.classList.add('senzany-intro-running');
+
+    gsap.set(intro, { autoAlpha: 0 });
+    gsap.set(q('.senzany-audio-intro__scene'), { scale: 1.16, filter: 'brightness(0.35) saturate(0.65)' });
+    gsap.set(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 0.25 });
+    gsap.set([fogBack, fogMiddle, fogFront], { autoAlpha: 0 });
+    gsap.set(q('.senzany-audio-intro__overline'), { autoAlpha: 0, y: 14, letterSpacing: '0.9em' });
+    gsap.set(q('.senzany-audio-intro__brand'), { autoAlpha: 0, y: 34, scale: 0.88, filter: 'blur(18px)' });
+    gsap.set(q('.senzany-audio-intro__line span'), { scaleX: 0, transformOrigin: '50% 50%' });
+    gsap.set(q('.senzany-audio-intro__tagline span'), { autoAlpha: 0, y: 28, filter: 'blur(12px)' });
+    gsap.set(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 0, y: 36, filter: 'blur(16px)', letterSpacing: '0.12em' });
+    gsap.set(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: 12 });
+    gsap.set(q('.senzany-audio-intro__vignette'), { autoAlpha: 0 });
+
+    embers.forEach((ember) => {
+      gsap.set(ember, { autoAlpha: 0, scale: 0.4 });
+      gsap.to(ember, {
+        y: () => `-${ember.dataset.rise}vh`,
+        x: () => Number(ember.dataset.drift),
+        autoAlpha: 0.8,
+        scale: () => 0.7 + Math.random() * 1.6,
+        duration: () => Number(ember.dataset.duration),
+        delay: () => Number(ember.dataset.delay),
+        repeat: 1,
+        ease: 'none'
+      });
     });
 
-    window.setTimeout(() => intro.classList.add('is-leaving'), 7800);
-    window.setTimeout(() => {
-      localStorage.setItem(STORAGE.introSeen, 'true');
-      intro.classList.remove('is-visible', 'is-leaving');
-      intro.remove();
-    }, 9600);
+    gsap.to(fogBack, { xPercent: 16, duration: 12, ease: 'sine.inOut' });
+    gsap.to(fogMiddle, { xPercent: -18, duration: 13, ease: 'sine.inOut' });
+    gsap.to(fogFront, { xPercent: 12, duration: 11, ease: 'sine.inOut' });
 
+    const timeline = gsap.timeline({
+      defaults: { ease: 'power2.out' },
+      onComplete: () => {
+        localStorage.setItem(STORAGE.introSeen, 'true');
+        document.documentElement.classList.remove('senzany-intro-running');
+        intro.style.pointerEvents = 'none';
+        intro.remove();
+      }
+    });
+
+    timeline
+      .to(intro, { autoAlpha: 1, duration: 0.9 }, 0)
+      .to(q('.senzany-audio-intro__scene'), { scale: 1.06, filter: 'brightness(0.62) saturate(0.8)', duration: 9.4, ease: 'power1.out' }, 0)
+      .to(q('.senzany-audio-intro__vignette'), { autoAlpha: 1, duration: 1.2 }, 0)
+      .to(fogBack, { autoAlpha: 0.46, duration: 1.8 }, 0.35)
+      .to(fogMiddle, { autoAlpha: 0.38, duration: 2.2 }, 0.55)
+      .to(fogFront, { autoAlpha: 0.62, duration: 2.5 }, 0.75)
+      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 1, scale: 1, duration: 2.1, ease: 'power3.out' }, 0.7)
+      .to(q('.senzany-audio-intro__overline'), { autoAlpha: 1, y: 0, letterSpacing: '0.52em', duration: 1.2 }, 1.2)
+      .to(q('.senzany-audio-intro__brand'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 1.8, ease: 'expo.out' }, 1.55)
+      .to(q('.senzany-audio-intro__brand'), { textShadow: '0 0 26px rgba(241,43,54,.42), 0 0 80px rgba(153,0,13,.22)', duration: 1.1, yoyo: true, repeat: 1 }, 2.4)
+      .to(q('.senzany-audio-intro__line span'), { scaleX: 1, duration: 1.05, ease: 'expo.inOut' }, 2.75)
+      .to(q('.senzany-audio-intro__tagline span'), { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1.25 }, 3.05)
+      .to(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 1, y: 0, filter: 'blur(0px)', letterSpacing: '0.035em', duration: 1.55, ease: 'expo.out' }, 3.35)
+      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 1, y: 0, duration: 0.9 }, 4.35)
+      .to({}, { duration: 2.45 })
+      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: -8, duration: 0.65 }, 7.05)
+      .to(q('.senzany-audio-intro__content'), { autoAlpha: 0, scale: 1.035, filter: 'blur(10px)', duration: 1.4, ease: 'power2.in' }, 7.25)
+      .to([fogBack, fogMiddle, fogFront], { autoAlpha: 0.92, scale: 1.2, duration: 1.25, ease: 'power2.in' }, 7.25)
+      .to(intro, { autoAlpha: 0, duration: 1.55, ease: 'power2.inOut' }, 8.15);
+
+    return true;
+  };
+
+  const showIntroOnce = () => {
+    if (localStorage.getItem(STORAGE.introSeen) === 'true') return false;
+    playGsapIntro().catch(() => {
+      intro.classList.add('is-visible');
+      window.setTimeout(() => intro.classList.add('is-leaving'), 7600);
+      window.setTimeout(() => {
+        localStorage.setItem(STORAGE.introSeen, 'true');
+        intro.remove();
+      }, 9300);
+    });
     return true;
   };
 

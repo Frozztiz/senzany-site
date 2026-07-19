@@ -207,161 +207,259 @@
   }
 }
 
-/* Intro cinématique Senzany — V4 */
+/* Intro cinématique Senzany — GSAP V1 */
+html.senzany-intro-running,
+html.senzany-intro-running body {
+  overflow: hidden !important;
+}
+
 .senzany-audio-intro {
   position: fixed;
   inset: 0;
   z-index: 10050;
-  display: grid;
-  place-items: center;
   overflow: hidden;
-  pointer-events: none;
-  opacity: 0;
   visibility: hidden;
+  opacity: 0;
   isolation: isolate;
   background: #020203;
-  transition: opacity 1.7s cubic-bezier(.22,.61,.36,1), visibility 1.7s ease;
+  font-family: inherit;
 }
 
-.senzany-audio-intro.is-visible { opacity: 1; visibility: visible; }
-.senzany-audio-intro.is-leaving { opacity: 0; }
+.senzany-audio-intro.is-visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+.senzany-audio-intro.is-leaving {
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
 
 .senzany-audio-intro__scene {
   position: absolute;
-  inset: -8%;
-  z-index: -7;
+  inset: -7%;
+  z-index: -8;
   background:
-    linear-gradient(180deg, rgba(0,0,0,.36), rgba(0,0,0,.88)),
-    radial-gradient(ellipse at 50% 52%, rgba(116,6,13,.19), transparent 34%),
-    radial-gradient(ellipse at 50% 100%, rgba(31,31,35,.42), transparent 52%);
-  transform: scale(1.08);
-  filter: saturate(.75) contrast(1.08);
+    linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.92)),
+    radial-gradient(ellipse at 50% 46%, rgba(125,5,15,.20), transparent 34%),
+    radial-gradient(ellipse at 50% 100%, rgba(48,48,52,.34), transparent 56%);
+  transform-origin: 50% 50%;
 }
 
-.senzany-audio-intro.is-visible .senzany-audio-intro__scene {
-  animation: senzanyScenePush 9.6s cubic-bezier(.2,.65,.25,1) both;
+.senzany-audio-intro__scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: .32;
+  background-image:
+    linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+  background-size: 4px 4px;
+  mix-blend-mode: soft-light;
 }
 
 .senzany-audio-intro__glow {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 48%;
   z-index: -5;
-  width: min(72vw, 980px);
-  aspect-ratio: 1.8;
-  transform: translate(-50%, -48%) scale(.42);
+  width: min(82vw, 1180px);
+  aspect-ratio: 1.9;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
-  opacity: 0;
-  background: radial-gradient(ellipse, rgba(224,20,34,.34) 0%, rgba(130,5,15,.16) 34%, transparent 70%);
-  filter: blur(30px);
-}
-
-.senzany-audio-intro.is-visible .senzany-audio-intro__glow {
-  animation: senzanyRedGlow 9.6s ease-in-out both;
+  background:
+    radial-gradient(ellipse, rgba(241,43,54,.30) 0%, rgba(142,5,18,.16) 36%, transparent 72%);
+  filter: blur(34px);
 }
 
 .senzany-audio-intro__fog {
   position: absolute;
-  left: -35%;
-  width: 170%;
+  left: -32%;
+  width: 164%;
   pointer-events: none;
   opacity: 0;
   mix-blend-mode: screen;
+  will-change: transform, opacity;
   background:
-    radial-gradient(ellipse at 8% 54%, rgba(232,232,232,.20) 0 6%, transparent 24%),
-    radial-gradient(ellipse at 28% 48%, rgba(180,180,184,.14) 0 10%, transparent 29%),
-    radial-gradient(ellipse at 52% 60%, rgba(235,235,238,.18) 0 8%, transparent 27%),
-    radial-gradient(ellipse at 77% 45%, rgba(188,188,192,.14) 0 11%, transparent 30%),
-    radial-gradient(ellipse at 94% 62%, rgba(226,226,230,.15) 0 7%, transparent 24%);
+    radial-gradient(ellipse at 5% 52%, rgba(235,235,238,.24) 0 7%, transparent 25%),
+    radial-gradient(ellipse at 23% 43%, rgba(200,200,205,.19) 0 11%, transparent 31%),
+    radial-gradient(ellipse at 45% 62%, rgba(245,245,248,.22) 0 8%, transparent 29%),
+    radial-gradient(ellipse at 68% 48%, rgba(190,190,198,.18) 0 12%, transparent 32%),
+    radial-gradient(ellipse at 88% 58%, rgba(240,240,244,.22) 0 8%, transparent 27%);
 }
 
 .senzany-audio-intro__fog--back {
-  top: 12%; height: 50%; filter: blur(30px); transform: translate3d(-10%,0,0) scale(1.08);
+  top: 6%;
+  height: 55%;
+  filter: blur(34px);
+  transform: translateX(-8%) scale(1.1);
 }
+
 .senzany-audio-intro__fog--middle {
-  top: 36%; height: 46%; filter: blur(22px); transform: translate3d(10%,0,0) scale(1.16);
+  top: 28%;
+  height: 54%;
+  filter: blur(25px);
+  transform: translateX(8%) scale(1.16);
 }
+
 .senzany-audio-intro__fog--front {
-  bottom: -13%; height: 60%; filter: blur(38px); transform: translate3d(-4%,0,0) scale(1.25);
+  bottom: -18%;
+  height: 67%;
+  filter: blur(42px);
+  transform: translateX(-3%) scale(1.24);
 }
 
-.senzany-audio-intro.is-visible .senzany-audio-intro__fog--back { animation: senzanyFogBackV4 9.6s ease-in-out both; }
-.senzany-audio-intro.is-visible .senzany-audio-intro__fog--middle { animation: senzanyFogMiddleV4 9.6s ease-in-out both; }
-.senzany-audio-intro.is-visible .senzany-audio-intro__fog--front { animation: senzanyFogFrontV4 9.6s ease-in-out both; }
+.senzany-audio-intro__embers {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+}
 
-.senzany-audio-intro__embers { position:absolute; inset:0; z-index:-2; overflow:hidden; opacity:0; }
 .senzany-audio-intro__embers i {
-  position:absolute; bottom:-30px; width:3px; height:3px; border-radius:50%;
-  background:#ef3945; box-shadow:0 0 8px #e21727; opacity:.65;
-  animation:senzanyEmber 5.6s linear infinite;
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  background: #ff3d49;
+  box-shadow: 0 0 7px #f0192a, 0 0 16px rgba(241,25,42,.45);
+  will-change: transform, opacity;
 }
-.senzany-audio-intro__embers i:nth-child(1){left:8%;animation-delay:-1.4s;animation-duration:5.8s}
-.senzany-audio-intro__embers i:nth-child(2){left:18%;animation-delay:-3.2s;animation-duration:7.1s}
-.senzany-audio-intro__embers i:nth-child(3){left:31%;animation-delay:-.6s;animation-duration:6.5s}
-.senzany-audio-intro__embers i:nth-child(4){left:42%;animation-delay:-4.1s;animation-duration:7.8s}
-.senzany-audio-intro__embers i:nth-child(5){left:54%;animation-delay:-2.5s;animation-duration:5.9s}
-.senzany-audio-intro__embers i:nth-child(6){left:63%;animation-delay:-1.8s;animation-duration:7.3s}
-.senzany-audio-intro__embers i:nth-child(7){left:72%;animation-delay:-4.6s;animation-duration:6.8s}
-.senzany-audio-intro__embers i:nth-child(8){left:81%;animation-delay:-.9s;animation-duration:7.6s}
-.senzany-audio-intro__embers i:nth-child(9){left:89%;animation-delay:-3.8s;animation-duration:6.2s}
-.senzany-audio-intro__embers i:nth-child(10){left:96%;animation-delay:-2.1s;animation-duration:7.9s}
-.senzany-audio-intro.is-visible .senzany-audio-intro__embers { animation:senzanyEmbersReveal 9.6s ease both; }
 
 .senzany-audio-intro__content {
-  position:relative; z-index:3; width:min(1040px, calc(100vw - 44px)); text-align:center;
-  transform:scale(.88) translateY(16px); opacity:0; filter:blur(16px);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  width: min(1120px, calc(100vw - 44px));
+  transform: translate(-50%, -50%);
+  text-align: center;
+  will-change: transform, opacity, filter;
 }
-.senzany-audio-intro.is-visible .senzany-audio-intro__content { animation:senzanyContentV4 9.6s cubic-bezier(.2,.75,.2,1) both; }
 
 .senzany-audio-intro__overline {
-  margin-bottom:18px; color:rgba(255,255,255,.56); font-size:clamp(9px,1vw,12px); font-weight:800;
-  letter-spacing:.52em; text-transform:uppercase;
+  margin-bottom: 18px;
+  color: rgba(255,255,255,.56);
+  font-size: clamp(9px, .8vw, 12px);
+  font-weight: 800;
+  letter-spacing: .52em;
+  text-transform: uppercase;
 }
+
 .senzany-audio-intro__brand {
-  position:relative; display:inline-block; color:#f6f2eb; font-size:clamp(64px,13vw,176px);
-  font-weight:950; line-height:.82; letter-spacing:.045em; text-transform:uppercase;
-  text-shadow:0 5px 0 rgba(0,0,0,.5),0 0 28px rgba(255,255,255,.10),0 0 72px rgba(218,18,31,.34),0 0 130px rgba(218,18,31,.18);
+  position: relative;
+  display: inline-block;
+  color: #f7f2eb;
+  font-size: clamp(72px, 13vw, 190px);
+  font-weight: 950;
+  line-height: .78;
+  letter-spacing: -.055em;
+  text-transform: uppercase;
+  text-shadow: 0 10px 55px rgba(0,0,0,.85);
 }
+
 .senzany-audio-intro__brand::after {
-  content:attr(data-text); position:absolute; inset:0; color:transparent;
-  -webkit-text-stroke:1px rgba(241,43,54,.45); transform:translate(3px,2px); filter:blur(.4px); z-index:-1;
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: rgba(224,22,36,.55);
+  transform: translate(4px, 3px);
+  filter: blur(4px);
 }
-.senzany-audio-intro__line { width:min(620px,72vw); height:1px; margin:31px auto 25px; background:rgba(255,255,255,.09); overflow:hidden; }
-.senzany-audio-intro__line span { display:block; width:100%; height:100%; transform:translateX(-105%); background:linear-gradient(90deg,transparent,#c91520 20%,#ff6871 50%,#c91520 80%,transparent); box-shadow:0 0 18px rgba(241,43,54,.9); }
-.senzany-audio-intro.is-visible .senzany-audio-intro__line span { animation:senzanyLineSweep 2.2s 2.1s cubic-bezier(.2,.8,.2,1) forwards; }
 
-.senzany-audio-intro__tagline { text-transform:uppercase; }
+.senzany-audio-intro__line {
+  display: flex;
+  justify-content: center;
+  width: min(650px, 72vw);
+  height: 1px;
+  margin: clamp(26px, 4vh, 45px) auto clamp(24px, 3.5vh, 38px);
+  background: rgba(255,255,255,.08);
+  overflow: visible;
+}
+
+.senzany-audio-intro__line span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  margin-top: -1px;
+  background: linear-gradient(90deg, transparent, #e11f2c 18%, #ff6b73 50%, #e11f2c 82%, transparent);
+  box-shadow: 0 0 14px rgba(239,33,48,.8), 0 0 32px rgba(180,0,20,.45);
+}
+
+.senzany-audio-intro__tagline {
+  text-transform: uppercase;
+}
+
 .senzany-audio-intro__tagline span,
-.senzany-audio-intro__tagline strong { display:block; }
-.senzany-audio-intro__tagline span { color:rgba(255,255,255,.76); font-size:clamp(15px,2.15vw,28px); font-weight:700; letter-spacing:.30em; }
-.senzany-audio-intro__tagline strong { margin-top:4px; color:#fff; font-size:clamp(24px,4vw,54px); font-weight:950; letter-spacing:.12em; text-shadow:0 0 30px rgba(201,21,32,.32); }
-.senzany-audio-intro__hint { margin-top:28px; color:rgba(255,255,255,.36); font-size:9px; font-weight:800; letter-spacing:.44em; text-transform:uppercase; }
+.senzany-audio-intro__tagline strong {
+  display: block;
+}
 
-.senzany-audio-intro__vignette { position:absolute; inset:-2px; z-index:8; box-shadow:inset 0 0 210px 55px #000; background:linear-gradient(180deg,rgba(0,0,0,.45),transparent 25%,transparent 72%,rgba(0,0,0,.68)); }
+.senzany-audio-intro__tagline span {
+  color: rgba(255,255,255,.72);
+  font-size: clamp(20px, 3.4vw, 50px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .12em;
+}
 
-@keyframes senzanyScenePush { 0%{transform:scale(1.12);opacity:.35} 22%{opacity:1} 82%{opacity:1} 100%{transform:scale(1);opacity:.15} }
-@keyframes senzanyRedGlow { 0%{opacity:0;transform:translate(-50%,-48%) scale(.35)} 25%{opacity:.4} 48%{opacity:.82;transform:translate(-50%,-48%) scale(1)} 74%{opacity:.55} 100%{opacity:0;transform:translate(-50%,-48%) scale(1.18)} }
-@keyframes senzanyContentV4 { 0%,10%{opacity:0;filter:blur(18px);transform:scale(.87) translateY(18px)} 26%{opacity:1;filter:blur(0);transform:scale(1) translateY(0)} 73%{opacity:1;filter:blur(0);transform:scale(1) translateY(0)} 100%{opacity:0;filter:blur(10px);transform:scale(1.045) translateY(-8px)} }
-@keyframes senzanyLineSweep { 0%{transform:translateX(-105%)} 55%{transform:translateX(0)} 100%{transform:translateX(105%)} }
-@keyframes senzanyFogBackV4 { 0%{opacity:0;transform:translate3d(-13%,3%,0) scale(1.08)} 22%{opacity:.28} 72%{opacity:.35} 100%{opacity:0;transform:translate3d(12%,-3%,0) scale(1.22)} }
-@keyframes senzanyFogMiddleV4 { 0%{opacity:0;transform:translate3d(14%,2%,0) scale(1.12)} 28%{opacity:.20} 75%{opacity:.30} 100%{opacity:0;transform:translate3d(-14%,-2%,0) scale(1.28)} }
-@keyframes senzanyFogFrontV4 { 0%{opacity:0;transform:translate3d(-8%,8%,0) scale(1.2)} 36%{opacity:.22} 74%{opacity:.38} 100%{opacity:0;transform:translate3d(13%,-5%,0) scale(1.34)} }
-@keyframes senzanyEmber { from{transform:translate3d(0,0,0) scale(.6)} to{transform:translate3d(34px,-115vh,0) scale(1.25)} }
-@keyframes senzanyEmbersReveal { 0%,18%{opacity:0} 35%{opacity:.8} 80%{opacity:.65} 100%{opacity:0} }
+.senzany-audio-intro__tagline strong {
+  margin-top: 6px;
+  color: #fff;
+  font-size: clamp(42px, 7.7vw, 112px);
+  font-weight: 950;
+  line-height: .95;
+  letter-spacing: .035em;
+  text-shadow: 0 8px 38px rgba(0,0,0,.9), 0 0 28px rgba(180,8,23,.20);
+}
 
-@media (max-width:640px) {
-  .senzany-audio-intro__overline{letter-spacing:.34em}
-  .senzany-audio-intro__brand{font-size:clamp(58px,20vw,92px)}
-  .senzany-audio-intro__tagline span{letter-spacing:.16em;font-size:13px}
-  .senzany-audio-intro__tagline strong{letter-spacing:.08em;font-size:clamp(25px,8vw,38px)}
-  .senzany-audio-intro__hint{letter-spacing:.22em}
+.senzany-audio-intro__hint {
+  margin-top: clamp(24px, 4vh, 44px);
+  color: rgba(255,255,255,.35);
+  font-size: clamp(8px, .75vw, 11px);
+  font-weight: 700;
+  letter-spacing: .52em;
+  text-transform: uppercase;
+}
+
+.senzany-audio-intro__vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.68), transparent 22%, transparent 72%, rgba(0,0,0,.88)),
+    radial-gradient(ellipse at center, transparent 28%, rgba(0,0,0,.42) 66%, rgba(0,0,0,.94) 100%);
+}
+
+@media (max-width: 640px) {
+  .senzany-audio-intro__content {
+    width: calc(100vw - 28px);
+  }
+
+  .senzany-audio-intro__brand {
+    font-size: clamp(58px, 20vw, 104px);
+  }
+
+  .senzany-audio-intro__tagline span {
+    font-size: clamp(15px, 5vw, 26px);
+  }
+
+  .senzany-audio-intro__tagline strong {
+    font-size: clamp(31px, 10.6vw, 60px);
+  }
+
+  .senzany-audio-intro__overline,
+  .senzany-audio-intro__hint {
+    letter-spacing: .34em;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .senzany-audio-intro.is-visible .senzany-audio-intro__content,
-  .senzany-audio-intro.is-visible .senzany-audio-intro__fog,
-  .senzany-audio-intro.is-visible .senzany-audio-intro__scene,
-  .senzany-audio-intro.is-visible .senzany-audio-intro__glow,
-  .senzany-audio-intro.is-visible .senzany-audio-intro__embers { animation-duration:.01ms!important; }
+  .senzany-audio-intro__fog,
+  .senzany-audio-intro__embers {
+    display: none;
+  }
 }
-
