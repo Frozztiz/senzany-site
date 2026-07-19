@@ -9,7 +9,7 @@
     muted: 'senzanyAmbientMuted',
     volume: 'senzanyAmbientVolume',
     position: 'senzanyAmbientPosition',
-    introSeen: 'senzanyAmbientIntroSeenV2'
+    introSeen: 'senzanyAmbientIntroSeenV3'
   };
 
   const DEFAULT_VOLUME = 0.22;
@@ -61,6 +61,8 @@
   intro.className = 'senzany-audio-intro';
   intro.setAttribute('aria-hidden', 'true');
   intro.innerHTML = `
+    <div class="senzany-audio-intro__fog senzany-audio-intro__fog--back" aria-hidden="true"></div>
+    <div class="senzany-audio-intro__fog senzany-audio-intro__fog--front" aria-hidden="true"></div>
     <div class="senzany-audio-intro__content">
       <div class="senzany-audio-intro__brand">SENZANY</div>
       <div class="senzany-audio-intro__line"></div>
@@ -126,12 +128,12 @@
       requestAnimationFrame(() => intro.classList.add('is-visible'));
     });
 
-    window.setTimeout(() => intro.classList.add('is-leaving'), 1650);
+    window.setTimeout(() => intro.classList.add('is-leaving'), 5600);
     window.setTimeout(() => {
       localStorage.setItem(STORAGE.introSeen, 'true');
       intro.classList.remove('is-visible', 'is-leaving');
       intro.remove();
-    }, 2350);
+    }, 7200);
 
     return true;
   };

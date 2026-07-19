@@ -1,8 +1,13 @@
-CORRECTION INTRO CINEMATIQUE SENZANY V2
+SENZANY - INTRO CINEMATIQUE V3
 
-Remplacer uniquement :
+Fichiers à remplacer :
 - assets/js/shared/ambient-player.js
 - assets/css/shared/ambient-player.css
 
-Après déploiement : Ctrl + F5, puis cliquer une fois n'importe où sur le site.
-La nouvelle version utilise une clé différente et doit donc s'afficher même si l'ancienne intro avait été marquée comme vue.
+Nouveautés :
+- intro visible environ 7 secondes
+- brouillard animé en arrière-plan et au premier plan
+- apparition puis disparition progressives
+- nouvelle clé V3 pour que l’intro soit visible une fois après cette mise à jour
+
+Après déploiement : Ctrl + F5 puis clique une fois sur la page.
