@@ -9,7 +9,7 @@
     muted: 'senzanyAmbientMuted',
     volume: 'senzanyAmbientVolume',
     position: 'senzanyAmbientPosition',
-    introSeen: 'senzanyAmbientIntroSeenGSAPV2'
+    introSeen: 'senzanyAmbientIntroSeenGSAPV3'
   };
 
   const DEFAULT_VOLUME = 0.22;
@@ -61,11 +61,13 @@
   intro.className = 'senzany-audio-intro';
   intro.setAttribute('aria-hidden', 'true');
   intro.innerHTML = `
-    <div class="senzany-audio-intro__scene" aria-hidden="true"></div>
-    <div class="senzany-audio-intro__glow" aria-hidden="true"></div>
-    <div class="senzany-audio-intro__embers" aria-hidden="true">
-      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <div class="senzany-audio-intro__scene" aria-hidden="true">
+      <div class="senzany-audio-intro__moon"></div>
+      <div class="senzany-audio-intro__forest senzany-audio-intro__forest--far"></div>
+      <div class="senzany-audio-intro__forest senzany-audio-intro__forest--near"></div>
     </div>
+    <div class="senzany-audio-intro__glow" aria-hidden="true"></div>
+    <div class="senzany-audio-intro__embers" aria-hidden="true"></div>
     <div class="senzany-audio-intro__fog senzany-audio-intro__fog--back" aria-hidden="true"></div>
     <div class="senzany-audio-intro__fog senzany-audio-intro__fog--middle" aria-hidden="true"></div>
     <div class="senzany-audio-intro__fog senzany-audio-intro__fog--front" aria-hidden="true"></div>
@@ -82,6 +84,7 @@
       </div>
       <div class="senzany-audio-intro__hint">L’EXPÉRIENCE COMMENCE</div>
     </div>
+    <div class="senzany-audio-intro__shutter" aria-hidden="true"></div>
     <div class="senzany-audio-intro__vignette" aria-hidden="true"></div>
   `;
   document.body.appendChild(intro);
@@ -157,7 +160,7 @@
   const createEmbers = () => {
     const container = intro.querySelector('.senzany-audio-intro__embers');
     container.innerHTML = '';
-    for (let index = 0; index < 34; index += 1) {
+    for (let index = 0; index < 72; index += 1) {
       const ember = document.createElement('i');
       ember.style.left = `${Math.random() * 100}%`;
       ember.style.bottom = `${-5 - Math.random() * 18}%`;
@@ -188,37 +191,40 @@
     intro.style.pointerEvents = 'all';
     document.documentElement.classList.add('senzany-intro-running');
 
-    gsap.killTweensOf('*');
     gsap.set(intro, { autoAlpha: 0 });
-    gsap.set(q('.senzany-audio-intro__scene'), { scale: 1.22, filter: 'brightness(0.18) saturate(0.5)' });
-    gsap.set(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 0.18 });
+    gsap.set(q('.senzany-audio-intro__scene'), { scale: 1.22, filter: 'brightness(0.12) saturate(0.45)' });
+    gsap.set(q('.senzany-audio-intro__moon'), { autoAlpha: 0, scale: 0.7 });
+    gsap.set(q('.senzany-audio-intro__forest--far'), { autoAlpha: 0, y: 38 });
+    gsap.set(q('.senzany-audio-intro__forest--near'), { autoAlpha: 0, y: 58 });
+    gsap.set(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 0.2 });
     gsap.set([fogBack, fogMiddle, fogFront], { autoAlpha: 0 });
-    gsap.set(q('.senzany-audio-intro__overline'), { autoAlpha: 0, y: 18, letterSpacing: '1.05em' });
-    gsap.set(q('.senzany-audio-intro__logo'), { autoAlpha: 0, scale: 0.55, rotation: -2, filter: 'blur(20px) brightness(0.35)' });
-    gsap.set(q('.senzany-audio-intro__brand'), { autoAlpha: 0, y: 42, scale: 0.82, filter: 'blur(24px)' });
+    gsap.set(q('.senzany-audio-intro__overline'), { autoAlpha: 0, y: 18, letterSpacing: '1em' });
+    gsap.set(q('.senzany-audio-intro__logo'), { autoAlpha: 0, scale: 0.62, rotation: -3, filter: 'blur(24px) brightness(0.2)' });
+    gsap.set(q('.senzany-audio-intro__brand'), { autoAlpha: 0, y: 46, scale: 0.84, filter: 'blur(28px)' });
     gsap.set(q('.senzany-audio-intro__line span'), { scaleX: 0, transformOrigin: '50% 50%' });
-    gsap.set(q('.senzany-audio-intro__tagline span'), { autoAlpha: 0, y: 36, filter: 'blur(18px)' });
-    gsap.set(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 0, y: 48, scale: 1.08, filter: 'blur(24px)', letterSpacing: '0.16em' });
+    gsap.set(q('.senzany-audio-intro__tagline span'), { autoAlpha: 0, y: 34, filter: 'blur(18px)' });
+    gsap.set(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 0, y: 50, scale: 1.12, filter: 'blur(26px)', letterSpacing: '0.19em' });
     gsap.set(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: 14 });
     gsap.set(q('.senzany-audio-intro__vignette'), { autoAlpha: 0 });
+    gsap.set(q('.senzany-audio-intro__shutter'), { autoAlpha: 0 });
 
-    embers.forEach((ember) => {
-      gsap.set(ember, { autoAlpha: 0, scale: 0.35 });
+    embers.forEach((ember, index) => {
+      gsap.set(ember, { autoAlpha: 0, scale: 0.2 + Math.random() * 0.55 });
       gsap.to(ember, {
-        y: () => `-${ember.dataset.rise}vh`,
-        x: () => Number(ember.dataset.drift),
-        autoAlpha: 0.95,
-        scale: () => 0.8 + Math.random() * 1.9,
-        duration: () => Number(ember.dataset.duration) + 2,
-        delay: () => Number(ember.dataset.delay),
-        repeat: 2,
+        y: () => `-${80 + Math.random() * 55}vh`,
+        x: () => (Math.random() - 0.5) * 260,
+        autoAlpha: index % 4 === 0 ? 1 : 0.72,
+        scale: () => 0.6 + Math.random() * 2.2,
+        duration: () => 5.5 + Math.random() * 6.5,
+        delay: () => Math.random() * 3.5,
+        repeat: 1,
         ease: 'none'
       });
     });
 
-    gsap.to(fogBack, { xPercent: 24, scale: 1.2, duration: 16, ease: 'sine.inOut' });
-    gsap.to(fogMiddle, { xPercent: -28, scale: 1.28, duration: 15, ease: 'sine.inOut' });
-    gsap.to(fogFront, { xPercent: 20, scale: 1.38, duration: 14, ease: 'sine.inOut' });
+    gsap.to(fogBack, { xPercent: 28, scale: 1.28, duration: 18, ease: 'sine.inOut' });
+    gsap.to(fogMiddle, { xPercent: -34, scale: 1.36, duration: 17, ease: 'sine.inOut' });
+    gsap.to(fogFront, { xPercent: 24, scale: 1.46, duration: 16, ease: 'sine.inOut' });
 
     const timeline = gsap.timeline({
       defaults: { ease: 'power2.out' },
@@ -231,30 +237,35 @@
     });
 
     timeline
-      .to(intro, { autoAlpha: 1, duration: 1.05 }, 0)
-      .to(q('.senzany-audio-intro__scene'), { scale: 1.04, filter: 'brightness(0.48) saturate(0.76)', duration: 11.8, ease: 'power1.out' }, 0)
-      .to(q('.senzany-audio-intro__vignette'), { autoAlpha: 1, duration: 1.25 }, 0)
-      .to(fogBack, { autoAlpha: 0.78, duration: 2.0 }, 0.25)
-      .to(fogMiddle, { autoAlpha: 0.72, duration: 2.2 }, 0.45)
-      .to(fogFront, { autoAlpha: 0.9, duration: 2.4 }, 0.65)
-      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 1, scale: 1.15, duration: 2.8, ease: 'power3.out' }, 0.75)
-      .to(q('.senzany-audio-intro__overline'), { autoAlpha: 1, y: 0, letterSpacing: '0.58em', duration: 1.3 }, 1.15)
-      .to(q('.senzany-audio-intro__logo'), { autoAlpha: 1, scale: 1, rotation: 0, filter: 'blur(0px) brightness(1)', duration: 2.05, ease: 'expo.out' }, 1.45)
-      .to(q('.senzany-audio-intro__brand'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 2.15, ease: 'expo.out' }, 1.7)
-      .to(q('.senzany-audio-intro__identity'), { scale: 1.025, duration: 1.7, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 2.6)
-      .to(q('.senzany-audio-intro__line span'), { scaleX: 1, duration: 1.15, ease: 'expo.inOut' }, 3.25)
-      .to(q('.senzany-audio-intro__tagline span'), { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1.45 }, 3.65)
-      .to(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', letterSpacing: '0.028em', duration: 1.85, ease: 'expo.out' }, 4.0)
-      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 1, y: 0, duration: 1.0 }, 5.1)
-      .to(q('.senzany-audio-intro__glow'), { scale: 1.35, autoAlpha: 0.78, duration: 2.6, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 5.0)
-      .to({}, { duration: 2.2 })
-      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: -10, duration: 0.7 }, 8.2)
-      .to(fogFront, { autoAlpha: 1, scale: 1.58, filter: 'blur(28px)', duration: 1.15, ease: 'power2.in' }, 8.35)
-      .to(fogMiddle, { autoAlpha: 1, scale: 1.42, duration: 1.25, ease: 'power2.in' }, 8.4)
-      .to(q('.senzany-audio-intro__content'), { autoAlpha: 0, scale: 1.07, filter: 'blur(18px)', duration: 1.5, ease: 'power2.in' }, 8.65)
-      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 1.7, duration: 1.2 }, 9.0)
-      .to([fogBack, fogMiddle, fogFront], { autoAlpha: 0, xPercent: '+=12', duration: 2.0, ease: 'power2.inOut' }, 9.55)
-      .to(intro, { autoAlpha: 0, duration: 1.85, ease: 'power2.inOut' }, 10.0);
+      .to(intro, { autoAlpha: 1, duration: 1.1 }, 0)
+      .to(q('.senzany-audio-intro__scene'), { scale: 1.03, filter: 'brightness(0.42) saturate(0.75)', duration: 12.8, ease: 'power1.out' }, 0)
+      .to(q('.senzany-audio-intro__moon'), { autoAlpha: 0.9, scale: 1, duration: 2.8, ease: 'power3.out' }, 0.25)
+      .to(q('.senzany-audio-intro__forest--far'), { autoAlpha: 0.68, y: 0, duration: 2.5 }, 0.35)
+      .to(q('.senzany-audio-intro__forest--near'), { autoAlpha: 0.94, y: 0, duration: 2.9 }, 0.5)
+      .to(q('.senzany-audio-intro__vignette'), { autoAlpha: 1, duration: 1.4 }, 0)
+      .to(fogBack, { autoAlpha: 0.88, duration: 2.1 }, 0.15)
+      .to(fogMiddle, { autoAlpha: 0.82, duration: 2.3 }, 0.35)
+      .to(fogFront, { autoAlpha: 0.98, duration: 2.6 }, 0.55)
+      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 1, scale: 1.18, duration: 3.1, ease: 'power3.out' }, 0.7)
+      .to(q('.senzany-audio-intro__overline'), { autoAlpha: 1, y: 0, letterSpacing: '0.56em', duration: 1.35 }, 1.25)
+      .to(q('.senzany-audio-intro__logo'), { autoAlpha: 1, scale: 1, rotation: 0, filter: 'blur(0px) brightness(1)', duration: 2.2, ease: 'expo.out' }, 1.55)
+      .to(q('.senzany-audio-intro__brand'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 2.35, ease: 'expo.out' }, 1.72)
+      .to(q('.senzany-audio-intro__identity'), { scale: 1.028, duration: 1.6, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 2.85)
+      .to(q('.senzany-audio-intro__line span'), { scaleX: 1, duration: 1.2, ease: 'expo.inOut' }, 3.55)
+      .to(q('.senzany-audio-intro__tagline span'), { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1.5 }, 4.0)
+      .to(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', letterSpacing: '0.028em', duration: 2.0, ease: 'expo.out' }, 4.55)
+      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 1, y: 0, duration: 1.0 }, 5.75)
+      .to(q('.senzany-audio-intro__glow'), { scale: 1.42, autoAlpha: 0.82, duration: 2.9, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 5.4)
+      .to({}, { duration: 2.1 })
+      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: -10, duration: 0.65 }, 8.75)
+      .to(fogFront, { autoAlpha: 1, scale: 1.72, filter: 'blur(34px)', duration: 1.3, ease: 'power2.in' }, 8.85)
+      .to(fogMiddle, { autoAlpha: 1, scale: 1.58, duration: 1.45, ease: 'power2.in' }, 8.95)
+      .to(q('.senzany-audio-intro__content'), { autoAlpha: 0, scale: 1.075, filter: 'blur(22px)', duration: 1.55, ease: 'power2.in' }, 9.15)
+      .to(q('.senzany-audio-intro__shutter'), { autoAlpha: 1, duration: 0.55, ease: 'power2.in' }, 9.55)
+      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 1.85, duration: 1.25 }, 9.6)
+      .to([fogBack, fogMiddle, fogFront], { autoAlpha: 0, xPercent: '+=14', duration: 2.1, ease: 'power2.inOut' }, 10.05)
+      .to(q('.senzany-audio-intro__shutter'), { autoAlpha: 0, duration: 1.15, ease: 'power2.out' }, 10.35)
+      .to(intro, { autoAlpha: 0, duration: 2.0, ease: 'power2.inOut' }, 10.4);
 
     return true;
   };
