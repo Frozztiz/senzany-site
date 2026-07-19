@@ -105,17 +105,24 @@
    passer en données 100% live. Le reste du script ne bouge pas.
 --------------------------------------------------------------- */
 const SENZANY_DATA = {
-  players: { current: 32, max: 50 },
-  votesThisMonth: 1256,
   nextWipeDate: "2026-07-21",
   eventDate: "2026-07-21T20:00:00"
 };
 
 function renderStats(d){
-  document.getElementById('statPlayers').textContent = d.players.current + ' / ' + d.players.max;
-  document.getElementById('statVotes').textContent = d.votesThisMonth.toLocaleString('fr-FR');
   const wipe = new Date(d.nextWipeDate);
-  document.getElementById('statWipe').textContent = wipe.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
+
+  document.getElementById('statPlayers').textContent =
+    'Bientôt disponible';
+
+  document.getElementById('statVotes').textContent =
+    '—';
+
+  document.getElementById('statWipe').textContent =
+    wipe.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit'
+    });
 }
 renderStats(SENZANY_DATA);
 
