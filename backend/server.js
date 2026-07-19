@@ -19,6 +19,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/topserveurs", require("./routes/topserveurs"));
 app.use("/api/discord", require("./routes/discord"));
 app.use("/api/game", require("./routes/game"));
+app.use("/api/steam", require("./routes/steam"));
 
 const PORT = process.env.PORT || 3000;
 

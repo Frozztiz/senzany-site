@@ -1,0 +1,17 @@
+INSTALLATION STEAM - SENZANY
+
+Variables à ajouter dans l'environnement de production du backend :
+SITE_URL=http://213.32.88.222
+STEAM_API_KEY=votre clé Steam Web API
+SESSION_SECRET=une longue chaîne aléatoire secrète
+
+Après le déploiement, tester :
+http://213.32.88.222/api/steam/me
+Résultat déconnecté attendu : {"loggedIn":false}
+
+Puis ouvrir :
+http://213.32.88.222/senzany-profil.html
+et cliquer sur Connexion Steam.
+
+Important : lors du passage au nom de domaine HTTPS, remplacer SITE_URL par https://votre-domaine.fr.
+Le cookie passera automatiquement en mode Secure.
