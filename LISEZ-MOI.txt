@@ -1,13 +1,11 @@
-SENZANY - INTRO CINEMATIQUE V3
+SENZANY — INTRO CINÉMATIQUE V4
 
-Fichiers à remplacer :
+Remplacer uniquement :
 - assets/js/shared/ambient-player.js
 - assets/css/shared/ambient-player.css
 
-Nouveautés :
-- intro visible environ 7 secondes
-- brouillard animé en arrière-plan et au premier plan
-- apparition puis disparition progressives
-- nouvelle clé V3 pour que l’intro soit visible une fois après cette mise à jour
+Après déploiement : Ctrl + F5 puis cliquer une fois sur la page.
+La clé V4 force l'affichage une fois même si les anciennes intros ont déjà été vues.
 
-Après déploiement : Ctrl + F5 puis clique une fois sur la page.
+Pour relancer manuellement :
+localStorage.removeItem('senzanyAmbientIntroSeenV4'); location.reload();

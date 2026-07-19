@@ -9,7 +9,7 @@
     muted: 'senzanyAmbientMuted',
     volume: 'senzanyAmbientVolume',
     position: 'senzanyAmbientPosition',
-    introSeen: 'senzanyAmbientIntroSeenV3'
+    introSeen: 'senzanyAmbientIntroSeenV4'
   };
 
   const DEFAULT_VOLUME = 0.22;
@@ -61,13 +61,25 @@
   intro.className = 'senzany-audio-intro';
   intro.setAttribute('aria-hidden', 'true');
   intro.innerHTML = `
+    <div class="senzany-audio-intro__scene" aria-hidden="true"></div>
+    <div class="senzany-audio-intro__glow" aria-hidden="true"></div>
+    <div class="senzany-audio-intro__embers" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
     <div class="senzany-audio-intro__fog senzany-audio-intro__fog--back" aria-hidden="true"></div>
+    <div class="senzany-audio-intro__fog senzany-audio-intro__fog--middle" aria-hidden="true"></div>
     <div class="senzany-audio-intro__fog senzany-audio-intro__fog--front" aria-hidden="true"></div>
     <div class="senzany-audio-intro__content">
-      <div class="senzany-audio-intro__brand">SENZANY</div>
-      <div class="senzany-audio-intro__line"></div>
-      <div class="senzany-audio-intro__tagline">VOICI LE RÉCIT DE VOTRE MORT</div>
+      <div class="senzany-audio-intro__overline">PORTAIL OFFICIEL</div>
+      <div class="senzany-audio-intro__brand" data-text="SENZANY">SENZANY</div>
+      <div class="senzany-audio-intro__line"><span></span></div>
+      <div class="senzany-audio-intro__tagline">
+        <span>VOICI LE RÉCIT</span>
+        <strong>DE VOTRE MORT</strong>
+      </div>
+      <div class="senzany-audio-intro__hint">L’EXPÉRIENCE COMMENCE</div>
     </div>
+    <div class="senzany-audio-intro__vignette" aria-hidden="true"></div>
   `;
   document.body.appendChild(intro);
 
@@ -128,12 +140,12 @@
       requestAnimationFrame(() => intro.classList.add('is-visible'));
     });
 
-    window.setTimeout(() => intro.classList.add('is-leaving'), 5600);
+    window.setTimeout(() => intro.classList.add('is-leaving'), 7800);
     window.setTimeout(() => {
       localStorage.setItem(STORAGE.introSeen, 'true');
       intro.classList.remove('is-visible', 'is-leaving');
       intro.remove();
-    }, 7200);
+    }, 9600);
 
     return true;
   };
