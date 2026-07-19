@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+/*
+ * Senzany — navigation commune
+ * Ce fichier est volontairement chargé après les CSS propres à chaque page.
+ * Les !important évitent que les anciennes règles locales changent la police
+ * ou la taille du menu lorsqu'on change de rubrique.
+ */
+
+:root {
+  --senzany-nav-paper: #ece5da;
+  --senzany-nav-muted: #928a80;
+  --senzany-nav-red: #d1272c;
+  --senzany-nav-red-dark: #8c1f1f;
+  --senzany-nav-line: rgba(255, 255, 255, 0.10);
+}
+
+[data-site-header] header {
+  font-family: 'Oswald', sans-serif !important;
+}
+
+[data-site-header] nav.wrap {
+  height: 72px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+[data-site-header] .brand,
+[data-site-footer] .brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  text-decoration: none !important;
+}
+
+[data-site-header] .badge {
+  width: 42px !important;
+  height: 42px !important;
+  flex: 0 0 42px !important;
+  object-fit: contain !important;
+}
+
+[data-site-header] .brand-name,
+[data-site-header] .brand-name:link,
+[data-site-header] .brand-name:visited,
+[data-site-footer] .brand-name,
+[data-site-footer] .brand-name:link,
+[data-site-footer] .brand-name:visited {
+  font-family: 'Anton', sans-serif !important;
+  font-size: 21px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.05em !important;
+  color: var(--senzany-nav-paper) !important;
+  text-decoration: none !important;
+}
+
+[data-site-header] .brand,
+[data-site-header] .brand:link,
+[data-site-header] .brand:visited,
+[data-site-footer] .brand,
+[data-site-footer] .brand:link,
+[data-site-footer] .brand:visited {
+  color: var(--senzany-nav-paper) !important;
+  text-decoration: none !important;
+}
+
+[data-site-header] .navlinks {
+  display: flex !important;
+  align-items: center !important;
+  gap: 24px !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.045em !important;
+  text-transform: uppercase !important;
+}
+
+[data-site-header] .navlinks a,
+[data-site-header] .navlinks a:link,
+[data-site-header] .navlinks a:visited {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 30px !important;
+  padding: 4px 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--senzany-nav-muted) !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 13.5px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.045em !important;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  transform: none !important;
+}
+
+[data-site-header] .navlinks a:hover,
+[data-site-header] .navlinks a:focus-visible,
+[data-site-header] .navlinks a.active,
+[data-site-header] .navlinks a[aria-current='page'] {
+  color: var(--senzany-nav-paper) !important;
+  border-bottom-color: var(--senzany-nav-red) !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.045em !important;
+  transform: none !important;
+}
+
+[data-site-header] .btn-join,
+[data-site-header] .btn-join:link,
+[data-site-header] .btn-join:visited {
+  padding: 11px 20px !important;
+  background: var(--senzany-nav-red-dark) !important;
+  color: var(--senzany-nav-paper) !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 13.5px !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.05em !important;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+
+[data-site-header] .btn-join:hover,
+[data-site-header] .btn-join:focus-visible {
+  background: var(--senzany-nav-red) !important;
+  color: var(--senzany-nav-paper) !important;
+}
+
+[data-site-header] .mobile-menu,
+[data-site-header] .mobile-menu a {
+  font-family: 'Oswald', sans-serif !important;
+}
+
+[data-site-header] .mobile-menu a,
+[data-site-header] .mobile-menu a:link,
+[data-site-header] .mobile-menu a:visited {
+  padding: 10px 0 !important;
+  color: var(--senzany-nav-muted) !important;
+  font-size: 14.5px !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0.04em !important;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+}
+
+[data-site-header] .mobile-menu a:hover,
+[data-site-header] .mobile-menu a.active,
+[data-site-header] .mobile-menu a[aria-current='page'] {
+  color: var(--senzany-nav-paper) !important;
+}
+
+/* Footer : empêche notamment le mot SENZANY de devenir violet après visite. */
+[data-site-footer] .footer-brand-name {
+  font-size: 24px !important;
+}
+
+[data-site-footer] a,
+[data-site-footer] a:link,
+[data-site-footer] a:visited {
+  text-decoration: none !important;
+}
+
+@media (max-width: 1100px) {
+  [data-site-header] .navlinks {
+    display: none !important;
+  }
+
+  [data-site-header] .burger {
+    display: block !important;
+  }
+}

@@ -1,4 +1,14 @@
 (() => {
+  // Feuille de style commune : uniformise le header, le menu et le footer sur toutes les pages.
+  const sharedNavStylesheet = 'assets/css/shared/navigation-unified-v1.css';
+  if (!document.querySelector(`link[data-senzany-shared-nav="v1"]`)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `${sharedNavStylesheet}?v=1.0.0`;
+    link.dataset.senzanySharedNav = 'v1';
+    document.head.appendChild(link);
+  }
+
   const NAV = [
     ['accueil','index.html','Accueil'],
     ['jouer','senzany-jouer.html','Jouer'],
