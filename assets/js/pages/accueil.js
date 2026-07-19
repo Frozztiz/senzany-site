@@ -148,3 +148,23 @@
   window.setInterval(refreshGameStats, 60000);
   window.setInterval(updateCountdown, 1000);
 })();
+
+// Accueil V2.7 — profondeur légère sur les quatre piliers.
+(() => {
+  if (window.matchMedia('(pointer: coarse), (prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.home-pillar[data-tilt]').forEach((card) => {
+    card.addEventListener('pointermove', (event) => {
+      const rect = card.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = (event.clientY - rect.top) / rect.height;
+      card.style.setProperty('--mx', `${x * 100}%`);
+      card.style.setProperty('--my', `${y * 100}%`);
+      card.style.transform = `perspective(950px) rotateX(${(0.5 - y) * 3.2}deg) rotateY(${(x - 0.5) * 3.2}deg) translateY(-8px)`;
+    });
+    card.addEventListener('pointerleave', () => {
+      card.style.removeProperty('transform');
+      card.style.setProperty('--mx', '50%');
+      card.style.setProperty('--my', '50%');
+    });
+  });
+})();
