@@ -9,7 +9,7 @@
     muted: 'senzanyAmbientMuted',
     volume: 'senzanyAmbientVolume',
     position: 'senzanyAmbientPosition',
-    introSeen: 'senzanyAmbientIntroSeen'
+    introSeen: 'senzanyAmbientIntroSeenV2'
   };
 
   const DEFAULT_VOLUME = 0.22;
@@ -116,14 +116,24 @@
   };
 
   const showIntroOnce = () => {
-    if (localStorage.getItem(STORAGE.introSeen) === 'true') return;
-    localStorage.setItem(STORAGE.introSeen, 'true');
-    intro.classList.add('is-visible');
-    window.setTimeout(() => intro.classList.add('is-leaving'), 1150);
+    if (localStorage.getItem(STORAGE.introSeen) === 'true') return false;
+    if (!document.body.contains(intro)) document.body.appendChild(intro);
+
+    intro.classList.remove('is-leaving');
+    // Deux frames garantissent que le navigateur applique d'abord l'état caché,
+    // puis l'état visible et lance bien la transition CSS.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => intro.classList.add('is-visible'));
+    });
+
+    window.setTimeout(() => intro.classList.add('is-leaving'), 1650);
     window.setTimeout(() => {
+      localStorage.setItem(STORAGE.introSeen, 'true');
       intro.classList.remove('is-visible', 'is-leaving');
       intro.remove();
-    }, 1900);
+    }, 2350);
+
+    return true;
   };
 
   const fadeTo = (target, duration = FADE_DURATION, onComplete) => {
@@ -145,21 +155,26 @@
     fadeFrame = requestAnimationFrame(tick);
   };
 
-  const startPlayback = async (withFade = true) => {
+  const startPlayback = async (withFade = true, fromUserInteraction = false) => {
     enabled = true;
     waitingForInteraction = false;
     localStorage.setItem(STORAGE.enabled, 'true');
 
+    // L'intro doit partir pendant le geste utilisateur, sans attendre la promesse audio.
+    // Cela évite qu'elle soit perdue si le navigateur retarde ou refuse audio.play().
+    if (fromUserInteraction && introPending) {
+      introPending = false;
+      showIntroOnce();
+    }
+
     try {
       if (withFade) audio.volume = 0;
       await audio.play();
-      if (introPending) {
-        introPending = false;
-        showIntroOnce();
-      }
       fadeTo(muted ? 0 : preferredVolume, withFade ? FADE_DURATION : 150);
     } catch (error) {
       waitingForInteraction = true;
+      // Si la lecture a échoué, on permettra une nouvelle tentative d'intro.
+      if (localStorage.getItem(STORAGE.introSeen) !== 'true') introPending = true;
     }
     updateUi();
   };
@@ -177,7 +192,7 @@
 
   playButton.addEventListener('click', () => {
     if (enabled && !audio.paused) stopPlayback();
-    else startPlayback(true);
+    else startPlayback(true, true);
   });
 
   muteButton.addEventListener('click', () => {
@@ -221,7 +236,7 @@
   const resumeAfterInteraction = (event) => {
     if (!enabled || !audio.paused) return;
     if (event?.target?.closest?.('.senzany-ambient-player')) return;
-    startPlayback(true);
+    startPlayback(true, true);
   };
 
   document.addEventListener('pointerdown', resumeAfterInteraction, { passive: true });

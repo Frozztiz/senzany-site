@@ -1,14 +1,8 @@
-SENZANY - AJOUT DE LA MUSIQUE D'AMBIANCE
+CORRECTION INTRO CINEMATIQUE SENZANY V2
 
-Copie le dossier "assets" à la racine de ton projet et accepte le remplacement de components.js.
-
-Fichiers ajoutés :
-- assets/audio/senzany-wasteland-ambient.mp3
-- assets/css/shared/ambient-player.css
+Remplacer uniquement :
 - assets/js/shared/ambient-player.js
+- assets/css/shared/ambient-player.css
 
-Fichier modifié :
-- assets/js/components.js
-
-Aucune page HTML n'est à modifier.
-Après mise en ligne, fais Ctrl + F5 pour vider le cache du navigateur.
+Après déploiement : Ctrl + F5, puis cliquer une fois n'importe où sur le site.
+La nouvelle version utilise une clé différente et doit donc s'afficher même si l'ancienne intro avait été marquée comme vue.
