@@ -5,47 +5,74 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Boutique — SENZANY</title>
 <link href="assets/css/pages/boutique.css" rel="stylesheet"/>
-<!-- Boutique V3.8.3 : corrections manifesto + bandeau règles -->
+<!-- Boutique V4.0 : hero premium + collection vedette -->
 </head>
 <body data-page="boutique">
 <div data-site-header=""></div>
 <main>
-<section class="shop-hero">
+<section class="shop-hero shop-hero--v4">
   <div class="shop-hero__veil"></div>
+  <div class="shop-hero__grid"></div>
   <div class="wrap shop-hero__inner">
-    <div class="shop-kicker mono">SENZANY // SOUTENIR LE PROJET</div>
-    <div class="shop-hero__title">
-      <span class="shop-hero__title-solid">BOUTIQUE</span>
-      <span class="shop-hero__title-outline">OFFICIELLE</span>
+    <div class="shop-hero__copy">
+      <div class="shop-kicker mono"><span>01</span> SENZANY // BOUTIQUE OFFICIELLE</div>
+      <div class="shop-hero__title">
+        <span class="shop-hero__title-solid">SOUTENEZ</span>
+        <span class="shop-hero__title-outline">L’AVENTURE</span>
+      </div>
+      <p class="shop-hero__lead">Découvrez les collections officielles de Senzany et participez au développement d’un univers PVE ambitieux, durable et en constante évolution.</p>
+      <div class="shop-hero__actions">
+        <a class="shop-btn shop-btn--primary" href="https://senzany.tip4serv.com/" target="_blank" rel="noopener noreferrer">Accéder à la boutique <span>↗</span></a>
+        <a class="shop-btn shop-btn--ghost" href="#collection-vedette">Voir la collection vedette <span>↓</span></a>
+      </div>
+      <div class="shop-hero__meta">
+        <div><b>100%</b><span>OFFICIEL</span></div>
+        <div><b>PVE</b><span>ÉQUILIBRE PRÉSERVÉ</span></div>
+        <div><b>24/7</b><span>ACCÈS TIP4SERV</span></div>
+      </div>
+      <div class="shop-hero__status mono"><span></span> BOUTIQUE EXTERNE SÉCURISÉE // TIP4SERV</div>
     </div>
-    <p class="shop-hero__lead">Soutenez le développement de Senzany et découvrez les contenus proposés dans le respect du cadre de monétisation applicable aux serveurs DayZ autorisés.</p>
-    <div class="shop-hero__actions">
-      <a class="shop-btn shop-btn--primary" href="https://senzany.tip4serv.com/" target="_blank" rel="noopener noreferrer">Découvrir la boutique <span>↗</span></a>
-      <a class="shop-btn shop-btn--ghost" href="#engagements">Notre engagement</a>
-    </div>
-    <div class="shop-hero__status mono"><span></span> BOUTIQUE EXTERNE SÉCURISÉE // TIP4SERV</div>
+
+    <aside class="shop-showcase" aria-label="Collection vedette Summer Vibes">
+      <div class="shop-showcase__top mono"><span>COLLECTION 01</span><span>DISPONIBLE</span></div>
+      <div class="shop-showcase__media">
+        <img src="assets/images/news/senzany-summer-vibes-2026.png" alt="Collection Summer Vibes 2026 de Senzany">
+        <span class="shop-showcase__limited mono">ÉDITION LIMITÉE</span>
+      </div>
+      <div class="shop-showcase__body">
+        <span class="section-tag">COLLECTION SAISONNIÈRE</span>
+        <h2>SUMMER<br>VIBES</h2>
+        <p>Une identité estivale exclusive, pensée pour célébrer la saison avec style sans déséquilibrer l’expérience de jeu.</p>
+        <a href="https://senzany.tip4serv.com/" target="_blank" rel="noopener noreferrer">EXPLORER LA COLLECTION <span>↗</span></a>
+      </div>
+    </aside>
+  </div>
+  <div class="shop-hero__ticker mono" aria-hidden="true">
+    <span>SENZANY OFFICIAL STORE</span><i>◆</i><span>COLLECTIONS SAISONNIÈRES</span><i>◆</i><span>PROJET COMMUNAUTAIRE</span><i>◆</i><span>EXPÉRIENCE ÉQUITABLE</span>
   </div>
 </section>
 
-<section class="summer-feature">
+<section class="summer-feature summer-feature--v4" id="collection-vedette">
   <div class="wrap">
     <div class="summer-feature__panel">
       <div class="summer-feature__visual">
-        <div class="summer-feature__badge mono">ÉVÉNEMENT EN COURS</div>
-        <div class="summer-feature__logo"><span>SUMMER</span><strong>VIBES</strong></div>
-        <div class="summer-feature__edition mono">ÉDITION LIMITÉE</div>
+        <img src="assets/images/news/senzany-summer-vibes-2026.png" alt="Visuel officiel Summer Vibes 2026">
+        <div class="summer-feature__badge mono">COLLECTION ACTIVE // 2026</div>
+        <div class="summer-feature__edition mono">DISPONIBILITÉ LIMITÉE</div>
       </div>
       <div class="summer-feature__content">
-        <div class="section-tag">Collection saisonnière</div>
-        <h2>L’ÉTÉ S’INSTALLE<br>SUR SENZANY.</h2>
-        <p>Découvrez l’univers <strong>Summer Vibes</strong>, une sélection saisonnière pensée pour apporter une identité plus solaire et plus fun à la communauté, sans modifier l’équilibre du gameplay.</p>
-        <div class="summer-feature__chips"><span>COSMÉTIQUE</span><span>SAISONNIER</span><span>DISPONIBILITÉ LIMITÉE</span></div>
-        <a class="shop-btn shop-btn--summer" href="https://senzany.tip4serv.com/" target="_blank" rel="noopener noreferrer">Voir Summer Vibes <span>↗</span></a>
+        <div class="section-tag">EN CE MOMENT SUR SENZANY</div>
+        <h2>L’ÉTÉ CHANGE<br>LES RÈGLES.</h2>
+        <p><strong>Summer Vibes</strong> apporte une nouvelle énergie à l’univers Senzany avec une sélection saisonnière reconnaissable, immersive et pensée pour la communauté.</p>
+        <div class="summer-feature__chips"><span>COLLECTION EXCLUSIVE</span><span>IDENTITÉ SAISONNIÈRE</span><span>GAMEPLAY PRÉSERVÉ</span></div>
+        <div class="summer-feature__footer">
+          <a class="shop-btn shop-btn--summer" href="https://senzany.tip4serv.com/" target="_blank" rel="noopener noreferrer">Découvrir Summer Vibes <span>↗</span></a>
+          <span class="mono">SENZANY // DROP 01</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
-
 
 <section class="official-monetization">
   <div class="wrap">
