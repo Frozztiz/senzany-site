@@ -9,7 +9,7 @@
     muted: 'senzanyAmbientMuted',
     volume: 'senzanyAmbientVolume',
     position: 'senzanyAmbientPosition',
-    introSeen: 'senzanyAmbientIntroSeenGSAPV3'
+    introSeen: 'senzanyAmbientIntroSeenSmokeV4'
   };
 
   const DEFAULT_VOLUME = 0.22;
@@ -66,11 +66,8 @@
       <div class="senzany-audio-intro__forest senzany-audio-intro__forest--far"></div>
       <div class="senzany-audio-intro__forest senzany-audio-intro__forest--near"></div>
     </div>
+    <canvas class="senzany-audio-intro__atmosphere" aria-hidden="true"></canvas>
     <div class="senzany-audio-intro__glow" aria-hidden="true"></div>
-    <div class="senzany-audio-intro__embers" aria-hidden="true"></div>
-    <div class="senzany-audio-intro__fog senzany-audio-intro__fog--back" aria-hidden="true"></div>
-    <div class="senzany-audio-intro__fog senzany-audio-intro__fog--middle" aria-hidden="true"></div>
-    <div class="senzany-audio-intro__fog senzany-audio-intro__fog--front" aria-hidden="true"></div>
     <div class="senzany-audio-intro__content">
       <div class="senzany-audio-intro__overline">PORTAIL OFFICIEL</div>
       <div class="senzany-audio-intro__identity">
@@ -157,21 +154,118 @@
     document.head.appendChild(script);
   });
 
-  const createEmbers = () => {
-    const container = intro.querySelector('.senzany-audio-intro__embers');
-    container.innerHTML = '';
-    for (let index = 0; index < 72; index += 1) {
-      const ember = document.createElement('i');
-      ember.style.left = `${Math.random() * 100}%`;
-      ember.style.bottom = `${-5 - Math.random() * 18}%`;
-      ember.style.width = `${1 + Math.random() * 3}px`;
-      ember.style.height = ember.style.width;
-      ember.dataset.drift = String((Math.random() - 0.5) * 180);
-      ember.dataset.rise = String(65 + Math.random() * 55);
-      ember.dataset.duration = String(3.8 + Math.random() * 4.5);
-      ember.dataset.delay = String(Math.random() * 3.2);
-      container.appendChild(ember);
+  const createAtmosphere = (canvas) => {
+    const context = canvas.getContext('2d', { alpha: true });
+    const state = { frame: 0, running: true, width: 0, height: 0, dpr: 1 };
+    const fog = [];
+    const sparks = [];
+
+    const resize = () => {
+      state.dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      state.width = window.innerWidth;
+      state.height = window.innerHeight;
+      canvas.width = Math.round(state.width * state.dpr);
+      canvas.height = Math.round(state.height * state.dpr);
+      canvas.style.width = `${state.width}px`;
+      canvas.style.height = `${state.height}px`;
+      context.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+    };
+
+    const resetFog = (particle, initial = false) => {
+      const band = Math.random();
+      particle.x = initial ? Math.random() * state.width : -state.width * (0.12 + Math.random() * 0.25);
+      particle.y = state.height * (0.12 + band * 0.78);
+      particle.radiusX = state.width * (0.14 + Math.random() * 0.24);
+      particle.radiusY = state.height * (0.07 + Math.random() * 0.17);
+      particle.speed = 7 + Math.random() * 18;
+      particle.wave = 12 + Math.random() * 42;
+      particle.phase = Math.random() * Math.PI * 2;
+      particle.alpha = 0.035 + Math.random() * 0.095;
+      particle.warmth = Math.random();
+    };
+
+    const resetSpark = (spark, initial = false) => {
+      spark.x = Math.random() * state.width;
+      spark.y = initial ? Math.random() * state.height : state.height + 20;
+      spark.vy = 20 + Math.random() * 70;
+      spark.vx = -12 + Math.random() * 24;
+      spark.size = 0.7 + Math.random() * 2.8;
+      spark.life = 0.25 + Math.random() * 0.75;
+      spark.phase = Math.random() * Math.PI * 2;
+    };
+
+    resize();
+    for (let index = 0; index < 38; index += 1) {
+      const particle = {};
+      resetFog(particle, true);
+      fog.push(particle);
     }
+    for (let index = 0; index < 95; index += 1) {
+      const spark = {};
+      resetSpark(spark, true);
+      sparks.push(spark);
+    }
+
+    let previous = performance.now();
+    const render = (now) => {
+      if (!state.running) return;
+      const delta = Math.min(0.04, (now - previous) / 1000);
+      previous = now;
+      context.clearRect(0, 0, state.width, state.height);
+
+      context.globalCompositeOperation = 'screen';
+      fog.forEach((particle) => {
+        particle.x += particle.speed * delta;
+        particle.phase += delta * 0.22;
+        if (particle.x - particle.radiusX > state.width * 1.2) resetFog(particle);
+        const py = particle.y + Math.sin(particle.phase) * particle.wave;
+        context.save();
+        context.translate(particle.x, py);
+        context.scale(1, particle.radiusY / particle.radiusX);
+        const gradient = context.createRadialGradient(0, 0, 0, 0, 0, particle.radiusX);
+        const tint = particle.warmth > 0.76 ? '190,94,100' : '200,205,214';
+        gradient.addColorStop(0, `rgba(${tint},${particle.alpha})`);
+        gradient.addColorStop(0.38, `rgba(${tint},${particle.alpha * 0.72})`);
+        gradient.addColorStop(0.72, `rgba(${tint},${particle.alpha * 0.22})`);
+        gradient.addColorStop(1, `rgba(${tint},0)`);
+        context.fillStyle = gradient;
+        context.beginPath();
+        context.arc(0, 0, particle.radiusX, 0, Math.PI * 2);
+        context.fill();
+        context.restore();
+      });
+
+      context.globalCompositeOperation = 'lighter';
+      sparks.forEach((spark) => {
+        spark.y -= spark.vy * delta;
+        spark.x += spark.vx * delta + Math.sin(now * 0.0018 + spark.phase) * 0.25;
+        if (spark.y < -30) resetSpark(spark);
+        const flicker = 0.42 + Math.sin(now * 0.012 + spark.phase) * 0.25;
+        const gradient = context.createRadialGradient(spark.x, spark.y, 0, spark.x, spark.y, spark.size * 5.5);
+        gradient.addColorStop(0, `rgba(255,220,170,${Math.max(0, flicker * spark.life)})`);
+        gradient.addColorStop(0.25, `rgba(255,72,38,${Math.max(0, flicker * spark.life * 0.9)})`);
+        gradient.addColorStop(1, 'rgba(180,0,15,0)');
+        context.fillStyle = gradient;
+        context.beginPath();
+        context.arc(spark.x, spark.y, spark.size * 5.5, 0, Math.PI * 2);
+        context.fill();
+      });
+
+      context.globalCompositeOperation = 'source-over';
+      state.frame = requestAnimationFrame(render);
+    };
+
+    window.addEventListener('resize', resize, { passive: true });
+    state.frame = requestAnimationFrame(render);
+
+    return {
+      stop() {
+        state.running = false;
+        cancelAnimationFrame(state.frame);
+        window.removeEventListener('resize', resize);
+        context.clearRect(0, 0, state.width, state.height);
+      }
+    };
   };
 
   const playGsapIntro = async () => {
@@ -179,57 +273,36 @@
     if (!gsap) throw new Error('GSAP indisponible');
 
     if (!document.body.contains(intro)) document.body.appendChild(intro);
-    createEmbers();
-
     const q = gsap.utils.selector(intro);
-    const embers = q('.senzany-audio-intro__embers i');
-    const fogBack = q('.senzany-audio-intro__fog--back');
-    const fogMiddle = q('.senzany-audio-intro__fog--middle');
-    const fogFront = q('.senzany-audio-intro__fog--front');
+    const canvas = q('.senzany-audio-intro__atmosphere')[0];
+    const atmosphere = createAtmosphere(canvas);
 
     intro.style.visibility = 'visible';
     intro.style.pointerEvents = 'all';
     document.documentElement.classList.add('senzany-intro-running');
 
     gsap.set(intro, { autoAlpha: 0 });
-    gsap.set(q('.senzany-audio-intro__scene'), { scale: 1.22, filter: 'brightness(0.12) saturate(0.45)' });
-    gsap.set(q('.senzany-audio-intro__moon'), { autoAlpha: 0, scale: 0.7 });
-    gsap.set(q('.senzany-audio-intro__forest--far'), { autoAlpha: 0, y: 38 });
-    gsap.set(q('.senzany-audio-intro__forest--near'), { autoAlpha: 0, y: 58 });
-    gsap.set(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 0.2 });
-    gsap.set([fogBack, fogMiddle, fogFront], { autoAlpha: 0 });
-    gsap.set(q('.senzany-audio-intro__overline'), { autoAlpha: 0, y: 18, letterSpacing: '1em' });
-    gsap.set(q('.senzany-audio-intro__logo'), { autoAlpha: 0, scale: 0.62, rotation: -3, filter: 'blur(24px) brightness(0.2)' });
-    gsap.set(q('.senzany-audio-intro__brand'), { autoAlpha: 0, y: 46, scale: 0.84, filter: 'blur(28px)' });
+    gsap.set(canvas, { autoAlpha: 0, scale: 1.08 });
+    gsap.set(q('.senzany-audio-intro__scene'), { scale: 1.28, filter: 'brightness(0.08) saturate(0.35)' });
+    gsap.set(q('.senzany-audio-intro__moon'), { autoAlpha: 0, scale: 0.55 });
+    gsap.set(q('.senzany-audio-intro__forest--far'), { autoAlpha: 0, y: 50 });
+    gsap.set(q('.senzany-audio-intro__forest--near'), { autoAlpha: 0, y: 70 });
+    gsap.set(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 0.18 });
+    gsap.set(q('.senzany-audio-intro__overline'), { autoAlpha: 0, y: 22, letterSpacing: '1em' });
+    gsap.set(q('.senzany-audio-intro__logo'), { autoAlpha: 0, scale: 0.52, rotation: -4, filter: 'blur(30px) brightness(0.1)' });
+    gsap.set(q('.senzany-audio-intro__brand'), { autoAlpha: 0, y: 55, scale: 0.78, filter: 'blur(34px)' });
     gsap.set(q('.senzany-audio-intro__line span'), { scaleX: 0, transformOrigin: '50% 50%' });
-    gsap.set(q('.senzany-audio-intro__tagline span'), { autoAlpha: 0, y: 34, filter: 'blur(18px)' });
-    gsap.set(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 0, y: 50, scale: 1.12, filter: 'blur(26px)', letterSpacing: '0.19em' });
-    gsap.set(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: 14 });
+    gsap.set(q('.senzany-audio-intro__tagline span'), { autoAlpha: 0, y: 38, filter: 'blur(20px)' });
+    gsap.set(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 0, y: 64, scale: 1.18, filter: 'blur(32px)', letterSpacing: '0.22em' });
+    gsap.set(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: 16 });
     gsap.set(q('.senzany-audio-intro__vignette'), { autoAlpha: 0 });
     gsap.set(q('.senzany-audio-intro__shutter'), { autoAlpha: 0 });
-
-    embers.forEach((ember, index) => {
-      gsap.set(ember, { autoAlpha: 0, scale: 0.2 + Math.random() * 0.55 });
-      gsap.to(ember, {
-        y: () => `-${80 + Math.random() * 55}vh`,
-        x: () => (Math.random() - 0.5) * 260,
-        autoAlpha: index % 4 === 0 ? 1 : 0.72,
-        scale: () => 0.6 + Math.random() * 2.2,
-        duration: () => 5.5 + Math.random() * 6.5,
-        delay: () => Math.random() * 3.5,
-        repeat: 1,
-        ease: 'none'
-      });
-    });
-
-    gsap.to(fogBack, { xPercent: 28, scale: 1.28, duration: 18, ease: 'sine.inOut' });
-    gsap.to(fogMiddle, { xPercent: -34, scale: 1.36, duration: 17, ease: 'sine.inOut' });
-    gsap.to(fogFront, { xPercent: 24, scale: 1.46, duration: 16, ease: 'sine.inOut' });
 
     const timeline = gsap.timeline({
       defaults: { ease: 'power2.out' },
       onComplete: () => {
         localStorage.setItem(STORAGE.introSeen, 'true');
+        atmosphere.stop();
         document.documentElement.classList.remove('senzany-intro-running');
         intro.style.pointerEvents = 'none';
         intro.remove();
@@ -237,35 +310,32 @@
     });
 
     timeline
-      .to(intro, { autoAlpha: 1, duration: 1.1 }, 0)
-      .to(q('.senzany-audio-intro__scene'), { scale: 1.03, filter: 'brightness(0.42) saturate(0.75)', duration: 12.8, ease: 'power1.out' }, 0)
-      .to(q('.senzany-audio-intro__moon'), { autoAlpha: 0.9, scale: 1, duration: 2.8, ease: 'power3.out' }, 0.25)
-      .to(q('.senzany-audio-intro__forest--far'), { autoAlpha: 0.68, y: 0, duration: 2.5 }, 0.35)
-      .to(q('.senzany-audio-intro__forest--near'), { autoAlpha: 0.94, y: 0, duration: 2.9 }, 0.5)
-      .to(q('.senzany-audio-intro__vignette'), { autoAlpha: 1, duration: 1.4 }, 0)
-      .to(fogBack, { autoAlpha: 0.88, duration: 2.1 }, 0.15)
-      .to(fogMiddle, { autoAlpha: 0.82, duration: 2.3 }, 0.35)
-      .to(fogFront, { autoAlpha: 0.98, duration: 2.6 }, 0.55)
-      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 1, scale: 1.18, duration: 3.1, ease: 'power3.out' }, 0.7)
-      .to(q('.senzany-audio-intro__overline'), { autoAlpha: 1, y: 0, letterSpacing: '0.56em', duration: 1.35 }, 1.25)
-      .to(q('.senzany-audio-intro__logo'), { autoAlpha: 1, scale: 1, rotation: 0, filter: 'blur(0px) brightness(1)', duration: 2.2, ease: 'expo.out' }, 1.55)
-      .to(q('.senzany-audio-intro__brand'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 2.35, ease: 'expo.out' }, 1.72)
-      .to(q('.senzany-audio-intro__identity'), { scale: 1.028, duration: 1.6, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 2.85)
-      .to(q('.senzany-audio-intro__line span'), { scaleX: 1, duration: 1.2, ease: 'expo.inOut' }, 3.55)
-      .to(q('.senzany-audio-intro__tagline span'), { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1.5 }, 4.0)
-      .to(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', letterSpacing: '0.028em', duration: 2.0, ease: 'expo.out' }, 4.55)
-      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 1, y: 0, duration: 1.0 }, 5.75)
-      .to(q('.senzany-audio-intro__glow'), { scale: 1.42, autoAlpha: 0.82, duration: 2.9, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 5.4)
-      .to({}, { duration: 2.1 })
-      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: -10, duration: 0.65 }, 8.75)
-      .to(fogFront, { autoAlpha: 1, scale: 1.72, filter: 'blur(34px)', duration: 1.3, ease: 'power2.in' }, 8.85)
-      .to(fogMiddle, { autoAlpha: 1, scale: 1.58, duration: 1.45, ease: 'power2.in' }, 8.95)
-      .to(q('.senzany-audio-intro__content'), { autoAlpha: 0, scale: 1.075, filter: 'blur(22px)', duration: 1.55, ease: 'power2.in' }, 9.15)
-      .to(q('.senzany-audio-intro__shutter'), { autoAlpha: 1, duration: 0.55, ease: 'power2.in' }, 9.55)
-      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 1.85, duration: 1.25 }, 9.6)
-      .to([fogBack, fogMiddle, fogFront], { autoAlpha: 0, xPercent: '+=14', duration: 2.1, ease: 'power2.inOut' }, 10.05)
-      .to(q('.senzany-audio-intro__shutter'), { autoAlpha: 0, duration: 1.15, ease: 'power2.out' }, 10.35)
-      .to(intro, { autoAlpha: 0, duration: 2.0, ease: 'power2.inOut' }, 10.4);
+      .to(intro, { autoAlpha: 1, duration: 0.9 }, 0)
+      .to(q('.senzany-audio-intro__vignette'), { autoAlpha: 1, duration: 1.2 }, 0)
+      .to(q('.senzany-audio-intro__scene'), { scale: 1.02, filter: 'brightness(0.5) saturate(0.85)', duration: 12.5, ease: 'power1.out' }, 0)
+      .to(q('.senzany-audio-intro__moon'), { autoAlpha: 0.9, scale: 1, duration: 3.2, ease: 'expo.out' }, 0.15)
+      .to(q('.senzany-audio-intro__forest--far'), { autoAlpha: 0.72, y: 0, duration: 2.6 }, 0.2)
+      .to(q('.senzany-audio-intro__forest--near'), { autoAlpha: 0.98, y: 0, duration: 3.1 }, 0.35)
+      .to(canvas, { autoAlpha: 1, scale: 1, duration: 2.3 }, 0.2)
+      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 1, scale: 1.25, duration: 3.5, ease: 'expo.out' }, 0.8)
+      .to(q('.senzany-audio-intro__overline'), { autoAlpha: 1, y: 0, letterSpacing: '0.56em', duration: 1.4 }, 1.35)
+      .to(q('.senzany-audio-intro__logo'), { autoAlpha: 1, scale: 1, rotation: 0, filter: 'blur(0px) brightness(1)', duration: 2.4, ease: 'expo.out' }, 1.65)
+      .to(q('.senzany-audio-intro__brand'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 2.6, ease: 'expo.out' }, 1.8)
+      .to(q('.senzany-audio-intro__identity'), { scale: 1.035, duration: 1.9, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 3.0)
+      .to(q('.senzany-audio-intro__line span'), { scaleX: 1, duration: 1.25, ease: 'expo.inOut' }, 3.75)
+      .to(q('.senzany-audio-intro__tagline span'), { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1.55 }, 4.25)
+      .to(q('.senzany-audio-intro__tagline strong'), { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', letterSpacing: '0.028em', duration: 2.2, ease: 'expo.out' }, 4.85)
+      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 1, y: 0, duration: 1.0 }, 6.15)
+      .to(q('.senzany-audio-intro__glow'), { scale: 1.58, autoAlpha: 0.95, duration: 3.2, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 5.8)
+      .to({}, { duration: 2.25 })
+      .to(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: -12, duration: 0.55 }, 9.15)
+      .to(canvas, { scale: 1.16, filter: 'brightness(1.35) contrast(1.15)', duration: 1.6, ease: 'power2.in' }, 9.1)
+      .to(q('.senzany-audio-intro__content'), { autoAlpha: 0, scale: 1.09, filter: 'blur(24px)', duration: 1.65, ease: 'power2.in' }, 9.35)
+      .to(q('.senzany-audio-intro__shutter'), { autoAlpha: 1, duration: 0.65, ease: 'power2.in' }, 9.7)
+      .to(q('.senzany-audio-intro__glow'), { autoAlpha: 0, scale: 1.9, duration: 1.2 }, 9.8)
+      .to(canvas, { autoAlpha: 0, scale: 1.28, duration: 2.1, ease: 'power2.inOut' }, 10.35)
+      .to(q('.senzany-audio-intro__shutter'), { autoAlpha: 0, duration: 1.15, ease: 'power2.out' }, 10.65)
+      .to(intro, { autoAlpha: 0, duration: 1.8, ease: 'power2.inOut' }, 10.7);
 
     return true;
   };
