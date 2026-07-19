@@ -62,19 +62,31 @@
   function animatePlayerCount(element, players, maxPlayers) {
     if (!element) return;
 
+    const previousPlayers = Number(element.dataset.players);
+    const startValue = Number.isFinite(previousPlayers) ? previousPlayers : 0;
+    element.dataset.players = String(players);
+
+    const finalLabel = players >= maxPlayers ? 'SERVEUR COMPLET' : `${players} / ${maxPlayers}`;
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      element.textContent = `${players} / ${maxPlayers}`;
+      element.textContent = finalLabel;
       return;
     }
 
+    element.classList.remove('is-updating');
+    void element.offsetWidth;
+    element.classList.add('is-updating');
+
     const startedAt = performance.now();
-    const duration = 850;
+    const duration = 780;
 
     const tick = (now) => {
       const progress = Math.min(1, (now - startedAt) / duration);
       const eased = 1 - Math.pow(1 - progress, 3);
-      element.textContent = `${Math.round(players * eased)} / ${maxPlayers}`;
+      const current = Math.round(startValue + (players - startValue) * eased);
+      element.textContent = progress >= 1 ? finalLabel : `${current} / ${maxPlayers}`;
       if (progress < 1) requestAnimationFrame(tick);
+      else window.setTimeout(() => element.classList.remove('is-updating'), 260);
     };
 
     requestAnimationFrame(tick);
@@ -96,19 +108,36 @@
     if (elements.statusLabel) elements.statusLabel.textContent = data?.online ? 'LIVE' : 'OFFLINE';
 
     if (!hasPlayerCount) {
+      delete elements.playersElement.dataset.players;
       elements.playersElement.textContent = data?.online ? 'Bientôt disponible' : 'Hors ligne';
-      if (elements.occupancyBar) elements.occupancyBar.style.width = '0%';
+      if (elements.occupancyBar) {
+        elements.occupancyBar.style.width = '0%';
+        elements.occupancyBar.setAttribute('aria-valuenow', '0');
+      }
+      elements.card?.classList.remove('is-calm', 'is-busy', 'is-near-full', 'is-full');
       return;
     }
 
     animatePlayerCount(elements.playersElement, players, maxPlayers);
 
     const occupancyPercent = Math.max(0, Math.min(100, (players / maxPlayers) * 100));
-    if (elements.occupancyBar) elements.occupancyBar.style.width = `${occupancyPercent.toFixed(1)}%`;
+    if (elements.occupancyBar) {
+      elements.occupancyBar.style.width = `${occupancyPercent.toFixed(1)}%`;
+      elements.occupancyBar.setAttribute('role', 'progressbar');
+      elements.occupancyBar.setAttribute('aria-valuemin', '0');
+      elements.occupancyBar.setAttribute('aria-valuemax', '100');
+      elements.occupancyBar.setAttribute('aria-valuenow', String(Math.round(occupancyPercent)));
+    }
 
-    elements.card?.classList.remove('is-calm', 'is-busy', 'is-full');
+    elements.card?.classList.remove('is-calm', 'is-busy', 'is-near-full', 'is-full');
     elements.card?.classList.add(
-      occupancyPercent >= 72 ? 'is-full' : occupancyPercent >= 42 ? 'is-busy' : 'is-calm'
+      players >= maxPlayers
+        ? 'is-full'
+        : occupancyPercent >= 80
+          ? 'is-near-full'
+          : occupancyPercent >= 45
+            ? 'is-busy'
+            : 'is-calm'
     );
 
     if (elements.mapElement && data?.map) {
@@ -232,7 +261,7 @@
   initCardTilt();
 
   window.setInterval(refreshTopServeursStats, 300000);
-  window.setInterval(refreshGameStats, 60000);
+  window.setInterval(refreshGameStats, 30000);
   window.setInterval(updateCountdown, 1000);
 })();
 
