@@ -24,27 +24,19 @@
       </div>
     </div>
 
-    <aside class="community-command reveal" aria-label="Statistiques de la communauté en direct">
-      <div class="community-command__glow" aria-hidden="true"></div>
-      <div class="community-command__top">
-        <div class="community-command__identity">
-          <span class="community-command__pulse"></span>
-          <div><small>Réseau communautaire</small><strong>SENZANY LIVE</strong></div>
-        </div>
-        <span class="community-command__status">EN LIGNE</span>
+    <div class="community-livebar reveal" aria-label="Statistiques de la communauté en direct">
+      <div class="community-livebar__status">
+        <span class="community-livebar__pulse"></span>
+        <div><small>Senzany en direct</small><strong>La communauté est active</strong></div>
       </div>
-      <div class="community-command__online">
-        <span>Survivants actuellement connectés</span>
-        <strong id="commPlayers">—</strong>
-        <small>Capacité du serveur : 50 joueurs</small>
+      <div class="community-livebar__stats">
+        <div class="community-livebar__stat community-livebar__stat--players"><span>En jeu</span><strong id="commPlayers">—</strong><small>sur 50 survivants</small></div>
+        <div class="community-livebar__stat"><span>Discord</span><strong id="commDiscordFull">—</strong><small>membres</small></div>
+        <div class="community-livebar__stat"><span>Votes du mois</span><strong id="commVotesFull">—</strong><small>soutiens</small></div>
+        <div class="community-livebar__stat"><span>Identité</span><strong>100%</strong><small>francophone</small></div>
       </div>
-      <div class="community-command__metrics">
-        <div><span>Discord</span><strong id="commDiscordFull">—</strong><small>membres</small></div>
-        <div><span>Votes</span><strong id="commVotesFull">—</strong><small>ce mois-ci</small></div>
-        <div><span>Identité</span><strong>100%</strong><small>francophone</small></div>
-      </div>
-      <a class="community-command__join" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank"><span>Entrer dans la communauté</span><b>↗</b></a>
-    </aside>
+      <a class="community-livebar__join" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Rejoindre le Discord <b>↗</b></a>
+    </div>
   </div>
   <a class="scroll-cue" href="#manifeste"><span>Découvrir</span><i></i></a>
 </section>
@@ -84,7 +76,7 @@
   <div class="story-panel__overlay"></div>
   <div class="wrap story-panel__content reveal">
     <p class="eyebrow">L'aventure se vit ensemble</p>
-    <h2><span class="story-title__solid">SEUL, VOUS SURVIVEZ.</span><span class="story-title__outline">ENSEMBLE, VOUS<br>ÉCRIVEZ L'HISTOIRE.</span></h2>
+    <h2><span class="story-title__solid">SEUL, VOUS SURVIVEZ.</span><span class="story-title__solid story-title__solid--secondary">ENSEMBLE, VOUS<br>ÉCRIVEZ L'HISTOIRE.</span></h2>
     <p>Courses, événements, rencontres improvisées et projets collectifs : chaque joueur apporte quelque chose à l'univers Senzany.</p>
     <a class="text-link" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Entrer dans la communauté ↗</a>
   </div>
