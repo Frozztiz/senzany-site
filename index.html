@@ -7,7 +7,7 @@
 <meta content="Senzany, serveur DayZ PVE français sur Chernarus. Découvrez un univers communautaire immersif, évolutif et riche en contenus." name="description"/>
 <title>SENZANY — Portail officiel DayZ PVE</title>
 <link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
-<link href="assets/css/pages/accueil.css?v=2.3" rel="stylesheet"/>
+<link href="assets/css/pages/accueil.css?v=2.4" rel="stylesheet"/>
 </head>
 <body data-page="accueil">
 <div data-site-header=""></div>
@@ -16,25 +16,30 @@
 <div aria-hidden="true" class="home-hero__light"></div>
 <div aria-hidden="true" class="home-hero__grain"></div>
 <div aria-hidden="true" class="home-hero__ash" id="heroAsh"></div>
-<div class="wrap home-countdown-wrap"><section aria-labelledby="hero-countdown-title" class="season-event season-event--wide home-reveal">
-<div aria-hidden="true" class="season-event__scan"></div>
-<div class="season-event__topline"><span>Saison IV</span><b>Événement majeur</b></div>
-<div class="season-event__title">
-<small>Wipe officiel</small>
-<strong id="hero-countdown-title">21 juillet</strong>
-</div>
-<div aria-label="Compte à rebours avant la Saison 4" class="season-event__clock" id="countdown">
-<div><strong id="cd-d">00</strong><span>Jours</span></div><i>:</i>
-<div><strong id="cd-h">00</strong><span>Heures</span></div><i>:</i>
-<div><strong id="cd-m">00</strong><span>Minutes</span></div><i>:</i>
-<div><strong id="cd-s">00</strong><span>Secondes</span></div>
-</div>
-<div class="season-event__progress">
-<div class="season-event__progress-head"><span>Déploiement de la Saison 4</span><b id="seasonProgressLabel">0%</b></div>
-<div class="season-event__track"><span id="seasonProgressBar"></span></div>
-</div>
-<a href="senzany-jouer.html">Préparer mon arrivée <span>↗</span></a>
-</section></div><div class="wrap home-hero__inner">
+<div class="wrap home-countdown-wrap">
+<section aria-labelledby="hero-countdown-title" class="doomsday-countdown home-reveal">
+  <div class="doomsday-countdown__edge" aria-hidden="true"></div>
+  <div class="doomsday-countdown__event">
+    <span class="doomsday-countdown__eyebrow">Saison IV // Nouveau départ</span>
+    <strong id="hero-countdown-title">21 juillet 2026</strong>
+    <small>Wipe officiel — 20h00</small>
+  </div>
+  <div aria-label="Compte à rebours avant la Saison 4" class="doomsday-countdown__clock" id="countdown">
+    <div class="doomsday-unit"><strong id="cd-d">00</strong><span>Jours</span></div>
+    <i aria-hidden="true"></i>
+    <div class="doomsday-unit"><strong id="cd-h">00</strong><span>Heures</span></div>
+    <i aria-hidden="true"></i>
+    <div class="doomsday-unit"><strong id="cd-m">00</strong><span>Minutes</span></div>
+    <i aria-hidden="true"></i>
+    <div class="doomsday-unit"><strong id="cd-s">00</strong><span>Secondes</span></div>
+  </div>
+  <div class="doomsday-countdown__status">
+    <div class="doomsday-countdown__status-head"><span>Phase de déploiement</span><b id="seasonProgressLabel">0%</b></div>
+    <div class="doomsday-countdown__track"><span id="seasonProgressBar"></span></div>
+    <div class="doomsday-countdown__status-foot"><span class="doomsday-pulse"></span><span>Systèmes prêts</span><a href="senzany-jouer.html">Préparer mon arrivée ↗</a></div>
+  </div>
+</section>
+</div><div class="wrap home-hero__inner">
 <div class="home-hero__content home-reveal">
 <p class="home-kicker">01 Senzany // Portail officiel</p>
 <h1 class="home-hero__title">
@@ -81,48 +86,57 @@
 </div>
 </section>
 
-<section aria-labelledby="world-title" class="home-world" id="univers">
+<section aria-labelledby="world-title" class="home-world home-world--intel" id="univers">
 <div class="wrap">
 <header class="home-section-head home-reveal">
 <div>
-<p class="home-kicker">L’univers Senzany</p>
-<h2 id="world-title">Bien plus qu’un serveur.</h2>
+<p class="home-kicker">Chernarus // Dossier opérationnel</p>
+<h2 id="world-title">Le territoire vous observe.</h2>
 </div>
-<p>Un monde pensé pour durer, évoluer et surprendre. Chaque système contribue à une expérience cohérente, accessible et profondément communautaire.</p>
+<p>Une lecture immersive de l’univers Senzany : zones sensibles, progression, saison active et activité communautaire. Ici, pas de raccourci vers le menu — seulement ce qui rend notre Chernarus unique.</p>
 </header>
-<div class="home-world__grid">
-<a class="home-world-card home-reveal" href="senzany-jouer.html"><img alt="" aria-hidden="true" class="home-world-card__image" loading="lazy" src="assets/images/accueil/exploration-new.webp"/>
-<span class="home-world-card__number">01 // Exploration</span>
-<div>
-<h3>Un Chernarus transformé</h3>
-<p>Volcan actif, zones inédites, bunkers, secrets et événements façonnent une carte vivante.</p>
-<span class="home-world-card__link">Explorer le monde ↗</span>
-</div>
-</a>
-<a class="home-world-card home-reveal" href="senzany-evenements.html"><img alt="" aria-hidden="true" class="home-world-card__image" loading="lazy" src="assets/images/accueil/evenements-new.webp"/>
-<span class="home-world-card__number">02 // Événements</span>
-<div>
-<h3>Chaque semaine compte</h3>
-<p>Courses, convois, boss, compétitions et rendez-vous communautaires.</p>
-<span class="home-world-card__link">Voir les événements ↗</span>
-</div>
-</a>
-<a class="home-world-card home-reveal" href="senzany-communaute.html"><img alt="" aria-hidden="true" class="home-world-card__image" loading="lazy" src="assets/images/accueil/communaute-new.webp"/>
-<span class="home-world-card__number">03 // Communauté</span>
-<div>
-<h3>Survivre ensemble</h3>
-<p>Une communauté française active et une équipe présente à chaque étape.</p>
-<span class="home-world-card__link">Rencontrer la communauté ↗</span>
-</div>
-</a>
-<a class="home-world-card home-reveal" href="senzany-boutique.html"><img alt="" aria-hidden="true" class="home-world-card__image" loading="lazy" src="assets/images/accueil/saison-new.webp"/>
-<span class="home-world-card__number">04 // Saison</span>
-<div>
-<h3>Summer Vibes 2026</h3>
-<p>Découvrez la collection estivale et les contenus saisonniers actuellement mis en avant.</p>
-<span class="home-world-card__link">Découvrir la collection ↗</span>
-</div>
-</a>
+<div class="chernarus-intel home-reveal">
+  <div class="chernarus-intel__visual" aria-label="Carte stylisée de Chernarus">
+    <div class="chernarus-intel__grid" aria-hidden="true"></div>
+    <svg class="chernarus-intel__map" viewBox="0 0 1000 560" role="img" aria-label="Carte topographique stylisée de Chernarus">
+      <defs>
+        <filter id="mapGlow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <path class="map-land" d="M92 92 L190 48 316 74 405 38 535 84 666 58 828 120 913 222 888 335 933 428 842 518 665 496 554 532 423 492 286 522 177 455 74 364 105 256 58 172 Z"/>
+      <path class="map-road" d="M120 360 C240 310 287 218 397 230 S585 372 714 310 826 204 900 224"/>
+      <path class="map-road map-road--secondary" d="M160 126 C252 190 341 154 430 196 S618 244 726 176 822 172 874 266"/>
+      <path class="map-river" d="M86 280 C214 252 286 322 392 294 S584 184 708 250 817 398 910 370"/>
+      <g class="map-contours">
+        <path d="M185 392 C246 360 270 294 336 282 S454 335 501 312"/><path d="M210 420 C282 380 306 326 364 318 S449 365 528 338"/>
+        <path d="M580 150 C644 116 716 126 756 176 S808 258 866 276"/><path d="M604 178 C662 146 706 158 738 199 S786 272 842 292"/>
+      </g>
+      <g class="map-markers">
+        <g transform="translate(252 172)"><circle r="10"/><circle r="24"/><text x="34" y="-4">BUNKER ALPHA</text><text x="34" y="14" class="map-marker-sub">Accès verrouillé</text></g>
+        <g transform="translate(682 202)"><circle r="10"/><circle r="24"/><text x="34" y="-4">ZONE VOLCANIQUE</text><text x="34" y="14" class="map-marker-sub">Risque extrême</text></g>
+        <g transform="translate(454 394)"><circle r="10"/><circle r="24"/><text x="34" y="-4">CENTRE COMMERCIAL</text><text x="34" y="14" class="map-marker-sub">Économie active</text></g>
+        <g transform="translate(794 424)"><circle r="10"/><circle r="24"/><text x="-34" y="-4" text-anchor="end">ZONE ÉVÉNEMENT</text><text x="-34" y="14" text-anchor="end" class="map-marker-sub">Activité programmée</text></g>
+      </g>
+    </svg>
+    <div class="chernarus-intel__scan" aria-hidden="true"></div>
+    <div class="chernarus-intel__corner chernarus-intel__corner--tl"></div><div class="chernarus-intel__corner chernarus-intel__corner--br"></div>
+    <div class="chernarus-intel__legend"><span><i class="legend-red"></i>Zone sensible</span><span><i class="legend-gold"></i>Point d’intérêt</span><span><i class="legend-blue"></i>Axe principal</span></div>
+  </div>
+  <aside class="chernarus-intel__data">
+    <div class="intel-data__top"><span>Dossier 04-CHN</span><b>ACTIF</b></div>
+    <h3>Une carte qui évolue avec la saison.</h3>
+    <p>Nos zones, événements et systèmes ne sont pas de simples décors : ils structurent la progression et donnent un rythme différent à chaque session.</p>
+    <div class="intel-metrics">
+      <div><strong>60 m</strong><span>Territoires</span></div>
+      <div><strong>24/7</strong><span>Monde actif</span></div>
+      <div><strong>PVE</strong><span>Expérience</span></div>
+      <div><strong>S4</strong><span>Saison</span></div>
+    </div>
+    <div class="intel-signals">
+      <article><span>01</span><div><strong>Exploration</strong><p>Bunkers, zones inédites, secrets et itinéraires à haut risque.</p></div></article>
+      <article><span>02</span><div><strong>Progression</strong><p>Une évolution pensée sur le long terme, au rythme du survivant.</p></div></article>
+      <article><span>03</span><div><strong>Événements</strong><p>Des rendez-vous qui transforment ponctuellement le territoire.</p></div></article>
+    </div>
+  </aside>
 </div>
 </div>
 </section>
@@ -172,6 +186,6 @@
 <script defer="" src="assets/js/components.js"></script>
 <script defer="" src="assets/js/app.js"></script>
 <script defer="" src="assets/js/api.js"></script>
-<script defer="" src="assets/js/pages/accueil.js?v=2.3"></script>
+<script defer="" src="assets/js/pages/accueil.js?v=2.4"></script>
 </body>
 </html>
