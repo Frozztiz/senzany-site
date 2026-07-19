@@ -1,218 +1,177 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <meta name="description" content="Senzany, serveur DayZ PVE français sur Chernarus. Découvrez un univers communautaire immersif, évolutif et riche en contenus."/>
-  <title>SENZANY — Portail officiel DayZ PVE</title>
-  <link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
-  <link href="assets/css/pages/accueil.css?v=2.0" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Senzany, serveur DayZ PVE français sur Chernarus. Découvrez un univers communautaire immersif, évolutif et riche en contenus." name="description"/>
+<title>SENZANY — Portail officiel DayZ PVE</title>
+<link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
+<link href="assets/css/pages/accueil.css?v=2.1" rel="stylesheet"/>
 </head>
 <body data-page="accueil">
 <div data-site-header=""></div>
-
 <main class="home-main">
-  <section class="home-hero" id="accueil">
-    <div class="home-hero__light" aria-hidden="true"></div>
-    <div class="home-hero__grain" aria-hidden="true"></div>
-    <div class="home-hero__ash" id="heroAsh" aria-hidden="true"></div>
-
-    <div class="wrap home-hero__inner">
-      <div class="home-hero__content home-reveal">
-        <p class="home-kicker">01 Senzany // Portail officiel</p>
-        <h1 class="home-hero__title">
-          <span>VOICI LE RÉCIT</span>
-          <span class="home-hero__outline">DE VOTRE MORT.</span>
-        </h1>
-        <p class="home-hero__lead">
+<section class="home-hero" id="accueil">
+<div aria-hidden="true" class="home-hero__light"></div>
+<div aria-hidden="true" class="home-hero__grain"></div>
+<div aria-hidden="true" class="home-hero__ash" id="heroAsh"></div>
+<div class="wrap home-countdown-wrap"><section aria-labelledby="hero-countdown-title" class="season-event season-event--wide home-reveal">
+<div aria-hidden="true" class="season-event__scan"></div>
+<div class="season-event__topline"><span>Saison IV</span><b>Événement majeur</b></div>
+<div class="season-event__title">
+<small>Wipe officiel</small>
+<strong id="hero-countdown-title">21 juillet</strong>
+</div>
+<div aria-label="Compte à rebours avant la Saison 4" class="season-event__clock" id="countdown">
+<div><strong id="cd-d">00</strong><span>Jours</span></div><i>:</i>
+<div><strong id="cd-h">00</strong><span>Heures</span></div><i>:</i>
+<div><strong id="cd-m">00</strong><span>Minutes</span></div><i>:</i>
+<div><strong id="cd-s">00</strong><span>Secondes</span></div>
+</div>
+<div class="season-event__progress">
+<div class="season-event__progress-head"><span>Déploiement de la Saison 4</span><b id="seasonProgressLabel">0%</b></div>
+<div class="season-event__track"><span id="seasonProgressBar"></span></div>
+</div>
+<a href="senzany-jouer.html">Préparer mon arrivée <span>↗</span></a>
+</section></div><div class="wrap home-hero__inner">
+<div class="home-hero__content home-reveal">
+<p class="home-kicker">01 Senzany // Portail officiel</p>
+<h1 class="home-hero__title">
+<span>VOICI LE RÉCIT</span>
+<span class="home-hero__outline">DE VOTRE MORT.</span>
+</h1>
+<p class="home-hero__lead">
           Un serveur DayZ PVE français où progression, exploration, événements et communauté construisent une aventure qui ne ressemble à aucune autre.
         </p>
-        <div class="home-hero__actions">
-          <a class="home-btn home-btn--primary" href="senzany-jouer.html">Rejoindre le serveur <span>↗</span></a>
-          <a class="home-btn home-btn--ghost" href="#univers">Découvrir Senzany <span>↓</span></a>
-        </div>
+<div class="home-hero__actions">
+<a class="home-btn home-btn--primary" href="senzany-jouer.html">Rejoindre le serveur <span>↗</span></a>
+<a class="home-btn home-btn--ghost" href="#univers">Découvrir Senzany <span>↓</span></a>
+</div>
+<div aria-label="Informations principales" class="home-hero__signals">
+<div><strong>100%</strong><span>PVE français</span></div>
+<div><strong>24/7</strong><span>Serveur actif</span></div>
+<div><strong>+18</strong><span>Staff à l’écoute</span></div>
+</div>
+</div>
+<div class="home-hero__side home-hero__side--network home-reveal">
+<aside aria-label="État du serveur" class="home-live-card">
+<div class="home-live-card__head">
+<span class="home-live-dot"></span>
+<span>État du réseau</span>
+<small>LIVE</small>
+</div>
+<div class="home-live-card__main">
+<span>Joueurs connectés</span>
+<strong id="statPlayers">— / —</strong>
+</div>
+<div class="home-live-card__grid">
+<div><span>Carte</span><strong>Chernarus+</strong></div>
+<div><span>Mode</span><strong>PVE</strong></div>
+<div><span>Votes du mois</span><strong id="statVotes">—</strong></div>
+<div><span>Prochain wipe</span><strong id="statWipe">—</strong></div>
+</div>
+<a href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" rel="noopener" target="_blank">Voter pour Senzany <span>↗</span></a>
+</aside>
 
-        <div class="home-hero__signals" aria-label="Informations principales">
-          <div><strong>100%</strong><span>PVE français</span></div>
-          <div><strong>24/7</strong><span>Serveur actif</span></div>
-          <div><strong>+18</strong><span>Staff à l’écoute</span></div>
-        </div>
-      </div>
+</div>
+</div>
+<div aria-hidden="true" class="home-hero__ticker">
+<span>Senzany official portal</span><i></i><span>Expérience PVE</span><i></i><span>Contenus saisonniers</span><i></i><span>Communauté française</span>
+</div>
+</section>
 
-      <div class="home-hero__side home-reveal">
-        <aside class="home-live-card" aria-label="État du serveur">
-          <div class="home-live-card__head">
-            <span class="home-live-dot"></span>
-            <span>État du réseau</span>
-            <small>LIVE</small>
-          </div>
-          <div class="home-live-card__main">
-            <span>Joueurs connectés</span>
-            <strong id="statPlayers">— / —</strong>
-          </div>
-          <div class="home-live-card__grid">
-            <div><span>Carte</span><strong>Chernarus+</strong></div>
-            <div><span>Mode</span><strong>PVE</strong></div>
-            <div><span>Votes du mois</span><strong id="statVotes">—</strong></div>
-            <div><span>Prochain wipe</span><strong id="statWipe">—</strong></div>
-          </div>
-          <a href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" target="_blank" rel="noopener">Voter pour Senzany <span>↗</span></a>
-        </aside>
+<section aria-labelledby="world-title" class="home-world" id="univers">
+<div class="wrap">
+<header class="home-section-head home-reveal">
+<div>
+<p class="home-kicker">L’univers Senzany</p>
+<h2 id="world-title">Bien plus qu’un serveur.</h2>
+</div>
+<p>Un monde pensé pour durer, évoluer et surprendre. Chaque système contribue à une expérience cohérente, accessible et profondément communautaire.</p>
+</header>
+<div class="home-world__grid">
+<a class="home-world-card home-world-card--large home-reveal" href="senzany-jouer.html"><img alt="" aria-hidden="true" class="home-world-card__image" loading="lazy" src="assets/images/accueil/exploration.png"/>
+<span class="home-world-card__number">01 // Exploration</span>
+<div>
+<h3>Un Chernarus transformé</h3>
+<p>Volcan actif, zones inédites, bunkers, secrets et événements façonnent une carte vivante.</p>
+<span class="home-world-card__link">Explorer le monde ↗</span>
+</div>
+</a>
+<a class="home-world-card home-reveal" href="senzany-evenements.html"><img alt="" aria-hidden="true" class="home-world-card__image" loading="lazy" src="assets/images/accueil/evenements.png"/>
+<span class="home-world-card__number">02 // Événements</span>
+<div>
+<h3>Chaque semaine compte</h3>
+<p>Courses, convois, boss, compétitions et rendez-vous communautaires.</p>
+<span class="home-world-card__link">Voir les événements ↗</span>
+</div>
+</a>
+<a class="home-world-card home-reveal" href="senzany-communaute.html"><img alt="" aria-hidden="true" class="home-world-card__image" loading="lazy" src="assets/images/accueil/communaute.png"/>
+<span class="home-world-card__number">03 // Communauté</span>
+<div>
+<h3>Survivre ensemble</h3>
+<p>Une communauté française active et une équipe présente à chaque étape.</p>
+<span class="home-world-card__link">Rencontrer la communauté ↗</span>
+</div>
+</a>
+<a class="home-world-card home-world-card--wide home-reveal" href="senzany-boutique.html"><img alt="" aria-hidden="true" class="home-world-card__image" loading="lazy" src="assets/images/accueil/saison.png"/>
+<span class="home-world-card__number">04 // Saison</span>
+<div>
+<h3>Summer Vibes 2026</h3>
+<p>Découvrez la collection estivale et les contenus saisonniers actuellement mis en avant.</p>
+<span class="home-world-card__link">Découvrir la collection ↗</span>
+</div>
+</a>
+</div>
+</div>
+</section>
 
-        <section class="season-event" aria-labelledby="hero-countdown-title">
-          <div class="season-event__scan" aria-hidden="true"></div>
-          <div class="season-event__topline"><span>Saison IV</span><b>Événement majeur</b></div>
-          <div class="season-event__title">
-            <small>Wipe officiel</small>
-            <strong id="hero-countdown-title">21 juillet</strong>
-          </div>
-          <div class="season-event__clock" id="countdown" aria-label="Compte à rebours avant la Saison 4">
-            <div><strong id="cd-d">00</strong><span>Jours</span></div><i>:</i>
-            <div><strong id="cd-h">00</strong><span>Heures</span></div><i>:</i>
-            <div><strong id="cd-m">00</strong><span>Minutes</span></div><i>:</i>
-            <div><strong id="cd-s">00</strong><span>Secondes</span></div>
-          </div>
-          <div class="season-event__progress">
-            <div class="season-event__progress-head"><span>Déploiement de la Saison 4</span><b id="seasonProgressLabel">0%</b></div>
-            <div class="season-event__track"><span id="seasonProgressBar"></span></div>
-          </div>
-          <a href="senzany-jouer.html">Préparer mon arrivée <span>↗</span></a>
-        </section>
-      </div>
-    </div>
-
-    <div class="home-hero__ticker" aria-hidden="true">
-      <span>Senzany official portal</span><i></i><span>Expérience PVE</span><i></i><span>Contenus saisonniers</span><i></i><span>Communauté française</span>
-    </div>
-  </section>
-
-  <section class="home-season home-season--teaser" aria-labelledby="season-title">
-    <div class="wrap">
-      <a class="home-season__teaser home-reveal" href="senzany-jouer.html">
-        <div>
-          <p class="home-kicker">Saison 4 // Nouveau départ</p>
-          <h2 id="season-title">Le prochain chapitre approche.</h2>
-        </div>
-        <p>La nouvelle saison ouvre le 21 juillet 2026 à 20h00. Préparez votre équipe et votre retour sur Chernarus.</p>
-        <span>Découvrir la Saison 4 ↗</span>
-      </a>
-    </div>
-  </section>
-
-  <section class="home-world" id="univers" aria-labelledby="world-title">
-    <div class="wrap">
-      <header class="home-section-head home-reveal">
-        <div>
-          <p class="home-kicker">L’univers Senzany</p>
-          <h2 id="world-title">Bien plus qu’un serveur.</h2>
-        </div>
-        <p>Un monde pensé pour durer, évoluer et surprendre. Chaque système contribue à une expérience cohérente, accessible et profondément communautaire.</p>
-      </header>
-
-      <div class="home-world__grid">
-        <a class="home-world-card home-world-card--large home-reveal" href="senzany-jouer.html" style="--card-image:url('assets/images/accueil/exploration.png')">
-          <span class="home-world-card__number">01 // Exploration</span>
-          <div>
-            <h3>Un Chernarus transformé</h3>
-            <p>Volcan actif, zones inédites, bunkers, secrets et événements façonnent une carte vivante.</p>
-            <span class="home-world-card__link">Explorer le monde ↗</span>
-          </div>
-        </a>
-        <a class="home-world-card home-reveal" href="senzany-evenements.html" style="--card-image:url('assets/images/accueil/evenements.png')">
-          <span class="home-world-card__number">02 // Événements</span>
-          <div>
-            <h3>Chaque semaine compte</h3>
-            <p>Courses, convois, boss, compétitions et rendez-vous communautaires.</p>
-            <span class="home-world-card__link">Voir les événements ↗</span>
-          </div>
-        </a>
-        <a class="home-world-card home-reveal" href="senzany-communaute.html" style="--card-image:url('assets/images/accueil/communaute.png')">
-          <span class="home-world-card__number">03 // Communauté</span>
-          <div>
-            <h3>Survivre ensemble</h3>
-            <p>Une communauté française active et une équipe présente à chaque étape.</p>
-            <span class="home-world-card__link">Rencontrer la communauté ↗</span>
-          </div>
-        </a>
-        <a class="home-world-card home-world-card--wide home-reveal" href="senzany-boutique.html" style="--card-image:url('assets/images/accueil/saison.png')">
-          <span class="home-world-card__number">04 // Saison</span>
-          <div>
-            <h3>Summer Vibes 2026</h3>
-            <p>Découvrez la collection estivale et les contenus saisonniers actuellement mis en avant.</p>
-            <span class="home-world-card__link">Découvrir la collection ↗</span>
-          </div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <section class="home-portal" aria-labelledby="portal-title">
-    <div class="wrap">
-      <header class="home-section-head home-reveal">
-        <div>
-          <p class="home-kicker">Votre portail</p>
-          <h2 id="portal-title">Tout Senzany, au même endroit.</h2>
-        </div>
-        <p>Consultez votre profil, retrouvez le staff, préparez vos aventures et accédez aux services essentiels du serveur.</p>
-      </header>
-
-      <div class="home-portal__grid">
-        <a class="home-portal-card home-reveal" href="senzany-profil.html" style="--portal-image:url('assets/images/accueil/profil.png')"><span>01</span><div><strong>Mon profil</strong><p>Votre identité, vos statistiques et toutes vos données joueur.</p></div><i>↗</i></a>
-        <a class="home-portal-card home-reveal" href="senzany-staff.html" style="--portal-image:url('assets/images/accueil/staff.jpg')"><span>02</span><div><strong>Le staff</strong><p>Découvrez les opérateurs qui font vivre et évoluer Senzany.</p></div><i>↗</i></a>
-        <a class="home-portal-card home-reveal" href="senzany-wiki.html" style="--portal-image:url('assets/images/accueil/wiki.png')"><span>03</span><div><strong>Le wiki</strong><p>Guides, systèmes, règles et informations utiles pour progresser.</p></div><i>↗</i></a>
-        <a class="home-portal-card home-reveal" href="senzany-support.html" style="--portal-image:url('assets/images/accueil/support.png')"><span>04</span><div><strong>Support</strong><p>Une question ou un problème ? Retrouvez rapidement la bonne aide.</p></div><i>↗</i></a>
-      </div>
-    </div>
-  </section>
-
-  <section class="home-news" aria-labelledby="news-title">
-    <div class="wrap">
-      <header class="home-section-head home-reveal">
-        <div>
-          <p class="home-kicker">Transmission récente</p>
-          <h2 id="news-title">Dernières actualités.</h2>
-        </div>
-        <p>Les annonces importantes du serveur et les nouveautés qui préparent la suite de l’aventure.</p>
-      </header>
-
-      <div class="home-news__grid">
-        <article class="home-news-card home-reveal">
-          <div class="home-news-card__media" style="background-image:url('assets/images/news/dayz-update-129.jpg')"><span>Mise à jour officielle</span></div>
-          <div class="home-news-card__body">
-            <small>15 juillet 2026</small>
-            <h3>Mise à jour 1.29 — Road to Badlands</h3>
-            <p>Nouvelle arme, équipements désertiques, convois militaires et nombreux ajustements.</p>
-            <a href="https://steamcommunity.com/app/221100/announcements/?l=french" target="_blank" rel="noopener">Lire l’annonce ↗</a>
-          </div>
-        </article>
-        <article class="home-news-card home-reveal">
-          <div class="home-news-card__media" style="background-image:url('assets/images/news/senzany-summer-vibes-2026.png')"><span>Événement spécial été</span></div>
-          <div class="home-news-card__body">
-            <small>Collection limitée</small>
-            <h3>Senzany Summer Vibes 2026</h3>
-            <p>Une identité estivale exclusive, disponible pendant une période limitée.</p>
-            <a href="https://senzany.tip4serv.com/category/senzany-summer-vibes-2026" target="_blank" rel="noopener">Voir la collection ↗</a>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="home-trust" aria-label="Monétisation officielle">
-    <div class="wrap">
-      <a class="home-trust__banner home-reveal" href="https://www.bohemia.net/monetization/approved/dayz" target="_blank" rel="noopener">
-        <span class="home-trust__seal">✓<small>Validé</small></span>
-        <div><small>Bohemia Interactive // DayZ</small><strong>Monétisation officiellement autorisée</strong><p>Senzany figure dans la liste officielle des serveurs approuvés.</p></div>
-        <b>Vérifier la liste officielle ↗</b>
-      </a>
-    </div>
-  </section>
+<section aria-labelledby="news-title" class="home-news">
+<div class="wrap">
+<header class="home-section-head home-reveal">
+<div>
+<p class="home-kicker">Transmission récente</p>
+<h2 id="news-title">Dernières actualités.</h2>
+</div>
+<p>Les annonces importantes du serveur et les nouveautés qui préparent la suite de l’aventure.</p>
+</header>
+<div class="home-news__grid">
+<article class="home-news-card home-reveal">
+<div class="home-news-card__media" style="background-image:url('assets/images/news/dayz-update-129.jpg')"><span>Mise à jour officielle</span></div>
+<div class="home-news-card__body">
+<small>15 juillet 2026</small>
+<h3>Mise à jour 1.29 — Road to Badlands</h3>
+<p>Nouvelle arme, équipements désertiques, convois militaires et nombreux ajustements.</p>
+<a href="https://steamcommunity.com/app/221100/announcements/?l=french" rel="noopener" target="_blank">Lire l’annonce ↗</a>
+</div>
+</article>
+<article class="home-news-card home-reveal">
+<div class="home-news-card__media" style="background-image:url('assets/images/news/senzany-summer-vibes-2026.png')"><span>Événement spécial été</span></div>
+<div class="home-news-card__body">
+<small>Collection limitée</small>
+<h3>Senzany Summer Vibes 2026</h3>
+<p>Une identité estivale exclusive, disponible pendant une période limitée.</p>
+<a href="https://senzany.tip4serv.com/category/senzany-summer-vibes-2026" rel="noopener" target="_blank">Voir la collection ↗</a>
+</div>
+</article>
+</div>
+</div>
+</section>
+<section aria-label="Monétisation officielle" class="home-trust">
+<div class="wrap">
+<a class="home-trust__banner home-reveal" href="https://www.bohemia.net/monetization/approved/dayz" rel="noopener" target="_blank">
+<span class="home-trust__seal">✓<small>Validé</small></span>
+<div><small>Bohemia Interactive // DayZ</small><strong>Monétisation officiellement autorisée</strong><p>Senzany figure dans la liste officielle des serveurs approuvés.</p></div>
+<b>Vérifier la liste officielle ↗</b>
+</a>
+</div>
+</section>
 </main>
-
 <div data-site-footer=""></div>
-<script defer src="assets/js/components.js"></script>
-<script defer src="assets/js/app.js"></script>
-<script defer src="assets/js/api.js"></script>
-<script defer src="assets/js/pages/accueil.js?v=2.0"></script>
+<script defer="" src="assets/js/components.js"></script>
+<script defer="" src="assets/js/app.js"></script>
+<script defer="" src="assets/js/api.js"></script>
+<script defer="" src="assets/js/pages/accueil.js?v=2.1"></script>
 </body>
 </html>

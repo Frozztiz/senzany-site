@@ -139,3 +139,45 @@
 @media(max-width:1100px){.home-hero__inner{grid-template-columns:1fr;align-items:center}.home-hero__title span:first-child,.home-hero__outline{white-space:normal}.home-hero__side{max-width:720px}.home-season__teaser{grid-template-columns:1fr}.home-portal__grid{grid-template-columns:1fr 1fr}}
 @media(max-width:780px){.home-hero__title{font-size:clamp(52px,15vw,86px)}.home-hero__outline{margin-top:10px}.season-event{padding:20px 16px}.season-event__clock{gap:3px}.season-event__clock strong{font-size:clamp(29px,10vw,45px)}.season-event__clock i{font-size:26px}.home-portal__grid{grid-template-columns:1fr}.home-portal-card{min-height:310px}}
 @media(prefers-reduced-motion:reduce){.season-event__scan,.season-event__clock i,.home-live-card:before{animation:none}.home-world-card:hover,.home-portal-card:hover{transform:translateY(-4px)}}
+
+/* === ACCUEIL V2.1 : structure du hero et compte à rebours horizontal === */
+.home-countdown-wrap{position:relative;z-index:4;padding-top:24px}
+.season-event--wide{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(420px,1.8fr) minmax(220px,.8fr);align-items:center;gap:28px;padding:18px 24px;min-height:132px;border-color:rgba(227,45,49,.68);background:linear-gradient(100deg,rgba(70,13,16,.72),rgba(16,11,10,.96) 36%,rgba(22,12,12,.96));box-shadow:0 18px 50px rgba(0,0,0,.48),0 0 30px rgba(220,44,49,.12)}
+.season-event--wide .season-event__topline{grid-column:1;grid-row:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;font-size:9px}
+.season-event--wide .season-event__title{grid-column:1;grid-row:1;text-align:left;padding:32px 0 0;border:0}
+.season-event--wide .season-event__title small{font-size:8px}.season-event--wide .season-event__title strong{font-size:clamp(34px,3.5vw,54px);white-space:nowrap}
+.season-event--wide .season-event__clock{grid-column:2;grid-row:1;padding:0;align-items:center}
+.season-event--wide .season-event__clock strong{font-size:clamp(36px,4.1vw,64px)}
+.season-event--wide .season-event__clock span{font-size:7px}
+.season-event--wide .season-event__progress{grid-column:3;grid-row:1;margin:0}
+.season-event--wide>a{grid-column:3;grid-row:1;align-self:end;margin:48px 0 0;padding-top:12px}
+.season-event--wide .season-event__scan{height:64px}
+.home-hero__inner{grid-template-columns:minmax(0,1.2fr) minmax(330px,.55fr);padding-block:62px 92px;align-items:center}
+.home-hero__side--network{align-self:center}
+.home-live-card{min-width:0}
+.home-live-card__main{padding:22px 20px}.home-live-card__grid div{padding:15px 18px}
+
+/* Images explicites et robustes dans les cartes */
+.home-world-card{background-image:none!important;background:#0c0908;isolation:isolate}
+.home-world-card__image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:-3;filter:saturate(.9) contrast(1.02);transition:transform .8s cubic-bezier(.2,.7,.2,1),filter .6s ease}
+.home-world-card:before{z-index:-1;background:linear-gradient(180deg,rgba(5,4,4,.10),rgba(5,4,4,.91) 88%)}
+.home-world-card:after{z-index:1}
+.home-world-card:hover .home-world-card__image{transform:scale(1.075);filter:saturate(1.08) contrast(1.06)}
+.home-world-card>*:not(.home-world-card__image){position:relative;z-index:2}
+
+/* La section Portail a été retirée de l’accueil : les accès restent dans la navigation principale. */
+
+@media(max-width:1050px){
+  .season-event--wide{grid-template-columns:1fr;gap:14px}
+  .season-event--wide .season-event__topline,.season-event--wide .season-event__title,.season-event--wide .season-event__clock,.season-event--wide .season-event__progress,.season-event--wide>a{grid-column:1;grid-row:auto}
+  .season-event--wide .season-event__title{padding:0}.season-event--wide>a{margin:0}
+  .home-hero__inner{grid-template-columns:1fr}.home-hero__side--network{max-width:680px;width:100%}
+}
+@media(max-width:780px){
+  .home-countdown-wrap{padding-top:14px}
+  .season-event--wide{padding:16px 14px}
+  .season-event--wide .season-event__clock{grid-template-columns:repeat(4,1fr);gap:5px}
+  .season-event--wide .season-event__clock i{display:none}
+  .season-event--wide .season-event__title strong{white-space:normal}
+  .home-hero__inner{padding-block:48px 86px}
+}

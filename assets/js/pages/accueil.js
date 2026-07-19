@@ -119,7 +119,7 @@
 
   function initCardTilt() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(pointer: coarse)').matches) return;
-    document.querySelectorAll('.home-world-card, .home-portal-card').forEach((card) => {
+    document.querySelectorAll('.home-world-card').forEach((card) => {
       card.addEventListener('pointermove', (event) => {
         const rect = card.getBoundingClientRect();
         const x = (event.clientX - rect.left) / rect.width;
