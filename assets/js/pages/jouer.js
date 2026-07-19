@@ -71,6 +71,52 @@
   refresh();
   setInterval(refresh, 30000);
 
+  // Film Senzany — ouverture de la vidéo YouTube dans la fenêtre prévue.
+  const filmButton = document.getElementById('openFilm');
+  const filmModal = document.getElementById('filmModal');
+  const filmFrame = document.getElementById('filmFrame');
+  const filmClose = document.getElementById('closeFilm');
+  const YOUTUBE_VIDEO_ID = '3Uf5WygzmrI';
+
+  function openFilm() {
+    if (!filmModal || !filmFrame) {
+      window.open(`https://www.youtube.com/watch?v=${YOUTUBE_VIDEO_ID}`, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    filmFrame.innerHTML = `
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&rel=0"
+        title="Film Senzany"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen>
+      </iframe>`;
+
+    filmModal.classList.add('is-open');
+    filmModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    filmClose?.focus();
+  }
+
+  function closeFilm() {
+    if (!filmModal || !filmFrame) return;
+    filmModal.classList.remove('is-open');
+    filmModal.setAttribute('aria-hidden', 'true');
+    filmFrame.innerHTML = '';
+    document.body.style.overflow = '';
+    filmButton?.focus();
+  }
+
+  filmButton?.addEventListener('click', openFilm);
+  filmClose?.addEventListener('click', closeFilm);
+  filmModal?.querySelectorAll('[data-close-film]').forEach((element) => {
+    element.addEventListener('click', closeFilm);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && filmModal?.classList.contains('is-open')) closeFilm();
+  });
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -84,46 +130,4 @@
     element.style.transitionDelay = `${Math.min(index % 4, 3) * 70}ms`;
     observer.observe(element);
   });
-
-  const preview = document.getElementById('featurePreview');
-  const previewBox = document.querySelector('.systems-showcase__media');
-  const previewKicker = document.getElementById('featureKicker');
-  const previewTitle = document.getElementById('featureTitle');
-  const previewCurrent = document.getElementById('featureCurrent');
-  document.querySelectorAll('.feature-switch').forEach((button, index) => {
-    const activate = () => {
-      document.querySelectorAll('.feature-switch').forEach((item) => item.classList.remove('is-active'));
-      button.classList.add('is-active');
-      previewBox?.classList.add('is-changing');
-      setTimeout(() => {
-        if (preview) preview.src = button.dataset.image;
-        if (previewKicker) previewKicker.textContent = button.dataset.kicker;
-        if (previewTitle) previewTitle.textContent = button.dataset.title;
-        if (previewCurrent) previewCurrent.textContent = String(index + 1).padStart(2, '0');
-        previewBox?.classList.remove('is-changing');
-      }, 180);
-    };
-    button.addEventListener('mouseenter', activate);
-    button.addEventListener('focus', activate);
-    button.addEventListener('click', activate);
-  });
-
-  const filmModal = document.getElementById('filmModal');
-  const filmFrame = document.getElementById('filmFrame');
-  const openFilm = document.getElementById('openFilm');
-  const closeFilm = () => {
-    filmModal?.classList.remove('is-open');
-    filmModal?.setAttribute('aria-hidden', 'true');
-    if (filmFrame) filmFrame.innerHTML = '';
-    document.body.style.overflow = '';
-  };
-  openFilm?.addEventListener('click', () => {
-    if (filmFrame) filmFrame.innerHTML = '<iframe src="https://www.youtube.com/embed/3Uf5WygzmrI?autoplay=1&rel=0" title="Film Senzany" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
-    filmModal?.classList.add('is-open');
-    filmModal?.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  });
-  document.getElementById('closeFilm')?.addEventListener('click', closeFilm);
-  filmModal?.querySelector('[data-close-film]')?.addEventListener('click', closeFilm);
-  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeFilm(); });
 })();
