@@ -5,7 +5,8 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <meta name="description" content="Senzany, serveur DayZ PVE français sur Chernarus. Découvrez un univers communautaire immersif, évolutif et riche en contenus."/>
   <title>SENZANY — Portail officiel DayZ PVE</title>
-  <link href="assets/css/pages/accueil.css?v=1.1" rel="stylesheet"/>
+  <link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
+  <link href="assets/css/pages/accueil.css?v=1.2" rel="stylesheet"/>
 </head>
 <body data-page="accueil">
 <div data-site-header=""></div>
@@ -38,24 +39,40 @@
         </div>
       </div>
 
-      <aside class="home-live-card home-reveal" aria-label="État du serveur">
-        <div class="home-live-card__head">
-          <span class="home-live-dot"></span>
-          <span>État du réseau</span>
-          <small>LIVE</small>
-        </div>
-        <div class="home-live-card__main">
-          <span>Joueurs connectés</span>
-          <strong id="statPlayers">— / —</strong>
-        </div>
-        <div class="home-live-card__grid">
-          <div><span>Carte</span><strong>Chernarus+</strong></div>
-          <div><span>Mode</span><strong>PVE</strong></div>
-          <div><span>Votes du mois</span><strong id="statVotes">—</strong></div>
-          <div><span>Prochain wipe</span><strong id="statWipe">—</strong></div>
-        </div>
-        <a href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" target="_blank" rel="noopener">Voter pour Senzany <span>↗</span></a>
-      </aside>
+      <div class="home-hero__side home-reveal">
+        <aside class="home-live-card" aria-label="État du serveur">
+          <div class="home-live-card__head">
+            <span class="home-live-dot"></span>
+            <span>État du réseau</span>
+            <small>LIVE</small>
+          </div>
+          <div class="home-live-card__main">
+            <span>Joueurs connectés</span>
+            <strong id="statPlayers">— / —</strong>
+          </div>
+          <div class="home-live-card__grid">
+            <div><span>Carte</span><strong>Chernarus+</strong></div>
+            <div><span>Mode</span><strong>PVE</strong></div>
+            <div><span>Votes du mois</span><strong id="statVotes">—</strong></div>
+            <div><span>Prochain wipe</span><strong id="statWipe">—</strong></div>
+          </div>
+          <a href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" target="_blank" rel="noopener">Voter pour Senzany <span>↗</span></a>
+        </aside>
+
+        <section class="home-hero-countdown" aria-labelledby="hero-countdown-title">
+          <div class="home-hero-countdown__head">
+            <span>Saison 4 // 21 juillet 2026</span>
+            <strong id="hero-countdown-title">Nouveau départ</strong>
+          </div>
+          <div class="home-hero-countdown__grid" id="countdown" aria-label="Compte à rebours avant la Saison 4">
+            <div><strong id="cd-d">00</strong><span>Jours</span></div>
+            <div><strong id="cd-h">00</strong><span>Heures</span></div>
+            <div><strong id="cd-m">00</strong><span>Minutes</span></div>
+            <div><strong id="cd-s">00</strong><span>Secondes</span></div>
+          </div>
+          <a href="senzany-jouer.html">Préparer mon arrivée <span>↗</span></a>
+        </section>
+      </div>
     </div>
 
     <div class="home-hero__ticker" aria-hidden="true">
@@ -63,22 +80,16 @@
     </div>
   </section>
 
-  <section class="home-season" aria-labelledby="season-title">
+  <section class="home-season home-season--teaser" aria-labelledby="season-title">
     <div class="wrap">
-      <div class="home-season__panel home-reveal">
-        <div class="home-season__copy">
+      <a class="home-season__teaser home-reveal" href="senzany-jouer.html">
+        <div>
           <p class="home-kicker">Saison 4 // Nouveau départ</p>
           <h2 id="season-title">Le prochain chapitre approche.</h2>
-          <p>La nouvelle saison ouvre le 21 juillet 2026 à 20h00. Préparez votre équipe, votre stratégie et votre retour sur Chernarus.</p>
-          <a href="senzany-jouer.html">Préparer mon arrivée <span>↗</span></a>
         </div>
-        <div class="home-season__countdown" id="countdown" aria-label="Compte à rebours">
-          <div><strong id="cd-d">00</strong><span>Jours</span></div>
-          <div><strong id="cd-h">00</strong><span>Heures</span></div>
-          <div><strong id="cd-m">00</strong><span>Minutes</span></div>
-          <div><strong id="cd-s">00</strong><span>Secondes</span></div>
-        </div>
-      </div>
+        <p>La nouvelle saison ouvre le 21 juillet 2026 à 20h00. Préparez votre équipe et votre retour sur Chernarus.</p>
+        <span>Découvrir la Saison 4 ↗</span>
+      </a>
     </div>
   </section>
 
@@ -196,6 +207,6 @@
 <script defer src="assets/js/components.js"></script>
 <script defer src="assets/js/app.js"></script>
 <script defer src="assets/js/api.js"></script>
-<script defer src="assets/js/pages/accueil.js?v=1.1"></script>
+<script defer src="assets/js/pages/accueil.js?v=1.2"></script>
 </body>
 </html>
