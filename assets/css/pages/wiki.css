@@ -113,3 +113,52 @@ footer{padding:50px 0 30px;background:#070606;border-top:1px solid var(--line);b
 @media(max-width:1100px){.navlinks{display:none}.burger{display:block}.grid-4{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){body{background-attachment:scroll}.page-header{min-height:560px;background-attachment:scroll}.page-header::after{display:none}.page-header-inner{padding-top:100px;padding-bottom:56px}.wiki-bottom-grid{grid-template-columns:1fr}}
 @media(max-width:620px){.wrap{padding:0 18px}.page-header{min-height:520px}.page-title{font-size:56px}.page-sub{font-size:16px}.wiki-search-shell{margin-top:26px}.search-state{display:none}.section-head{align-items:flex-start}.archive-counter{display:none}.grid-4{grid-template-columns:1fr}.wiki-card{min-height:235px}.section-title{font-size:38px}section{padding:58px 0}}
+
+/* Terminal d'archives */
+.database-terminal{
+  position:relative;
+  overflow:hidden;
+  min-height:260px;
+  padding:30px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(95,186,121,.10),transparent 34%),
+    linear-gradient(145deg,rgba(12,16,13,.97),rgba(7,9,8,.99));
+  border-color:rgba(95,186,121,.24);
+  box-shadow:inset 0 0 38px rgba(0,0,0,.34);
+}
+.database-terminal::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;width:100%;height:2px;
+  background:linear-gradient(90deg,var(--green),transparent 72%);
+}
+.database-terminal::after{
+  content:"DATABASE // 00";
+  position:absolute;
+  right:22px;
+  bottom:12px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:46px;
+  font-weight:600;
+  letter-spacing:.04em;
+  color:rgba(255,255,255,.025);
+  pointer-events:none;
+}
+.terminal-topline{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}
+.database-terminal h3{font-family:'Anton',sans-serif;font-size:28px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.terminal-online{display:inline-flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid rgba(95,186,121,.28);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#9ed8ad;background:rgba(95,186,121,.05)}
+.terminal-online span{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);animation:pulse 1.8s infinite}
+.terminal-screen{position:relative;z-index:1;padding:18px;border:1px solid rgba(95,186,121,.18);background:rgba(1,7,4,.66);box-shadow:inset 0 0 24px rgba(0,0,0,.48)}
+.terminal-screen::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;background:repeating-linear-gradient(180deg,rgba(255,255,255,.04) 0 1px,transparent 1px 4px)}
+.terminal-line,.terminal-footerline,.terminal-progress-head{position:relative;z-index:1;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.terminal-line{color:#91a899;margin-bottom:14px}.terminal-prompt{color:var(--green);margin-right:7px}
+.terminal-modules{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:18px}
+.terminal-modules span{padding:8px 9px;border:1px solid rgba(95,186,121,.15);background:rgba(95,186,121,.035);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#b6c6ba}
+.terminal-modules span::before{content:"✓";color:var(--green);margin-right:6px}
+.terminal-progress-head{display:flex;justify-content:space-between;gap:12px;color:#aab4ad;margin-bottom:7px}.terminal-progress-head strong{color:var(--paper)}
+.terminal-progress{position:relative;z-index:1;height:7px;border:1px solid rgba(95,186,121,.24);background:rgba(255,255,255,.025);overflow:hidden;margin-bottom:14px}
+.terminal-progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,#4a9e64,var(--green));box-shadow:0 0 16px rgba(95,186,121,.35)}
+.terminal-footerline{display:flex;align-items:center;gap:8px;color:#88938b}.terminal-footerline strong{color:#d0aa55}
+.terminal-cursor{display:inline-block;width:8px;height:13px;background:var(--green);box-shadow:0 0 10px rgba(95,186,121,.55);animation:terminalBlink 1s steps(1,end) infinite}
+@keyframes terminalBlink{0%,48%{opacity:1}49%,100%{opacity:.12}}
+@media(max-width:620px){.database-terminal{padding:22px}.terminal-modules{grid-template-columns:repeat(2,minmax(0,1fr))}.terminal-online{font-size:8px}.database-terminal::after{font-size:34px}}
