@@ -6,7 +6,7 @@
 <title>Dossier survivant — SENZANY</title>
 <link href="assets/css/pages/profil.css" rel="stylesheet"/>
 </head>
-<body data-page="profil" data-build="v4.0-survivor-dashboard">
+<body data-page="profil" data-build="v4.0-dashboard">
 <div data-site-header=""></div>
 
 <main>
@@ -23,70 +23,56 @@
     <div class="wrap">
       <div id="profileLoading" class="profile-loading">
         <span class="profile-loading__dot"></span>
-        Chargement du dossier survivant…
+        Vérification de la session Steam…
       </div>
 
       <div id="loggedOutView" class="login-panel" hidden>
         <div class="login-panel__code mono">AUTH // STEAM REQUIRED</div>
         <div class="login-panel__body">
           <div>
-            <div class="section-tag">Accès au portail</div>
+            <div class="section-tag">Accès au terminal</div>
             <h2>Identifiez votre survivant</h2>
-            <p>Connectez-vous avec Steam pour ouvrir votre dossier Senzany et accéder aux services liés à votre compte.</p>
+            <p>Connectez-vous avec Steam pour ouvrir votre dossier Senzany et synchroniser vos services.</p>
           </div>
-          <a class="profile-button profile-button--primary" href="/api/steam/login">
-            Se connecter avec Steam <span>↗</span>
-          </a>
+          <a class="profile-button profile-button--primary" href="/api/steam/login">Se connecter avec Steam <span>↗</span></a>
         </div>
       </div>
 
       <div id="loggedInView" hidden>
-        <article class="survivor-header">
-          <div class="survivor-header__scan" aria-hidden="true"></div>
-          <div class="survivor-header__avatar-wrap">
-            <img alt="Avatar Steam" id="steamAvatar" class="survivor-header__avatar" src=""/>
-            <span class="survivor-header__online" title="Session Steam active"></span>
+        <article class="identity-card survivor-header">
+          <div class="identity-card__scan" aria-hidden="true"></div>
+          <div class="identity-card__avatar-wrap">
+            <img alt="Avatar Steam" id="steamAvatar" class="identity-card__avatar" src=""/>
+            <span class="identity-card__online" title="Session Steam active"></span>
           </div>
-          <div class="survivor-header__main">
-            <div class="mono survivor-header__eyebrow">DOSSIER // IDENTITÉ AUTHENTIFIÉE</div>
+          <div class="identity-card__main">
+            <div class="identity-card__eyebrow mono">DOSSIER // IDENTITÉ AUTHENTIFIÉE</div>
             <h2 id="steamName">Survivant</h2>
-            <div class="survivor-header__meta">
-              <span><i></i> Steam connecté</span>
-              <span id="discordHeaderState">Discord en attente</span>
+            <div class="survivor-header__sync">
+              <span class="sync-pill sync-pill--ok">Steam connecté</span>
+              <span class="sync-pill" id="headerDiscordState">Discord en attente</span>
             </div>
           </div>
-          <div class="survivor-header__actions">
+          <div class="identity-card__actions">
             <a id="steamProfileLink" class="profile-button" href="#" target="_blank" rel="noopener noreferrer">Profil Steam <span>↗</span></a>
             <a class="profile-button profile-button--danger" href="/api/steam/logout">Se déconnecter</a>
           </div>
         </article>
 
-        <section class="command-strip" aria-label="Résumé du compte">
-          <article class="command-stat command-stat--live">
-            <span class="command-stat__index mono">01</span>
-            <div><span class="command-stat__label">Steam</span><strong>Connecté</strong></div>
-          </article>
-          <article class="command-stat" id="discordSummaryCard">
-            <span class="command-stat__index mono">02</span>
-            <div><span class="command-stat__label">Discord</span><strong id="discordSummary">Non associé</strong></div>
-          </article>
-          <article class="command-stat command-stat--amber">
-            <span class="command-stat__index mono">03</span>
-            <div><span class="command-stat__label">Temps DayZ</span><strong id="dayzHoursSummary">—</strong></div>
-          </article>
-          <article class="command-stat command-stat--locked">
-            <span class="command-stat__index mono">04</span>
-            <div><span class="command-stat__label">Compte Senzany</span><strong>Actif</strong></div>
-          </article>
+        <section class="quick-status" aria-label="Résumé du compte">
+          <div class="quick-status__item"><span class="mono">01</span><strong>Steam</strong><em class="status-ok">Connecté</em></div>
+          <div class="quick-status__item"><span class="mono">02</span><strong>Discord</strong><em id="quickDiscord">Non associé</em></div>
+          <div class="quick-status__item"><span class="mono">03</span><strong>Temps DayZ</strong><em id="quickHours">—</em></div>
+          <div class="quick-status__item"><span class="mono">04</span><strong>Compte Senzany</strong><em class="status-ok">Actif</em></div>
         </section>
 
-        <div class="dashboard-grid">
-          <section class="dashboard-panel dashboard-panel--identity">
+        <div class="dashboard-grid dashboard-grid--primary">
+          <section class="profile-panel dashboard-card dashboard-card--steam">
             <div class="panel-heading">
               <div><div class="section-tag">01 // Identité</div><h3>Carte survivant</h3></div>
               <span class="panel-state panel-state--online">Synchronisé</span>
             </div>
-            <dl class="identity-data">
+            <dl class="identity-data compact-data">
               <div><dt>Pseudo Steam</dt><dd id="identityName">—</dd></div>
               <div><dt>SteamID64</dt><dd id="steamIdValue" class="mono">—</dd></div>
               <div><dt>Statut Steam</dt><dd id="steamStatusValue">—</dd></div>
@@ -94,41 +80,38 @@
             </dl>
           </section>
 
-          <section class="dashboard-panel dashboard-panel--dayz">
+          <section class="profile-panel dashboard-card dashboard-card--dayz">
             <div class="panel-heading">
               <div><div class="section-tag">02 // Expérience</div><h3>Temps de jeu</h3></div>
               <span class="panel-state" id="dayzState">Lecture Steam</span>
             </div>
-            <div class="dayz-stat">
+            <div class="dayz-stat dashboard-number">
               <div class="dayz-stat__value" id="dayzHours">—</div>
               <div class="dayz-stat__label">heures sur DayZ</div>
             </div>
-            <p id="dayzExplanation" class="panel-copy">Chargement des données publiques Steam…</p>
-            <div class="data-source mono">SOURCE // STEAM — TOUS SERVEURS CONFONDUS</div>
+            <div class="metric-bar"><span id="dayzMetricBar"></span></div>
+            <p id="dayzExplanation" class="panel-copy">Chargement des données Steam…</p>
+            <div class="privacy-note mono">SOURCE // STEAM — TOUS SERVEURS CONFONDUS</div>
           </section>
 
-          <section class="dashboard-panel dashboard-panel--discord">
+          <section class="profile-panel dashboard-card dashboard-card--discord">
             <div class="panel-heading">
               <div><div class="section-tag">03 // Communauté</div><h3>Compte Discord</h3></div>
               <span class="panel-state panel-state--pending" id="discordState">Non associé</span>
             </div>
-
             <div class="discord-placeholder" id="discordUnlinked">
               <div class="discord-placeholder__mark">D</div>
-              <div><strong>Compte Discord non associé</strong><p>Reliez Discord pour synchroniser votre identité et vos rôles Senzany.</p></div>
+              <div><strong>Discord non associé</strong><p>Reliez votre compte pour synchroniser votre identité et vos rôles Senzany.</p></div>
             </div>
-
             <div class="discord-linked" id="discordLinked" hidden>
               <img class="discord-linked__avatar" id="discordAvatar" alt="Avatar Discord" src=""/>
               <div><div class="mono discord-linked__label">DISCORD ASSOCIÉ</div><strong id="discordUsername">—</strong><div class="mono discord-linked__id" id="discordId">—</div></div>
             </div>
-
             <div class="discord-roles" id="discordRoles" hidden>
               <div class="mono discord-roles__title">RÔLES SENZANY</div>
               <div class="discord-roles__list" id="discordRolesList"></div>
               <p class="discord-roles__empty" id="discordRolesEmpty" hidden>Aucun rôle spécifique détecté.</p>
             </div>
-
             <div class="discord-actions">
               <a class="profile-button profile-button--discord" id="discordLinkButton" href="/api/discord/login">Associer Discord <span>↗</span></a>
               <button class="profile-button profile-button--danger" id="discordUnlinkButton" type="button" hidden>Dissocier Discord</button>
@@ -137,58 +120,58 @@
           </section>
         </div>
 
-        <section class="progression-zone">
-          <div class="progression-zone__heading">
-            <div><div class="section-tag">Évolution du compte</div><h2>Progression Senzany</h2></div>
-            <p>Les modules ci-dessous sont déjà réservés dans le portail. Ils seront activés uniquement lorsqu’une source serveur fiable sera disponible.</p>
+        <div class="dashboard-section-title">
+          <div><div class="section-tag">Évolution du compte</div><h2>Progression Senzany</h2></div>
+          <p>Les modules ci-dessous sont prêts visuellement. Ils seront activés lorsque leurs sources de données seront disponibles.</p>
+        </div>
+
+        <div class="dashboard-grid dashboard-grid--modules">
+          <article class="module-card module-card--votes">
+            <div class="module-card__top"><span class="module-index mono">01</span><span class="module-state">À connecter</span></div>
+            <div class="module-icon">V</div>
+            <h3>Votes</h3>
+            <p>Historique personnel, total mensuel et récompenses liées aux votes.</p>
+            <div class="module-value">—</div>
+            <div class="module-foot mono">SOURCE TOP-SERVEURS À DÉFINIR</div>
+          </article>
+
+          <article class="module-card module-card--xp">
+            <div class="module-card__top"><span class="module-index mono">02</span><span class="module-state">À venir</span></div>
+            <div class="module-icon">XP</div>
+            <h3>Expérience</h3>
+            <p>Niveau, expérience cumulée et progression du compte survivant.</p>
+            <div class="progress-line"><span></span></div>
+            <div class="module-foot mono">SYSTÈME SERVEUR REQUIS</div>
+          </article>
+
+          <article class="module-card module-card--achievements">
+            <div class="module-card__top"><span class="module-index mono">03</span><span class="module-state">À venir</span></div>
+            <div class="module-icon">◆</div>
+            <h3>Succès</h3>
+            <p>Objectifs et accomplissements débloqués pendant votre aventure.</p>
+            <div class="achievement-slots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="module-foot mono">RÈGLES À DÉFINIR</div>
+          </article>
+        </div>
+
+        <section class="battlepass-card">
+          <div class="battlepass-card__content">
+            <div class="section-tag">04 // En attente</div>
+            <h2>Battle Pass</h2>
+            <p>Le portail sera connecté après l’intégration et la validation du système directement en jeu.</p>
+            <div class="battlepass-card__status"><span>21.07</span><strong>Intégration serveur prioritaire</strong></div>
           </div>
-
-          <div class="module-grid">
-            <article class="module-card module-card--votes">
-              <div class="module-card__top"><span class="module-card__number mono">01</span><span class="module-card__status">À connecter</span></div>
-              <div class="module-card__icon">V</div>
-              <h3>Votes</h3>
-              <p>Historique personnel, total mensuel et récompenses liées aux votes.</p>
-              <div class="module-card__value">—</div>
-              <div class="module-card__footer mono">SOURCE TOP-SERVEURS À DÉFINIR</div>
-            </article>
-
-            <article class="module-card module-card--xp">
-              <div class="module-card__top"><span class="module-card__number mono">02</span><span class="module-card__status">À venir</span></div>
-              <div class="module-card__icon">XP</div>
-              <h3>Expérience</h3>
-              <p>Niveau, expérience cumulée et progression du compte survivant.</p>
-              <div class="xp-preview"><div class="xp-preview__bar"><span></span></div><div class="xp-preview__labels mono"><span>NIVEAU —</span><span>0%</span></div></div>
-              <div class="module-card__footer mono">SYSTÈME SERVEUR REQUIS</div>
-            </article>
-
-            <article class="module-card module-card--success">
-              <div class="module-card__top"><span class="module-card__number mono">03</span><span class="module-card__status">À venir</span></div>
-              <div class="module-card__icon">◆</div>
-              <h3>Succès</h3>
-              <p>Objectifs et accomplissements débloqués pendant votre aventure.</p>
-              <div class="achievement-preview"><span>?</span><span>?</span><span>?</span><span>?</span></div>
-              <div class="module-card__footer mono">RÈGLES À DÉFINIR</div>
-            </article>
-
-            <article class="module-card module-card--battlepass">
-              <div class="module-card__top"><span class="module-card__number mono">04</span><span class="module-card__status module-card__status--hold">En attente</span></div>
-              <div class="module-card__icon">BP</div>
-              <h3>Battle Pass</h3>
-              <p>Le portail sera connecté après l’intégration et la validation du système en jeu.</p>
-              <div class="module-card__value module-card__value--small">21.07</div>
-              <div class="module-card__footer mono">AUCUNE DONNÉE WEB POUR LE MOMENT</div>
-            </article>
+          <div class="battlepass-card__lock">
+            <div class="lock-mark">BP</div>
+            <span class="mono">AUCUNE DONNÉE WEB POUR LE MOMENT</span>
           </div>
         </section>
 
-        <section class="activity-zone">
-          <div class="activity-zone__header"><div><div class="section-tag">Journal du terminal</div><h2>État des services</h2></div><span class="mono activity-zone__time" id="terminalUpdatedAt">MISE À JOUR —</span></div>
-          <div class="service-list">
-            <div class="service-row"><span class="service-row__dot service-row__dot--online"></span><div><strong>Authentification Steam</strong><small>Session active et profil synchronisé</small></div><span class="service-row__state">OPÉRATIONNEL</span></div>
-            <div class="service-row" id="discordServiceRow"><span class="service-row__dot"></span><div><strong>Liaison Discord</strong><small id="discordServiceText">Association en attente</small></div><span class="service-row__state" id="discordServiceState">EN ATTENTE</span></div>
-            <div class="service-row"><span class="service-row__dot service-row__dot--online"></span><div><strong>Base Senzany</strong><small>Profil relié à Supabase via l’API OVH</small></div><span class="service-row__state">OPÉRATIONNEL</span></div>
-          </div>
+        <section class="service-strip">
+          <div class="service-strip__title"><div class="section-tag">Journal du terminal</div><h2>État des services</h2></div>
+          <div class="service-item"><span class="service-dot service-dot--ok"></span><div><strong>Authentification Steam</strong><small>Session active et profil synchronisé</small></div><em>Opérationnel</em></div>
+          <div class="service-item"><span class="service-dot" id="discordServiceDot"></span><div><strong>Liaison Discord</strong><small id="discordServiceText">Association en attente</small></div><em id="discordServiceState">En attente</em></div>
+          <div class="service-item"><span class="service-dot service-dot--ok"></span><div><strong>Base Senzany</strong><small>Profil relié à Supabase via l’API OVH</small></div><em>Opérationnel</em></div>
         </section>
       </div>
     </div>
