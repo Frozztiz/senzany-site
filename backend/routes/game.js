@@ -6,7 +6,13 @@ const router = express.Router();
 const DEFAULT_SERVER_IP = "208.115.196.109";
 const DEFAULT_QUERY_PORT = 2305;
 const DEFAULT_MAX_PLAYERS = 50;
-const QUERY_TIMEOUT_MS = 3000;
+const QUERY_TIMEOUT_MS = 5000;
+
+const A2S_HEADER = Buffer.from([0xff, 0xff, 0xff, 0xff]);
+const A2S_INFO_TYPE = 0x54;
+const A2S_INFO_RESPONSE = 0x49;
+const A2S_CHALLENGE_RESPONSE = 0x41;
+const A2S_INFO_TEXT = Buffer.from("Source Engine Query\0", "ascii");
 
 function readCString(buffer, offset) {
   const end = buffer.indexOf(0x00, offset);
@@ -22,7 +28,11 @@ function readCString(buffer, offset) {
 }
 
 function parseA2SInfo(buffer) {
-  if (buffer.length < 6 || buffer.readInt32LE(0) !== -1 || buffer[4] !== 0x49) {
+  if (
+    buffer.length < 6 ||
+    buffer.readInt32LE(0) !== -1 ||
+    buffer[4] !== A2S_INFO_RESPONSE
+  ) {
     throw new Error("Réponse Steam A2S_INFO invalide");
   }
 
@@ -63,10 +73,21 @@ function parseA2SInfo(buffer) {
   };
 }
 
+function buildA2SInfoQuery(challenge = null) {
+  const parts = [A2S_HEADER, Buffer.from([A2S_INFO_TYPE]), A2S_INFO_TEXT];
+
+  if (challenge) {
+    parts.push(challenge);
+  }
+
+  return Buffer.concat(parts);
+}
+
 function queryDayzServer(host, port) {
   return new Promise((resolve, reject) => {
     const socket = dgram.createSocket("udp4");
     let finished = false;
+    let challengeSent = false;
 
     const finish = (error, result) => {
       if (finished) return;
@@ -78,29 +99,58 @@ function queryDayzServer(host, port) {
       else resolve(result);
     };
 
+    const sendQuery = (challenge = null) => {
+      const query = buildA2SInfoQuery(challenge);
+      socket.send(query, port, host, (error) => {
+        if (error) finish(error);
+      });
+    };
+
     const timeout = setTimeout(() => {
       finish(new Error(`Timeout Steam Query après ${QUERY_TIMEOUT_MS} ms`));
     }, QUERY_TIMEOUT_MS);
 
-    socket.once("error", (error) => finish(error));
+    socket.on("error", (error) => finish(error));
 
-    socket.once("message", (message) => {
+    socket.on("message", (message) => {
       try {
-        finish(null, parseA2SInfo(message));
+        if (message.length < 5 || message.readInt32LE(0) !== -1) {
+          throw new Error("Paquet Steam Query invalide");
+        }
+
+        const responseType = message[4];
+
+        // Depuis les changements anti-amplification de Steam, certains serveurs
+        // exigent un challenge avant d'envoyer la réponse A2S_INFO complète.
+        if (responseType === A2S_CHALLENGE_RESPONSE) {
+          if (message.length < 9) {
+            throw new Error("Challenge Steam Query incomplet");
+          }
+
+          if (challengeSent) {
+            throw new Error("Le serveur renvoie plusieurs challenges Steam Query");
+          }
+
+          challengeSent = true;
+          const challenge = message.subarray(5, 9);
+          sendQuery(challenge);
+          return;
+        }
+
+        if (responseType === A2S_INFO_RESPONSE) {
+          finish(null, parseA2SInfo(message));
+          return;
+        }
+
+        throw new Error(
+          `Type de réponse Steam Query inattendu : 0x${responseType.toString(16)}`
+        );
       } catch (error) {
         finish(error);
       }
     });
 
-    // A2S_INFO : 0xFFFFFFFF + 'TSource Engine Query\0'
-    const query = Buffer.concat([
-      Buffer.from([0xff, 0xff, 0xff, 0xff, 0x54]),
-      Buffer.from("Source Engine Query\0", "ascii"),
-    ]);
-
-    socket.send(query, port, host, (error) => {
-      if (error) finish(error);
-    });
+    sendQuery();
   });
 }
 
@@ -123,6 +173,8 @@ router.get("/stats", async (req, res) => {
       name: server.name,
       bots: server.bots,
       source: "steam-query",
+      queryHost: host,
+      queryPort,
       updatedAt: new Date().toISOString(),
     });
   } catch (error) {
@@ -134,7 +186,9 @@ router.get("/stats", async (req, res) => {
       maxPlayers: fallbackMaxPlayers,
       map: "chernarusplus",
       source: "steam-query",
-      error: "Serveur DayZ inaccessible via Steam Query",
+      queryHost: host,
+      queryPort,
+      error: error.message,
       updatedAt: new Date().toISOString(),
     });
   }
