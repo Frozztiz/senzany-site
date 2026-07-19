@@ -1,28 +1,28 @@
 (() => {
+  'use strict';
+
   const PAGE_DATA = {
     nextWipeDate: '2026-07-21',
     eventDate: '2026-07-21T20:00:00'
   };
 
-  function setText(id, value) {
+  const setText = (id, value) => {
     const element = document.getElementById(id);
     if (element) element.textContent = value;
-  }
+  };
 
   function renderInitialData() {
     const wipe = new Date(PAGE_DATA.nextWipeDate);
     setText('statPlayers', 'Bientôt disponible');
     setText('statVotes', '—');
-    setText('statWipe', wipe.toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: '2-digit'
-    }));
+    setText('statWipe', wipe.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
   }
 
   async function refreshTopServeursStats() {
     try {
+      if (!window.SenzanyAPI?.topServeurs) return;
       const data = await window.SenzanyAPI.topServeurs.getStats();
-      setText('statVotes', data.monthlyVotes.toLocaleString('fr-FR'));
+      if (Number.isFinite(data?.monthlyVotes)) setText('statVotes', data.monthlyVotes.toLocaleString('fr-FR'));
     } catch (error) {
       console.warn('Stats Top-Serveurs indisponibles.', error);
     }
@@ -33,14 +33,10 @@
     if (!playersElement) return;
 
     try {
+      if (!window.SenzanyAPI?.game) return;
       const data = await window.SenzanyAPI.game.getStats();
-      const hasPlayerCount = data.online &&
-        data.players !== null && data.players !== undefined &&
-        data.maxPlayers !== null && data.maxPlayers !== undefined;
-
-      playersElement.textContent = hasPlayerCount
-        ? `${data.players} / ${data.maxPlayers}`
-        : (data.online ? 'Bientôt disponible' : 'Hors ligne');
+      const hasPlayerCount = data?.online && data.players !== null && data.players !== undefined && data.maxPlayers !== null && data.maxPlayers !== undefined;
+      playersElement.textContent = hasPlayerCount ? `${data.players} / ${data.maxPlayers}` : (data?.online ? 'Bientôt disponible' : 'Hors ligne');
     } catch (error) {
       playersElement.textContent = 'Bientôt disponible';
       console.warn('Stats DayZ indisponibles.', error);
@@ -50,10 +46,10 @@
   function updateCountdown() {
     const countdown = document.getElementById('countdown');
     if (!countdown) return;
-
     const diff = new Date(PAGE_DATA.eventDate).getTime() - Date.now();
+
     if (diff <= 0) {
-      countdown.innerHTML = '<div class="cd-block"><div class="cd-num">—</div><div class="cd-lab">Terminé</div></div>';
+      countdown.innerHTML = '<div><strong>LIVE</strong><span>Saison ouverte</span></div>';
       return;
     }
 
@@ -65,19 +61,40 @@
 
   function createAshParticles() {
     const ash = document.getElementById('heroAsh');
-    if (!ash) return;
+    if (!ash || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    for (let index = 0; index < 22; index += 1) {
+    for (let index = 0; index < 24; index += 1) {
       const particle = document.createElement('span');
-      const size = 2 + Math.random() * 2;
+      const size = 1 + Math.random() * 2.5;
       particle.style.left = `${Math.random() * 100}%`;
-      particle.style.bottom = `${Math.random() * 40}%`;
       particle.style.width = `${size}px`;
       particle.style.height = `${size}px`;
-      particle.style.animationDuration = `${8 + Math.random() * 10}s`;
-      particle.style.animationDelay = `${Math.random() * 10}s`;
+      particle.style.animationDuration = `${10 + Math.random() * 12}s`;
+      particle.style.animationDelay = `${Math.random() * 12}s`;
       ash.appendChild(particle);
     }
+  }
+
+  function initReveal() {
+    const elements = document.querySelectorAll('.home-reveal');
+    if (!elements.length) return;
+    if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      elements.forEach((element) => element.classList.add('is-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -30px' });
+
+    elements.forEach((element, index) => {
+      element.style.transitionDelay = `${Math.min(index % 4, 3) * 80}ms`;
+      observer.observe(element);
+    });
   }
 
   renderInitialData();
@@ -85,8 +102,9 @@
   refreshGameStats();
   updateCountdown();
   createAshParticles();
+  initReveal();
 
-  setInterval(refreshTopServeursStats, 300000);
-  setInterval(refreshGameStats, 60000);
-  setInterval(updateCountdown, 1000);
+  window.setInterval(refreshTopServeursStats, 300000);
+  window.setInterval(refreshGameStats, 60000);
+  window.setInterval(updateCountdown, 1000);
 })();
