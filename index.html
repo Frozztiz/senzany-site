@@ -127,13 +127,7 @@ function renderStats(d){
 renderStats(SENZANY_DATA);
 
 /* ---------------------------------------------------------------
-   DONNÉES LIVE — Discord Widget
-   API publique de Discord, sans authentification, toujours à jour.
---------------------------------------------------------------- */
-/* ---------------------------------------------------------------
-   DONNÉES LIVE — Bot Discord
-   Le bot (token gardé secret côté Netlify) donne le vrai nombre
-   total de membres, pas seulement ceux en ligne.
+   DONNÉES LIVE — Discord via le backend Express
 --------------------------------------------------------------- */
 async function fetchDiscordStats(){
   try{
@@ -164,9 +158,9 @@ async function fetchTopServeursStats(){
     document.getElementById('statVotes').textContent = data.monthlyVotes.toLocaleString('fr-FR');
     const commVotes = document.getElementById('commVotes');
     if(commVotes) commVotes.textContent = data.monthlyVotes.toLocaleString('fr-FR');
-    if(data.avicesCount !== null){
+    if(data.advicesCount !== null && data.advicesCount !== undefined){
       const commAvis = document.getElementById('commAvis');
-      if(commAvis) commAvis.textContent = data.avicesCount;
+      if(commAvis) commAvis.textContent = data.advicesCount;
     }
   } catch(err){
     console.warn('Stats Top-Serveurs indisponibles.', err);
@@ -176,20 +170,31 @@ fetchTopServeursStats();
 setInterval(fetchTopServeursStats, 300000);
 
 /* ---------------------------------------------------------------
-   DONNÉES LIVE — Steam GetServerList
-   Interroge Steam en direct (via Netlify Function, clé gardée
-   secrète) pour le vrai nombre de joueurs sur le serveur DayZ.
+   DONNÉES LIVE — Serveur DayZ via le backend Express
 --------------------------------------------------------------- */
 async function fetchLiveServerData(){
+  const playersElement = document.getElementById('statPlayers');
+
   try{
     const res = await fetch('/api/game/stats');
     if(!res.ok) throw new Error('reponse non ok');
     const data = await res.json();
-    document.getElementById('statPlayers').textContent = data.online
-      ? (data.players + ' / ' + data.maxPlayers)
-      : 'Hors ligne';
+
+    if (
+      playersElement &&
+      data.online &&
+      data.players !== null &&
+      data.players !== undefined &&
+      data.maxPlayers !== null &&
+      data.maxPlayers !== undefined
+    ) {
+      playersElement.textContent = `${data.players} / ${data.maxPlayers}`;
+    } else if (playersElement) {
+      playersElement.textContent = data.online ? 'Bientôt disponible' : 'Hors ligne';
+    }
   } catch(err){
-    console.warn('Stats live indisponibles, valeurs statiques utilisées.', err);
+    if (playersElement) playersElement.textContent = 'Bientôt disponible';
+    console.warn('Stats live indisponibles.', err);
   }
 }
 fetchLiveServerData();
