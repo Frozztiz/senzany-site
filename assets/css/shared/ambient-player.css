@@ -13,12 +13,12 @@
   bottom: 22px;
   z-index: 9999;
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 38px;
+  grid-template-columns: 40px minmax(0, 1fr) 34px;
   align-items: center;
   gap: 11px;
-  width: min(330px, calc(100vw - 32px));
-  min-height: 70px;
-  padding: 11px 12px;
+  width: min(285px, calc(100vw - 32px));
+  min-height: 62px;
+  padding: 9px 10px;
   color: var(--ambient-text);
   background:
     linear-gradient(135deg, rgba(201, 21, 32, 0.12), transparent 45%),
@@ -30,7 +30,7 @@
   -webkit-backdrop-filter: blur(16px);
   transform: translateY(16px);
   opacity: 0;
-  animation: ambientPlayerIn 0.7s cubic-bezier(.2,.8,.2,1) 0.25s forwards;
+  animation: ambientPlayerIn 0.7s cubic-bezier(.2,.8,.2,1) 1.6s forwards;
   font-family: inherit;
 }
 
@@ -60,8 +60,8 @@
 }
 
 .ambient-main-button {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: linear-gradient(145deg, var(--ambient-red-bright), #8f0710);
   box-shadow: 0 8px 22px rgba(201, 21, 32, 0.35);
@@ -151,8 +151,8 @@
 }
 
 .ambient-mute-button {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.055);
   transition: background 0.2s ease, color 0.2s ease;
@@ -205,4 +205,79 @@
     transform: none;
     opacity: 1;
   }
+}
+
+/* Intro cinématique affichée une seule fois au premier démarrage audio */
+.senzany-audio-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  background:
+    radial-gradient(circle at center, rgba(130, 8, 16, 0.2), transparent 42%),
+    rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.senzany-audio-intro.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.senzany-audio-intro.is-leaving {
+  opacity: 0;
+}
+
+.senzany-audio-intro__content {
+  width: min(760px, calc(100vw - 48px));
+  text-align: center;
+  transform: scale(0.94);
+  opacity: 0;
+}
+
+.senzany-audio-intro.is-visible .senzany-audio-intro__content {
+  animation: senzanyIntroContent 1.35s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.senzany-audio-intro__brand {
+  color: #fff;
+  font-size: clamp(46px, 9vw, 112px);
+  font-weight: 950;
+  line-height: 0.9;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 36px rgba(226, 18, 31, 0.45), 0 4px 30px #000;
+}
+
+.senzany-audio-intro__line {
+  width: 0;
+  height: 2px;
+  margin: 24px auto 19px;
+  background: linear-gradient(90deg, transparent, #f12b36, transparent);
+  box-shadow: 0 0 18px rgba(241, 43, 54, 0.85);
+  animation: senzanyIntroLine 0.7s 0.15s ease forwards;
+}
+
+.senzany-audio-intro__tagline {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(11px, 1.5vw, 17px);
+  font-weight: 800;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+}
+
+@keyframes senzanyIntroContent {
+  0% { transform: scale(0.94); opacity: 0; filter: blur(8px); }
+  28% { transform: scale(1); opacity: 1; filter: blur(0); }
+  78% { transform: scale(1); opacity: 1; filter: blur(0); }
+  100% { transform: scale(1.025); opacity: 0; filter: blur(3px); }
+}
+
+@keyframes senzanyIntroLine {
+  to { width: min(420px, 72vw); }
 }

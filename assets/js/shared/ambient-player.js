@@ -8,7 +8,8 @@
     enabled: 'senzanyAmbientEnabled',
     muted: 'senzanyAmbientMuted',
     volume: 'senzanyAmbientVolume',
-    position: 'senzanyAmbientPosition'
+    position: 'senzanyAmbientPosition',
+    introSeen: 'senzanyAmbientIntroSeen'
   };
 
   const DEFAULT_VOLUME = 0.22;
@@ -56,6 +57,18 @@
   `;
   document.body.appendChild(player);
 
+  const intro = document.createElement('div');
+  intro.className = 'senzany-audio-intro';
+  intro.setAttribute('aria-hidden', 'true');
+  intro.innerHTML = `
+    <div class="senzany-audio-intro__content">
+      <div class="senzany-audio-intro__brand">SENZANY</div>
+      <div class="senzany-audio-intro__line"></div>
+      <div class="senzany-audio-intro__tagline">VOICI LE RÉCIT DE VOTRE MORT</div>
+    </div>
+  `;
+  document.body.appendChild(intro);
+
   const playButton = player.querySelector('.ambient-main-button');
   const muteButton = player.querySelector('.ambient-mute-button');
   const volumeInput = player.querySelector('.ambient-volume');
@@ -66,11 +79,13 @@
   audio.preload = 'metadata';
   audio.playsInline = true;
 
-  let enabled = readBoolean(STORAGE.enabled, false);
+  const storedEnabled = localStorage.getItem(STORAGE.enabled);
+  let enabled = storedEnabled === null ? true : storedEnabled === 'true';
+  let firstVisitPending = storedEnabled === null;
   let muted = readBoolean(STORAGE.muted, false);
   let preferredVolume = Math.min(1, Math.max(0, readNumber(STORAGE.volume, DEFAULT_VOLUME)));
   let fadeFrame = null;
-  let waitingForInteraction = false;
+  let waitingForInteraction = enabled;
 
   audio.muted = muted;
   audio.volume = enabled ? preferredVolume : 0;
@@ -100,6 +115,17 @@
     status.textContent = isPlaying ? 'En lecture' : (waitingForInteraction ? 'Cliquer pour écouter' : 'Désactivée');
   };
 
+  const showIntroOnce = () => {
+    if (localStorage.getItem(STORAGE.introSeen) === 'true') return;
+    localStorage.setItem(STORAGE.introSeen, 'true');
+    intro.classList.add('is-visible');
+    window.setTimeout(() => intro.classList.add('is-leaving'), 1150);
+    window.setTimeout(() => {
+      intro.classList.remove('is-visible', 'is-leaving');
+      intro.remove();
+    }, 1900);
+  };
+
   const fadeTo = (target, duration = FADE_DURATION, onComplete) => {
     if (fadeFrame) cancelAnimationFrame(fadeFrame);
     const start = audio.volume;
@@ -127,6 +153,10 @@
     try {
       if (withFade) audio.volume = 0;
       await audio.play();
+      if (firstVisitPending) {
+        firstVisitPending = false;
+        showIntroOnce();
+      }
       fadeTo(muted ? 0 : preferredVolume, withFade ? FADE_DURATION : 150);
     } catch (error) {
       waitingForInteraction = true;
@@ -136,6 +166,7 @@
 
   const stopPlayback = () => {
     enabled = false;
+    firstVisitPending = false;
     waitingForInteraction = false;
     localStorage.setItem(STORAGE.enabled, 'false');
     fadeTo(0, 450, () => {
@@ -188,11 +219,14 @@
   window.addEventListener('beforeunload', savePosition);
   window.setInterval(savePosition, 4000);
 
-  const resumeAfterInteraction = () => {
-    if (enabled && audio.paused) startPlayback(false);
+  const resumeAfterInteraction = (event) => {
+    if (!enabled || !audio.paused) return;
+    if (event?.target?.closest?.('.senzany-ambient-player')) return;
+    startPlayback(true);
   };
-  document.addEventListener('pointerdown', resumeAfterInteraction, { once: true, passive: true });
-  document.addEventListener('keydown', resumeAfterInteraction, { once: true });
+
+  document.addEventListener('pointerdown', resumeAfterInteraction, { passive: true });
+  document.addEventListener('keydown', resumeAfterInteraction);
 
   updateUi();
 })();
