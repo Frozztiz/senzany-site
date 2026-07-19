@@ -9,6 +9,23 @@
     document.head.appendChild(link);
   }
 
+  // Lecteur d'ambiance global, disponible sur toutes les pages.
+  if (!document.querySelector('link[data-senzany-ambient]')) {
+    const ambientCss = document.createElement('link');
+    ambientCss.rel = 'stylesheet';
+    ambientCss.href = 'assets/css/shared/ambient-player.css?v=1.0.0';
+    ambientCss.dataset.senzanyAmbient = 'true';
+    document.head.appendChild(ambientCss);
+  }
+
+  if (!document.querySelector('script[data-senzany-ambient]')) {
+    const ambientScript = document.createElement('script');
+    ambientScript.src = 'assets/js/shared/ambient-player.js?v=1.0.0';
+    ambientScript.defer = true;
+    ambientScript.dataset.senzanyAmbient = 'true';
+    document.head.appendChild(ambientScript);
+  }
+
   const NAV = [
     ['accueil','index.html','Accueil'],
     ['jouer','senzany-jouer.html','Jouer'],
