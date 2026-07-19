@@ -5,7 +5,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <meta name="description" content="Rejoignez Senzany, serveur DayZ PVE français : connexion, installation des mods et découverte de l'expérience."/>
   <title>Jouer — SENZANY</title>
-  <link href="assets/css/pages/jouer.css?v=2.2" rel="stylesheet"/>
+  <link href="assets/css/pages/jouer.css?v=2.3" rel="stylesheet"/>
   <link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
 </head>
 <body data-page="jouer">
@@ -58,36 +58,69 @@
 
     <section class="chapter chapter-access" id="chapitre-acces">
       <div class="wrap">
-        <header class="chapter-heading reveal">
-          <p class="eyebrow">CHAPITRE I // LE PASSAGE</p>
-          <h2>QUATRE ÉTAPES.<br><span>UNE NOUVELLE SURVIE.</span></h2>
-          <p>Rejoindre Senzany ne demande aucune installation complexe. Le launcher DayZ s'occupe automatiquement des mods.</p>
+        <header class="chapter-heading chapter-heading--guide reveal">
+          <div>
+            <p class="eyebrow">CHAPITRE I // REJOINDRE LE SERVEUR</p>
+            <h2>COMMENT JOUER<br><span>SUR SENZANY ?</span></h2>
+          </div>
+          <p>Suivez les quatre étapes ci-dessous. Le launcher officiel de DayZ télécharge et active automatiquement les mods nécessaires.</p>
         </header>
 
-        <div class="access-grid">
-          <article class="access-card reveal">
-            <span class="access-card__number">01</span><span class="access-card__glyph">▣</span>
-            <h3>POSSEDER DAYZ</h3>
-            <p>Installez DayZ depuis Steam et lancez-le une première fois pour initialiser le jeu.</p>
-            <a href="https://store.steampowered.com/app/221100/DayZ/" rel="noopener" target="_blank">OUVRIR STEAM ↗</a>
+        <div class="join-guide" aria-label="Tutoriel pour rejoindre Senzany">
+          <article class="join-step reveal">
+            <div class="join-step__rail"><span>01</span><i></i></div>
+            <div class="join-step__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48"><rect x="7" y="10" width="34" height="24" rx="2"/><path d="M17 40h14M24 34v6"/><path d="m20 17 10 5-10 5z"/></svg>
+            </div>
+            <div class="join-step__body">
+              <p class="join-step__kicker">AVANT DE COMMENCER</p>
+              <h3>INSTALLEZ ET LANCEZ DAYZ</h3>
+              <p>DayZ doit être installé depuis Steam. Lancez le jeu une première fois, puis refermez-le afin que le launcher initialise correctement vos dossiers.</p>
+              <ul><li>Installer DayZ depuis Steam</li><li>Lancer le jeu une première fois</li><li>Fermer DayZ avant de poursuivre</li></ul>
+            </div>
+            <a class="join-step__action" href="https://store.steampowered.com/app/221100/DayZ/" rel="noopener" target="_blank">OUVRIR STEAM ↗</a>
           </article>
-          <article class="access-card reveal">
-            <span class="access-card__number">02</span><span class="access-card__glyph">⌕</span>
-            <h3>TROUVER SENZANY</h3>
-            <p>Recherchez « Senzany » dans le launcher officiel ou utilisez directement notre adresse.</p>
-            <button class="text-action" id="copyIpSecondary" type="button">COPIER 208.115.196.109:2302</button>
+
+          <article class="join-step reveal">
+            <div class="join-step__rail"><span>02</span><i></i></div>
+            <div class="join-step__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48"><circle cx="21" cy="21" r="11"/><path d="m29 29 10 10"/><path d="M16 21h10M21 16v10"/></svg>
+            </div>
+            <div class="join-step__body">
+              <p class="join-step__kicker">LAUNCHER OFFICIEL</p>
+              <h3>RECHERCHEZ « SENZANY »</h3>
+              <p>Dans Steam, cliquez sur <strong>Jouer</strong>, puis choisissez le launcher DayZ. Ouvrez l'onglet des serveurs communautaires et recherchez simplement « Senzany ».</p>
+              <div class="server-search-demo"><span>RECHERCHE SERVEUR</span><strong>Senzany</strong><em>208.115.196.109:2302</em></div>
+            </div>
+            <button class="join-step__action text-action" id="copyIpSecondary" type="button">COPIER L'ADRESSE</button>
           </article>
-          <article class="access-card reveal">
-            <span class="access-card__number">03</span><span class="access-card__glyph">⇩</span>
-            <h3>INSTALLER LES MODS</h3>
-            <p>Validez la configuration proposée. Tous les mods requis sont téléchargés et activés automatiquement.</p>
-            <span class="card-note">AUCUNE INSTALLATION MANUELLE</span>
+
+          <article class="join-step reveal">
+            <div class="join-step__rail"><span>03</span><i></i></div>
+            <div class="join-step__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48"><path d="M24 6v24"/><path d="m14 21 10 10 10-10"/><path d="M9 38h30"/><path d="M12 38v4h24v-4"/></svg>
+            </div>
+            <div class="join-step__body">
+              <p class="join-step__kicker">CONFIGURATION AUTOMATIQUE</p>
+              <h3>ACCEPTEZ LES MODS PROPOSÉS</h3>
+              <p>Sélectionnez le serveur, cliquez sur <strong>Rejoindre</strong> et acceptez la configuration proposée. Le launcher télécharge les mods manquants et active la bonne collection.</p>
+              <ul><li>Aucun mod à rechercher manuellement</li><li>Téléchargement automatique via Steam Workshop</li><li>Attendre la fin avant de lancer le serveur</li></ul>
+            </div>
+            <span class="join-step__status">AUTOMATIQUE</span>
           </article>
-          <article class="access-card access-card--accent reveal">
-            <span class="access-card__number">04</span><span class="access-card__glyph">◆</span>
-            <h3>ÉCRIRE VOTRE RÉCIT</h3>
-            <p>Créez votre personnage, découvrez nos systèmes et commencez votre progression.</p>
-            <a href="steam://connect/208.115.196.109:2302">LANCER LA CONNEXION ↗</a>
+
+          <article class="join-step reveal">
+            <div class="join-step__rail"><span>04</span></div>
+            <div class="join-step__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48"><circle cx="24" cy="15" r="8"/><path d="M10 42c1-10 6-16 14-16s13 6 14 16"/><path d="M34 10h8v8"/><path d="m41 11-8 8"/></svg>
+            </div>
+            <div class="join-step__body">
+              <p class="join-step__kicker">DERNIÈRE ÉTAPE</p>
+              <h3>ENTREZ DANS SENZANY</h3>
+              <p>Une fois les mods prêts, relancez la connexion depuis le launcher. Créez votre personnage et commencez votre progression. Le Discord reste disponible pour toute aide.</p>
+              <div class="join-tip"><strong>Conseil :</strong> ajoutez Senzany aux favoris pour le retrouver instantanément lors de votre prochaine connexion.</div>
+            </div>
+            <span class="join-step__status join-step__status--ready">PRÊT À JOUER</span>
           </article>
         </div>
       </div>
@@ -103,18 +136,38 @@
     </section>
 
     <section class="systems-section">
-      <div class="wrap">
+      <div class="wrap systems-layout">
         <header class="systems-heading reveal">
           <p class="eyebrow">POURQUOI SENZANY ?</p>
           <h2>UN MONDE QUI<br><span>NE CESSE D'ÉVOLUER.</span></h2>
+          <p>Pas une galerie de promesses : des systèmes complémentaires qui construisent une progression longue, vivante et renouvelée.</p>
         </header>
-        <div class="systems-grid">
-          <article class="system-card system-card--progression reveal"><span>01</span><div><p>PROGRESSION</p><h3>ÉCONOMIE & MÉTIERS</h3><small>Construisez un véritable parcours sur le long terme.</small></div></article>
-          <article class="system-card system-card--craft reveal"><span>02</span><div><p>CRÉATION</p><h3>ENVIRON 200 CRAFTS</h3><small>Des recettes exclusives et de nouveaux objectifs.</small></div></article>
-          <article class="system-card system-card--events reveal"><span>03</span><div><p>RENDEZ-VOUS</p><h3>ÉVÉNEMENTS VIVANTS</h3><small>Courses, boss, chasses au trésor et événements saisonniers.</small></div></article>
-          <article class="system-card system-card--world reveal"><span>04</span><div><p>EXPLORATION</p><h3>MONDE TRANSFORMÉ</h3><small>Des zones retravaillées et des lieux à redécouvrir.</small></div></article>
-          <article class="system-card system-card--community reveal"><span>05</span><div><p>COMMUNAUTÉ</p><h3>UNE AVENTURE PARTAGÉE</h3><small>Une communauté francophone active et accueillante.</small></div></article>
-          <article class="system-card system-card--future reveal"><span>06</span><div><p>À VENIR</p><h3>IA, QUÊTES & SAISONS</h3><small>De nouveaux systèmes pour renouveler l'expérience.</small></div></article>
+
+        <div class="feature-list">
+          <article class="feature-row reveal">
+            <span class="feature-row__index">01</span><span class="feature-row__icon"><svg viewBox="0 0 48 48"><path d="M8 38h32M12 38V22h10v16M26 38V12h10v26"/><path d="m10 17 8-8 7 7 12-12"/></svg></span>
+            <div><p>PROGRESSION</p><h3>ÉCONOMIE & MÉTIERS</h3><span>Développez une activité, équipez-vous et construisez un parcours durable.</span></div><strong>LONG TERME</strong>
+          </article>
+          <article class="feature-row reveal">
+            <span class="feature-row__index">02</span><span class="feature-row__icon"><svg viewBox="0 0 48 48"><path d="M13 8h22l5 10-16 22L8 18z"/><path d="m8 18 16 7 16-7M24 25v15"/></svg></span>
+            <div><p>CRÉATION</p><h3>ENVIRON 200 CRAFTS</h3><span>Des recettes exclusives, des objets utiles et de nouveaux objectifs à maîtriser.</span></div><strong>EXCLUSIF</strong>
+          </article>
+          <article class="feature-row reveal">
+            <span class="feature-row__index">03</span><span class="feature-row__icon"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="16"/><path d="M24 13v11l8 5"/><path d="M8 8l5 5M40 8l-5 5"/></svg></span>
+            <div><p>RENDEZ-VOUS</p><h3>ÉVÉNEMENTS VIVANTS</h3><span>Courses, boss, chasses au trésor et événements saisonniers réguliers.</span></div><strong>RÉGULIER</strong>
+          </article>
+          <article class="feature-row reveal">
+            <span class="feature-row__index">04</span><span class="feature-row__icon"><svg viewBox="0 0 48 48"><path d="M7 36 18 17l7 10 6-9 10 18z"/><path d="M10 40h28M34 8v10M29 13h10"/></svg></span>
+            <div><p>EXPLORATION</p><h3>MONDE TRANSFORMÉ</h3><span>Des zones retravaillées, des lieux secrets et des espaces à redécouvrir.</span></div><strong>IMMERSIF</strong>
+          </article>
+          <article class="feature-row reveal">
+            <span class="feature-row__index">05</span><span class="feature-row__icon"><svg viewBox="0 0 48 48"><circle cx="17" cy="18" r="7"/><circle cx="33" cy="19" r="6"/><path d="M5 41c1-10 5-15 12-15s11 5 12 15M27 29c2-3 4-4 7-4 6 0 9 5 9 14"/></svg></span>
+            <div><p>COMMUNAUTÉ</p><h3>UNE AVENTURE PARTAGÉE</h3><span>Une équipe francophone présente et des joueurs qui font vivre le serveur.</span></div><strong>ENSEMBLE</strong>
+          </article>
+          <article class="feature-row reveal">
+            <span class="feature-row__index">06</span><span class="feature-row__icon"><svg viewBox="0 0 48 48"><path d="M14 9h20v30H14z"/><path d="M9 16h5M9 24h5M9 32h5M34 16h5M34 24h5M34 32h5"/><circle cx="24" cy="24" r="5"/></svg></span>
+            <div><p>À VENIR</p><h3>IA, QUÊTES & SAISONS</h3><span>De nouveaux systèmes conçus pour renouveler constamment l'expérience.</span></div><strong>ÉVOLUTIF</strong>
+          </article>
         </div>
       </div>
     </section>
@@ -125,7 +178,7 @@
         <p class="eyebrow">CHAPITRE III // LA COMMUNAUTÉ</p>
         <h2>VOUS NE SURVIVEZ<br><span>JAMAIS SEUL.</span></h2>
         <p>Une équipe présente, des joueurs impliqués et des rendez-vous réguliers donnent vie à Senzany, saison après saison.</p>
-        <a class="btn btn-ghost" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">REJOINDRE LE DISCORD ↗</a>
+        <a class="text-link" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">DÉCOUVRIR LA COMMUNAUTÉ SUR DISCORD ↗</a>
       </div>
     </section>
 
