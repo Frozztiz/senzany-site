@@ -53,3 +53,34 @@
     init();
   }
 })();
+
+/* V7.0 — profondeur lumineuse des cartes, désactivée sur tactile/mouvement réduit */
+(() => {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finePointer = window.matchMedia('(pointer: fine)').matches;
+  if (reduced || !finePointer) return;
+
+  const cards = document.querySelectorAll('.collection-visual');
+  cards.forEach((card) => {
+    let frame = 0;
+    const reset = () => {
+      cancelAnimationFrame(frame);
+      card.style.transform = '';
+    };
+    card.addEventListener('pointermove', (event) => {
+      const rect = card.getBoundingClientRect();
+      const px = (event.clientX - rect.left) / rect.width;
+      const py = (event.clientY - rect.top) / rect.height;
+      const ry = (px - .5) * 4.5;
+      const rx = (.5 - py) * 3.2;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        card.style.transform = `translateY(-6px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+        card.style.setProperty('--mouse-x', `${px * 100}%`);
+        card.style.setProperty('--mouse-y', `${py * 100}%`);
+      });
+    }, { passive: true });
+    card.addEventListener('pointerleave', reset, { passive: true });
+    card.addEventListener('blur', reset, true);
+  });
+})();
