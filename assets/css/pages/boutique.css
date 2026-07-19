@@ -630,3 +630,18 @@ body{background-color:var(--bg)!important;background-image:url('../../images/bac
  .collection-visual__overlay{padding:23px}
  .collection-visual__image img{padding:12px}
 }
+
+/* ============================================================
+   V6.1 — CATÉGORIES TIP4SERV INDIVIDUELLES
+   ============================================================ */
+.collection-visual--grades .collection-visual__scene{background-position:48% 34%;filter:saturate(.48) sepia(.12) contrast(1.16)}
+.collection-visual--barrels .collection-visual__scene{background-position:13% 60%;filter:saturate(.66) sepia(.18) contrast(1.12)}
+.collection-visual--weapons .collection-visual__scene{background-position:78% 46%;filter:saturate(.55) contrast(1.18)}
+.collection-visual--wide{grid-column:1/-1;min-height:390px}
+.collection-visual--wide .collection-visual__overlay{padding-right:42%;background:linear-gradient(90deg,rgba(7,6,6,.98) 0%,rgba(7,6,6,.84) 38%,rgba(7,6,6,.20) 72%,rgba(7,6,6,.46) 100%)}
+.collection-visual--wide .collection-visual__overlay h3{max-width:680px}
+.collection-visual:focus-visible{outline:2px solid var(--blood-bright);outline-offset:4px}
+@media(max-width:900px){
+ .collection-visual--wide{grid-column:auto;min-height:420px}
+ .collection-visual--wide .collection-visual__overlay{padding-right:30px;background:linear-gradient(180deg,rgba(7,6,6,.04) 15%,rgba(7,6,6,.32) 48%,rgba(7,6,6,.97) 100%)}
+}
