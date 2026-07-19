@@ -4,8 +4,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Boutique — SENZANY</title>
-<link href="assets/css/pages/boutique.css?v=7.0" rel="stylesheet"/>
-<!-- Boutique V7.0 : visuels dédiés + effets premium cohérents Staff/Profil -->
+<link href="assets/css/pages/boutique.css?v=7.1" rel="stylesheet"/>
+<!-- Boutique V7.1 : validation officielle renforcée + seconde partie premium -->
 </head>
 <body data-page="boutique">
 <div data-site-header=""></div>
@@ -90,18 +90,23 @@
   </div>
 </section>
 
-<section class="official-monetization" data-reveal>
+<section class="official-monetization official-monetization--v71" data-reveal>
   <div class="wrap">
-    <div class="official-monetization__panel">
-      <div class="official-monetization__content">
-        <span class="official-monetization__badge">✓ OFFICIEL</span>
-        <p>Senzany fait partie des serveurs <strong>officiellement autorisés à la monétisation par Bohemia Interactive.</strong></p>
+    <a class="official-monetization__panel" href="https://www.bohemia.net/monetization/approved/dayz" target="_blank" rel="noopener" aria-label="Vérifier Senzany dans la liste officielle de monétisation DayZ">
+      <div class="official-monetization__seal" aria-hidden="true">
+        <span>✓</span>
+        <small>VALIDÉ</small>
       </div>
-      <a class="official-monetization__cta" href="https://www.bohemia.net/monetization/approved/dayz" target="_blank" rel="noopener">
-        VOIR LA LISTE OFFICIELLE
-        <span aria-hidden="true">↗</span>
-      </a>
-    </div>
+      <div class="official-monetization__content">
+        <div class="official-monetization__eyebrow">BOHEMIA INTERACTIVE // DAYZ</div>
+        <h2>MONÉTISATION OFFICIELLEMENT AUTORISÉE</h2>
+        <p>Senzany figure dans la liste des serveurs approuvés. Consultez directement la source officielle pour vérifier notre statut.</p>
+      </div>
+      <div class="official-monetization__cta">
+        <span>VÉRIFIER SUR LA LISTE OFFICIELLE</span>
+        <b aria-hidden="true">↗</b>
+      </div>
+    </a>
   </div>
 </section>
 
@@ -113,29 +118,29 @@
       <p>La boutique accompagne le développement du projet tout en préservant une expérience saine, lisible et cohérente pour l'ensemble des survivants.</p>
     </div>
     <div class="commitment-grid">
-      <article class="commitment-card"><div class="commitment-top"><b>01</b><span>NOTRE PROMESSE</span></div><div class="commitment-symbol">◎</div><small>CLARTÉ</small><h3>TRANSPARENCE</h3><strong>Vous savez ce que vous achetez.</strong><p>Chaque offre indique clairement son contenu, sa disponibilité et ce qu'elle apporte. Pas de mauvaise surprise.</p><div class="commitment-status">● INFORMATION CLAIRE</div></article>
-      <article class="commitment-card"><div class="commitment-top"><b>02</b><span>NOTRE LIGNE</span></div><div class="commitment-symbol">⚖</div><small>ÉQUILIBRE</small><h3>ÉQUITÉ</h3><strong>Soutenir ne signifie pas dominer.</strong><p>La boutique est pensée pour préserver une expérience juste et cohérente entre tous les survivants.</p><div class="commitment-status">● EXPÉRIENCE PRÉSERVÉE</div></article>
-      <article class="commitment-card"><div class="commitment-top"><b>03</b><span>NOTRE PROJET</span></div><div class="commitment-symbol">◇</div><small>ENGAGEMENT</small><h3>CONSTRUIRE DURABLEMENT</h3><strong>Chaque soutien participe au projet.</strong><p>Votre contribution accompagne l'évolution de Senzany, son infrastructure et les futurs contenus.</p><div class="commitment-status">● VISION LONG TERME</div></article>
+      <article class="commitment-card" data-reveal data-reveal-delay="80"><div class="commitment-top"><b>01</b><span>NOTRE PROMESSE</span></div><div class="commitment-symbol">◎</div><small>CLARTÉ</small><h3>TRANSPARENCE</h3><strong>Vous savez ce que vous achetez.</strong><p>Chaque offre indique clairement son contenu, sa disponibilité et ce qu'elle apporte. Pas de mauvaise surprise.</p><div class="commitment-status">● INFORMATION CLAIRE</div></article>
+      <article class="commitment-card" data-reveal data-reveal-delay="160"><div class="commitment-top"><b>02</b><span>NOTRE LIGNE</span></div><div class="commitment-symbol">⚖</div><small>ÉQUILIBRE</small><h3>ÉQUITÉ</h3><strong>Soutenir ne signifie pas dominer.</strong><p>La boutique est pensée pour préserver une expérience juste et cohérente entre tous les survivants.</p><div class="commitment-status">● EXPÉRIENCE PRÉSERVÉE</div></article>
+      <article class="commitment-card" data-reveal data-reveal-delay="240"><div class="commitment-top"><b>03</b><span>NOTRE PROJET</span></div><div class="commitment-symbol">◇</div><small>ENGAGEMENT</small><h3>CONSTRUIRE DURABLEMENT</h3><strong>Chaque soutien participe au projet.</strong><p>Votre contribution accompagne l'évolution de Senzany, son infrastructure et les futurs contenus.</p><div class="commitment-status">● VISION LONG TERME</div></article>
     </div>
-    <div class="rules-strip"><div><span>BOHEMIA INTERACTIVE // DAYZ</span><strong>UN CADRE CLAIR, UNE EXPÉRIENCE PRÉSERVÉE</strong><p>Nous maintenons une séparation nette entre soutien au projet et avantages susceptibles de déséquilibrer l'expérience de jeu.</p></div><a href="https://www.bohemia.net/monetization" target="_blank" rel="noopener">LIRE LES RÈGLES OFFICIELLES ↗</a></div>
+    <div class="rules-strip" data-reveal data-reveal-delay="300"><div><span>BOHEMIA INTERACTIVE // DAYZ</span><strong>UN CADRE CLAIR, UNE EXPÉRIENCE PRÉSERVÉE</strong><p>Nous maintenons une séparation nette entre soutien au projet et avantages susceptibles de déséquilibrer l'expérience de jeu.</p></div><a href="https://www.bohemia.net/monetization" target="_blank" rel="noopener">LIRE LES RÈGLES OFFICIELLES ↗</a></div>
   </div>
 </section>
 <section class="shop-support" data-reveal>
  <div class="wrap">
   <div class="support-intro"><span class="eyebrow">VOTRE SOUTIEN SERT CONCRÈTEMENT</span><h2>FAIRE VIVRE SENZANY<br>SUR LE LONG TERME</h2><p>Chaque soutien reçu alimente une seule ambition : maintenir, développer et enrichir durablement l'écosystème Senzany.</p></div>
   <div class="support-flow">
-   <article><div class="flow-head"><b>01</b><span>INFRA</span></div><div class="flow-icon">▥</div><h3>INFRASTRUCTURE</h3><div class="chips"><i>HÉBERGEMENT</i><i>SERVICES</i><i>STABILITÉ</i></div><p>Maintenir un environnement fiable, disponible et performant pour toute la communauté.</p></article>
-   <article><div class="flow-head"><b>02</b><span>DEV</span></div><div class="flow-icon">⌘</div><h3>DÉVELOPPEMENT</h3><div class="chips"><i>SYSTÈMES</i><i>AMÉLIORATIONS</i><i>PORTAIL</i></div><p>Faire évoluer continuellement les outils, fonctionnalités et services qui composent Senzany.</p></article>
-   <article><div class="flow-head"><b>03</b><span>LIVE</span></div><div class="flow-icon">✦</div><h3>NOUVEAUX CONTENUS</h3><div class="chips"><i>SAISONS</i><i>ÉVÉNEMENTS</i><i>NOUVEAUTÉS</i></div><p>Renouveler l'expérience, créer de nouveaux rendez-vous et préparer les futurs projets.</p></article>
-   <article><div class="flow-head"><b>04</b><span>COMM</span></div><div class="flow-icon">•••</div><h3>COMMUNAUTÉ</h3><div class="chips"><i>DISCORD</i><i>ANIMATIONS</i><i>EXPÉRIENCE</i></div><p>Construire une communauté durable, active et accompagnée autour de l'univers Senzany.</p></article>
+   <article data-reveal data-reveal-delay="80"><div class="flow-head"><b>01</b><span>INFRA</span></div><div class="flow-icon">▥</div><h3>INFRASTRUCTURE</h3><div class="chips"><i>HÉBERGEMENT</i><i>SERVICES</i><i>STABILITÉ</i></div><p>Maintenir un environnement fiable, disponible et performant pour toute la communauté.</p></article>
+   <article data-reveal data-reveal-delay="160"><div class="flow-head"><b>02</b><span>DEV</span></div><div class="flow-icon">⌘</div><h3>DÉVELOPPEMENT</h3><div class="chips"><i>SYSTÈMES</i><i>AMÉLIORATIONS</i><i>PORTAIL</i></div><p>Faire évoluer continuellement les outils, fonctionnalités et services qui composent Senzany.</p></article>
+   <article data-reveal data-reveal-delay="240"><div class="flow-head"><b>03</b><span>LIVE</span></div><div class="flow-icon">✦</div><h3>NOUVEAUX CONTENUS</h3><div class="chips"><i>SAISONS</i><i>ÉVÉNEMENTS</i><i>NOUVEAUTÉS</i></div><p>Renouveler l'expérience, créer de nouveaux rendez-vous et préparer les futurs projets.</p></article>
+   <article data-reveal data-reveal-delay="320"><div class="flow-head"><b>04</b><span>COMM</span></div><div class="flow-icon">•••</div><h3>COMMUNAUTÉ</h3><div class="chips"><i>DISCORD</i><i>ANIMATIONS</i><i>EXPÉRIENCE</i></div><p>Construire une communauté durable, active et accompagnée autour de l'univers Senzany.</p></article>
   </div>
-  <div class="manifesto"><span>VOTRE SOUTIEN</span><b>→</b><strong>UNE SEULE AMBITION</strong><em>FAIRE GRANDIR SENZANY.</em></div>
+  <div class="manifesto" data-reveal data-reveal-delay="360"><span>VOTRE SOUTIEN</span><b>→</b><strong>UNE SEULE AMBITION</strong><em>FAIRE GRANDIR SENZANY.</em></div>
  </div>
 </section>
 </main>
 <div data-site-footer=""></div>
 <script defer src="assets/js/components.js"></script>
 <script defer src="assets/js/app.js"></script>
-<script defer src="assets/js/pages/boutique.js?v=7.0"></script>
+<script defer src="assets/js/pages/boutique.js?v=7.1"></script>
 </body>
 </html>

@@ -54,13 +54,13 @@
   }
 })();
 
-/* V7.0 — profondeur lumineuse des cartes, désactivée sur tactile/mouvement réduit */
+/* V7.1 — profondeur lumineuse des cartes, désactivée sur tactile/mouvement réduit */
 (() => {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = window.matchMedia('(pointer: fine)').matches;
   if (reduced || !finePointer) return;
 
-  const cards = document.querySelectorAll('.collection-visual');
+  const cards = document.querySelectorAll('.collection-visual, .commitment-card, .support-flow article');
   cards.forEach((card) => {
     let frame = 0;
     const reset = () => {
