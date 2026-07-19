@@ -1,108 +1,68 @@
 (() => {
-  function setText(id, value) {
-    const element = document.getElementById(id);
-    if (element) element.textContent = value;
+  const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+
+  async function refreshDiscordStats(){
+    try{ const data = await window.SenzanyAPI.discord.getStats(); setText('commDiscordFull', data.members.toLocaleString('fr-FR')); }
+    catch(error){ console.warn('Stats Discord indisponibles.', error); }
   }
-
-  async function refreshDiscordStats() {
-    try {
-      const data = await window.SenzanyAPI.discord.getStats();
-      setText('commDiscordFull', data.members.toLocaleString('fr-FR'));
-    } catch (error) {
-      console.warn('Stats Discord indisponibles.', error);
-    }
-  }
-
-  async function refreshGameStats() {
-    const playersElement = document.getElementById('commPlayers');
-    if (!playersElement) return;
-
-    try {
+  async function refreshGameStats(){
+    const el = document.getElementById('commPlayers'); if(!el) return;
+    try{
       const data = await window.SenzanyAPI.game.getStats();
-      const hasPlayerCount = data.online &&
-        data.players !== null && data.players !== undefined &&
-        data.maxPlayers !== null && data.maxPlayers !== undefined;
-
-      playersElement.textContent = hasPlayerCount
-        ? `${data.players} / ${data.maxPlayers}`
-        : (data.online ? 'Bientôt disponible' : 'Hors ligne');
-    } catch (error) {
-      playersElement.textContent = 'Bientôt disponible';
-      console.warn('Stats DayZ indisponibles.', error);
-    }
+      const valid = data.online && data.players != null && data.maxPlayers != null;
+      el.textContent = valid ? `${data.players} / ${data.maxPlayers}` : (data.online ? 'Ouvert' : 'Hors ligne');
+    }catch(error){ el.textContent = 'Bientôt'; console.warn('Stats DayZ indisponibles.', error); }
+  }
+  async function refreshTopServeursStats(){
+    try{ const data = await window.SenzanyAPI.topServeurs.getStats(); setText('commVotesFull', data.monthlyVotes.toLocaleString('fr-FR')); }
+    catch(error){ console.warn('Stats Top-Serveurs indisponibles.', error); }
   }
 
-  async function refreshTopServeursStats() {
-    try {
-      const data = await window.SenzanyAPI.topServeurs.getStats();
-      setText('commVotesFull', data.monthlyVotes.toLocaleString('fr-FR'));
-    } catch (error) {
-      console.warn('Stats Top-Serveurs indisponibles.', error);
-    }
-  }
-
-  function initializeGallery() {
-    const lightbox = document.getElementById('communityLightbox');
-    if (!lightbox) return;
-
-    const galleryItems = [...document.querySelectorAll('.gallery-item')];
-    const lightboxImage = lightbox.querySelector('img');
-    const lightboxTitle = lightbox.querySelector('.lightbox-meta strong');
-    const lightboxText = lightbox.querySelector('.lightbox-meta small');
-    const lightboxCount = lightbox.querySelector('.lightbox-count');
-    let currentIndex = 0;
-
-    const showImage = (index) => {
-      currentIndex = (index + galleryItems.length) % galleryItems.length;
-      const item = galleryItems[currentIndex];
-      const image = item.querySelector('img');
-      const title = item.querySelector('figcaption strong');
-      const text = item.querySelector('figcaption small');
-      lightboxImage.src = image.src;
-      lightboxImage.alt = image.alt;
-      lightboxTitle.textContent = title ? title.textContent : image.alt;
-      lightboxText.textContent = text ? text.textContent : '';
-      lightboxCount.textContent = `${currentIndex + 1} / ${galleryItems.length}`;
-    };
-
-    const openLightbox = (index) => {
-      showImage(index);
-      lightbox.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    };
-
-    const closeLightbox = () => {
-      lightbox.classList.remove('open');
-      document.body.style.overflow = '';
-    };
-
-    galleryItems.forEach((item, index) => item.addEventListener('click', () => openLightbox(index)));
-    lightbox.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
-    lightbox.querySelector('.lightbox-prev').addEventListener('click', (event) => {
-      event.stopPropagation();
-      showImage(currentIndex - 1);
-    });
-    lightbox.querySelector('.lightbox-next').addEventListener('click', (event) => {
-      event.stopPropagation();
-      showImage(currentIndex + 1);
-    });
-    lightbox.addEventListener('click', (event) => {
-      if (event.target === lightbox) closeLightbox();
-    });
-    document.addEventListener('keydown', (event) => {
-      if (!lightbox.classList.contains('open')) return;
-      if (event.key === 'Escape') closeLightbox();
-      if (event.key === 'ArrowLeft') showImage(currentIndex - 1);
-      if (event.key === 'ArrowRight') showImage(currentIndex + 1);
+  function initializeGalleryToggle(){
+    const button = document.getElementById('toggleGallery');
+    const gallery = document.getElementById('galleryMore');
+    if(!button || !gallery) return;
+    button.addEventListener('click', () => {
+      const open = gallery.classList.toggle('open');
+      button.innerHTML = open ? 'Réduire la galerie <span>↑</span>' : 'Voir toutes les captures <span>↓</span>';
+      button.setAttribute('aria-expanded', String(open));
     });
   }
 
-  refreshDiscordStats();
-  refreshGameStats();
-  refreshTopServeursStats();
-  initializeGallery();
+  function initializeLightbox(){
+    const lightbox = document.getElementById('communityLightbox'); if(!lightbox) return;
+    const items = [...document.querySelectorAll('.gallery-item')];
+    const image = lightbox.querySelector('img');
+    const title = lightbox.querySelector('.lightbox-meta strong');
+    const text = lightbox.querySelector('.lightbox-meta small');
+    const count = lightbox.querySelector('.lightbox-count');
+    let current = 0;
+    const show = index => {
+      current = (index + items.length) % items.length;
+      const item = items[current], source = item.querySelector('img');
+      image.src = source.src; image.alt = source.alt;
+      title.textContent = item.querySelector('figcaption strong')?.textContent || source.alt;
+      text.textContent = item.querySelector('figcaption small')?.textContent || '';
+      count.textContent = `${current + 1} / ${items.length}`;
+    };
+    const open = index => { show(index); lightbox.classList.add('open'); document.body.style.overflow='hidden'; };
+    const close = () => { lightbox.classList.remove('open'); document.body.style.overflow=''; };
+    items.forEach((item,index) => item.addEventListener('click',()=>open(index)));
+    lightbox.querySelector('.lightbox-close')?.addEventListener('click',close);
+    lightbox.querySelector('.lightbox-prev')?.addEventListener('click',e=>{e.stopPropagation();show(current-1)});
+    lightbox.querySelector('.lightbox-next')?.addEventListener('click',e=>{e.stopPropagation();show(current+1)});
+    lightbox.addEventListener('click',e=>{if(e.target===lightbox) close()});
+    document.addEventListener('keydown',e=>{if(!lightbox.classList.contains('open')) return;if(e.key==='Escape')close();if(e.key==='ArrowLeft')show(current-1);if(e.key==='ArrowRight')show(current+1)});
+  }
 
-  setInterval(refreshDiscordStats, 120000);
-  setInterval(refreshGameStats, 60000);
-  setInterval(refreshTopServeursStats, 300000);
+  function initializeReveal(){
+    const elements = document.querySelectorAll('.reveal');
+    if(!('IntersectionObserver' in window)){ elements.forEach(el=>el.classList.add('visible')); return; }
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => { if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);} }),{threshold:.12});
+    elements.forEach(el=>observer.observe(el));
+  }
+
+  refreshDiscordStats(); refreshGameStats(); refreshTopServeursStats();
+  initializeGalleryToggle(); initializeLightbox(); initializeReveal();
+  setInterval(refreshDiscordStats,120000); setInterval(refreshGameStats,60000); setInterval(refreshTopServeursStats,300000);
 })();

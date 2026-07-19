@@ -4,104 +4,163 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Communauté — SENZANY</title>
-
-<link href="assets/css/pages/communaute.css" rel="stylesheet"/></head>
+<link href="assets/css/pages/communaute.css" rel="stylesheet"/>
+</head>
 <body data-page="communaute">
-<div data-site-header=""></div>
-<div class="page-header">
-<div class="wrap">
-<div class="page-tag">Notre force</div>
-<h1 class="page-title">La communauté</h1>
-<p class="page-sub">Restez connecté avec les survivants, suivez l'actualité et participez à la vie du serveur.</p>
-</div>
-</div>
-<section class="community-intro">
-<div class="wrap community-intro-grid">
-<div class="community-copy">
-<div class="section-tag">Plus qu'un serveur</div>
-<h2>Une communauté qui écrit sa propre histoire</h2>
-<p>Chaque capture, chaque victoire et chaque moment improbable devient une partie du récit de Senzany. Découvrez les survivants qui font vivre le serveur et ceux qui se sont illustrés le mois dernier.</p>
-<div class="community-actions"><a class="btn btn-solid" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Rejoindre Discord</a><a class="btn" href="#galerie">Voir la galerie</a></div>
-</div>
-<div class="community-mini-stats">
-<div class="mini-stat"><strong id="commDiscordFull">—</strong><span>Membres Discord</span></div>
-<div class="mini-stat"><strong id="commPlayers">—</strong><span>Joueurs en ligne</span></div>
-<div class="mini-stat"><strong id="commVotesFull">—</strong><span>Votes ce mois</span></div>
-<div class="mini-stat"><strong>N°1</strong><span>Serveur PVE FR</span></div>
-</div>
-</div>
+<div data-site-header></div>
+
+<main>
+<section class="community-hero">
+  <div class="community-hero__veil"></div>
+  <div class="community-hero__embers" aria-hidden="true"></div>
+  <div class="wrap community-hero__grid">
+    <div class="community-hero__copy reveal">
+      <p class="eyebrow">Chapitre communautaire // Senzany</p>
+      <h1>UNE COMMUNAUTÉ.<br><span>UNE HISTOIRE.</span></h1>
+      <p class="community-hero__lead">Ici, les survivants ne traversent pas seulement Chernarus. Ils créent des souvenirs, des rivalités, des légendes et parfois… des situations complètement improbables.</p>
+      <div class="hero-actions">
+        <a class="btn btn-solid" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Rejoindre le Discord ↗</a>
+        <a class="btn" href="#galerie">Explorer la galerie ↓</a>
+      </div>
+    </div>
+
+    <aside class="community-live reveal" aria-label="Communauté en direct">
+      <div class="community-live__head"><span><i></i> Communauté en direct</span><b>LIVE</b></div>
+      <div class="community-live__main">
+        <div><strong id="commDiscordFull">—</strong><span>Membres Discord</span></div>
+        <div><strong id="commPlayers">—</strong><span>Joueurs en ligne</span></div>
+      </div>
+      <div class="community-live__foot">
+        <div><span>Votes du mois</span><strong id="commVotesFull">—</strong></div>
+        <div><span>Identité</span><strong>100% FR</strong></div>
+      </div>
+    </aside>
+  </div>
+  <a class="scroll-cue" href="#manifeste"><span>Découvrir</span><i></i></a>
 </section>
+
+<section class="manifesto" id="manifeste">
+  <div class="wrap manifesto__grid">
+    <div class="manifesto__title reveal">
+      <p class="eyebrow">Plus qu'un serveur</p>
+      <h2>CE SONT LES JOUEURS<br><span>QUI FONT VIVRE SENZANY.</span></h2>
+    </div>
+    <div class="manifesto__copy reveal">
+      <p>Chaque expédition, chaque événement et chaque rencontre devient une nouvelle page du récit. La communauté donne une âme au serveur et transforme les imprévus de DayZ en souvenirs inoubliables.</p>
+      <div class="manifesto__facts">
+        <div><strong>24/7</strong><span>Un monde toujours actif</span></div>
+        <div><strong>+18</strong><span>Une équipe à l'écoute</span></div>
+        <div><strong>PVE</strong><span>Une aventure construite ensemble</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="gallery-section" id="galerie">
-<div class="wrap">
-<div class="section-head"><div class="section-tag">Pris sur le vif</div><h2 class="section-title">Galerie communautaire</h2><p class="page-sub">Des aventures, des rencontres et quelques situations que seul DayZ peut rendre possibles.</p></div>
-<div class="gallery-feature-wrap">
-<figure class="gallery-feature gallery-item" data-gallery-index="0">
-<img alt="Gagnants du concours de pétanque" loading="eager" src="assets/images/gallery/gallery-petanque.png"/>
-<figcaption class="gallery-feature-caption">
-<span class="gallery-feature-badge">★ Capture du mois</span>
-<strong>Concours de pétanque</strong>
-<small>Les gagnants prennent la pose.</small>
-</figcaption>
-</figure>
-</div>
-<div class="gallery-toolbar">
-<div><span class="gallery-toolbar-label">Derniers moments de Senzany</span><strong>11 captures</strong></div>
-<span class="gallery-note">Cliquez sur une image pour l'afficher en plein écran.</span>
-</div>
-<div class="gallery-grid">
-<figure class="gallery-item" data-gallery-index="1"><img alt="Survivant au sommet d'un phare" loading="lazy" src="assets/images/gallery/gallery-phare.png"/><figcaption class="gallery-caption"><strong>Tout en haut</strong><small>Une vue qui donne le vertige.</small></figcaption></figure>
-<figure class="gallery-item" data-gallery-index="2"><img alt="Convoi de véhicules sous un pont" loading="lazy" src="assets/images/gallery/gallery-convoi.png"/><figcaption class="gallery-caption"><strong>Convoi sur Chernarus</strong><small>La route appartient aux survivants.</small></figcaption></figure>
-<figure class="gallery-item" data-gallery-index="3"><img alt="Groupe de survivants saluant" loading="lazy" src="assets/images/gallery/gallery-salut.png"/><figcaption class="gallery-caption"><strong>Rassemblement</strong><small>Respect et esprit d'équipe.</small></figcaption></figure>
-<figure class="gallery-item" data-gallery-index="4"><img alt="Collection de requins sur un toit" loading="lazy" src="assets/images/gallery/gallery-requins.jpg"/><figcaption class="gallery-caption"><strong>Pêche miraculeuse</strong><small>Une collection plutôt inquiétante.</small></figcaption></figure>
-<figure class="gallery-item" data-gallery-index="5"><img alt="Camion projeté dans les airs" loading="lazy" src="assets/images/gallery/gallery-camion-volant.jpg"/><figcaption class="gallery-caption"><strong>La physique DayZ</strong><small>Tout était parfaitement normal.</small></figcaption></figure>
-<figure class="gallery-item" data-gallery-index="6"><img alt="Église sous le soleil" loading="lazy" src="assets/images/gallery/gallery-eglise.png"/><figcaption class="gallery-caption"><strong>Lumière sur Chernarus</strong><small>Un instant de calme.</small></figcaption></figure>
-<figure class="gallery-item" data-gallery-index="7"><img alt="Survivant en tenue violette" loading="lazy" src="assets/images/gallery/gallery-survivant-violet.png"/><figcaption class="gallery-caption"><strong>Style de survivant</strong><small>Même l'apocalypse a ses codes.</small></figcaption></figure>
-<figure class="gallery-item" data-gallery-index="8"><img alt="Survivante en tenue rose" loading="lazy" src="assets/images/gallery/gallery-survivante-rose.png"/><figcaption class="gallery-caption"><strong>Au bord du monde</strong><small>Une pause face à l'horizon.</small></figcaption></figure>
-<figure class="gallery-item" data-gallery-index="9"><img alt="Camion de pompier au coucher du soleil" loading="lazy" src="assets/images/gallery/gallery-camion-pompier.png"/><figcaption class="gallery-caption"><strong>Fin de journée</strong><small>Le calme avant la prochaine mission.</small></figcaption></figure>
-<figure class="gallery-item" data-gallery-index="10"><img alt="Bateau devant le volcan" loading="lazy" src="assets/images/gallery/gallery-volcan-bateau.png"/><figcaption class="gallery-caption"><strong>Cap sur le volcan</strong><small>Expédition en territoire hostile.</small></figcaption></figure>
-<figure class="gallery-item" data-gallery-index="11"><img alt="Voiture bleue dans la campagne" loading="lazy" src="assets/images/gallery/gallery-voiture-bleue.png"/><figcaption class="gallery-caption"><strong>Sur les routes</strong><small>Une autre façon d'explorer Chernarus.</small></figcaption></figure>
-</div>
-</div>
+  <div class="wrap">
+    <header class="section-heading reveal">
+      <div><p class="eyebrow">Archives communautaires</p><h2>DES MOMENTS<br><span>QUI MÉRITENT DE RESTER.</span></h2></div>
+      <p>Des événements, des rencontres et quelques preuves que la physique de DayZ possède ses propres règles.</p>
+    </header>
+
+    <div class="gallery-stage reveal">
+      <figure class="gallery-item gallery-item--hero" data-gallery-index="0">
+        <img alt="Gagnants du concours de pétanque" loading="eager" src="assets/images/gallery/gallery-petanque.png"/>
+        <figcaption><span>Capture du mois</span><strong>Concours de pétanque</strong><small>Les gagnants prennent la pose.</small></figcaption>
+      </figure>
+      <figure class="gallery-item gallery-item--tall" data-gallery-index="1"><img alt="Survivant au sommet d'un phare" loading="lazy" src="assets/images/gallery/gallery-phare.png"/><figcaption><span>Exploration</span><strong>Tout en haut</strong><small>Une vue qui donne le vertige.</small></figcaption></figure>
+      <figure class="gallery-item" data-gallery-index="2"><img alt="Convoi de véhicules sous un pont" loading="lazy" src="assets/images/gallery/gallery-convoi.png"/><figcaption><span>Expédition</span><strong>Convoi sur Chernarus</strong><small>La route appartient aux survivants.</small></figcaption></figure>
+      <figure class="gallery-item" data-gallery-index="3"><img alt="Groupe de survivants saluant" loading="lazy" src="assets/images/gallery/gallery-salut.png"/><figcaption><span>Communauté</span><strong>Rassemblement</strong><small>Respect et esprit d'équipe.</small></figcaption></figure>
+      <figure class="gallery-item" data-gallery-index="4"><img alt="Collection de requins sur un toit" loading="lazy" src="assets/images/gallery/gallery-requins.jpg"/><figcaption><span>Insolite</span><strong>Pêche miraculeuse</strong><small>Une collection plutôt inquiétante.</small></figcaption></figure>
+      <figure class="gallery-item gallery-item--wide" data-gallery-index="5"><img alt="Camion projeté dans les airs" loading="lazy" src="assets/images/gallery/gallery-camion-volant.jpg"/><figcaption><span>Moment DayZ</span><strong>La physique a parlé</strong><small>Tout était parfaitement normal.</small></figcaption></figure>
+    </div>
+
+    <div class="gallery-more reveal" id="galleryMore">
+      <figure class="gallery-item" data-gallery-index="6"><img alt="Église sous le soleil" loading="lazy" src="assets/images/gallery/gallery-eglise.png"/><figcaption><span>Paysage</span><strong>Lumière sur Chernarus</strong><small>Un instant de calme.</small></figcaption></figure>
+      <figure class="gallery-item" data-gallery-index="7"><img alt="Survivant en tenue violette" loading="lazy" src="assets/images/gallery/gallery-survivant-violet.png"/><figcaption><span>Style</span><strong>Survivant violet</strong><small>Même l'apocalypse a ses codes.</small></figcaption></figure>
+      <figure class="gallery-item" data-gallery-index="8"><img alt="Survivante en tenue rose" loading="lazy" src="assets/images/gallery/gallery-survivante-rose.png"/><figcaption><span>Portrait</span><strong>Au bord du monde</strong><small>Une pause face à l'horizon.</small></figcaption></figure>
+      <figure class="gallery-item" data-gallery-index="9"><img alt="Camion de pompier au coucher du soleil" loading="lazy" src="assets/images/gallery/gallery-camion-pompier.png"/><figcaption><span>Véhicule</span><strong>Fin de journée</strong><small>Le calme avant la prochaine mission.</small></figcaption></figure>
+      <figure class="gallery-item" data-gallery-index="10"><img alt="Bateau devant le volcan" loading="lazy" src="assets/images/gallery/gallery-volcan-bateau.png"/><figcaption><span>Expédition</span><strong>Cap sur le volcan</strong><small>En territoire hostile.</small></figcaption></figure>
+      <figure class="gallery-item" data-gallery-index="11"><img alt="Voiture bleue dans la campagne" loading="lazy" src="assets/images/gallery/gallery-voiture-bleue.png"/><figcaption><span>Exploration</span><strong>Sur les routes</strong><small>Une autre façon de parcourir Chernarus.</small></figcaption></figure>
+    </div>
+    <div class="gallery-controls reveal"><button class="btn" id="toggleGallery" type="button">Voir toutes les captures <span>↓</span></button><small>Cliquez sur une image pour l'agrandir.</small></div>
+  </div>
 </section>
-<section class="hof-section" id="hall-of-fame">
-<div class="wrap">
-<div class="section-head"><div class="section-tag">Ils soutiennent Senzany</div><h2 class="section-title">Hall of Fame — Votants</h2><p class="page-sub">Les onze premiers joueurs récompensés pour leur soutien lors du classement précédent. Le nombre exact de votes n'étant pas disponible, l'ordre officiel est conservé.</p></div>
-<div class="hof-layout">
-<div class="hof-feature"><div class="hof-crown">🏆</div><h3>Les 11 récompensés</h3><p>Merci à celles et ceux qui ont fait progresser Senzany sur Top-Serveurs.</p><a class="btn btn-solid btn-sm" href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" rel="noopener" style="margin-top:20px" target="_blank">Voter pour Senzany</a></div>
-<div class="winner-list">
-<div class="winner"><span class="winner-rank">01</span><span class="winner-name">Falconeye</span></div>
-<div class="winner"><span class="winner-rank">02</span><span class="winner-name">skarlatan</span></div>
-<div class="winner"><span class="winner-rank">03</span><span class="winner-name">twixie</span></div>
-<div class="winner"><span class="winner-rank">04</span><span class="winner-name">dedex</span></div>
-<div class="winner"><span class="winner-rank">05</span><span class="winner-name">darkwolf</span></div>
-<div class="winner"><span class="winner-rank">06</span><span class="winner-name">Keldor</span></div>
-<div class="winner"><span class="winner-rank">07</span><span class="winner-name">Kiroaz_</span></div>
-<div class="winner"><span class="winner-rank">08</span><span class="winner-name">stackoss</span></div>
-<div class="winner"><span class="winner-rank">09</span><span class="winner-name">blackfenrir</span></div>
-<div class="winner"><span class="winner-rank">10</span><span class="winner-name">Black_Widow</span></div>
-<div class="winner"><span class="winner-rank">11</span><span class="winner-name">Ore</span></div>
-</div>
-</div>
-</div>
+
+<section class="story-panel">
+  <div class="story-panel__overlay"></div>
+  <div class="wrap story-panel__content reveal">
+    <p class="eyebrow">L'aventure se vit ensemble</p>
+    <h2>SEUL, VOUS SURVIVEZ.<br><span>ENSEMBLE, VOUS ÉCRIVEZ L'HISTOIRE.</span></h2>
+    <p>Courses, événements, rencontres improvisées et projets collectifs : chaque joueur apporte quelque chose à l'univers Senzany.</p>
+    <a class="text-link" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Entrer dans la communauté ↗</a>
+  </div>
 </section>
-<section>
-<div class="wrap">
-<div class="section-head"><div class="section-tag">Performances du mois</div><h2 class="section-title">Classements Leaderboard — Juin 2026</h2><p class="page-sub">Les meilleurs chasseurs de la communauté dans trois catégories.</p></div>
-<div class="leaderboards">
-<div class="leader-card"><div class="leader-icon">🐾</div><h3>Animaux</h3><div class="podium-row"><span class="podium-pos">🥇</span><span class="podium-name">Black_Widow</span><span class="podium-score">13 448 pts</span></div><div class="podium-row"><span class="podium-pos">🥈</span><span class="podium-name">Negan</span><span class="podium-score">4 556 pts</span></div><div class="podium-row"><span class="podium-pos">🥉</span><span class="podium-name">Y1Y1</span><span class="podium-score">4 348 pts</span></div></div>
-<div class="leader-card"><div class="leader-icon">🧟</div><h3>Zombies</h3><div class="podium-row"><span class="podium-pos">🥇</span><span class="podium-name">Y1Y1</span><span class="podium-score">30 985 pts</span></div><div class="podium-row"><span class="podium-pos">🥈</span><span class="podium-name">Black_Widow</span><span class="podium-score">29 516 pts</span></div><div class="podium-row"><span class="podium-pos">🥉</span><span class="podium-name">Ore</span><span class="podium-score">22 708 pts</span></div></div>
-<div class="leader-card"><div class="leader-icon">☣️</div><h3>Mutants</h3><div class="podium-row"><span class="podium-pos">🥇</span><span class="podium-name">peter dlcrt</span><span class="podium-score">#1</span></div><div class="podium-row"><span class="podium-pos">🥈</span><span class="podium-name">Y1Y1</span><span class="podium-score">#2</span></div><div class="podium-row"><span class="podium-pos">🥉</span><span class="podium-name">Mykii</span><span class="podium-score">#3</span></div></div>
-</div>
-<div class="thanks-panel"><strong>🔥 Félicitations à tous les participants !</strong><p style="color:var(--paper-dim);margin-top:4px">De nouveaux classements prendront place ici chaque mois.</p></div>
-</div>
+
+<section class="honors-section" id="hall-of-fame">
+  <div class="wrap">
+    <header class="section-heading reveal">
+      <div><p class="eyebrow">Ceux qui soutiennent le serveur</p><h2>HALL OF FAME<br><span>DES VOTANTS.</span></h2></div>
+      <p>Onze survivants mis à l'honneur pour leur soutien lors du classement précédent.</p>
+    </header>
+    <div class="honors-layout">
+      <article class="honors-champion reveal">
+        <div class="honors-champion__rank">01</div><div class="honors-champion__crown">♛</div>
+        <p>Premier du classement</p><h3>Falconeye</h3><span>Merci d'avoir porté Senzany au sommet.</span>
+        <a class="btn btn-solid" href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" rel="noopener" target="_blank">Voter pour Senzany ↗</a>
+      </article>
+      <div class="honors-list reveal">
+        <div class="honor-row"><b>02</b><strong>skarlatan</strong><span>Soutien Senzany</span></div>
+        <div class="honor-row"><b>03</b><strong>twixie</strong><span>Soutien Senzany</span></div>
+        <div class="honor-row"><b>04</b><strong>dedex</strong><span>Soutien Senzany</span></div>
+        <div class="honor-row"><b>05</b><strong>darkwolf</strong><span>Soutien Senzany</span></div>
+        <div class="honor-row"><b>06</b><strong>Keldor</strong><span>Soutien Senzany</span></div>
+        <div class="honor-row"><b>07</b><strong>Kiroaz_</strong><span>Soutien Senzany</span></div>
+        <div class="honor-row"><b>08</b><strong>stackoss</strong><span>Soutien Senzany</span></div>
+        <div class="honor-row"><b>09</b><strong>blackfenrir</strong><span>Soutien Senzany</span></div>
+        <div class="honor-row"><b>10</b><strong>Black_Widow</strong><span>Soutien Senzany</span></div>
+        <div class="honor-row"><b>11</b><strong>Ore</strong><span>Soutien Senzany</span></div>
+      </div>
+    </div>
+  </div>
 </section>
+
+<section class="leaderboards-section">
+  <div class="wrap">
+    <header class="section-heading reveal">
+      <div><p class="eyebrow">Performances du mois</p><h2>LES CHASSEURS<br><span>DE JUIN 2026.</span></h2></div>
+      <p>Trois disciplines, neuf places et des milliers de points gagnés sur le terrain.</p>
+    </header>
+    <div class="leaderboards">
+      <article class="leader-card reveal"><div class="leader-card__head"><span>01 // Faune</span><b>🐾</b></div><h3>ANIMAUX</h3><div class="podium"><div class="podium-row first"><b>01</b><strong>Black_Widow</strong><span>13 448 pts</span></div><div class="podium-row"><b>02</b><strong>Negan</strong><span>4 556 pts</span></div><div class="podium-row"><b>03</b><strong>Y1Y1</strong><span>4 348 pts</span></div></div></article>
+      <article class="leader-card leader-card--featured reveal"><div class="leader-card__head"><span>02 // Infectés</span><b>🧟</b></div><h3>ZOMBIES</h3><div class="podium"><div class="podium-row first"><b>01</b><strong>Y1Y1</strong><span>30 985 pts</span></div><div class="podium-row"><b>02</b><strong>Black_Widow</strong><span>29 516 pts</span></div><div class="podium-row"><b>03</b><strong>Ore</strong><span>22 708 pts</span></div></div></article>
+      <article class="leader-card reveal"><div class="leader-card__head"><span>03 // Menaces</span><b>☣</b></div><h3>MUTANTS</h3><div class="podium"><div class="podium-row first"><b>01</b><strong>peter dlcrt</strong><span>#1</span></div><div class="podium-row"><b>02</b><strong>Y1Y1</strong><span>#2</span></div><div class="podium-row"><b>03</b><strong>Mykii</strong><span>#3</span></div></div></article>
+    </div>
+  </div>
+</section>
+
+<section class="discord-cta">
+  <div class="discord-cta__overlay"></div>
+  <div class="wrap discord-cta__content reveal">
+    <p class="eyebrow">Votre place vous attend</p>
+    <h2>LE PROCHAIN SOUVENIR<br><span>POURRAIT ÊTRE LE VÔTRE.</span></h2>
+    <p>Rejoignez les survivants, participez aux événements et entrez dans le récit de Senzany.</p>
+    <a class="btn btn-solid btn-large" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Rejoindre la communauté ↗</a>
+  </div>
+</section>
+</main>
+
 <div aria-label="Image agrandie" aria-modal="true" class="lightbox" id="communityLightbox" role="dialog">
 <button aria-label="Fermer" class="lightbox-close">×</button>
 <button aria-label="Image précédente" class="lightbox-nav lightbox-prev">‹</button>
 <div class="lightbox-content"><img alt="" src=""/><div class="lightbox-meta"><div><strong></strong><small></small></div><span class="lightbox-count"></span></div></div>
 <button aria-label="Image suivante" class="lightbox-nav lightbox-next">›</button>
 </div>
-<div data-site-footer=""></div>
-<script defer="True" src="assets/js/components.js"></script><script defer="True" src="assets/js/app.js"></script><script defer src="assets/js/api.js"></script><script defer src="assets/js/pages/communaute.js"></script>
+
+<div data-site-footer></div>
+<script defer src="assets/js/components.js"></script>
+<script defer src="assets/js/app.js"></script>
+<script defer src="assets/js/api.js"></script>
+<script defer src="assets/js/pages/communaute.js"></script>
 </body>
 </html>
