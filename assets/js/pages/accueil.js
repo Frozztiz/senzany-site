@@ -29,6 +29,94 @@
     }
   }
 
+  function getNetworkElements() {
+    const card = document.querySelector('.home-live-card');
+    if (!card) return {};
+
+    const gridItems = card.querySelectorAll('.home-live-card__grid > div');
+    const mapElement = gridItems[0]?.querySelector('strong') || null;
+    const statusLabel = card.querySelector('.home-live-card__head small');
+    const dot = card.querySelector('.home-live-dot');
+    const main = card.querySelector('.home-live-card__main');
+
+    let occupancy = card.querySelector('.home-live-card__occupancy');
+    if (!occupancy && main) {
+      occupancy = document.createElement('div');
+      occupancy.className = 'home-live-card__occupancy';
+      occupancy.setAttribute('aria-hidden', 'true');
+      occupancy.innerHTML = '<span></span>';
+      main.insertAdjacentElement('afterend', occupancy);
+    }
+
+    return {
+      card,
+      dot,
+      mapElement,
+      occupancy,
+      occupancyBar: occupancy?.querySelector('span') || null,
+      playersElement: document.getElementById('statPlayers'),
+      statusLabel
+    };
+  }
+
+  function animatePlayerCount(element, players, maxPlayers) {
+    if (!element) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      element.textContent = `${players} / ${maxPlayers}`;
+      return;
+    }
+
+    const startedAt = performance.now();
+    const duration = 850;
+
+    const tick = (now) => {
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      element.textContent = `${Math.round(players * eased)} / ${maxPlayers}`;
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+
+    requestAnimationFrame(tick);
+  }
+
+  function updateNetworkCard(data) {
+    const elements = getNetworkElements();
+    if (!elements.playersElement) return;
+
+    const players = Number(data?.players);
+    const maxPlayers = Number(data?.maxPlayers);
+    const hasPlayerCount = data?.online && Number.isFinite(players) && Number.isFinite(maxPlayers) && maxPlayers > 0;
+
+    elements.card?.classList.toggle('is-online', Boolean(data?.online));
+    elements.card?.classList.toggle('is-offline', !data?.online);
+    elements.dot?.classList.toggle('is-online', Boolean(data?.online));
+    elements.dot?.classList.toggle('is-offline', !data?.online);
+
+    if (elements.statusLabel) elements.statusLabel.textContent = data?.online ? 'LIVE' : 'OFFLINE';
+
+    if (!hasPlayerCount) {
+      elements.playersElement.textContent = data?.online ? 'Bientôt disponible' : 'Hors ligne';
+      if (elements.occupancyBar) elements.occupancyBar.style.width = '0%';
+      return;
+    }
+
+    animatePlayerCount(elements.playersElement, players, maxPlayers);
+
+    const occupancyPercent = Math.max(0, Math.min(100, (players / maxPlayers) * 100));
+    if (elements.occupancyBar) elements.occupancyBar.style.width = `${occupancyPercent.toFixed(1)}%`;
+
+    elements.card?.classList.remove('is-calm', 'is-busy', 'is-full');
+    elements.card?.classList.add(
+      occupancyPercent >= 72 ? 'is-full' : occupancyPercent >= 42 ? 'is-busy' : 'is-calm'
+    );
+
+    if (elements.mapElement && data?.map) {
+      const normalizedMap = String(data.map).toLowerCase();
+      elements.mapElement.textContent = normalizedMap.includes('chernarus') ? 'Chernarus+' : data.map;
+    }
+  }
+
   async function refreshGameStats() {
     const playersElement = document.getElementById('statPlayers');
     if (!playersElement) return;
@@ -36,10 +124,9 @@
     try {
       if (!window.SenzanyAPI?.game) return;
       const data = await window.SenzanyAPI.game.getStats();
-      const hasPlayerCount = data?.online && data.players !== null && data.players !== undefined && data.maxPlayers !== null && data.maxPlayers !== undefined;
-      playersElement.textContent = hasPlayerCount ? `${data.players} / ${data.maxPlayers}` : (data?.online ? 'Bientôt disponible' : 'Hors ligne');
+      updateNetworkCard(data);
     } catch (error) {
-      playersElement.textContent = 'Bientôt disponible';
+      updateNetworkCard({ online: false });
       console.warn('Stats DayZ indisponibles.', error);
     }
   }
