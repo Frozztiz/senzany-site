@@ -110,7 +110,7 @@ async function fetchDiscordStats(){
     const res = await fetch("/api/discord/stats");
     if(!res.ok) throw new Error("reponse non ok");
     const data = await res.json();
-    document.getElementById("commDiscordFull").textContent = data.memberCount.toLocaleString("fr-FR");
+    document.getElementById("commDiscordFull").textContent = data.members.toLocaleString("fr-FR");
   } catch(err){
     console.warn("Stats Discord indisponibles.", err);
   }
