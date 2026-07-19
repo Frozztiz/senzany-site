@@ -81,7 +81,7 @@
 
   const storedEnabled = localStorage.getItem(STORAGE.enabled);
   let enabled = storedEnabled === null ? true : storedEnabled === 'true';
-  let firstVisitPending = storedEnabled === null;
+  let introPending = localStorage.getItem(STORAGE.introSeen) !== 'true';
   let muted = readBoolean(STORAGE.muted, false);
   let preferredVolume = Math.min(1, Math.max(0, readNumber(STORAGE.volume, DEFAULT_VOLUME)));
   let fadeFrame = null;
@@ -153,8 +153,8 @@
     try {
       if (withFade) audio.volume = 0;
       await audio.play();
-      if (firstVisitPending) {
-        firstVisitPending = false;
+      if (introPending) {
+        introPending = false;
         showIntroOnce();
       }
       fadeTo(muted ? 0 : preferredVolume, withFade ? FADE_DURATION : 150);
@@ -166,7 +166,6 @@
 
   const stopPlayback = () => {
     enabled = false;
-    firstVisitPending = false;
     waitingForInteraction = false;
     localStorage.setItem(STORAGE.enabled, 'false');
     fadeTo(0, 450, () => {
