@@ -2,6 +2,7 @@
   'use strict';
 
   const PAGE_DATA = {
+    seasonStartDate: '2026-06-01T00:00:00',
     nextWipeDate: '2026-07-21',
     eventDate: '2026-07-21T20:00:00'
   };
@@ -53,10 +54,28 @@
       return;
     }
 
-    setText('cd-d', String(Math.floor(diff / 86400000)).padStart(2, '0'));
-    setText('cd-h', String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0'));
-    setText('cd-m', String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0'));
-    setText('cd-s', String(Math.floor((diff % 60000) / 1000)).padStart(2, '0'));
+    const values = {
+      'cd-d': String(Math.floor(diff / 86400000)).padStart(2, '0'),
+      'cd-h': String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0'),
+      'cd-m': String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0'),
+      'cd-s': String(Math.floor((diff % 60000) / 1000)).padStart(2, '0')
+    };
+
+    Object.entries(values).forEach(([id, value]) => {
+      const element = document.getElementById(id);
+      if (!element || element.textContent === value) return;
+      element.textContent = value;
+      element.classList.remove('is-ticking');
+      void element.offsetWidth;
+      element.classList.add('is-ticking');
+    });
+
+    const start = new Date(PAGE_DATA.seasonStartDate).getTime();
+    const end = new Date(PAGE_DATA.eventDate).getTime();
+    const progress = Math.max(0, Math.min(100, ((Date.now() - start) / (end - start)) * 100));
+    const progressBar = document.getElementById('seasonProgressBar');
+    if (progressBar) progressBar.style.width = `${progress.toFixed(1)}%`;
+    setText('seasonProgressLabel', `${Math.round(progress)}%`);
   }
 
   function createAshParticles() {
@@ -97,12 +116,33 @@
     });
   }
 
+
+  function initCardTilt() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(pointer: coarse)').matches) return;
+    document.querySelectorAll('.home-world-card, .home-portal-card').forEach((card) => {
+      card.addEventListener('pointermove', (event) => {
+        const rect = card.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+        card.style.setProperty('--mx', `${x * 100}%`);
+        card.style.setProperty('--my', `${y * 100}%`);
+        card.style.setProperty('--rx', `${(0.5 - y) * 4}deg`);
+        card.style.setProperty('--ry', `${(x - 0.5) * 5}deg`);
+      });
+      card.addEventListener('pointerleave', () => {
+        card.style.removeProperty('--rx');
+        card.style.removeProperty('--ry');
+      });
+    });
+  }
+
   renderInitialData();
   refreshTopServeursStats();
   refreshGameStats();
   updateCountdown();
   createAshParticles();
   initReveal();
+  initCardTilt();
 
   window.setInterval(refreshTopServeursStats, 300000);
   window.setInterval(refreshGameStats, 60000);

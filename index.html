@@ -6,7 +6,7 @@
   <meta name="description" content="Senzany, serveur DayZ PVE français sur Chernarus. Découvrez un univers communautaire immersif, évolutif et riche en contenus."/>
   <title>SENZANY — Portail officiel DayZ PVE</title>
   <link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
-  <link href="assets/css/pages/accueil.css?v=1.2" rel="stylesheet"/>
+  <link href="assets/css/pages/accueil.css?v=2.0" rel="stylesheet"/>
 </head>
 <body data-page="accueil">
 <div data-site-header=""></div>
@@ -21,8 +21,8 @@
       <div class="home-hero__content home-reveal">
         <p class="home-kicker">01 Senzany // Portail officiel</p>
         <h1 class="home-hero__title">
-          <span>ÉCRIVEZ</span>
-          <span class="home-hero__outline">VOTRE HISTOIRE.</span>
+          <span>VOICI LE RÉCIT</span>
+          <span class="home-hero__outline">DE VOTRE MORT.</span>
         </h1>
         <p class="home-hero__lead">
           Un serveur DayZ PVE français où progression, exploration, événements et communauté construisent une aventure qui ne ressemble à aucune autre.
@@ -59,16 +59,22 @@
           <a href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" target="_blank" rel="noopener">Voter pour Senzany <span>↗</span></a>
         </aside>
 
-        <section class="home-hero-countdown" aria-labelledby="hero-countdown-title">
-          <div class="home-hero-countdown__head">
-            <span>Saison 4 // 21 juillet 2026</span>
-            <strong id="hero-countdown-title">Nouveau départ</strong>
+        <section class="season-event" aria-labelledby="hero-countdown-title">
+          <div class="season-event__scan" aria-hidden="true"></div>
+          <div class="season-event__topline"><span>Saison IV</span><b>Événement majeur</b></div>
+          <div class="season-event__title">
+            <small>Wipe officiel</small>
+            <strong id="hero-countdown-title">21 juillet</strong>
           </div>
-          <div class="home-hero-countdown__grid" id="countdown" aria-label="Compte à rebours avant la Saison 4">
-            <div><strong id="cd-d">00</strong><span>Jours</span></div>
-            <div><strong id="cd-h">00</strong><span>Heures</span></div>
-            <div><strong id="cd-m">00</strong><span>Minutes</span></div>
+          <div class="season-event__clock" id="countdown" aria-label="Compte à rebours avant la Saison 4">
+            <div><strong id="cd-d">00</strong><span>Jours</span></div><i>:</i>
+            <div><strong id="cd-h">00</strong><span>Heures</span></div><i>:</i>
+            <div><strong id="cd-m">00</strong><span>Minutes</span></div><i>:</i>
             <div><strong id="cd-s">00</strong><span>Secondes</span></div>
+          </div>
+          <div class="season-event__progress">
+            <div class="season-event__progress-head"><span>Déploiement de la Saison 4</span><b id="seasonProgressLabel">0%</b></div>
+            <div class="season-event__track"><span id="seasonProgressBar"></span></div>
           </div>
           <a href="senzany-jouer.html">Préparer mon arrivée <span>↗</span></a>
         </section>
@@ -104,7 +110,7 @@
       </header>
 
       <div class="home-world__grid">
-        <a class="home-world-card home-world-card--large home-reveal" href="senzany-jouer.html" style="--card-image:url('assets/images/gallery/gallery-volcan-bateau.png')">
+        <a class="home-world-card home-world-card--large home-reveal" href="senzany-jouer.html" style="--card-image:url('assets/images/accueil/exploration.png')">
           <span class="home-world-card__number">01 // Exploration</span>
           <div>
             <h3>Un Chernarus transformé</h3>
@@ -112,7 +118,7 @@
             <span class="home-world-card__link">Explorer le monde ↗</span>
           </div>
         </a>
-        <a class="home-world-card home-reveal" href="senzany-evenements.html" style="--card-image:url('assets/images/gallery/gallery-convoi.png')">
+        <a class="home-world-card home-reveal" href="senzany-evenements.html" style="--card-image:url('assets/images/accueil/evenements.png')">
           <span class="home-world-card__number">02 // Événements</span>
           <div>
             <h3>Chaque semaine compte</h3>
@@ -120,7 +126,7 @@
             <span class="home-world-card__link">Voir les événements ↗</span>
           </div>
         </a>
-        <a class="home-world-card home-reveal" href="senzany-communaute.html" style="--card-image:url('assets/images/gallery/gallery-petanque.png')">
+        <a class="home-world-card home-reveal" href="senzany-communaute.html" style="--card-image:url('assets/images/accueil/communaute.png')">
           <span class="home-world-card__number">03 // Communauté</span>
           <div>
             <h3>Survivre ensemble</h3>
@@ -128,7 +134,7 @@
             <span class="home-world-card__link">Rencontrer la communauté ↗</span>
           </div>
         </a>
-        <a class="home-world-card home-world-card--wide home-reveal" href="senzany-boutique.html" style="--card-image:url('assets/images/news/senzany-summer-vibes-2026.png')">
+        <a class="home-world-card home-world-card--wide home-reveal" href="senzany-boutique.html" style="--card-image:url('assets/images/accueil/saison.png')">
           <span class="home-world-card__number">04 // Saison</span>
           <div>
             <h3>Summer Vibes 2026</h3>
@@ -151,10 +157,10 @@
       </header>
 
       <div class="home-portal__grid">
-        <a class="home-portal-card home-reveal" href="senzany-profil.html"><span>01</span><strong>Mon profil</strong><p>Votre identité, vos statistiques et bientôt toutes vos données joueur.</p><i>↗</i></a>
-        <a class="home-portal-card home-reveal" href="senzany-staff.html"><span>02</span><strong>Le staff</strong><p>Découvrez les opérateurs qui font vivre et évoluer Senzany.</p><i>↗</i></a>
-        <a class="home-portal-card home-reveal" href="senzany-wiki.html"><span>03</span><strong>Le wiki</strong><p>Guides, systèmes, règles et informations utiles pour progresser.</p><i>↗</i></a>
-        <a class="home-portal-card home-reveal" href="senzany-support.html"><span>04</span><strong>Support</strong><p>Une question ou un problème ? Retrouvez rapidement la bonne aide.</p><i>↗</i></a>
+        <a class="home-portal-card home-reveal" href="senzany-profil.html" style="--portal-image:url('assets/images/accueil/profil.png')"><span>01</span><div><strong>Mon profil</strong><p>Votre identité, vos statistiques et toutes vos données joueur.</p></div><i>↗</i></a>
+        <a class="home-portal-card home-reveal" href="senzany-staff.html" style="--portal-image:url('assets/images/accueil/staff.jpg')"><span>02</span><div><strong>Le staff</strong><p>Découvrez les opérateurs qui font vivre et évoluer Senzany.</p></div><i>↗</i></a>
+        <a class="home-portal-card home-reveal" href="senzany-wiki.html" style="--portal-image:url('assets/images/accueil/wiki.png')"><span>03</span><div><strong>Le wiki</strong><p>Guides, systèmes, règles et informations utiles pour progresser.</p></div><i>↗</i></a>
+        <a class="home-portal-card home-reveal" href="senzany-support.html" style="--portal-image:url('assets/images/accueil/support.png')"><span>04</span><div><strong>Support</strong><p>Une question ou un problème ? Retrouvez rapidement la bonne aide.</p></div><i>↗</i></a>
       </div>
     </div>
   </section>
@@ -207,6 +213,6 @@
 <script defer src="assets/js/components.js"></script>
 <script defer src="assets/js/app.js"></script>
 <script defer src="assets/js/api.js"></script>
-<script defer src="assets/js/pages/accueil.js?v=1.2"></script>
+<script defer src="assets/js/pages/accueil.js?v=2.0"></script>
 </body>
 </html>
