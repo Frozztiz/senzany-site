@@ -325,3 +325,17 @@ main{display:block;position:relative;z-index:1}
   .community-livebar__stat:nth-child(-n+2){border-bottom:1px solid rgba(255,255,255,.075)}
   .story-title__solid--secondary{font-size:clamp(38px,11vw,58px)}
 }
+
+/* === Correction v5 : titre de la bannière en deux couleurs === */
+.story-panel h2 .story-title__solid{
+  color:#f3ede6 !important;
+  -webkit-text-fill-color:#f3ede6;
+  -webkit-text-stroke:0 !important;
+  text-shadow:0 4px 28px rgba(0,0,0,.82);
+}
+.story-panel h2 .story-title__solid--secondary{
+  color:#d92b33 !important;
+  -webkit-text-fill-color:#d92b33;
+  -webkit-text-stroke:0 !important;
+  text-shadow:0 0 24px rgba(217,43,51,.24),0 4px 28px rgba(0,0,0,.86);
+}
