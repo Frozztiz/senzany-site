@@ -123,9 +123,19 @@ async function fetchGameStats(){
     const res = await fetch("/api/game/stats");
     if(!res.ok) throw new Error("reponse non ok");
     const data = await res.json();
-    document.getElementById("commPlayers").textContent = data.online
-      ? (data.players + "/" + data.maxPlayers)
-      : "Hors ligne";
+    const players = document.getElementById("commPlayers");
+
+if (
+    players &&
+    data.online &&
+    data.players !== null &&
+    data.maxPlayers !== null &&
+    data.maxPlayers !== undefined
+) {
+    players.textContent = `${data.players} / ${data.maxPlayers}`;
+} else if (players) {
+    players.textContent = "Bientôt disponible";
+}
   } catch(err){
     console.warn("Stats de jeu indisponibles.", err);
   }
