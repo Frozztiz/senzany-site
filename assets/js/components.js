@@ -1,4 +1,22 @@
 (() => {
+  // Lecteur audio global : chargé une seule fois sur toutes les pages.
+  const ambientStylesheet = 'assets/css/shared/ambient-player.css';
+  if (!document.querySelector('link[data-senzany-ambient-player]')) {
+    const ambientLink = document.createElement('link');
+    ambientLink.rel = 'stylesheet';
+    ambientLink.href = `${ambientStylesheet}?v=1.0.0`;
+    ambientLink.dataset.senzanyAmbientPlayer = 'v1';
+    document.head.appendChild(ambientLink);
+  }
+
+  if (!document.querySelector('script[data-senzany-ambient-player]')) {
+    const ambientScript = document.createElement('script');
+    ambientScript.src = 'assets/js/shared/ambient-player.js?v=1.0.0';
+    ambientScript.defer = true;
+    ambientScript.dataset.senzanyAmbientPlayer = 'v1';
+    document.head.appendChild(ambientScript);
+  }
+
   // Feuille de style commune : uniformise le header, le menu et le footer sur toutes les pages.
   const sharedNavStylesheet = 'assets/css/shared/navigation-unified-v1.css';
   if (!document.querySelector(`link[data-senzany-shared-nav="v1"]`)) {
@@ -7,23 +25,6 @@
     link.href = `${sharedNavStylesheet}?v=1.0.0`;
     link.dataset.senzanySharedNav = 'v1';
     document.head.appendChild(link);
-  }
-
-  // Lecteur d'ambiance global, disponible sur toutes les pages.
-  if (!document.querySelector('link[data-senzany-ambient]')) {
-    const ambientCss = document.createElement('link');
-    ambientCss.rel = 'stylesheet';
-    ambientCss.href = 'assets/css/shared/ambient-player.css?v=1.0.0';
-    ambientCss.dataset.senzanyAmbient = 'true';
-    document.head.appendChild(ambientCss);
-  }
-
-  if (!document.querySelector('script[data-senzany-ambient]')) {
-    const ambientScript = document.createElement('script');
-    ambientScript.src = 'assets/js/shared/ambient-player.js?v=1.0.0';
-    ambientScript.defer = true;
-    ambientScript.dataset.senzanyAmbient = 'true';
-    document.head.appendChild(ambientScript);
   }
 
   const NAV = [

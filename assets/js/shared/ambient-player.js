@@ -1,182 +1,198 @@
 (() => {
   'use strict';
 
+  if (window.__senzanyAmbientPlayerLoaded) return;
+  window.__senzanyAmbientPlayerLoaded = true;
+
   const STORAGE = {
     enabled: 'senzanyAmbientEnabled',
+    muted: 'senzanyAmbientMuted',
     volume: 'senzanyAmbientVolume',
-    position: 'senzanyAmbientPosition',
-    updatedAt: 'senzanyAmbientUpdatedAt'
+    position: 'senzanyAmbientPosition'
   };
 
   const DEFAULT_VOLUME = 0.22;
-  const audio = new Audio('assets/audio/senzany-wasteland-ambient.mp3');
-  audio.loop = true;
-  audio.preload = 'auto';
-  audio.volume = 0;
-
-  const getStoredNumber = (key, fallback) => {
-    const value = Number.parseFloat(localStorage.getItem(key));
-    return Number.isFinite(value) ? value : fallback;
-  };
-
-  let targetVolume = Math.min(1, Math.max(0, getStoredNumber(STORAGE.volume, DEFAULT_VOLUME)));
-  let enabled = localStorage.getItem(STORAGE.enabled) === 'true';
-  let fadeFrame = null;
-  let saveTimer = null;
-  let hasPlayedThisVisit = false;
+  const FADE_DURATION = 700;
+  const AUDIO_URL = 'assets/audio/senzany-wasteland-ambient.mp3';
 
   const icons = {
     play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
     pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>',
-    volume: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12zm-2.5-8.77v2.06a7 7 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54z"/></svg>',
-    muted: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.59 3 2.7 2.7-1.42 1.42-2.7-2.7-2.7 2.7-1.42-1.42 2.7-2.7-2.7-2.7 1.42-1.42 2.7 2.7 2.7-2.7 1.42 1.42-2.7 2.7z"/></svg>'
+    volume: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm12.5 3a3.5 3.5 0 0 0-2-3.16v6.32A3.5 3.5 0 0 0 15.5 12zm-2-8.77v2.06a7 7 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54z"/></svg>',
+    muted: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.59 3 2.7-2.7-1.42-1.42-2.7 2.7-2.7-2.7-1.42 1.42 2.7 2.7-2.7 2.7 1.42 1.42 2.7-2.7 2.7 2.7 1.42-1.42z"/></svg>'
+  };
+
+  const readBoolean = (key, fallback) => {
+    const value = localStorage.getItem(key);
+    return value === null ? fallback : value === 'true';
+  };
+
+  const readNumber = (key, fallback) => {
+    const value = Number.parseFloat(localStorage.getItem(key));
+    return Number.isFinite(value) ? value : fallback;
   };
 
   const player = document.createElement('aside');
-  player.className = 'senzany-ambient';
+  player.className = 'senzany-ambient-player';
   player.setAttribute('aria-label', 'Lecteur de musique d’ambiance');
   player.innerHTML = `
-    <button class="senzany-ambient__toggle" type="button" aria-label="Lire la musique">${icons.play}</button>
-    <div class="senzany-ambient__meta">
-      <span class="senzany-ambient__eyebrow">Senzany ambient</span>
-      <strong class="senzany-ambient__title">Wasteland Ambient</strong>
+    <button class="ambient-main-button" type="button" aria-label="Activer la musique" title="Lecture / pause">
+      ${icons.play}
+    </button>
+    <div class="ambient-content">
+      <div class="ambient-eyebrow">
+        <span class="ambient-equalizer" aria-hidden="true"><span></span><span></span><span></span></span>
+        Ambiance Senzany
+      </div>
+      <div class="ambient-title">Wasteland Ambient</div>
+      <div class="ambient-controls-row">
+        <input class="ambient-volume" type="range" min="0" max="100" step="1" aria-label="Volume de la musique">
+        <span class="ambient-status">Désactivée</span>
+      </div>
     </div>
-    <div class="senzany-ambient__volume-wrap">
-      <button class="senzany-ambient__mute" type="button" aria-label="Couper le son">${icons.volume}</button>
-      <input class="senzany-ambient__volume" type="range" min="0" max="1" step="0.01" aria-label="Volume de la musique">
-    </div>`;
+    <button class="ambient-mute-button" type="button" aria-label="Couper le son" title="Couper / rétablir le son">
+      ${icons.volume}
+    </button>
+  `;
+  document.body.appendChild(player);
 
-  const hint = document.createElement('div');
-  hint.className = 'senzany-ambient__hint';
-  hint.textContent = '♪ Senzany Wasteland Ambient';
+  const playButton = player.querySelector('.ambient-main-button');
+  const muteButton = player.querySelector('.ambient-mute-button');
+  const volumeInput = player.querySelector('.ambient-volume');
+  const status = player.querySelector('.ambient-status');
 
-  document.body.append(player, hint);
+  const audio = new Audio(AUDIO_URL);
+  audio.loop = true;
+  audio.preload = 'metadata';
+  audio.playsInline = true;
 
-  const toggleButton = player.querySelector('.senzany-ambient__toggle');
-  const muteButton = player.querySelector('.senzany-ambient__mute');
-  const volumeInput = player.querySelector('.senzany-ambient__volume');
-  volumeInput.value = String(targetVolume);
+  let enabled = readBoolean(STORAGE.enabled, false);
+  let muted = readBoolean(STORAGE.muted, false);
+  let preferredVolume = Math.min(1, Math.max(0, readNumber(STORAGE.volume, DEFAULT_VOLUME)));
+  let fadeFrame = null;
+  let waitingForInteraction = false;
 
-  const setUi = () => {
-    const playing = !audio.paused;
-    toggleButton.innerHTML = playing ? icons.pause : icons.play;
-    toggleButton.setAttribute('aria-label', playing ? 'Mettre la musique en pause' : 'Lire la musique');
-    muteButton.innerHTML = targetVolume === 0 ? icons.muted : icons.volume;
-    muteButton.setAttribute('aria-label', targetVolume === 0 ? 'Rétablir le son' : 'Couper le son');
+  audio.muted = muted;
+  audio.volume = enabled ? preferredVolume : 0;
+  volumeInput.value = String(Math.round(preferredVolume * 100));
+
+  const savePosition = () => {
+    if (Number.isFinite(audio.currentTime)) {
+      localStorage.setItem(STORAGE.position, String(audio.currentTime));
+    }
   };
 
-  const fadeTo = (endVolume, duration = 900, onComplete) => {
+  const setPositionWhenReady = () => {
+    const savedPosition = Math.max(0, readNumber(STORAGE.position, 0));
+    if (audio.duration && Number.isFinite(audio.duration)) {
+      audio.currentTime = savedPosition % audio.duration;
+    }
+  };
+
+  const updateUi = () => {
+    const isPlaying = enabled && !audio.paused;
+    player.classList.toggle('is-playing', isPlaying);
+    player.classList.toggle('is-muted', muted || preferredVolume === 0);
+    playButton.innerHTML = isPlaying ? icons.pause : icons.play;
+    playButton.setAttribute('aria-label', isPlaying ? 'Mettre la musique en pause' : 'Activer la musique');
+    muteButton.innerHTML = (muted || preferredVolume === 0) ? icons.muted : icons.volume;
+    muteButton.setAttribute('aria-label', muted ? 'Rétablir le son' : 'Couper le son');
+    status.textContent = isPlaying ? 'En lecture' : (waitingForInteraction ? 'Cliquer pour écouter' : 'Désactivée');
+  };
+
+  const fadeTo = (target, duration = FADE_DURATION, onComplete) => {
     if (fadeFrame) cancelAnimationFrame(fadeFrame);
-    const startVolume = audio.volume;
+    const start = audio.volume;
     const startedAt = performance.now();
 
-    const step = (now) => {
+    const tick = (now) => {
       const progress = Math.min(1, (now - startedAt) / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      audio.volume = startVolume + (endVolume - startVolume) * eased;
-      if (progress < 1) fadeFrame = requestAnimationFrame(step);
-      else {
+      audio.volume = start + (target - start) * progress;
+      if (progress < 1) {
+        fadeFrame = requestAnimationFrame(tick);
+      } else {
         fadeFrame = null;
-        if (onComplete) onComplete();
+        if (typeof onComplete === 'function') onComplete();
       }
     };
-    fadeFrame = requestAnimationFrame(step);
+
+    fadeFrame = requestAnimationFrame(tick);
   };
 
-  const restorePosition = () => {
-    const storedPosition = getStoredNumber(STORAGE.position, 0);
-    const storedAt = getStoredNumber(STORAGE.updatedAt, Date.now());
-    const elapsed = enabled ? Math.max(0, (Date.now() - storedAt) / 1000) : 0;
-    const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 60;
-    audio.currentTime = (storedPosition + elapsed) % duration;
-  };
-
-  const showHint = () => {
-    if (hasPlayedThisVisit) return;
-    hasPlayedThisVisit = true;
-    hint.classList.add('is-visible');
-    window.setTimeout(() => hint.classList.remove('is-visible'), 2400);
-  };
-
-  const play = async () => {
+  const startPlayback = async (withFade = true) => {
     enabled = true;
+    waitingForInteraction = false;
     localStorage.setItem(STORAGE.enabled, 'true');
+
     try {
+      if (withFade) audio.volume = 0;
       await audio.play();
-      fadeTo(targetVolume, 1200);
-      showHint();
-    } catch {
-      enabled = false;
-      localStorage.setItem(STORAGE.enabled, 'false');
+      fadeTo(muted ? 0 : preferredVolume, withFade ? FADE_DURATION : 150);
+    } catch (error) {
+      waitingForInteraction = true;
     }
-    setUi();
+    updateUi();
   };
 
-  const pause = () => {
+  const stopPlayback = () => {
     enabled = false;
+    waitingForInteraction = false;
     localStorage.setItem(STORAGE.enabled, 'false');
-    fadeTo(0, 600, () => {
+    fadeTo(0, 450, () => {
       audio.pause();
-      setUi();
+      updateUi();
     });
+    updateUi();
   };
 
-  const persistPosition = () => {
-    if (!Number.isFinite(audio.currentTime)) return;
-    localStorage.setItem(STORAGE.position, String(audio.currentTime));
-    localStorage.setItem(STORAGE.updatedAt, String(Date.now()));
-  };
-
-  toggleButton.addEventListener('click', () => {
-    if (audio.paused) play();
-    else pause();
+  playButton.addEventListener('click', () => {
+    if (enabled && !audio.paused) stopPlayback();
+    else startPlayback(true);
   });
 
   muteButton.addEventListener('click', () => {
-    if (targetVolume > 0) {
-      muteButton.dataset.previousVolume = String(targetVolume);
-      targetVolume = 0;
-    } else {
-      targetVolume = Number.parseFloat(muteButton.dataset.previousVolume || '') || DEFAULT_VOLUME;
-    }
-    volumeInput.value = String(targetVolume);
-    localStorage.setItem(STORAGE.volume, String(targetVolume));
-    if (!audio.paused) fadeTo(targetVolume, 350);
-    setUi();
+    muted = !muted;
+    audio.muted = muted;
+    localStorage.setItem(STORAGE.muted, String(muted));
+    if (enabled && !audio.paused) fadeTo(muted ? 0 : preferredVolume, 250);
+    updateUi();
   });
 
   volumeInput.addEventListener('input', () => {
-    targetVolume = Number.parseFloat(volumeInput.value);
-    localStorage.setItem(STORAGE.volume, String(targetVolume));
-    if (!audio.paused) audio.volume = targetVolume;
-    setUi();
+    preferredVolume = Number(volumeInput.value) / 100;
+    localStorage.setItem(STORAGE.volume, String(preferredVolume));
+
+    if (preferredVolume > 0 && muted) {
+      muted = false;
+      audio.muted = false;
+      localStorage.setItem(STORAGE.muted, 'false');
+    }
+
+    if (enabled && !audio.paused) audio.volume = preferredVolume;
+    updateUi();
   });
 
-  audio.addEventListener('play', setUi);
-  audio.addEventListener('pause', setUi);
-  audio.addEventListener('loadedmetadata', restorePosition, { once: true });
+  audio.addEventListener('loadedmetadata', () => {
+    setPositionWhenReady();
+    if (enabled) startPlayback(false);
+  }, { once: true });
 
-  saveTimer = window.setInterval(() => {
-    if (!audio.paused) persistPosition();
-  }, 1000);
-
-  window.addEventListener('pagehide', () => {
-    persistPosition();
-    if (saveTimer) window.clearInterval(saveTimer);
+  audio.addEventListener('play', updateUi);
+  audio.addEventListener('pause', updateUi);
+  audio.addEventListener('error', () => {
+    status.textContent = 'Audio indisponible';
+    player.classList.remove('is-playing');
   });
 
-  window.requestAnimationFrame(() => player.classList.add('is-ready'));
-  setUi();
+  window.addEventListener('pagehide', savePosition);
+  window.addEventListener('beforeunload', savePosition);
+  window.setInterval(savePosition, 4000);
 
-  // Les navigateurs exigent une interaction avant la lecture avec son.
-  if (enabled) {
-    const resumeOnFirstInteraction = () => {
-      restorePosition();
-      play();
-      document.removeEventListener('pointerdown', resumeOnFirstInteraction);
-      document.removeEventListener('keydown', resumeOnFirstInteraction);
-    };
-    document.addEventListener('pointerdown', resumeOnFirstInteraction, { once: true });
-    document.addEventListener('keydown', resumeOnFirstInteraction, { once: true });
-  }
+  const resumeAfterInteraction = () => {
+    if (enabled && audio.paused) startPlayback(false);
+  };
+  document.addEventListener('pointerdown', resumeAfterInteraction, { once: true, passive: true });
+  document.addEventListener('keydown', resumeAfterInteraction, { once: true });
+
+  updateUi();
 })();

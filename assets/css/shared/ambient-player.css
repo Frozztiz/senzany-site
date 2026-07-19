@@ -1,158 +1,208 @@
 :root {
-  --ambient-red: #d20f24;
-  --ambient-panel: rgba(10, 10, 12, 0.92);
+  --ambient-red: #c91520;
+  --ambient-red-bright: #f12b36;
+  --ambient-bg: rgba(8, 8, 10, 0.92);
   --ambient-border: rgba(255, 255, 255, 0.12);
+  --ambient-text: #f4f4f5;
+  --ambient-muted: #9b9ba3;
 }
 
-.senzany-ambient {
+.senzany-ambient-player {
   position: fixed;
   right: 22px;
   bottom: 22px;
   z-index: 9999;
-  display: flex;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 38px;
   align-items: center;
-  gap: 10px;
-  padding: 9px 11px;
-  color: #fff;
-  background: linear-gradient(145deg, rgba(25, 25, 29, 0.96), var(--ambient-panel));
+  gap: 11px;
+  width: min(330px, calc(100vw - 32px));
+  min-height: 70px;
+  padding: 11px 12px;
+  color: var(--ambient-text);
+  background:
+    linear-gradient(135deg, rgba(201, 21, 32, 0.12), transparent 45%),
+    var(--ambient-bg);
   border: 1px solid var(--ambient-border);
-  border-radius: 16px;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.42), 0 0 24px rgba(210, 15, 36, 0.1);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transform: translateY(18px);
+  border-radius: 14px;
+  box-shadow: 0 16px 46px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transform: translateY(16px);
   opacity: 0;
-  transition: opacity .45s ease, transform .45s ease, border-color .25s ease, box-shadow .25s ease;
+  animation: ambientPlayerIn 0.7s cubic-bezier(.2,.8,.2,1) 0.25s forwards;
   font-family: inherit;
 }
 
-.senzany-ambient.is-ready {
-  transform: translateY(0);
-  opacity: 1;
+.senzany-ambient-player::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(241, 43, 54, 0.38), transparent 30%, transparent 70%, rgba(255, 255, 255, 0.08));
+  opacity: 0.45;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 1px;
 }
 
-.senzany-ambient:hover {
-  border-color: rgba(210, 15, 36, 0.5);
-  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.5), 0 0 30px rgba(210, 15, 36, 0.16);
-}
-
-.senzany-ambient__toggle,
-.senzany-ambient__mute {
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
+.ambient-main-button,
+.ambient-mute-button {
+  appearance: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
   display: grid;
   place-items: center;
-  padding: 0;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.055);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 11px;
-  cursor: pointer;
-  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+  flex: 0 0 auto;
 }
 
-.senzany-ambient__toggle {
-  background: linear-gradient(145deg, #e0172d, #980b19);
-  border-color: rgba(255, 75, 92, 0.45);
-  box-shadow: 0 5px 18px rgba(210, 15, 36, 0.25);
+.ambient-main-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--ambient-red-bright), #8f0710);
+  box-shadow: 0 8px 22px rgba(201, 21, 32, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.senzany-ambient__toggle:hover,
-.senzany-ambient__mute:hover {
-  transform: translateY(-1px);
-  border-color: rgba(255, 255, 255, 0.28);
+.ambient-main-button:hover {
+  transform: scale(1.06);
+  box-shadow: 0 10px 28px rgba(201, 21, 32, 0.5);
 }
 
-.senzany-ambient svg {
-  width: 18px;
-  height: 18px;
+.ambient-main-button svg,
+.ambient-mute-button svg {
+  width: 20px;
+  height: 20px;
   fill: currentColor;
 }
 
-.senzany-ambient__meta {
-  min-width: 154px;
-  line-height: 1.05;
+.ambient-content {
+  min-width: 0;
 }
 
-.senzany-ambient__eyebrow {
-  display: block;
-  margin-bottom: 5px;
-  color: rgba(255, 255, 255, 0.46);
+.ambient-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 3px;
+  color: var(--ambient-muted);
   font-size: 9px;
   font-weight: 800;
-  letter-spacing: .16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
-.senzany-ambient__title {
-  display: block;
-  max-width: 175px;
+.ambient-equalizer {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 11px;
+}
+
+.ambient-equalizer span {
+  width: 2px;
+  height: 4px;
+  background: var(--ambient-red-bright);
+  border-radius: 2px;
+}
+
+.senzany-ambient-player.is-playing .ambient-equalizer span {
+  animation: ambientEq 0.9s ease-in-out infinite alternate;
+}
+
+.senzany-ambient-player.is-playing .ambient-equalizer span:nth-child(2) { animation-delay: -0.3s; }
+.senzany-ambient-player.is-playing .ambient-equalizer span:nth-child(3) { animation-delay: -0.6s; }
+
+.ambient-title {
   overflow: hidden;
   color: #fff;
-  font-size: 12px;
-  font-weight: 750;
-  letter-spacing: .02em;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.035em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.senzany-ambient__volume-wrap {
+.ambient-controls-row {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 7px;
 }
 
-.senzany-ambient__volume {
-  width: 78px;
-  height: 4px;
-  accent-color: var(--ambient-red);
+.ambient-volume {
+  width: 100%;
+  height: 3px;
+  accent-color: var(--ambient-red-bright);
   cursor: pointer;
 }
 
-.senzany-ambient__hint {
-  position: fixed;
-  right: 22px;
-  bottom: 86px;
-  z-index: 9998;
-  padding: 10px 13px;
-  color: rgba(255, 255, 255, .88);
-  background: rgba(9, 9, 11, .94);
-  border: 1px solid rgba(210, 15, 36, .28);
-  border-radius: 10px;
-  box-shadow: 0 12px 35px rgba(0,0,0,.35);
-  font-size: 11px;
+.ambient-status {
+  flex: 0 0 auto;
+  color: var(--ambient-muted);
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
-  transition: opacity .3s ease, transform .3s ease;
 }
 
-.senzany-ambient__hint.is-visible {
-  opacity: 1;
-  transform: translateY(0);
+.ambient-mute-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.055);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.ambient-mute-button:hover {
+  color: var(--ambient-red-bright);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.senzany-ambient-player.is-muted .ambient-mute-button {
+  color: var(--ambient-red-bright);
+}
+
+@keyframes ambientPlayerIn {
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes ambientEq {
+  0% { height: 3px; }
+  100% { height: 11px; }
 }
 
 @media (max-width: 640px) {
-  .senzany-ambient {
+  .senzany-ambient-player {
     right: 12px;
     bottom: 12px;
-    padding: 7px;
+    width: min(290px, calc(100vw - 24px));
+    min-height: 62px;
+    grid-template-columns: 40px minmax(0, 1fr) 34px;
+    padding: 9px 10px;
   }
-  .senzany-ambient__meta,
-  .senzany-ambient__volume {
-    display: none;
+
+  .ambient-main-button {
+    width: 40px;
+    height: 40px;
   }
-  .senzany-ambient__volume-wrap { gap: 6px; }
-  .senzany-ambient__hint { right: 12px; bottom: 70px; }
+
+  .ambient-title { font-size: 12px; }
+  .ambient-status { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .senzany-ambient,
-  .senzany-ambient__hint,
-  .senzany-ambient__toggle,
-  .senzany-ambient__mute { transition: none; }
+  .senzany-ambient-player,
+  .ambient-equalizer span {
+    animation: none !important;
+  }
+
+  .senzany-ambient-player {
+    transform: none;
+    opacity: 1;
+  }
 }
