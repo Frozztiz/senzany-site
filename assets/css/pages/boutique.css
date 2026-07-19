@@ -570,3 +570,63 @@ body{background-color:var(--bg)!important;background-image:url('../../images/bac
   .js .shop-page [data-reveal]{opacity:1;transform:none;transition:none}
   .collection-card,.collection-card::before,.collection-card::after,.collection-card__icon{transition:none}
 }
+
+/* ============================================================
+   V6.0 — CORRECTION STRUCTURE + CADRAGE DES VISUELS
+   ============================================================ */
+.shop-hero--v6{min-height:780px;display:flex;align-items:stretch;background:url('../../images/backgrounds/hero-bg.jpg') 68% 32%/cover no-repeat!important}
+.shop-hero--v6::before{background:linear-gradient(90deg,rgba(4,4,4,.98) 0%,rgba(5,5,5,.88) 43%,rgba(7,5,5,.30) 72%,rgba(7,5,5,.62) 100%),linear-gradient(180deg,rgba(8,7,6,.04),rgba(8,7,6,.95) 100%)}
+.shop-hero__inner--v6{display:flex!important;align-items:center!important;grid-template-columns:none!important;padding-top:145px!important;padding-bottom:105px!important}
+.shop-hero__inner--v6 .shop-hero__copy{width:min(760px,100%)}
+.shop-hero--v6 .shop-hero__title-solid{font-size:clamp(74px,8.4vw,124px)}
+.shop-hero--v6 .shop-hero__title-outline{font-size:clamp(66px,7.6vw,112px)}
+
+.summer-feature--v6{padding:88px 0;background:linear-gradient(180deg,#090807,#0d0a09)!important}
+.summer-feature--v6 .summer-feature__panel{display:grid!important;grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr)!important;min-height:560px!important;overflow:hidden;border:1px solid rgba(232,162,46,.42);background:#0d0a09;box-shadow:0 32px 80px rgba(0,0,0,.38)}
+.summer-feature--v6 .summer-feature__visual{position:relative;min-height:560px!important;padding:34px!important;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(232,162,46,.16),transparent 55%),#090807!important;overflow:hidden}
+.summer-feature--v6 .summer-feature__visual::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 72%,rgba(10,8,8,.58)),linear-gradient(0deg,rgba(8,7,6,.45),transparent 35%)}
+.summer-feature__image-frame{position:relative;z-index:1;width:100%;height:100%;min-height:465px;display:flex;align-items:center;justify-content:center;padding:16px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.30);box-shadow:0 24px 55px rgba(0,0,0,.34)}
+.summer-feature--v6 .summer-feature__visual img{position:static!important;width:100%!important;height:100%!important;max-height:465px!important;object-fit:contain!important;object-position:center!important;transform:none!important;filter:saturate(1.04) contrast(1.03)}
+.summer-feature--v6 .summer-feature__badge{top:18px!important;left:18px!important;z-index:4!important}
+.summer-feature--v6 .summer-feature__edition{left:50px!important;bottom:28px!important;z-index:4!important}
+.summer-feature--v6 .summer-feature__content{padding:58px 48px!important;background:linear-gradient(145deg,rgba(24,17,15,.99),rgba(9,8,7,.99))!important}
+
+.shop-collections--v6{padding:96px 0 105px;background:linear-gradient(180deg,#0b0908,#070606)!important}
+.collection-showcase-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important}
+.collection-visual{position:relative;min-height:420px;display:block;overflow:hidden;border:1px solid rgba(255,255,255,.12);background:#100d0c;box-shadow:0 20px 55px rgba(0,0,0,.28);transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease}
+.collection-visual:hover{transform:translateY(-7px);border-color:rgba(209,39,44,.62);box-shadow:0 34px 75px rgba(0,0,0,.45)}
+.collection-visual__image,.collection-visual__scene{position:absolute;inset:0;overflow:hidden}
+.collection-visual__image img{width:100%;height:100%;object-fit:contain;object-position:center;background:#080706;padding:22px;transition:transform .55s ease}
+.collection-visual:hover .collection-visual__image img{transform:scale(1.025)}
+.collection-visual__scene{background:url('../../images/backgrounds/hero-bg.jpg') center/cover no-repeat;transition:transform .65s ease,filter .65s ease}
+.collection-visual:hover .collection-visual__scene{transform:scale(1.045)}
+.collection-visual--appearance .collection-visual__scene{background-position:74% 42%;filter:saturate(.72) contrast(1.08)}
+.collection-visual--camp .collection-visual__scene{background-position:18% 64%;filter:saturate(.62) sepia(.12) contrast(1.08)}
+.collection-visual--special .collection-visual__scene{background-position:60% 22%;filter:saturate(.88) contrast(1.12)}
+.collection-visual__overlay{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;padding:30px;background:linear-gradient(180deg,rgba(7,6,6,.04) 15%,rgba(7,6,6,.32) 48%,rgba(7,6,6,.97) 100%)}
+.collection-visual--summer .collection-visual__overlay{background:linear-gradient(180deg,rgba(7,6,6,.02),rgba(7,6,6,.20) 48%,rgba(7,6,6,.96) 100%)}
+.collection-visual__overlay span{font-size:9px;letter-spacing:.14em;color:var(--blood-bright)}
+.collection-visual__overlay h3{margin:9px 0 9px;font:clamp(38px,4vw,62px)/.92 'Anton',sans-serif;text-transform:uppercase;max-width:90%}
+.collection-visual__overlay p{max-width:520px;color:#b4aaa1;font-size:14px;line-height:1.55}
+.collection-visual__overlay b{margin-top:18px;font:10px 'IBM Plex Mono',monospace;letter-spacing:.14em;color:#eee5da}
+.collection-visual::after{content:"";position:absolute;left:0;right:0;bottom:0;z-index:3;height:3px;background:linear-gradient(90deg,var(--blood),var(--blood-bright));transform:scaleX(0);transform-origin:left;transition:transform .35s ease}
+.collection-visual:hover::after{transform:scaleX(1)}
+
+@media(max-width:900px){
+ .summer-feature--v6 .summer-feature__panel{grid-template-columns:1fr!important}
+ .summer-feature--v6 .summer-feature__visual{min-height:460px!important}
+ .summer-feature__image-frame{min-height:380px}
+ .summer-feature--v6 .summer-feature__visual img{max-height:380px!important}
+ .collection-showcase-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:620px){
+ .shop-hero__inner--v6{padding-top:118px!important;padding-bottom:82px!important}
+ .summer-feature--v6{padding:56px 0}
+ .summer-feature--v6 .summer-feature__visual{min-height:340px!important;padding:18px!important}
+ .summer-feature__image-frame{min-height:285px;padding:8px}
+ .summer-feature--v6 .summer-feature__visual img{max-height:285px!important}
+ .summer-feature--v6 .summer-feature__content{padding:38px 25px!important}
+ .collection-visual{min-height:360px}
+ .collection-visual__overlay{padding:23px}
+ .collection-visual__image img{padding:12px}
+}
