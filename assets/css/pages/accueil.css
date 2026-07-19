@@ -181,3 +181,84 @@
   .season-event--wide .season-event__title strong{white-space:normal}
   .home-hero__inner{padding-block:48px 86px}
 }
+
+/* === ACCUEIL V2.2 : composition corrigée et visuels dédiés === */
+.home-hero{
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:flex-start;
+}
+.home-countdown-wrap{
+  flex:0 0 auto;
+  width:min(1240px,calc(100% - 48px));
+  margin-inline:auto;
+  padding-top:22px;
+}
+.home-hero__inner{
+  width:min(1240px,calc(100% - 48px));
+  margin-inline:auto;
+  flex:1 0 auto;
+  padding-block:48px 96px;
+}
+.season-event--wide{
+  width:100%;
+  grid-template-columns:minmax(205px,.72fr) minmax(460px,1.7fr) minmax(250px,.82fr);
+  min-height:118px;
+  border:1px solid rgba(230,45,49,.78);
+  box-shadow:0 20px 55px rgba(0,0,0,.55),0 0 34px rgba(220,44,49,.16),inset 0 0 35px rgba(220,44,49,.05);
+}
+.season-event--wide .season-event__title strong{font-size:clamp(31px,3vw,48px)}
+.season-event--wide .season-event__clock strong{font-size:clamp(38px,4vw,60px)}
+.home-live-card{border-color:rgba(220,44,49,.64);box-shadow:0 25px 70px rgba(0,0,0,.52),0 0 30px rgba(220,44,49,.11),inset 0 0 34px rgba(145,22,25,.06)}
+
+.home-world{padding:100px 0 115px}
+.home-world__grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:none;
+  gap:18px;
+}
+.home-world-card,
+.home-world-card--large,
+.home-world-card--wide{
+  min-height:430px;
+  grid-row:auto;
+  padding:28px;
+}
+.home-world-card h3,
+.home-world-card--large h3{
+  font-size:clamp(38px,4.1vw,60px);
+  max-width:560px;
+}
+.home-world-card__image{
+  filter:saturate(1.02) contrast(1.08) brightness(.82);
+}
+.home-world-card:before{
+  background:
+    linear-gradient(180deg,rgba(5,4,4,.06) 0%,rgba(5,4,4,.18) 42%,rgba(5,4,4,.94) 100%),
+    linear-gradient(90deg,rgba(5,4,4,.32),transparent 68%);
+}
+.home-world-card:hover .home-world-card__image{
+  transform:scale(1.085);
+  filter:saturate(1.14) contrast(1.1) brightness(.9);
+}
+.home-world-card__number{
+  display:inline-flex;
+  width:max-content;
+  padding:7px 10px;
+  background:rgba(7,6,6,.62);
+  border:1px solid rgba(220,44,49,.28);
+  backdrop-filter:blur(7px);
+}
+.home-world-card__link{color:#fff}
+
+@media(max-width:1050px){
+  .home-countdown-wrap,.home-hero__inner{width:min(100% - 34px,1240px)}
+  .season-event--wide{grid-template-columns:1fr;gap:13px}
+  .home-world__grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:780px){
+  .home-countdown-wrap,.home-hero__inner{width:min(100% - 24px,1240px)}
+  .home-world__grid{grid-template-columns:1fr}
+  .home-world-card,.home-world-card--large,.home-world-card--wide{min-height:370px}
+}
