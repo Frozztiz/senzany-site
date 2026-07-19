@@ -1,84 +1,159 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Jouer — SENZANY</title>
-
-<link href="assets/css/pages/jouer.css" rel="stylesheet"/></head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta name="description" content="Rejoignez Senzany, serveur DayZ PVE français : connexion, installation des mods et accès à la communauté."/>
+  <title>Jouer — SENZANY</title>
+  <link href="assets/css/pages/jouer.css" rel="stylesheet"/>
+</head>
 <body data-page="jouer">
-<div data-site-header=""></div>
-<div class="page-header">
-<div class="wrap">
-<div class="page-tag">Rejoindre l'aventure</div>
-<h1 class="page-title">Rejoignez Senzany</h1>
-<p class="page-sub">Senzany est un serveur PVE unique, pensé pour la survie, l’entraide et la découverte. Pas de combats entre joueurs : vos seuls ennemis sont les infectés, la faim et l’hiver.</p>
-</div>
-</div>
-<section>
-<div class="wrap">
-<div class="join-layout">
-<div>
-<div class="server-panel">
-<div class="section-tag">Informations du serveur</div>
-<h2 class="section-title" style="font-size:30px;margin-bottom:10px;">Connexion directe</h2>
-<div class="info-line"><span>IP du serveur</span><strong class="mono" id="serverIp">208.115.196.109:2302</strong></div>
-<div class="info-line"><span>Mode de jeu</span><strong>PVE</strong></div>
-<div class="info-line"><span>Carte</span><strong>Chernarusplus</strong></div>
-<div class="info-line"><span>Slots</span><strong id="slotsInfo">26 / 50</strong></div>
-<div class="info-line"><span>Prochain wipe</span><strong>21/07</strong></div>
-<div class="info-line"><span>Fréquence des wipes</span><strong>Tous les 3 mois</strong></div>
-<div class="info-line"><span>Uptime</span><strong>99.8%</strong></div>
-<button class="btn btn-solid btn-sm" id="copyIpBtn" style="margin-top:18px;">Copier l'IP</button>
-</div>
-<div class="steps-panel">
-<div class="section-tag">Comment nous rejoindre ?</div>
-<div class="join-step"><span class="step-num">1</span><span>Lancez DayZ.</span></div>
-<div class="join-step"><span class="step-num">2</span><span>Allez dans l’onglet Multijoueur.</span></div>
-<div class="join-step"><span class="step-num">3</span><span>Recherchez « Senzany » dans la liste.</span></div>
-<div class="join-step"><span class="step-num">4</span><span>Cliquez sur Rejoindre et suivez les instructions.</span></div>
-</div>
-</div>
-<aside class="join-reasons">
-<h3>Pourquoi nous rejoindre ?</h3>
-<div class="reason"><div class="reason-icon">♨</div><div><h4>Expérience PVE unique</h4><p>Un monde sans joueurs ennemis, axé sur la survie et l’immersion.</p></div></div>
-<div class="reason"><div class="reason-icon">◉</div><div><h4>Économie avancée</h4><p>Traders, véhicules, coffres-forts et système économique complet.</p></div></div>
-<div class="reason"><div class="reason-icon">◆</div><div><h4>Événements réguliers</h4><p>Des événements immersifs organisés par notre équipe.</p></div></div>
-<div class="reason"><div class="reason-icon">●</div><div><h4>Communauté active</h4><p>Une communauté mature, entraide et 100 % française.</p></div></div>
-<div class="reason"><div class="reason-icon">★</div><div><h4>Staff réactif</h4><p>Une équipe présente et à l’écoute pour vous accompagner.</p></div></div>
-</aside>
-</div>
-</div>
-</section>
-<section class="video-section">
-<div class="wrap">
-<div class="official-video">
-<div>
-<div class="section-tag">Vidéos officielles</div>
-<div class="video-frame"><iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="" src="https://www.youtube.com/embed/3Uf5WygzmrI" title="Les 1 an de Senzany"></iframe></div>
-</div>
-<div class="video-copy">
-<h3>Les 1 an de Senzany</h3>
-<p>Revivez une année d’aventure, d’événements et de moments forts vécus avec toute la communauté Senzany.</p>
-<ul class="video-list"><li>Les plus beaux événements</li><li>Les meilleurs moments de la communauté</li><li>Des rencontres inoubliables</li><li>Et bien plus encore…</li></ul>
-<a class="btn btn-solid" href="https://www.youtube.com/watch?v=3Uf5WygzmrI" rel="noopener" target="_blank">Regarder sur YouTube ↗</a>
-</div>
-</div>
-</div>
-</section>
-<section style="border-bottom:none;">
-<div class="wrap" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; background:var(--panel); border:1px solid var(--blood); padding:24px 32px;">
-<div>
-<h3 style="font-family:'Anton',sans-serif; text-transform:uppercase; font-size:18px;">Rejoignez la communauté Senzany</h3>
-<p style="color:var(--paper-dim); font-size:13px; margin-top:6px;">Plus de 1000 survivants vous attendent sur Discord.</p>
-</div>
-<a class="btn btn-solid" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" style="display:inline-block;" target="_blank">Rejoindre Discord</a>
-</div>
-</section>
-<div data-site-footer=""></div>
-<script defer="True" src="assets/js/components.js"></script><script defer="True" src="assets/js/app.js"></script><script>
+  <div data-site-header></div>
 
-</script>
-<script defer src="assets/js/api.js"></script><script defer src="assets/js/pages/jouer.js"></script>
+  <main>
+    <section class="play-hero" aria-labelledby="play-title">
+      <div class="play-hero__shade"></div>
+      <div class="play-hero__embers" aria-hidden="true"></div>
+      <div class="wrap play-hero__grid">
+        <div class="play-hero__content">
+          <p class="eyebrow">PROTOCOLE D'ENTRÉE // SENZANY</p>
+          <h1 id="play-title">ENTREZ DANS<br><span>L'UNIVERS SENZANY</span></h1>
+          <p class="play-hero__lead">Un serveur DayZ PVE français où chaque survivant progresse à son rythme, construit son histoire et affronte un monde conçu pour durer.</p>
+
+          <div class="play-hero__actions">
+            <a class="btn btn-primary" href="steam://connect/208.115.196.109:2302">Rejoindre le serveur <span>↗</span></a>
+            <a class="btn btn-ghost" href="#installation">Préparer mon arrivée <span>↓</span></a>
+          </div>
+
+          <div class="play-hero__proofs" aria-label="Caractéristiques principales">
+            <div><strong>100%</strong><span>PVE français</span></div>
+            <div><strong>24/7</strong><span>Serveur actif</span></div>
+            <div><strong>+18</strong><span>Staff à l'écoute</span></div>
+          </div>
+        </div>
+
+        <aside class="live-card" aria-label="État du serveur">
+          <div class="live-card__head">
+            <div class="live-card__status"><span class="status-dot" id="serverStatusDot"></span> État du serveur</div>
+            <span class="live-label" id="serverStatusLabel">CONNEXION</span>
+          </div>
+
+          <div class="live-card__players">
+            <span>Joueurs connectés</span>
+            <strong id="slotsInfo">-- / 50</strong>
+          </div>
+          <div class="capacity" aria-hidden="true"><span id="capacityFill"></span></div>
+
+          <dl class="server-data">
+            <div><dt>Adresse</dt><dd class="mono" id="serverIp">208.115.196.109:2302</dd></div>
+            <div><dt>Carte</dt><dd id="serverMap">Chernarus+</dd></div>
+            <div><dt>Mode</dt><dd>PVE</dd></div>
+            <div><dt>Prochain wipe</dt><dd>21/07</dd></div>
+          </dl>
+
+          <div class="live-card__actions">
+            <button class="copy-button" id="copyIpBtn" type="button">Copier l'adresse</button>
+            <a class="discord-link" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Discord ↗</a>
+          </div>
+        </aside>
+      </div>
+      <a class="scroll-indicator" href="#installation"><span>Commencer</span><i></i></a>
+    </section>
+
+    <section class="access-section" id="installation">
+      <div class="wrap">
+        <header class="section-intro">
+          <p class="eyebrow">01 // PROCÉDURE D'ACCÈS</p>
+          <h2>QUATRE ÉTAPES.<br><span>UNE NOUVELLE SURVIE.</span></h2>
+          <p>Tout est automatisé : rejoignez le serveur, laissez le launcher télécharger les mods et entrez dans Chernarus.</p>
+        </header>
+
+        <div class="access-steps">
+          <article class="access-step">
+            <span class="access-step__number">01</span>
+            <div class="access-step__icon">▣</div>
+            <h3>Posséder DayZ</h3>
+            <p>Installez DayZ depuis Steam et lancez-le au moins une fois afin d'initialiser votre jeu.</p>
+            <a href="https://store.steampowered.com/app/221100/DayZ/" rel="noopener" target="_blank">Ouvrir Steam ↗</a>
+          </article>
+          <article class="access-step">
+            <span class="access-step__number">02</span>
+            <div class="access-step__icon">⌕</div>
+            <h3>Trouver Senzany</h3>
+            <p>Dans le launcher DayZ, recherchez <strong>Senzany</strong> ou utilisez l'adresse directe du serveur.</p>
+            <button class="text-action" id="copyIpSecondary" type="button">Copier 208.115.196.109:2302</button>
+          </article>
+          <article class="access-step">
+            <span class="access-step__number">03</span>
+            <div class="access-step__icon">⇩</div>
+            <h3>Installer les mods</h3>
+            <p>Acceptez la configuration proposée. Le launcher télécharge et active automatiquement les mods nécessaires.</p>
+            <span class="step-note">Aucune installation manuelle</span>
+          </article>
+          <article class="access-step access-step--accent">
+            <span class="access-step__number">04</span>
+            <div class="access-step__icon">◆</div>
+            <h3>Écrire votre récit</h3>
+            <p>Créez votre personnage, rejoignez la communauté et commencez votre progression dans Senzany.</p>
+            <a href="steam://connect/208.115.196.109:2302">Lancer la connexion ↗</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="experience-section">
+      <div class="experience-visual" role="img" aria-label="Survivants dans l'univers Senzany"></div>
+      <div class="wrap experience-grid">
+        <div class="experience-copy">
+          <p class="eyebrow">02 // PLUS QU'UN SERVEUR</p>
+          <h2>UNE EXPÉRIENCE<br><span>CONSTRUITE POUR DURER</span></h2>
+          <p>Senzany ne se limite pas à survivre. Le monde évolue avec ses joueurs, ses saisons et les systèmes développés par notre équipe.</p>
+        </div>
+        <div class="experience-list">
+          <article><span>01</span><div><h3>Progression complète</h3><p>Économie, véhicules, quêtes, métiers et objectifs conçus pour des centaines d'heures.</p></div></article>
+          <article><span>02</span><div><h3>Contenu exclusif</h3><p>Environ 200 crafts, systèmes uniques, zones retravaillées et contenus saisonniers.</p></div></article>
+          <article><span>03</span><div><h3>Événements vivants</h3><p>Courses, boss, chasses au trésor et rendez-vous communautaires réguliers.</p></div></article>
+          <article><span>04</span><div><h3>Équipe présente</h3><p>Une équipe francophone réactive, transparente et disponible pour accompagner les joueurs.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="video-section">
+      <div class="wrap video-grid">
+        <div class="video-frame">
+          <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen src="https://www.youtube.com/embed/3Uf5WygzmrI" title="Les 1 an de Senzany"></iframe>
+        </div>
+        <div class="video-copy">
+          <p class="eyebrow">03 // ARCHIVES SENZANY</p>
+          <h2>UN AN DE<br><span>SURVIE PARTAGÉE</span></h2>
+          <p>Revivez les événements, les rencontres et les moments qui ont construit la communauté Senzany.</p>
+          <ul>
+            <li>Événements communautaires</li>
+            <li>Moments forts du serveur</li>
+            <li>Rencontres et souvenirs</li>
+          </ul>
+          <a class="btn btn-primary" href="https://www.youtube.com/watch?v=3Uf5WygzmrI" rel="noopener" target="_blank">Voir la vidéo complète ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="final-cta__overlay"></div>
+      <div class="wrap final-cta__content">
+        <p class="eyebrow">VOTRE HISTOIRE COMMENCE MAINTENANT</p>
+        <h2>PRÊT À ÉCRIRE<br><span>LE RÉCIT DE VOTRE MORT ?</span></h2>
+        <div class="final-cta__actions">
+          <a class="btn btn-primary" href="steam://connect/208.115.196.109:2302">Rejoindre Senzany ↗</a>
+          <a class="btn btn-ghost" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Rejoindre Discord ↗</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div data-site-footer></div>
+  <script defer src="assets/js/components.js"></script>
+  <script defer src="assets/js/app.js"></script>
+  <script defer src="assets/js/api.js"></script>
+  <script defer src="assets/js/pages/jouer.js"></script>
 </body>
 </html>
