@@ -4,9 +4,9 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Terminal du Survivant — SENZANY</title>
-  <link rel="stylesheet" href="assets/css/pages/profil-terminal-v4.css?v=4.0.0"/>
+  <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0"/>
 </head>
-<body data-page="profil" data-build="terminal-survivant-v4-command">
+<body data-page="profil" data-build="terminal-survivant-v5-living-os">
 <div id="terminalBoot" class="terminal-boot" aria-hidden="true">
   <div class="terminal-boot__box">
     <span class="terminal-boot__mark">S</span>
@@ -90,7 +90,7 @@
         <section class="core-grid" aria-label="Informations principales">
           <article class="operator-card operator-card--steam">
             <div class="operator-card__top"><span>01</span><em class="panel-state panel-state--online">Synchronisé</em></div>
-            <div class="operator-card__heading"><small>IDENTITÉ // GRID A-14</small><h3><b class="panel-icon">S</b> Compte Steam</h3></div>
+            <div class="operator-card__heading"><small>IDENTITÉ // GRID A-14</small><h3><b class="panel-icon">S</b> Dossier Steam</h3></div>
             <dl class="data-table">
               <div><dt>Pseudo</dt><dd id="identityName">—</dd></div>
               <div><dt>SteamID64</dt><dd id="steamIdValue" class="mono">—</dd></div>
@@ -101,7 +101,7 @@
 
           <article class="operator-card operator-card--dayz">
             <div class="operator-card__top"><span>02</span><em class="panel-state" id="dayzState">Lecture Steam</em></div>
-            <div class="operator-card__heading"><small>EXPÉRIENCE // NODE 02</small><h3><b class="panel-icon">T</b> Temps de jeu</h3></div>
+            <div class="operator-card__heading"><small>EXPÉRIENCE // NODE 02</small><h3><b class="panel-icon">T</b> Dossier DayZ</h3></div>
             <div class="hours-display"><strong id="dayzHours">—</strong><span>HEURES SUR DAYZ</span></div>
             <div class="progress-track"><i id="dayzMetricBar"></i></div>
             <p id="dayzExplanation">Chargement des données Steam…</p>
@@ -110,7 +110,7 @@
 
           <article class="operator-card operator-card--discord">
             <div class="operator-card__top"><span>03</span><em class="panel-state panel-state--pending" id="discordState">Non associé</em></div>
-            <div class="operator-card__heading"><small>COMMUNAUTÉ // LINK 03</small><h3><b class="panel-icon">D</b> Compte Discord</h3></div>
+            <div class="operator-card__heading"><small>COMMUNAUTÉ // LINK 03</small><h3><b class="panel-icon">D</b> Dossier Communauté</h3></div>
 
             <div id="discordUnlinked" class="discord-empty">
               <div class="discord-empty__mark">D</div>
@@ -141,37 +141,37 @@
           <p>Les systèmes ci-dessous seront activés progressivement, uniquement lorsqu’une source fiable sera disponible.</p>
         </div>
 
-        <section class="module-grid">
-          <article class="module-tile module-tile--votes"><span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--br"></span>
+        <section class="module-grid" aria-label="Modules de progression">
+          <article class="module-tile module-tile--votes module-launcher" tabindex="0" role="button" data-module-name="Votes Senzany" aria-label="Ouvrir prochainement le module Votes Senzany"><span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--br"></span>
             <div class="module-tile__head"><span>01 // VOTES</span><em>À CONNECTER</em></div>
             <div class="module-symbol">V</div><div class="module-tile__value">—</div>
             <h3>Votes Senzany</h3>
             <p>Historique personnel et récompenses liées aux votes.</p>
-            <div class="module-tile__foot">SOURCE TOP-SERVEURS À DÉFINIR</div>
+            <div class="module-tile__foot">SOURCE TOP-SERVEURS À DÉFINIR <b>OUVRIR ↗</b></div>
           </article>
 
-          <article class="module-tile module-tile--xp"><span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--br"></span>
+          <article class="module-tile module-tile--xp module-launcher" tabindex="0" role="button" data-module-name="Expérience" aria-label="Ouvrir prochainement le module Expérience"><span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--br"></span>
             <div class="module-tile__head"><span>02 // XP</span><em>À VENIR</em></div>
             <div class="module-symbol">XP</div><div class="module-tile__value">NIV. —</div>
             <h3>Expérience</h3>
             <div class="progress-track"><i></i></div>
             <p>Progression globale du compte survivant.</p>
-            <div class="module-tile__foot">SYSTÈME SERVEUR REQUIS</div>
+            <div class="module-tile__foot">SYSTÈME SERVEUR REQUIS <b>OUVRIR ↗</b></div>
           </article>
 
-          <article class="module-tile module-tile--success"><span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--br"></span>
+          <article class="module-tile module-tile--success module-launcher" tabindex="0" role="button" data-module-name="Succès" aria-label="Ouvrir prochainement le module Succès"><span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--br"></span>
             <div class="module-tile__head"><span>03 // SUCCÈS</span><em>À DÉFINIR</em></div>
             <div class="module-symbol">★</div><div class="module-tile__value">— / —</div>
             <h3>Objectifs</h3>
             <div class="achievement-row"><i></i><i></i><i></i><i></i><i></i></div>
             <p>Accomplissements débloqués pendant l’aventure.</p>
-            <div class="module-tile__foot">RÈGLES À DÉFINIR</div>
+            <div class="module-tile__foot">RÈGLES À DÉFINIR <b>OUVRIR ↗</b></div>
           </article>
 
 
         </section>
 
-        <section class="battlepass-command" aria-label="Battle Pass Senzany">
+        <section class="battlepass-command module-launcher" tabindex="0" role="button" data-module-name="Battle Pass" aria-label="Ouvrir prochainement le Battle Pass Senzany">
           <span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--tr"></span><span class="hud-corner hud-corner--bl"></span><span class="hud-corner hud-corner--br"></span>
           <div class="battlepass-command__visual"><span>BP</span><strong>SAISON 01</strong><small>SENZANY // 21.07</small></div>
           <div class="battlepass-command__content">
@@ -194,6 +194,7 @@
             <div><span class="system-dot system-dot--ok"></span><strong>BASE SENZANY</strong><small>Profil relié via l’API OVH</small><em>ONLINE</em></div>
           </div>
           <div id="liveLog" class="live-log" aria-live="polite"></div>
+          <div id="moduleToast" class="module-toast" hidden></div>
         </section>
       </div>
     </div>
@@ -204,6 +205,6 @@
 <script defer src="assets/js/components.js"></script>
 <script defer src="assets/js/app.js"></script>
 <script defer src="assets/js/api.js"></script>
-<script defer src="assets/js/pages/profil-terminal-v4.js?v=4.0.0"></script>
+<script defer src="assets/js/pages/profil-terminal-v5.js?v=5.0.0"></script>
 </body>
 </html>
