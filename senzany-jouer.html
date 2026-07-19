@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <meta name="description" content="Rejoignez Senzany, serveur DayZ PVE français : connexion, installation des mods et accès à la communauté."/>
+  <meta name="description" content="Rejoignez Senzany, serveur DayZ PVE français : connexion, installation des mods et découverte de l'expérience."/>
   <title>Jouer — SENZANY</title>
   <link href="assets/css/pages/jouer.css" rel="stylesheet"/>
 </head>
@@ -12,139 +12,147 @@
 
   <main>
     <section class="play-hero" aria-labelledby="play-title">
-      <div class="play-hero__shade"></div>
+      <div class="play-hero__veil"></div>
       <div class="play-hero__embers" aria-hidden="true"></div>
       <div class="wrap play-hero__grid">
-        <div class="play-hero__content">
+        <div class="play-hero__content reveal">
           <p class="eyebrow">PROTOCOLE D'ENTRÉE // SENZANY</p>
-          <h1 id="play-title">ENTREZ DANS<br><span>L'UNIVERS SENZANY</span></h1>
-          <p class="play-hero__lead">Un serveur DayZ PVE français où chaque survivant progresse à son rythme, construit son histoire et affronte un monde conçu pour durer.</p>
-
+          <h1 id="play-title">VOTRE SURVIE<br><span>COMMENCE ICI.</span></h1>
+          <p class="play-hero__lead">Entrez dans un monde PVE français pensé pour durer : progression, exploration, économie, événements et communauté.</p>
           <div class="play-hero__actions">
-            <a class="btn btn-primary" href="steam://connect/208.115.196.109:2302">Rejoindre le serveur <span>↗</span></a>
-            <a class="btn btn-ghost" href="#installation">Préparer mon arrivée <span>↓</span></a>
+            <a class="btn btn-primary" href="steam://connect/208.115.196.109:2302">REJOINDRE LE SERVEUR <span>↗</span></a>
+            <a class="btn btn-ghost" href="#chapitre-acces">PRÉPARER MON ARRIVÉE <span>↓</span></a>
           </div>
-
-          <div class="play-hero__proofs" aria-label="Caractéristiques principales">
+          <div class="play-hero__proofs">
             <div><strong>100%</strong><span>PVE français</span></div>
             <div><strong>24/7</strong><span>Serveur actif</span></div>
             <div><strong>+18</strong><span>Staff à l'écoute</span></div>
           </div>
         </div>
 
-        <aside class="live-card" aria-label="État du serveur">
+        <aside class="live-card reveal" aria-label="État du serveur">
           <div class="live-card__head">
-            <div class="live-card__status"><span class="status-dot" id="serverStatusDot"></span> État du serveur</div>
-            <span class="live-label" id="serverStatusLabel">CONNEXION</span>
+            <span><i class="status-dot" id="serverStatusDot"></i> SERVEUR SENZANY</span>
+            <b id="serverStatusLabel">CONNEXION</b>
           </div>
-
           <div class="live-card__players">
-            <span>Joueurs connectés</span>
+            <span>JOUEURS EN LIGNE</span>
             <strong id="slotsInfo">-- / 50</strong>
           </div>
-          <div class="capacity" aria-hidden="true"><span id="capacityFill"></span></div>
-
+          <div class="capacity"><span id="capacityFill"></span></div>
           <dl class="server-data">
-            <div><dt>Adresse</dt><dd class="mono" id="serverIp">208.115.196.109:2302</dd></div>
+            <div><dt>Adresse</dt><dd class="mono">208.115.196.109:2302</dd></div>
             <div><dt>Carte</dt><dd id="serverMap">Chernarus+</dd></div>
             <div><dt>Mode</dt><dd>PVE</dd></div>
             <div><dt>Prochain wipe</dt><dd>21/07</dd></div>
           </dl>
-
           <div class="live-card__actions">
-            <button class="copy-button" id="copyIpBtn" type="button">Copier l'adresse</button>
-            <a class="discord-link" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Discord ↗</a>
+            <button id="copyIpBtn" type="button">COPIER L'ADRESSE</button>
+            <a href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">DISCORD ↗</a>
           </div>
         </aside>
       </div>
-      <a class="scroll-indicator" href="#installation"><span>Commencer</span><i></i></a>
+      <a class="scroll-cue" href="#chapitre-acces"><span>DÉCOUVRIR</span><i></i></a>
     </section>
 
-    <section class="access-section" id="installation">
+    <section class="chapter chapter-access" id="chapitre-acces">
       <div class="wrap">
-        <header class="section-intro">
-          <p class="eyebrow">01 // PROCÉDURE D'ACCÈS</p>
+        <header class="chapter-heading reveal">
+          <p class="eyebrow">CHAPITRE I // LE PASSAGE</p>
           <h2>QUATRE ÉTAPES.<br><span>UNE NOUVELLE SURVIE.</span></h2>
-          <p>Tout est automatisé : rejoignez le serveur, laissez le launcher télécharger les mods et entrez dans Chernarus.</p>
+          <p>Rejoindre Senzany ne demande aucune installation complexe. Le launcher DayZ s'occupe automatiquement des mods.</p>
         </header>
 
-        <div class="access-steps">
-          <article class="access-step">
-            <span class="access-step__number">01</span>
-            <div class="access-step__icon">▣</div>
-            <h3>Posséder DayZ</h3>
-            <p>Installez DayZ depuis Steam et lancez-le au moins une fois afin d'initialiser votre jeu.</p>
-            <a href="https://store.steampowered.com/app/221100/DayZ/" rel="noopener" target="_blank">Ouvrir Steam ↗</a>
+        <div class="access-grid">
+          <article class="access-card reveal">
+            <span class="access-card__number">01</span><span class="access-card__glyph">▣</span>
+            <h3>POSSEDER DAYZ</h3>
+            <p>Installez DayZ depuis Steam et lancez-le une première fois pour initialiser le jeu.</p>
+            <a href="https://store.steampowered.com/app/221100/DayZ/" rel="noopener" target="_blank">OUVRIR STEAM ↗</a>
           </article>
-          <article class="access-step">
-            <span class="access-step__number">02</span>
-            <div class="access-step__icon">⌕</div>
-            <h3>Trouver Senzany</h3>
-            <p>Dans le launcher DayZ, recherchez <strong>Senzany</strong> ou utilisez l'adresse directe du serveur.</p>
-            <button class="text-action" id="copyIpSecondary" type="button">Copier 208.115.196.109:2302</button>
+          <article class="access-card reveal">
+            <span class="access-card__number">02</span><span class="access-card__glyph">⌕</span>
+            <h3>TROUVER SENZANY</h3>
+            <p>Recherchez « Senzany » dans le launcher officiel ou utilisez directement notre adresse.</p>
+            <button class="text-action" id="copyIpSecondary" type="button">COPIER 208.115.196.109:2302</button>
           </article>
-          <article class="access-step">
-            <span class="access-step__number">03</span>
-            <div class="access-step__icon">⇩</div>
-            <h3>Installer les mods</h3>
-            <p>Acceptez la configuration proposée. Le launcher télécharge et active automatiquement les mods nécessaires.</p>
-            <span class="step-note">Aucune installation manuelle</span>
+          <article class="access-card reveal">
+            <span class="access-card__number">03</span><span class="access-card__glyph">⇩</span>
+            <h3>INSTALLER LES MODS</h3>
+            <p>Validez la configuration proposée. Tous les mods requis sont téléchargés et activés automatiquement.</p>
+            <span class="card-note">AUCUNE INSTALLATION MANUELLE</span>
           </article>
-          <article class="access-step access-step--accent">
-            <span class="access-step__number">04</span>
-            <div class="access-step__icon">◆</div>
-            <h3>Écrire votre récit</h3>
-            <p>Créez votre personnage, rejoignez la communauté et commencez votre progression dans Senzany.</p>
-            <a href="steam://connect/208.115.196.109:2302">Lancer la connexion ↗</a>
+          <article class="access-card access-card--accent reveal">
+            <span class="access-card__number">04</span><span class="access-card__glyph">◆</span>
+            <h3>ÉCRIRE VOTRE RÉCIT</h3>
+            <p>Créez votre personnage, découvrez nos systèmes et commencez votre progression.</p>
+            <a href="steam://connect/208.115.196.109:2302">LANCER LA CONNEXION ↗</a>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="experience-section">
-      <div class="experience-visual" role="img" aria-label="Survivants dans l'univers Senzany"></div>
-      <div class="wrap experience-grid">
-        <div class="experience-copy">
-          <p class="eyebrow">02 // PLUS QU'UN SERVEUR</p>
-          <h2>UNE EXPÉRIENCE<br><span>CONSTRUITE POUR DURER</span></h2>
-          <p>Senzany ne se limite pas à survivre. Le monde évolue avec ses joueurs, ses saisons et les systèmes développés par notre équipe.</p>
-        </div>
-        <div class="experience-list">
-          <article><span>01</span><div><h3>Progression complète</h3><p>Économie, véhicules, quêtes, métiers et objectifs conçus pour des centaines d'heures.</p></div></article>
-          <article><span>02</span><div><h3>Contenu exclusif</h3><p>Environ 200 crafts, systèmes uniques, zones retravaillées et contenus saisonniers.</p></div></article>
-          <article><span>03</span><div><h3>Événements vivants</h3><p>Courses, boss, chasses au trésor et rendez-vous communautaires réguliers.</p></div></article>
-          <article><span>04</span><div><h3>Équipe présente</h3><p>Une équipe francophone réactive, transparente et disponible pour accompagner les joueurs.</p></div></article>
+    <section class="story-break story-break--progression">
+      <div class="story-break__overlay"></div>
+      <div class="wrap story-break__content reveal">
+        <p class="eyebrow">CHAPITRE II // LA PROGRESSION</p>
+        <h2>CHAQUE SURVIVANT<br><span>CONSTRUIT SON HISTOIRE.</span></h2>
+        <p>Commencez avec peu. Progressez à votre rythme. Développez votre activité, vos équipements et votre place dans la communauté.</p>
+      </div>
+    </section>
+
+    <section class="systems-section">
+      <div class="wrap">
+        <header class="systems-heading reveal">
+          <p class="eyebrow">POURQUOI SENZANY ?</p>
+          <h2>UN MONDE QUI<br><span>NE CESSE D'ÉVOLUER.</span></h2>
+        </header>
+        <div class="systems-grid">
+          <article class="system-card system-card--progression reveal"><span>01</span><div><p>PROGRESSION</p><h3>ÉCONOMIE & MÉTIERS</h3><small>Construisez un véritable parcours sur le long terme.</small></div></article>
+          <article class="system-card system-card--craft reveal"><span>02</span><div><p>CRÉATION</p><h3>ENVIRON 200 CRAFTS</h3><small>Des recettes exclusives et de nouveaux objectifs.</small></div></article>
+          <article class="system-card system-card--events reveal"><span>03</span><div><p>RENDEZ-VOUS</p><h3>ÉVÉNEMENTS VIVANTS</h3><small>Courses, boss, chasses au trésor et événements saisonniers.</small></div></article>
+          <article class="system-card system-card--world reveal"><span>04</span><div><p>EXPLORATION</p><h3>MONDE TRANSFORMÉ</h3><small>Des zones retravaillées et des lieux à redécouvrir.</small></div></article>
+          <article class="system-card system-card--community reveal"><span>05</span><div><p>COMMUNAUTÉ</p><h3>UNE AVENTURE PARTAGÉE</h3><small>Une communauté francophone active et accueillante.</small></div></article>
+          <article class="system-card system-card--future reveal"><span>06</span><div><p>À VENIR</p><h3>IA, QUÊTES & SAISONS</h3><small>De nouveaux systèmes pour renouveler l'expérience.</small></div></article>
         </div>
       </div>
     </section>
 
-    <section class="video-section">
-      <div class="wrap video-grid">
-        <div class="video-frame">
-          <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen src="https://www.youtube.com/embed/3Uf5WygzmrI" title="Les 1 an de Senzany"></iframe>
-        </div>
-        <div class="video-copy">
-          <p class="eyebrow">03 // ARCHIVES SENZANY</p>
-          <h2>UN AN DE<br><span>SURVIE PARTAGÉE</span></h2>
-          <p>Revivez les événements, les rencontres et les moments qui ont construit la communauté Senzany.</p>
-          <ul>
-            <li>Événements communautaires</li>
-            <li>Moments forts du serveur</li>
-            <li>Rencontres et souvenirs</li>
-          </ul>
-          <a class="btn btn-primary" href="https://www.youtube.com/watch?v=3Uf5WygzmrI" rel="noopener" target="_blank">Voir la vidéo complète ↗</a>
+    <section class="story-break story-break--community">
+      <div class="story-break__overlay"></div>
+      <div class="wrap story-break__content story-break__content--right reveal">
+        <p class="eyebrow">CHAPITRE III // LA COMMUNAUTÉ</p>
+        <h2>VOUS NE SURVIVEZ<br><span>JAMAIS SEUL.</span></h2>
+        <p>Une équipe présente, des joueurs impliqués et des rendez-vous réguliers donnent vie à Senzany, saison après saison.</p>
+        <a class="btn btn-ghost" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">REJOINDRE LE DISCORD ↗</a>
+      </div>
+    </section>
+
+    <section class="archives-section">
+      <div class="wrap archives-grid reveal">
+        <a class="archives-poster" href="https://www.youtube.com/watch?v=3Uf5WygzmrI" rel="noopener" target="_blank" aria-label="Regarder les archives Senzany sur YouTube">
+          <span class="play-symbol">▶</span>
+          <span class="archives-poster__label">REGARDER LES ARCHIVES</span>
+        </a>
+        <div class="archives-copy">
+          <p class="eyebrow">ARCHIVES SENZANY</p>
+          <h2>UN AN DE<br><span>SURVIE PARTAGÉE.</span></h2>
+          <p>Revivez les événements, les rencontres et les moments qui ont construit notre communauté.</p>
+          <ul><li>Événements communautaires</li><li>Moments forts du serveur</li><li>Rencontres et souvenirs</li></ul>
+          <a class="btn btn-primary" href="https://www.youtube.com/watch?v=3Uf5WygzmrI" rel="noopener" target="_blank">VOIR SUR YOUTUBE ↗</a>
         </div>
       </div>
     </section>
 
     <section class="final-cta">
       <div class="final-cta__overlay"></div>
-      <div class="wrap final-cta__content">
-        <p class="eyebrow">VOTRE HISTOIRE COMMENCE MAINTENANT</p>
+      <div class="wrap final-cta__content reveal">
+        <p class="eyebrow">CHAPITRE IV // VOTRE HISTOIRE</p>
         <h2>PRÊT À ÉCRIRE<br><span>LE RÉCIT DE VOTRE MORT ?</span></h2>
+        <p>Le serveur est en ligne. Votre place vous attend.</p>
         <div class="final-cta__actions">
-          <a class="btn btn-primary" href="steam://connect/208.115.196.109:2302">Rejoindre Senzany ↗</a>
-          <a class="btn btn-ghost" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Rejoindre Discord ↗</a>
+          <a class="btn btn-primary" href="steam://connect/208.115.196.109:2302">REJOINDRE SENZANY ↗</a>
+          <a class="btn btn-ghost" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">REJOINDRE DISCORD ↗</a>
         </div>
       </div>
     </section>
