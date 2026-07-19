@@ -5,16 +5,16 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Boutique — SENZANY</title>
 <link href="assets/css/pages/boutique.css" rel="stylesheet"/>
-<!-- Boutique V4.0 : hero premium + collection vedette -->
+<!-- Boutique V5.0 : storefront premium + collections + animations -->
 </head>
 <body data-page="boutique">
 <div data-site-header=""></div>
 <main>
-<section class="shop-hero shop-hero--v4">
+<section class="shop-hero shop-hero--v4" data-shop-hero>
   <div class="shop-hero__veil"></div>
   <div class="shop-hero__grid"></div>
   <div class="wrap shop-hero__inner">
-    <div class="shop-hero__copy">
+    <div class="shop-hero__copy" data-reveal>
       <div class="shop-kicker mono"><span>01</span> SENZANY // BOUTIQUE OFFICIELLE</div>
       <div class="shop-hero__title">
         <span class="shop-hero__title-solid">SOUTENEZ</span>
@@ -33,7 +33,7 @@
       <div class="shop-hero__status mono"><span></span> BOUTIQUE EXTERNE SÉCURISÉE // TIP4SERV</div>
     </div>
 
-    <aside class="shop-showcase" aria-label="Collection vedette Summer Vibes">
+    <aside class="shop-showcase" aria-label="Collection vedette Summer Vibes" data-reveal data-reveal-delay="140">
       <div class="shop-showcase__top mono"><span>COLLECTION 01</span><span>DISPONIBLE</span></div>
       <div class="shop-showcase__media">
         <img src="assets/images/news/senzany-summer-vibes-2026.png" alt="Collection Summer Vibes 2026 de Senzany">
@@ -54,7 +54,7 @@
 
 <section class="summer-feature summer-feature--v4" id="collection-vedette">
   <div class="wrap">
-    <div class="summer-feature__panel">
+    <div class="summer-feature__panel" data-reveal>
       <div class="summer-feature__visual">
         <img src="assets/images/news/senzany-summer-vibes-2026.png" alt="Visuel officiel Summer Vibes 2026">
         <div class="summer-feature__badge mono">COLLECTION ACTIVE // 2026</div>
@@ -74,7 +74,70 @@
   </div>
 </section>
 
-<section class="official-monetization">
+<section class="shop-collections" id="collections">
+  <div class="wrap">
+    <div class="shop-collections__head" data-reveal>
+      <div>
+        <span class="eyebrow">CATALOGUE SENZANY</span>
+        <h2>CHOISISSEZ VOTRE<br>UNIVERS.</h2>
+      </div>
+      <p>Explorez les différentes familles de la boutique officielle. Les contenus proposés restent encadrés afin de préserver une expérience PVE cohérente et équitable.</p>
+    </div>
+
+    <div class="collection-grid">
+      <a class="collection-card collection-card--featured" href="https://senzany.tip4serv.com/" target="_blank" rel="noopener noreferrer" data-reveal>
+        <div class="collection-card__index mono">01 // COLLECTION ACTIVE</div>
+        <div class="collection-card__icon" aria-hidden="true">✦</div>
+        <div class="collection-card__body">
+          <span>SAISON 2026</span>
+          <h3>SUMMER<br>VIBES</h3>
+          <p>La collection estivale mise en avant actuellement sur Senzany.</p>
+        </div>
+        <div class="collection-card__footer"><span>DÉCOUVRIR</span><b>↗</b></div>
+      </a>
+
+      <a class="collection-card" href="https://senzany.tip4serv.com/" target="_blank" rel="noopener noreferrer" data-reveal data-reveal-delay="80">
+        <div class="collection-card__index mono">02 // IDENTITÉ</div>
+        <div class="collection-card__icon" aria-hidden="true">◈</div>
+        <div class="collection-card__body">
+          <span>PERSONNALISATION</span>
+          <h3>APPARENCES</h3>
+          <p>Des éléments visuels pensés pour affirmer votre style sans modifier l’équilibre du jeu.</p>
+        </div>
+        <div class="collection-card__footer"><span>EXPLORER</span><b>↗</b></div>
+      </a>
+
+      <a class="collection-card" href="https://senzany.tip4serv.com/" target="_blank" rel="noopener noreferrer" data-reveal data-reveal-delay="160">
+        <div class="collection-card__index mono">03 // UNIVERS</div>
+        <div class="collection-card__icon" aria-hidden="true">⌂</div>
+        <div class="collection-card__body">
+          <span>AMBIANCE</span>
+          <h3>CAMPEMENT</h3>
+          <p>Des contenus décoratifs pour enrichir votre environnement et votre identité de survivant.</p>
+        </div>
+        <div class="collection-card__footer"><span>EXPLORER</span><b>↗</b></div>
+      </a>
+
+      <a class="collection-card" href="https://senzany.tip4serv.com/" target="_blank" rel="noopener noreferrer" data-reveal data-reveal-delay="240">
+        <div class="collection-card__index mono">04 // SOUTIEN</div>
+        <div class="collection-card__icon" aria-hidden="true">◇</div>
+        <div class="collection-card__body">
+          <span>PROJET SENZANY</span>
+          <h3>ÉDITIONS<br>SPÉCIALES</h3>
+          <p>Des offres ponctuelles conçues dans le respect du cadre officiel de monétisation.</p>
+        </div>
+        <div class="collection-card__footer"><span>EXPLORER</span><b>↗</b></div>
+      </a>
+    </div>
+
+    <div class="shop-collections__notice mono" data-reveal>
+      <span>CADRE DE MONÉTISATION ACTIF</span>
+      <p>Les intitulés et contenus réels sont consultables sur Tip4Serv. La boutique Senzany ne présente aucun avantage comme une garantie de domination en jeu.</p>
+    </div>
+  </div>
+</section>
+
+<section class="official-monetization" data-reveal>
   <div class="wrap">
     <div class="official-monetization__panel">
       <div class="official-monetization__content">
@@ -89,7 +152,7 @@
   </div>
 </section>
 
-<section class="shop-framework" id="engagements">
+<section class="shop-framework" id="engagements" data-reveal>
   <div class="wrap">
     <div class="section-head section-head--center">
       <span class="eyebrow">NOTRE CADRE</span>
@@ -104,7 +167,7 @@
     <div class="rules-strip"><div><span>BOHEMIA INTERACTIVE // DAYZ</span><strong>UN CADRE CLAIR, UNE EXPÉRIENCE PRÉSERVÉE</strong><p>Nous maintenons une séparation nette entre soutien au projet et avantages susceptibles de déséquilibrer l'expérience de jeu.</p></div><a href="https://www.bohemia.net/monetization" target="_blank" rel="noopener">LIRE LES RÈGLES OFFICIELLES ↗</a></div>
   </div>
 </section>
-<section class="shop-support">
+<section class="shop-support" data-reveal>
  <div class="wrap">
   <div class="support-intro"><span class="eyebrow">VOTRE SOUTIEN SERT CONCRÈTEMENT</span><h2>FAIRE VIVRE SENZANY<br>SUR LE LONG TERME</h2><p>Chaque soutien reçu alimente une seule ambition : maintenir, développer et enrichir durablement l'écosystème Senzany.</p></div>
   <div class="support-flow">
@@ -120,5 +183,6 @@
 <div data-site-footer=""></div>
 <script defer src="assets/js/components.js"></script>
 <script defer src="assets/js/app.js"></script>
+<script defer src="assets/js/pages/boutique.js"></script>
 </body>
 </html>

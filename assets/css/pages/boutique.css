@@ -367,3 +367,206 @@ body{background-color:var(--bg)!important;background-image:url('../../images/bac
 @media(max-width:1050px){.shop-hero--v4 .shop-hero__inner{grid-template-columns:1fr .62fr;gap:35px}.shop-showcase__body h2{font-size:45px}.shop-hero__ticker{justify-content:flex-start}}
 @media(max-width:860px){.shop-hero--v4{min-height:auto}.shop-hero--v4 .shop-hero__inner{grid-template-columns:1fr;padding-top:135px;padding-bottom:95px}.shop-showcase{width:min(100%,520px);transform:none}.shop-showcase:hover{transform:translateY(-6px)}.shop-hero__ticker{display:none}.summer-feature--v4 .summer-feature__panel{grid-template-columns:1fr}.summer-feature--v4 .summer-feature__visual{min-height:390px}.summer-feature--v4 .summer-feature__visual::after{background:linear-gradient(0deg,rgba(10,8,8,.86),transparent 52%)}}
 @media(max-width:620px){.shop-hero--v4 .shop-hero__inner{padding-top:115px;padding-bottom:75px}.shop-hero--v4 .shop-hero__title-solid{font-size:clamp(58px,17vw,82px)}.shop-hero--v4 .shop-hero__title-outline{font-size:clamp(50px,15vw,72px)}.shop-hero__meta{width:100%}.shop-hero__meta div{min-width:calc(50% - 10px);padding-right:12px;margin-right:10px}.shop-hero__meta div:nth-child(2){border-right:0}.shop-hero__meta div:last-child{width:100%;border-top:1px solid rgba(255,255,255,.10);margin:0}.shop-showcase__media{height:210px}.summer-feature--v4{padding:56px 0}.summer-feature--v4 .summer-feature__visual{min-height:300px}.summer-feature--v4 .summer-feature__content{padding:38px 25px}.summer-feature__footer{align-items:flex-start;flex-direction:column}}
+
+
+/* ============================================================
+   V5.0 — STOREFRONT / COLLECTIONS / MICRO-INTERACTIONS
+   ============================================================ */
+.shop-collections{
+  position:relative;
+  padding:105px 0 112px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 12% 10%,rgba(140,31,31,.13),transparent 28%),
+    linear-gradient(180deg,#0c0908 0%,#080706 100%);
+  border-top:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.shop-collections::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.16;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(90deg,transparent 0,transparent 159px,rgba(255,255,255,.035) 160px),
+    repeating-linear-gradient(0deg,transparent 0,transparent 159px,rgba(255,255,255,.022) 160px);
+  mask-image:linear-gradient(180deg,#000,transparent 88%);
+}
+.shop-collections .wrap{position:relative;z-index:1}
+.shop-collections__head{
+  display:grid;
+  grid-template-columns:minmax(0,.95fr) minmax(320px,.7fr);
+  align-items:end;
+  gap:70px;
+  margin-bottom:46px;
+}
+.shop-collections__head h2{
+  margin-top:12px;
+  font-family:'Anton',sans-serif;
+  font-size:clamp(52px,6.2vw,90px);
+  font-weight:400;
+  line-height:.88;
+  letter-spacing:-.02em;
+}
+.shop-collections__head p{
+  max-width:520px;
+  color:#a79e95;
+  font-size:16px;
+  line-height:1.75;
+}
+.collection-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+}
+.collection-card{
+  position:relative;
+  min-height:430px;
+  display:flex;
+  flex-direction:column;
+  padding:19px 20px 20px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.11);
+  background:linear-gradient(155deg,rgba(26,21,19,.92),rgba(10,8,8,.97));
+  box-shadow:0 18px 50px rgba(0,0,0,.25);
+  transition:transform .38s cubic-bezier(.2,.75,.25,1),border-color .38s ease,box-shadow .38s ease;
+}
+.collection-card::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  pointer-events:none;
+  opacity:.42;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.06),transparent 35%),
+    radial-gradient(circle at 50% 30%,rgba(140,31,31,.17),transparent 44%);
+  transition:opacity .35s ease,transform .5s ease;
+}
+.collection-card::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:3px;
+  background:linear-gradient(90deg,var(--blood),var(--blood-bright));
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform .35s ease;
+}
+.collection-card:hover{
+  transform:translateY(-10px);
+  border-color:rgba(209,39,44,.55);
+  box-shadow:0 30px 70px rgba(0,0,0,.44),0 0 35px rgba(140,31,31,.09);
+}
+.collection-card:hover::before{opacity:.8;transform:scale(1.04)}
+.collection-card:hover::after{transform:scaleX(1)}
+.collection-card--featured{
+  background:
+    linear-gradient(165deg,rgba(81,20,22,.42),rgba(14,9,8,.97)),
+    url('../../images/news/senzany-summer-vibes-2026.png') center/cover;
+}
+.collection-card--featured::before{
+  opacity:1;
+  background:linear-gradient(180deg,rgba(8,7,7,.18),rgba(8,7,7,.95) 70%),linear-gradient(135deg,rgba(140,31,31,.28),transparent 55%);
+}
+.collection-card__index{
+  position:relative;
+  z-index:1;
+  font-size:8px;
+  letter-spacing:.14em;
+  color:#817870;
+}
+.collection-card__icon{
+  position:relative;
+  z-index:1;
+  display:grid;
+  place-items:center;
+  width:62px;
+  height:62px;
+  margin:38px 0 auto;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(9,7,7,.45);
+  color:#eee5da;
+  font-size:27px;
+  transition:transform .35s ease,border-color .35s ease,background .35s ease;
+}
+.collection-card:hover .collection-card__icon{
+  transform:translateY(-5px) rotate(-3deg);
+  border-color:rgba(209,39,44,.7);
+  background:rgba(140,31,31,.24);
+}
+.collection-card__body{position:relative;z-index:1;margin-top:42px}
+.collection-card__body>span{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:8px;
+  letter-spacing:.15em;
+  color:var(--blood-bright);
+}
+.collection-card__body h3{
+  margin:10px 0 14px;
+  font-family:'Anton',sans-serif;
+  font-size:clamp(34px,3vw,48px);
+  font-weight:400;
+  line-height:.9;
+}
+.collection-card__body p{color:#918981;font-size:13px;line-height:1.58}
+.collection-card--featured .collection-card__body p{color:#c3b9b0}
+.collection-card__footer{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:25px;
+  padding-top:15px;
+  border-top:1px solid rgba(255,255,255,.11);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:8px;
+  letter-spacing:.14em;
+  color:#b8aea5;
+}
+.collection-card__footer b{font-size:16px;color:var(--blood-bright);transition:transform .25s ease}
+.collection-card:hover .collection-card__footer b{transform:translate(3px,-3px)}
+.shop-collections__notice{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:30px;
+  align-items:center;
+  margin-top:18px;
+  padding:17px 20px;
+  border:1px solid rgba(255,255,255,.08);
+  border-left:3px solid var(--blood);
+  background:rgba(255,255,255,.025);
+}
+.shop-collections__notice span{font-size:8px;letter-spacing:.13em;color:#d5ccc2;white-space:nowrap}
+.shop-collections__notice p{font-size:9px;line-height:1.65;letter-spacing:.04em;color:#79716a}
+
+/* Reveal progressif, désactivé automatiquement sans JavaScript. */
+.js .shop-page [data-reveal]{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.75,.25,1);transition-delay:var(--reveal-delay,0ms)}
+.js .shop-page [data-reveal].is-visible{opacity:1;transform:none}
+
+/* Léger mouvement du décor du hero : aucune incidence sur la lisibilité. */
+.shop-hero--v4 .shop-hero__grid,
+.shop-hero--v4 .shop-hero__veil{transition:transform .35s ease-out}
+
+@media(max-width:1080px){
+  .collection-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .collection-card{min-height:390px}
+}
+@media(max-width:760px){
+  .shop-collections{padding:76px 0 82px}
+  .shop-collections__head{grid-template-columns:1fr;gap:25px}
+  .shop-collections__head p{max-width:none}
+  .shop-collections__notice{grid-template-columns:1fr;gap:8px}
+}
+@media(max-width:560px){
+  .collection-grid{grid-template-columns:1fr}
+  .collection-card{min-height:360px}
+  .collection-card__icon{margin-top:28px}
+}
+@media(prefers-reduced-motion:reduce){
+  .js .shop-page [data-reveal]{opacity:1;transform:none;transition:none}
+  .collection-card,.collection-card::before,.collection-card::after,.collection-card__icon{transition:none}
+}
