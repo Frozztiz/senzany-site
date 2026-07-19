@@ -34,7 +34,6 @@
     ['wiki','senzany-wiki.html','Wiki'],
     ['evenements','senzany-evenements.html','Événements'],
     ['boutique','senzany-boutique.html','Boutique'],
-    ['support','senzany-support.html','Support'],
     ['profil','senzany-profil.html','Mon profil'],
     ['staff','senzany-staff.html','Staff']
   ];
@@ -73,7 +72,7 @@
             <p>Serveur PVE DayZ sur Chernarus. Communauté 100% française.</p>
           </div>
           <div class="footer-links">
-            <div class="footer-col"><h4>Liens utiles</h4><a href="index.html">Accueil</a><a href="senzany-communaute.html">Communauté</a><a href="senzany-staff.html">Staff</a><a href="senzany-wiki.html">Wiki</a><a href="senzany-evenements.html">Événements</a><a href="senzany-boutique.html">Boutique</a><a href="senzany-support.html">Support</a></div>
+            <div class="footer-col"><h4>Liens utiles</h4><a href="index.html">Accueil</a><a href="senzany-communaute.html">Communauté</a><a href="senzany-staff.html">Staff</a><a href="senzany-wiki.html">Wiki</a><a href="senzany-evenements.html">Événements</a><a href="senzany-boutique.html">Boutique</a></div>
             <div class="footer-col"><h4>Informations</h4><a href="#">Règlement</a><a href="#">Conditions d'utilisation</a><a href="#">Politique de confidentialité</a></div>
             <div class="footer-col"><h4>Nous contacter</h4><a href="mailto:support@senzany.com">support@senzany.com</a><a href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Discord</a></div>
           </div>
