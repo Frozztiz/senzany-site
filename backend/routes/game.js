@@ -1,104 +1,87 @@
 const express = require("express");
+const { GameDig } = require("gamedig");
 
 const router = express.Router();
 
-const DEFAULT_SERVER_ADDRESS = "208.115.196.109:2302";
+const DEFAULT_SERVER_HOST = "208.115.196.109";
+const DEFAULT_GAME_PORT = 2302;
+const DEFAULT_QUERY_PORT = 2305;
 const DEFAULT_MAX_PLAYERS = 50;
-const REQUEST_TIMEOUT_MS = 8000;
 
 router.get("/stats", async (req, res) => {
-  const apiKey = process.env.STEAM_API_KEY;
-  const serverAddress =
-    process.env.DAYZ_SERVER_ADDRESS || DEFAULT_SERVER_ADDRESS;
-  const fallbackMaxPlayers = Number(
-    process.env.DAYZ_MAX_PLAYERS || DEFAULT_MAX_PLAYERS
+  const host =
+    process.env.DAYZ_SERVER_HOST ||
+    DEFAULT_SERVER_HOST;
+
+  const gamePort = Number(
+    process.env.DAYZ_SERVER_PORT ||
+    DEFAULT_GAME_PORT
   );
 
-  res.set("Cache-Control", "public, max-age=30, stale-while-revalidate=60");
+  const queryPort = Number(
+    process.env.DAYZ_QUERY_PORT ||
+    DEFAULT_QUERY_PORT
+  );
 
-  if (!apiKey) {
-    return res.status(500).json({
-      online: false,
-      players: null,
-      maxPlayers: fallbackMaxPlayers,
-      map: "chernarusplus",
-      source: "steam-web-api",
-      error: "STEAM_API_KEY manquant dans le fichier .env du backend OVH.",
-      updatedAt: new Date().toISOString(),
-    });
-  }
+  const fallbackMaxPlayers = Number(
+    process.env.DAYZ_MAX_PLAYERS ||
+    DEFAULT_MAX_PLAYERS
+  );
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  res.set(
+    "Cache-Control",
+    "public, max-age=30, stale-while-revalidate=60"
+  );
 
   try {
-    const filter = encodeURIComponent(`\\gameaddr\\${serverAddress}`);
-    const url =
-      "https://api.steampowered.com/IGameServersService/GetServerList/v1/" +
-      `?key=${encodeURIComponent(apiKey)}&filter=${filter}&limit=1`;
-
-    const steamResponse = await fetch(url, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "User-Agent": "Senzany-Portal/1.0",
-      },
-      signal: controller.signal,
+    const state = await GameDig.query({
+      type: "dayz",
+      host,
+      port: queryPort,
+      socketTimeout: 4000,
+      attemptTimeout: 8000,
+      maxRetries: 1,
     });
 
-    if (!steamResponse.ok) {
-      throw new Error(`Steam a répondu avec le statut ${steamResponse.status}`);
-    }
-
-    const data = await steamResponse.json();
-    const servers = data?.response?.servers;
-
-    if (!Array.isArray(servers) || servers.length === 0) {
-      return res.status(200).json({
-        online: false,
-        players: null,
-        maxPlayers: fallbackMaxPlayers,
-        map: "chernarusplus",
-        source: "steam-web-api",
-        serverAddress,
-        error: "Serveur introuvable dans l'API Steam.",
-        updatedAt: new Date().toISOString(),
-      });
-    }
-
-    const server = servers[0];
+    const connectedPlayers = Array.isArray(state.players)
+      ? state.players.length
+      : Number(state.numplayers || 0);
 
     return res.status(200).json({
       online: true,
-      players: Number(server.players ?? 0),
-      maxPlayers: Number(server.max_players ?? fallbackMaxPlayers),
-      map: server.map || "chernarusplus",
-      name: server.name || "Senzany",
-      bots: Number(server.bots ?? 0),
-      source: "steam-web-api",
-      serverAddress,
+      players: connectedPlayers,
+      maxPlayers: Number(state.maxplayers || fallbackMaxPlayers),
+      map: state.map || "chernarusplus",
+      name: state.name || "Senzany",
+      bots: Number(state.bots || 0),
+      ping: Number(state.ping || 0),
+      source: "direct-dayz-query",
+      serverAddress: `${host}:${gamePort}`,
+      queryAddress: `${host}:${queryPort}`,
       updatedAt: new Date().toISOString(),
     });
   } catch (error) {
     const message =
-      error?.name === "AbortError"
-        ? `Délai dépassé après ${REQUEST_TIMEOUT_MS} ms lors de l'appel à Steam.`
-        : error?.message || "Impossible de contacter Steam.";
+      error instanceof Error
+        ? error.message
+        : "Impossible d'interroger directement le serveur DayZ.";
 
-    console.error("Erreur Steam Web API DayZ :", message);
+    console.error(
+      "Erreur interrogation directe serveur DayZ :",
+      message
+    );
 
     return res.status(200).json({
       online: false,
       players: null,
       maxPlayers: fallbackMaxPlayers,
       map: "chernarusplus",
-      source: "steam-web-api",
-      serverAddress,
+      source: "direct-dayz-query",
+      serverAddress: `${host}:${gamePort}`,
+      queryAddress: `${host}:${queryPort}`,
       error: message,
       updatedAt: new Date().toISOString(),
     });
-  } finally {
-    clearTimeout(timeout);
   }
 });
 
