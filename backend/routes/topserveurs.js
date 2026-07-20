@@ -1,45 +1,55 @@
-const express = require("express");
-const router = express.Router();
-
-const topServeursService = require("../services/topServeursService");
-const supabaseService = require("../services/supabaseService");
-const { verifySteamId } = require("../utils/steamSession");
-
-router.get("/stats", async (req, res) => {
-  try {
-    const stats = await topServeursService.getStats();
-    res.json(stats);
-  } catch (err) {
-    console.error("Top-Serveurs stats:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
 router.get("/my-votes", async (req, res) => {
   res.set("Cache-Control", "no-store");
 
   try {
     const secret = process.env.SESSION_SECRET;
-    if (!secret) return res.status(500).json({ error: "SESSION_SECRET manquant." });
-
-    const steamId = verifySteamId(req.cookies?.senzany_session, secret);
-    if (!steamId) return res.status(401).json({ error: "Connexion Steam requise." });
-
-    const discordLink = await supabaseService.getLinkBySteamId(steamId);
-    if (!discordLink?.discord_id) {
-      return res.json({ linked: false, found: false, votes: null, position: null });
+    if (!secret) {
+      return res.status(500).json({
+        error: "SESSION_SECRET manquant.",
+      });
     }
 
-    const result = await topServeursService.getPlayerVotes({
+    const steamId = verifySteamId(
+      req.cookies?.senzany_session,
+      secret
+    );
+
+    if (!steamId) {
+      return res.status(401).json({
+        error: "Connexion Steam requise.",
+      });
+    }
+
+    const discordLink =
+      await supabaseService.getLinkBySteamId(steamId);
+
+    if (!discordLink?.discord_id) {
+      return res.json({
+        linked: false,
+        found: false,
+        votes: null,
+        position: null,
+      });
+    }
+
+    console.log("==== MY VOTES ====");
+    console.log({
       discordId: discordLink.discord_id,
       discordUsername: discordLink.discord_username,
     });
 
+    const result =
+      await topServeursService.getPlayerVotes({
+        discordId: discordLink.discord_id,
+        discordUsername: discordLink.discord_username,
+      });
+
     return res.json(result);
   } catch (err) {
     console.error("Top-Serveurs my-votes:", err);
-    return res.status(502).json({ error: "Classement Top-Serveurs indisponible." });
+
+    return res.status(502).json({
+      error: "Classement Top-Serveurs indisponible.",
+    });
   }
 });
-
-module.exports = router;
