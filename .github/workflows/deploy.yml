@@ -29,28 +29,48 @@ jobs:
 
               cd /var/www/senzany
 
-              echo "Synchronisation avec GitHub..."
+              echo "=== Synchronisation Git ==="
               git fetch origin main
               git reset --hard origin/main
               git clean -fd
 
-              echo "Préparation du backend..."
+              echo "=== Préparation du backend ==="
               mkdir -p /var/www/senzany/server
 
-              cp -f /var/www/senzany/backend/server.js /var/www/senzany/server/server.js
-              cp -f /var/www/senzany/backend/package.json /var/www/senzany/server/package.json
+              cp -f backend/server.js server/server.js
+              cp -f backend/package.json server/package.json
 
               for directory in config controllers middleware routes services utils; do
-                if [ -d "/var/www/senzany/backend/$directory" ]; then
-                  mkdir -p "/var/www/senzany/server/$directory"
-                  cp -rf "/var/www/senzany/backend/$directory/." "/var/www/senzany/server/$directory/"
+                if [ -d "backend/$directory" ]; then
+                  mkdir -p "server/$directory"
+                  cp -rf "backend/$directory/." "server/$directory/"
                 fi
               done
 
               cd /var/www/senzany/server
+
+              echo "=== Installation des dépendances ==="
               npm install --omit=dev
+
+              echo "=== Redémarrage de l API ==="
               pm2 restart senzany-api --update-env || pm2 start server.js --name senzany-api
               pm2 save
 
-              echo "Déploiement terminé."
+              echo "=== Vérification de l API ==="
+              sleep 4
+
+              if curl --fail --silent --show-error http://127.0.0.1:3000/api/health; then
+                echo ""
+                echo "API Senzany opérationnelle."
+              else
+                echo ""
+                echo "ERREUR : l API ne répond pas sur le port 3000."
+                echo "=== État PM2 ==="
+                pm2 status
+                echo "=== Informations du processus ==="
+                pm2 describe senzany-api || true
+                echo "=== Derniers logs ==="
+                pm2 logs senzany-api --lines 100 --nostream || true
+                exit 1
+              fi
             '
