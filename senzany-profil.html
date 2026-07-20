@@ -144,11 +144,11 @@
 
         <section class="module-grid" aria-label="Modules de progression">
           <article class="module-tile module-tile--votes module-launcher" tabindex="0" role="button" data-module-name="Votes Senzany" aria-label="Ouvrir prochainement le module Votes Senzany"><span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--br"></span>
-            <div class="module-tile__head"><span>01 // VOTES</span><em>À CONNECTER</em></div>
-            <div class="module-symbol">V</div><div class="module-tile__value">—</div>
+            <div class="module-tile__head"><span>01 // VOTES</span><em id="votesModuleState">SYNCHRONISATION</em></div>
+            <div class="module-symbol">V</div><div class="module-tile__value" id="personalVotesValue">—</div>
             <h3>Votes Senzany</h3>
-            <p>Historique personnel et récompenses liées aux votes.</p>
-            <div class="module-tile__foot">SOURCE TOP-SERVEURS À DÉFINIR <b>OUVRIR ↗</b></div>
+            <p id="personalVotesText">Votes personnels enregistrés ce mois-ci.</p>
+            <div class="module-tile__foot" id="personalVotesFoot">SOURCE // TOP-SERVEURS <b>ACTUALISATION…</b></div>
           </article>
 
           <article class="module-tile module-tile--xp module-launcher" tabindex="0" role="button" data-module-name="Expérience" aria-label="Ouvrir prochainement le module Expérience"><span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--br"></span>
@@ -205,7 +205,7 @@
 <div data-site-footer></div>
 <script defer src="assets/js/components.js"></script>
 <script defer src="assets/js/app.js"></script>
-<script defer src="assets/js/api.js"></script>
-<script defer src="assets/js/pages/profil-terminal-v5.js?v=5.0.0"></script>
+<script defer src="assets/js/api.js?v=20260720-votes1"></script>
+<script defer src="assets/js/pages/profil-terminal-v5.js?v=5.1.0"></script>
 </body>
 </html>

@@ -19,7 +19,8 @@
       unlink: () => request('/api/discord/unlink', { method: 'POST' })
     }),
     topServeurs: Object.freeze({
-      getStats: () => request('/api/topserveurs/stats')
+      getStats: () => request('/api/topserveurs/stats'),
+      getMyVotes: () => request('/api/topserveurs/my-votes')
     }),
     game: Object.freeze({
       getStats: () => request('/api/game/stats')
