@@ -26,9 +26,15 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 \
             "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" '
               set -e
-              cd /var/www/senzany
-              git pull --ff-only origin main
 
+              cd /var/www/senzany
+
+              echo "Synchronisation avec GitHub..."
+              git fetch origin main
+              git reset --hard origin/main
+              git clean -fd
+
+              echo "Préparation du backend..."
               mkdir -p /var/www/senzany/server
 
               cp -f /var/www/senzany/backend/server.js /var/www/senzany/server/server.js
@@ -45,4 +51,6 @@ jobs:
               npm install --omit=dev
               pm2 restart senzany-api --update-env || pm2 start server.js --name senzany-api
               pm2 save
+
+              echo "Déploiement terminé."
             '
