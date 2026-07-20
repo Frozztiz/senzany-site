@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+
+  <title>Centre de commandement — SENZANY</title>
+
+  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=1.1.0" />
+</head>
+
+<body data-page="admin" data-build="admin-control-center-v1">
+  <div data-site-header></div>
+
+  <main class="admin-main">
+    <section class="admin-hero">
+      <div class="admin-hero__grid" aria-hidden="true"></div>
+
+      <div class="admin-wrap admin-hero__content">
+        <span class="admin-kicker">SENZANY NETWORK // ACCÈS RESTREINT</span>
+
+        <h1>
+          CENTRE DE
+          <strong>COMMANDEMENT</strong>
+        </h1>
+
+        <p>
+          Interface sécurisée destinée au staff Senzany pour superviser les
+          joueurs, préparer les livraisons et administrer les futurs modules du
+          portail.
+        </p>
+      </div>
+    </section>
+
+    <section class="admin-panel-section">
+      <div class="admin-wrap">
+        <!-- Vérification de la session -->
+        <section id="adminLoading" class="admin-gate">
+          <div class="admin-gate__icon" aria-hidden="true">S</div>
+
+          <div>
+            <span>VÉRIFICATION DE L’ACCÈS</span>
+            <h2>Initialisation du terminal staff…</h2>
+            <p>Vérification de ta session Steam et de tes autorisations.</p>
+          </div>
+        </section>
+
+        <!-- Utilisateur non connecté -->
+        <section id="adminLoggedOut" class="admin-gate" hidden>
+          <div class="admin-gate__icon" aria-hidden="true">!</div>
+
+          <div>
+            <span>AUTHENTIFICATION REQUISE</span>
+            <h2>Connexion Steam nécessaire</h2>
+            <p>
+              Connecte-toi avec ton compte Steam pour accéder au centre de
+              commandement.
+            </p>
+
+            <a class="admin-button admin-button--primary" href="/api/steam/login">
+              Connexion Steam
+            </a>
+          </div>
+        </section>
+
+        <!-- Utilisateur connecté mais non autorisé -->
+        <section id="adminAccessDenied" class="admin-gate admin-gate--danger" hidden>
+          <div class="admin-gate__icon" aria-hidden="true">×</div>
+
+          <div>
+            <span>ACCÈS REFUSÉ</span>
+            <h2>Zone réservée au staff</h2>
+            <p>
+              Ton compte Steam est connecté, mais il ne possède pas les
+              autorisations nécessaires.
+            </p>
+
+            <a class="admin-button" href="senzany-profil.html">Retour au profil</a>
+          </div>
+        </section>
+
+        <!-- Erreur backend -->
+        <section id="adminError" class="admin-gate admin-gate--danger" hidden>
+          <div class="admin-gate__icon" aria-hidden="true">!</div>
+
+          <div>
+            <span>ERREUR DU TERMINAL</span>
+            <h2>Impossible de vérifier l’accès</h2>
+
+            <p id="adminErrorMessage">
+              Une erreur est survenue pendant la connexion au backend.
+            </p>
+
+            <button id="adminRetryButton" class="admin-button" type="button">
+              Réessayer
+            </button>
+          </div>
+        </section>
+
+        <!-- Tableau de bord staff -->
+        <div id="adminDashboard" hidden>
+          <section class="admin-status-bar" aria-label="État du terminal">
+            <div>
+              <span>SESSION</span>
+              <strong>STAFF AUTORISÉ</strong>
+            </div>
+
+            <div>
+              <span>ENVIRONNEMENT</span>
+              <strong>SENZANY PORTAL</strong>
+            </div>
+
+            <div>
+              <span>BACKEND</span>
+              <strong id="adminBackendStatus">ONLINE</strong>
+            </div>
+
+            <a href="/api/steam/logout">Déconnexion</a>
+          </section>
+
+          <!-- Accueil du centre de commandement -->
+          <section id="adminHomeView" class="admin-command-center">
+            <div class="admin-section-heading">
+              <div>
+                <span>TERMINAL PRINCIPAL</span>
+                <h2>Senzany Control Center</h2>
+                <p>
+                  Sélectionne un module. Seul le module Livraisons est actif
+                  dans cette première version.
+                </p>
+              </div>
+
+              <div class="admin-terminal-badge">V1.0</div>
+            </div>
+
+            <div class="admin-module-grid">
+              <button class="admin-module-card admin-module-card--active" type="button" data-admin-module="deliveries">
+                <span class="admin-module-card__index">01</span>
+                <span class="admin-module-card__icon" aria-hidden="true">▣</span>
+                <strong>Livraisons</strong>
+                <small>Créer, suivre et préparer les récompenses joueurs.</small>
+                <em>MODULE ACTIF</em>
+              </button>
+
+              <button class="admin-module-card" type="button" disabled>
+                <span class="admin-module-card__index">02</span>
+                <span class="admin-module-card__icon" aria-hidden="true">◎</span>
+                <strong>Joueurs</strong>
+                <small>Profils, connexions et informations liées au serveur.</small>
+                <em>À VENIR</em>
+              </button>
+
+              <button class="admin-module-card" type="button" disabled>
+                <span class="admin-module-card__index">03</span>
+                <span class="admin-module-card__icon" aria-hidden="true">◆</span>
+                <strong>Véhicules</strong>
+                <small>Suivi et outils de gestion du parc automobile.</small>
+                <em>À VENIR</em>
+              </button>
+
+              <button class="admin-module-card" type="button" disabled>
+                <span class="admin-module-card__index">04</span>
+                <span class="admin-module-card__icon" aria-hidden="true">$</span>
+                <strong>Boutique</strong>
+                <small>Récompenses, achats et opérations commerciales.</small>
+                <em>À VENIR</em>
+              </button>
+
+              <button class="admin-module-card" type="button" disabled>
+                <span class="admin-module-card__index">05</span>
+                <span class="admin-module-card__icon" aria-hidden="true">★</span>
+                <strong>Battle Pass</strong>
+                <small>Paliers, récompenses et progression saisonnière.</small>
+                <em>À VENIR</em>
+              </button>
+
+              <button class="admin-module-card" type="button" disabled>
+                <span class="admin-module-card__index">06</span>
+                <span class="admin-module-card__icon" aria-hidden="true">⌁</span>
+                <strong>DNA</strong>
+                <small>Données et récompenses liées au système DNA.</small>
+                <em>À VENIR</em>
+              </button>
+
+              <button class="admin-module-card" type="button" disabled>
+                <span class="admin-module-card__index">07</span>
+                <span class="admin-module-card__icon" aria-hidden="true">◈</span>
+                <strong>Quêtes</strong>
+                <small>Gestion des objectifs et contenus scénarisés.</small>
+                <em>À VENIR</em>
+              </button>
+
+              <button class="admin-module-card" type="button" disabled>
+                <span class="admin-module-card__index">08</span>
+                <span class="admin-module-card__icon" aria-hidden="true">AI</span>
+                <strong>Intelligence artificielle</strong>
+                <small>Paramètres des interactions et systèmes IA.</small>
+                <em>À VENIR</em>
+              </button>
+
+              <button class="admin-module-card" type="button" disabled>
+                <span class="admin-module-card__index">09</span>
+                <span class="admin-module-card__icon" aria-hidden="true">≡</span>
+                <strong>Logs</strong>
+                <small>Historique des actions sensibles du centre de contrôle.</small>
+                <em>À VENIR</em>
+              </button>
+
+              <button class="admin-module-card" type="button" disabled>
+                <span class="admin-module-card__index">10</span>
+                <span class="admin-module-card__icon" aria-hidden="true">⚙</span>
+                <strong>Paramètres</strong>
+                <small>Configuration générale et autorisations du portail.</small>
+                <em>À VENIR</em>
+              </button>
+            </div>
+          </section>
+
+          <!-- Module Livraisons -->
+          <section id="adminDeliveriesView" class="admin-module-view" hidden>
+            <div class="admin-module-toolbar">
+              <button id="backToAdminHome" class="admin-button admin-button--small" type="button">
+                ← Retour au centre
+              </button>
+
+              <div>
+                <span>MODULE 01</span>
+                <strong>Gestion des livraisons</strong>
+              </div>
+            </div>
+
+            <div class="admin-layout">
+              <!-- Création d’une livraison -->
+              <section class="admin-card">
+                <div class="admin-card__header">
+                  <div>
+                    <span>NOUVELLE OPÉRATION</span>
+                    <h2>Créer une livraison</h2>
+                  </div>
+
+                  <b>01</b>
+                </div>
+
+                <form id="deliveryForm">
+                  <div class="admin-field">
+                    <label for="deliverySteamId">SteamID64 du joueur</label>
+
+                    <input
+                      id="deliverySteamId"
+                      name="steamId"
+                      type="text"
+                      inputmode="numeric"
+                      maxlength="17"
+                      autocomplete="off"
+                      placeholder="7656119XXXXXXXXXX"
+                      required
+                    />
+
+                    <small>Le SteamID64 contient exactement 17 chiffres.</small>
+                  </div>
+
+                  <div class="admin-field">
+                    <label for="deliveryPlayerName">Nom du joueur</label>
+
+                    <input
+                      id="deliveryPlayerName"
+                      name="playerName"
+                      type="text"
+                      maxlength="100"
+                      autocomplete="off"
+                      placeholder="Exemple : Mishka"
+                    />
+                  </div>
+
+                  <div class="admin-field">
+                    <label for="deliveryTitle">Titre de la livraison</label>
+
+                    <input
+                      id="deliveryTitle"
+                      name="title"
+                      type="text"
+                      maxlength="150"
+                      autocomplete="off"
+                      placeholder="Exemple : Compensation véhicule"
+                      required
+                    />
+                  </div>
+
+                  <div class="admin-field">
+                    <label for="deliveryMessage">Message adressé au joueur</label>
+
+                    <textarea
+                      id="deliveryMessage"
+                      name="message"
+                      rows="4"
+                      placeholder="Exemple : Compensation liée au ticket #125"
+                    ></textarea>
+                  </div>
+
+                  <div class="admin-items">
+                    <div class="admin-items__heading">
+                      <div>
+                        <span>CONTENU</span>
+                        <h3>Objets de la livraison</h3>
+                      </div>
+
+                      <button id="addDeliveryItem" class="admin-button admin-button--small" type="button">
+                        + Ajouter un objet
+                      </button>
+                    </div>
+
+                    <div id="deliveryItemsList"></div>
+                  </div>
+
+                  <div id="deliveryFormFeedback" class="admin-feedback" hidden></div>
+
+                  <button id="createDeliveryButton" class="admin-button admin-button--primary admin-button--submit" type="submit">
+                    Créer la livraison
+                  </button>
+                </form>
+              </section>
+
+              <!-- Historique -->
+              <section class="admin-card">
+                <div class="admin-card__header">
+                  <div>
+                    <span>SUIVI DES OPÉRATIONS</span>
+                    <h2>Livraisons existantes</h2>
+                  </div>
+
+                  <b>02</b>
+                </div>
+
+                <div class="admin-filters">
+                  <select id="deliveryStatusFilter" aria-label="Filtrer les livraisons par statut">
+                    <option value="">Tous les statuts</option>
+                    <option value="pending">En attente</option>
+                    <option value="claimed">Réclamée</option>
+                    <option value="processing">En traitement</option>
+                    <option value="delivered">Livrée</option>
+                    <option value="failed">Erreur</option>
+                    <option value="cancelled">Annulée</option>
+                  </select>
+
+                  <button id="refreshDeliveriesButton" class="admin-button admin-button--small" type="button">
+                    Actualiser
+                  </button>
+                </div>
+
+                <div id="deliveriesLoading" class="admin-list-message">
+                  Chargement des livraisons…
+                </div>
+
+                <div id="deliveriesEmpty" class="admin-list-message" hidden>
+                  Aucune livraison trouvée.
+                </div>
+
+                <div id="deliveriesList" class="admin-deliveries-list"></div>
+              </section>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div data-site-footer></div>
+
+  <script defer src="assets/js/components.js"></script>
+  <script defer src="assets/js/app.js"></script>
+  <script type="module" src="assets/js/admin/admin.js?v=1.0.0"></script>
+</body>
+</html>

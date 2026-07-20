@@ -20,6 +20,7 @@ app.use("/api/topserveurs", require("./routes/topserveurs"));
 app.use("/api/discord", require("./routes/discord"));
 app.use("/api/game", require("./routes/game"));
 app.use("/api/steam", require("./routes/steam"));
+app.use("/api/deliveries", require("./routes/deliveries"));
 
 const PORT = process.env.PORT || 3000;
 
