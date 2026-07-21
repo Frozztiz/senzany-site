@@ -29,6 +29,16 @@ jobs:
 
               cd /var/www/senzany
 
+              echo "=== Sauvegarde du fichier .env ==="
+
+              if [ -f "/var/www/senzany/server/.env" ]; then
+                cp /var/www/senzany/server/.env /tmp/senzany-server.env
+                chmod 600 /tmp/senzany-server.env
+                echo "Fichier .env sauvegardé."
+              else
+                echo "Attention : aucun fichier .env trouvé avant le déploiement."
+              fi
+
               echo "=== Synchronisation Git ==="
               git fetch origin main
               git reset --hard origin/main
@@ -40,6 +50,10 @@ jobs:
               cp -f backend/server.js server/server.js
               cp -f backend/package.json server/package.json
 
+              if [ -f "backend/package-lock.json" ]; then
+                cp -f backend/package-lock.json server/package-lock.json
+              fi
+
               for directory in config controllers middleware routes services utils; do
                 if [ -d "backend/$directory" ]; then
                   mkdir -p "server/$directory"
@@ -47,10 +61,27 @@ jobs:
                 fi
               done
 
+              echo "=== Restauration du fichier .env ==="
+
+              if [ -f "/tmp/senzany-server.env" ]; then
+                cp /tmp/senzany-server.env /var/www/senzany/server/.env
+                chmod 600 /var/www/senzany/server/.env
+                rm -f /tmp/senzany-server.env
+                echo "Fichier .env restauré."
+              else
+                echo "ERREUR : aucune sauvegarde du fichier .env disponible."
+                exit 1
+              fi
+
               cd /var/www/senzany/server
 
               echo "=== Installation des dépendances ==="
-              npm install --omit=dev
+
+              if [ -f "package-lock.json" ]; then
+                npm ci --omit=dev
+              else
+                npm install --omit=dev
+              fi
 
               echo "=== Redémarrage de l API ==="
               pm2 restart senzany-api --update-env || pm2 start server.js --name senzany-api
