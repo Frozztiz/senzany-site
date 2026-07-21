@@ -974,3 +974,251 @@ body[data-page="admin"] [data-site-footer] {
   }
 }
 
+/* ============================================================
+   V3 — SENZANY CONTROL CENTER / AAA POLISH
+   ============================================================ */
+
+.admin-section-heading h2 {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-transform: uppercase;
+  letter-spacing: -0.035em;
+}
+
+.admin-section-heading h2::before {
+  content: "SENZANY";
+  color: var(--admin-accent-strong);
+  font-size: 0.42em;
+  letter-spacing: 0.22em;
+}
+
+.admin-section-heading h2::after {
+  content: "ADMINISTRATION TERMINAL";
+  margin-top: 8px;
+  color: rgba(245, 245, 245, 0.42);
+  font-size: 0.22em;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+}
+
+.admin-module-card {
+  min-height: 248px;
+  border-color: rgba(217, 40, 40, 0.12);
+}
+
+.admin-module-card:disabled {
+  border-color: rgba(217, 40, 40, 0.10);
+}
+
+.admin-module-card__index {
+  position: absolute;
+  top: 14px;
+  right: 17px;
+  z-index: 0;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.055);
+  font-size: 5rem;
+  line-height: 1;
+  letter-spacing: -0.08em;
+  pointer-events: none;
+}
+
+.admin-module-card--active .admin-module-card__index {
+  color: rgba(255, 255, 255, 0.09);
+}
+
+.admin-module-card__icon {
+  width: 48px;
+  height: 48px;
+  margin: 8px 0 22px;
+  border-radius: 12px;
+}
+
+.admin-module-card__icon svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 7px rgba(255, 59, 59, 0.16));
+}
+
+.admin-module-card strong {
+  font-size: 1.15rem;
+  letter-spacing: 0.015em;
+}
+
+.admin-module-card small {
+  max-width: 92%;
+}
+
+.admin-module-card em {
+  letter-spacing: 0.14em;
+}
+
+/* Ligne lumineuse supérieure */
+.admin-module-card > .admin-module-card__accent {
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  height: 1px;
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(217, 40, 40, 0.34),
+    transparent
+  );
+  opacity: 0.45;
+}
+
+.admin-module-card--active > .admin-module-card__accent {
+  height: 2px;
+  opacity: 1;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--admin-accent-strong),
+    transparent
+  );
+  box-shadow: 0 0 16px rgba(255, 59, 59, 0.45);
+}
+
+/* Micro-interaction : reflet traversant */
+.admin-module-card .admin-module-card__sheen {
+  position: absolute;
+  inset: -30% -70%;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    108deg,
+    transparent 45%,
+    rgba(255, 255, 255, 0.065) 50%,
+    transparent 55%
+  );
+  transform: translateX(-48%);
+  transition: transform 0.85s cubic-bezier(.2,.75,.2,1);
+}
+
+.admin-module-card:hover:not(:disabled) .admin-module-card__sheen {
+  transform: translateX(48%);
+}
+
+/* Point de statut */
+.admin-module-card__status-dot {
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.06);
+}
+
+.admin-module-card--active .admin-module-card__status-dot {
+  background: var(--admin-accent-strong);
+  box-shadow: 0 0 12px rgba(255, 59, 59, 0.62);
+  animation: adminStatusPulse 1.9s ease-in-out infinite;
+}
+
+@keyframes adminStatusPulse {
+  50% {
+    opacity: 0.45;
+    transform: scale(0.72);
+  }
+}
+
+/* Mise en page badge + point */
+.admin-module-card em {
+  gap: 0;
+}
+
+/* V1.0 façon plaque technique */
+.admin-terminal-badge {
+  position: relative;
+  overflow: hidden;
+  min-width: 86px;
+  letter-spacing: 0.16em;
+}
+
+.admin-terminal-badge::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(255, 59, 59, 0.12);
+  border-radius: 6px;
+}
+
+/* Ligne tactique sous l'entête */
+.admin-section-heading {
+  position: relative;
+  padding-bottom: 22px;
+}
+
+.admin-section-heading::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(217, 40, 40, 0.38),
+    rgba(255, 255, 255, 0.06) 44%,
+    transparent 86%
+  );
+}
+
+/* Effet profondeur */
+.admin-command-center {
+  position: relative;
+}
+
+.admin-command-center::before {
+  content: "";
+  position: absolute;
+  inset: 125px -4% -40px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(217, 40, 40, 0.055), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.008), transparent 35%);
+}
+
+/* Hover plus premium */
+.admin-module-card:hover:not(:disabled) {
+  transform: translateY(-6px) scale(1.006);
+}
+
+.admin-module-card--active:hover {
+  box-shadow:
+    0 30px 72px rgba(0, 0, 0, 0.5),
+    inset 0 0 52px rgba(217, 40, 40, 0.12),
+    0 0 42px rgba(217, 40, 40, 0.20);
+}
+
+/* Responsive */
+@media (max-width: 760px) {
+  .admin-module-card__index {
+    font-size: 4.2rem;
+  }
+
+  .admin-section-heading h2::after {
+    font-size: 0.25em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-module-card__sheen {
+    display: none;
+  }
+
+  .admin-module-card__status-dot {
+    animation: none !important;
+  }
+}
+
