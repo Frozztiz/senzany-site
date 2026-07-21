@@ -782,3 +782,195 @@ body[data-page="admin"] {
   }
 }
 
+/* ============================================================
+   POLISH VISUEL V2 — TERMINAL SENZANY
+   ============================================================ */
+
+/* Fond tactique très léger */
+body[data-page="admin"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.16;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 59, 59, 0.045), transparent 26%),
+    radial-gradient(circle at 86% 12%, rgba(255, 255, 255, 0.025), transparent 24%),
+    linear-gradient(rgba(255, 255, 255, 0.016) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.016) 1px, transparent 1px);
+  background-size:
+    auto,
+    auto,
+    64px 64px,
+    64px 64px;
+}
+
+body[data-page="admin"] .admin-main,
+body[data-page="admin"] [data-site-header],
+body[data-page="admin"] [data-site-footer] {
+  position: relative;
+  z-index: 1;
+}
+
+/* Texture discrète sur les cartes */
+.admin-module-card {
+  isolation: isolate;
+}
+
+.admin-module-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.34;
+  background:
+    linear-gradient(130deg, rgba(255, 255, 255, 0.025), transparent 34%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 5px,
+      rgba(255, 255, 255, 0.011) 6px
+    );
+}
+
+/* Cartes inactives un peu plus lisibles */
+.admin-module-card:disabled {
+  opacity: 0.66;
+  filter: saturate(0.68);
+  background:
+    radial-gradient(circle at 85% 12%, rgba(255, 255, 255, 0.035), transparent 30%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.028), transparent 56%),
+    rgba(14, 14, 14, 0.96);
+}
+
+.admin-module-card:disabled strong {
+  color: rgba(245, 245, 245, 0.74);
+}
+
+.admin-module-card:disabled small {
+  color: rgba(165, 165, 165, 0.68);
+}
+
+/* Halo respirant du module actif */
+.admin-module-card--active {
+  animation: adminActivePulse 3.8s ease-in-out infinite;
+}
+
+@keyframes adminActivePulse {
+  0%,
+  100% {
+    box-shadow:
+      0 22px 56px rgba(0, 0, 0, 0.4),
+      inset 0 0 36px rgba(217, 40, 40, 0.07),
+      0 0 18px rgba(217, 40, 40, 0.08);
+  }
+
+  50% {
+    box-shadow:
+      0 26px 64px rgba(0, 0, 0, 0.46),
+      inset 0 0 42px rgba(217, 40, 40, 0.1),
+      0 0 34px rgba(217, 40, 40, 0.16);
+  }
+}
+
+/* Icônes plus présentes et cohérentes */
+.admin-module-card__icon {
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 18px rgba(255, 59, 59, 0.045);
+}
+
+.admin-module-card__icon::after {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  background: linear-gradient(
+    110deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.11) 50%,
+    transparent 58%
+  );
+  transform: translateX(-80%);
+  transition: transform 0.45s ease;
+}
+
+.admin-module-card:hover:not(:disabled) .admin-module-card__icon::after {
+  transform: translateX(80%);
+}
+
+.admin-module-card--active .admin-module-card__icon {
+  border-color: rgba(255, 95, 95, 0.58);
+  background: rgba(217, 40, 40, 0.14);
+  box-shadow:
+    inset 0 0 18px rgba(255, 59, 59, 0.08),
+    0 0 18px rgba(217, 40, 40, 0.08);
+}
+
+/* Badge À VENIR plus net */
+.admin-module-card em {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.admin-module-card--active em {
+  border-color: rgba(255, 95, 95, 0.3);
+  background: rgba(217, 40, 40, 0.11);
+}
+
+/* Petit repère lumineux en haut des cartes */
+.admin-module-card::marker {
+  content: "";
+}
+
+.admin-module-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.admin-module-card--active::after {
+  border-color: rgba(255, 95, 95, 0.14);
+}
+
+/* Barre supérieure légèrement renforcée */
+.admin-status-bar {
+  background:
+    linear-gradient(90deg, rgba(217, 40, 40, 0.035), transparent 35%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.028), transparent),
+    var(--admin-panel);
+}
+
+.admin-status-bar strong {
+  letter-spacing: 0.025em;
+}
+
+/* Badge version plus propre */
+.admin-terminal-badge {
+  box-shadow:
+    inset 0 0 18px rgba(217, 40, 40, 0.06),
+    0 0 20px rgba(217, 40, 40, 0.06);
+}
+
+/* Transitions plus douces */
+.admin-module-card,
+.admin-terminal-badge,
+.admin-status-bar {
+  will-change: transform, box-shadow;
+}
+
+/* Désactivation des animations pour accessibilité */
+@media (prefers-reduced-motion: reduce) {
+  .admin-module-card--active {
+    animation: none;
+  }
+
+  .admin-module-card__icon::after {
+    transition: none;
+  }
+}
+
