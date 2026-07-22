@@ -98,7 +98,25 @@
 
   const storedEnabled = localStorage.getItem(STORAGE.enabled);
   let enabled = storedEnabled === null ? true : storedEnabled === 'true';
-  let introPending = localStorage.getItem(STORAGE.introSeen) !== 'true';
+  const params = new URLSearchParams(window.location.search);
+
+// Forcer l'intro
+if (params.has("intro")) {
+  localStorage.removeItem(STORAGE.introSeen);
+}
+
+// Réinitialiser l'intro puis nettoyer l'URL
+if (params.has("resetintro")) {
+  localStorage.removeItem(STORAGE.introSeen);
+
+  history.replaceState(
+    {},
+    "",
+    window.location.pathname + window.location.hash
+  );
+}
+
+let introPending = localStorage.getItem(STORAGE.introSeen) !== "true";
   let muted = readBoolean(STORAGE.muted, false);
   let preferredVolume = Math.min(1, Math.max(0, readNumber(STORAGE.volume, DEFAULT_VOLUME)));
   let fadeFrame = null;
