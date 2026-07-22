@@ -44,6 +44,67 @@ function buildQueryPorts() {
   ]);
 }
 
+function toValidNumber(value) {
+  const number = Number(value);
+
+  return Number.isFinite(number) && number >= 0
+    ? number
+    : null;
+}
+
+function extractPlayerCount(state) {
+  const candidates = [
+    state?.numplayers,
+    state?.numPlayers,
+    state?.raw?.numplayers,
+    state?.raw?.numPlayers,
+    state?.raw?.players,
+    state?.raw?.online,
+    state?.raw?.clients,
+    state?.raw?.rules?.numplayers,
+    state?.raw?.rules?.players,
+  ];
+
+  for (const candidate of candidates) {
+    const value = toValidNumber(candidate);
+
+    if (value !== null) {
+      return value;
+    }
+  }
+
+  if (Array.isArray(state?.players)) {
+    return state.players.length;
+  }
+
+  return 0;
+}
+
+function extractMaxPlayers(
+  state,
+  fallbackMaxPlayers
+) {
+  const candidates = [
+    state?.maxplayers,
+    state?.maxPlayers,
+    state?.raw?.maxplayers,
+    state?.raw?.maxPlayers,
+    state?.raw?.max_clients,
+    state?.raw?.rules?.maxplayers,
+    state?.raw?.rules?.maxPlayers,
+  ];
+
+  for (const candidate of candidates) {
+    const value = toValidNumber(candidate);
+
+    if (value !== null && value > 0) {
+      return value;
+    }
+  }
+
+  return fallbackMaxPlayers;
+}
+
 async function querySinglePort(host, port) {
   const state = await GameDig.query({
     type: "dayz",
@@ -92,26 +153,29 @@ function buildOnlinePayload({
   gamePort,
   fallbackMaxPlayers,
 }) {
-  const playerList = Array.isArray(state.players)
-    ? state.players
-    : [];
-
   const connectedPlayers =
-    playerList.length > 0
-      ? playerList.length
-      : Number(state.numplayers || 0);
+    extractPlayerCount(state);
+
+  const maxPlayers = extractMaxPlayers(
+    state,
+    fallbackMaxPlayers
+  );
 
   return {
     online: true,
     degraded: false,
     players: connectedPlayers,
-    maxPlayers: Number(
-      state.maxplayers || fallbackMaxPlayers
-    ),
-    map: state.map || "chernarusplus",
-    name: state.name || "Senzany",
-    bots: Number(state.bots || 0),
-    ping: Number(state.ping || 0),
+    maxPlayers,
+    map:
+      state?.map ||
+      state?.raw?.map ||
+      "chernarusplus",
+    name:
+      state?.name ||
+      state?.raw?.name ||
+      "Senzany",
+    bots: Number(state?.bots || 0),
+    ping: Number(state?.ping || 0),
     source: "direct-dayz-query",
     serverAddress: `${host}:${gamePort}`,
     queryAddress: `${host}:${queryPort}`,
@@ -125,9 +189,26 @@ async function getFreshServerState({
   queryPorts,
   fallbackMaxPlayers,
 }) {
-  const { state, port } = await queryDayzServer(
-    host,
-    queryPorts
+  const { state, port } =
+    await queryDayzServer(host, queryPorts);
+
+  console.log(
+    "Réponse GameDig DayZ :",
+    JSON.stringify(
+      {
+        port,
+        numplayers: state?.numplayers,
+        maxplayers: state?.maxplayers,
+        playersLength: Array.isArray(
+          state?.players
+        )
+          ? state.players.length
+          : null,
+        raw: state?.raw,
+      },
+      null,
+      2
+    )
   );
 
   const payload = buildOnlinePayload({
