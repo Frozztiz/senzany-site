@@ -96,27 +96,27 @@
   audio.preload = 'metadata';
   audio.playsInline = true;
 
-  const storedEnabled = localStorage.getItem(STORAGE.enabled);
-  let enabled = storedEnabled === null ? true : storedEnabled === 'true';
   const params = new URLSearchParams(window.location.search);
 
-// Forcer l'intro
-if (params.has("intro")) {
-  localStorage.removeItem(STORAGE.introSeen);
-}
+  const forceIntro =
+    params.has('intro') ||
+    params.has('resetintro');
 
-// Réinitialiser l'intro puis nettoyer l'URL
-if (params.has("resetintro")) {
-  localStorage.removeItem(STORAGE.introSeen);
+  if (forceIntro) {
+    localStorage.removeItem(STORAGE.introSeen);
 
-  history.replaceState(
-    {},
-    "",
-    window.location.pathname + window.location.hash
-  );
-}
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname + window.location.hash
+    );
+  }
 
-let introPending = localStorage.getItem(STORAGE.introSeen) !== "true";
+  const storedEnabled = localStorage.getItem(STORAGE.enabled);
+  let enabled = storedEnabled === null ? true : storedEnabled === 'true';
+  let introPending =
+    forceIntro ||
+    localStorage.getItem(STORAGE.introSeen) !== 'true';
   let muted = readBoolean(STORAGE.muted, false);
   let preferredVolume = Math.min(1, Math.max(0, readNumber(STORAGE.volume, DEFAULT_VOLUME)));
   let fadeFrame = null;
@@ -358,18 +358,65 @@ let introPending = localStorage.getItem(STORAGE.introSeen) !== "true";
     return true;
   };
 
-  const showIntroOnce = () => {
-    if (localStorage.getItem(STORAGE.introSeen) === 'true') return false;
-    playGsapIntro().catch(() => {
+  const showIntroOnce = (force = false) => {
+    if (
+      !force &&
+      localStorage.getItem(STORAGE.introSeen) === 'true'
+    ) {
+      return false;
+    }
+
+    if (
+      document.documentElement.classList.contains('senzany-intro-running')
+    ) {
+      return false;
+    }
+
+    if (force) {
+      localStorage.removeItem(STORAGE.introSeen);
+    }
+
+    if (!document.body.contains(intro)) {
+      document.body.appendChild(intro);
+    }
+
+    intro.classList.remove('is-visible', 'is-leaving');
+
+    playGsapIntro().catch((error) => {
+      console.warn('Cinématique GSAP indisponible.', error);
+
       intro.classList.add('is-visible');
-      window.setTimeout(() => intro.classList.add('is-leaving'), 7600);
+
+      window.setTimeout(() => {
+        intro.classList.add('is-leaving');
+      }, 7600);
+
       window.setTimeout(() => {
         localStorage.setItem(STORAGE.introSeen, 'true');
         intro.remove();
       }, 9300);
     });
+
     return true;
   };
+
+  if (forceIntro) {
+    introPending = false;
+
+    window.requestAnimationFrame(() => {
+      showIntroOnce(true);
+    });
+  }
+
+  // Mode développeur : F9 rejoue immédiatement la cinématique.
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'F9' || event.repeat) return;
+
+    event.preventDefault();
+    introPending = false;
+    localStorage.removeItem(STORAGE.introSeen);
+    showIntroOnce(true);
+  });
 
   const fadeTo = (target, duration = FADE_DURATION, onComplete) => {
     if (fadeFrame) cancelAnimationFrame(fadeFrame);
