@@ -1,150 +1,187 @@
-/**
- * SENZANY — Centre de commandement
- * assets/js/admin/admin.js
- */
+<!DOCTYPE html>
 
-const elements = {
-    loading: document.getElementById("adminLoading"),
-    loggedOut: document.getElementById("adminLoggedOut"),
-    accessDenied: document.getElementById("adminAccessDenied"),
-    error: document.getElementById("adminError"),
-    errorMessage: document.getElementById("adminErrorMessage"),
-    retryButton: document.getElementById("adminRetryButton"),
-    dashboard: document.getElementById("adminDashboard"),
-
-    backendStatus: document.getElementById("adminBackendStatus"),
-
-    homeView: document.getElementById("adminHomeView"),
-    deliveriesView: document.getElementById("adminDeliveriesView"),
-
-    deliveriesButton: document.querySelector('[data-admin-module="deliveries"]'),
-    backButton: document.getElementById("backToAdminHome")
-};
-
-function hideAll() {
-    elements.loading.hidden = true;
-    elements.loggedOut.hidden = true;
-    elements.accessDenied.hidden = true;
-    elements.error.hidden = true;
-    elements.dashboard.hidden = true;
-}
-
-function show(view) {
-    hideAll();
-
-    switch (view) {
-        case "loading":
-            elements.loading.hidden = false;
-            break;
-
-        case "loggedOut":
-            elements.loggedOut.hidden = false;
-            break;
-
-        case "denied":
-            elements.accessDenied.hidden = false;
-            break;
-
-        case "error":
-            elements.error.hidden = false;
-            break;
-
-        case "dashboard":
-            elements.dashboard.hidden = false;
-            break;
-    }
-}
-
-function showHome() {
-    if (elements.homeView)
-        elements.homeView.hidden = false;
-
-    if (elements.deliveriesView)
-        elements.deliveriesView.hidden = true;
-}
-
-function showDeliveries() {
-    if (elements.homeView)
-        elements.homeView.hidden = true;
-
-    if (elements.deliveriesView)
-        elements.deliveriesView.hidden = false;
-}
-
-async function checkAccess() {
-
-    show("loading");
-
-    try {
-
-        const response = await fetch("/api/steam/me", {
-            credentials: "same-origin",
-            cache: "no-store"
-        });
-
-        if (!response.ok)
-            throw new Error("Backend indisponible");
-
-        const user = await response.json();
-
-        console.log(user);
-
-        const logged =
-            user.logged ||
-            user.loggedIn ||
-            user.authenticated;
-
-        if (!logged) {
-            show("loggedOut");
-            return;
-        }
-
-        const staff =
-            user.isStaff ||
-            user.staff ||
-            user.admin ||
-            user.isAdmin ||
-            user.role === "staff" ||
-            user.role === "admin";
-
-        if (!staff) {
-            show("denied");
-            return;
-        }
-
-        if (elements.backendStatus)
-            elements.backendStatus.textContent = "ONLINE";
-
-        show("dashboard");
-
-        showHome();
-
-    }
-    catch (err) {
-
-        console.error(err);
-
-        if (elements.backendStatus)
-            elements.backendStatus.textContent = "ERREUR";
-
-        if (elements.errorMessage)
-            elements.errorMessage.textContent = err.message;
-
-        show("error");
-    }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    if (elements.deliveriesButton)
-        elements.deliveriesButton.addEventListener("click", showDeliveries);
-
-    if (elements.backButton)
-        elements.backButton.addEventListener("click", showHome);
-
-    if (elements.retryButton)
-        elements.retryButton.addEventListener("click", checkAccess);
-
-    checkAccess();
-
-});
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Senzany, serveur DayZ PVE français sur Chernarus. Découvrez un univers communautaire immersif, évolutif et riche en contenus." name="description"/>
+<title>SENZANY — Portail officiel DayZ PVE</title>
+<link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
+<link href="assets/css/pages/accueil.css?v=2.7" rel="stylesheet"/>
+</head>
+<body data-page="accueil">
+<div data-site-header=""></div>
+<main class="home-main">
+<section class="home-hero" id="accueil">
+<div aria-hidden="true" class="home-hero__light"></div>
+<div aria-hidden="true" class="home-hero__grain"></div>
+<div aria-hidden="true" class="home-hero__ash" id="heroAsh"></div>
+<div class="wrap home-countdown-wrap">
+<section aria-labelledby="hero-countdown-title" class="doomsday-countdown home-reveal">
+<div aria-hidden="true" class="doomsday-countdown__edge"></div>
+<div class="doomsday-countdown__event">
+<span class="doomsday-countdown__eyebrow">Saison IV // Nouveau départ</span>
+<strong id="hero-countdown-title">21 juillet 2026</strong>
+<small>Wipe officiel — 20h00</small>
+</div>
+<div aria-label="Compte à rebours avant la Saison 4" class="doomsday-countdown__clock" id="countdown">
+<div class="doomsday-unit"><strong id="cd-d">00</strong><span>Jours</span></div>
+<i aria-hidden="true"></i>
+<div class="doomsday-unit"><strong id="cd-h">00</strong><span>Heures</span></div>
+<i aria-hidden="true"></i>
+<div class="doomsday-unit"><strong id="cd-m">00</strong><span>Minutes</span></div>
+<i aria-hidden="true"></i>
+<div class="doomsday-unit"><strong id="cd-s">00</strong><span>Secondes</span></div>
+</div>
+<div class="doomsday-countdown__status">
+<div class="doomsday-countdown__status-head"><span>Phase de déploiement</span><b id="seasonProgressLabel">0%</b></div>
+<div class="doomsday-countdown__track"><span id="seasonProgressBar"></span></div>
+<div class="doomsday-countdown__status-foot"><span class="doomsday-pulse"></span><span>Systèmes prêts</span><a href="senzany-jouer.html">Préparer mon arrivée ↗</a></div>
+</div>
+</section>
+</div><div class="wrap home-hero__inner">
+<div class="home-hero__content home-reveal">
+<p class="home-kicker">01 Senzany // Portail officiel</p>
+<h1 class="home-hero__title">
+<span>VOICI LE RÉCIT</span>
+<span class="home-hero__outline">DE VOTRE MORT.</span>
+</h1>
+<p class="home-hero__lead">
+          Un serveur DayZ PVE français où progression, exploration, événements et communauté construisent une aventure qui ne ressemble à aucune autre.
+        </p>
+<div class="home-hero__actions">
+<a class="home-btn home-btn--primary" href="senzany-jouer.html">Rejoindre le serveur <span>↗</span></a>
+<a class="home-btn home-btn--ghost" href="#univers">Découvrir Senzany <span>↓</span></a>
+</div>
+<div aria-label="Informations principales" class="home-hero__signals">
+<div><strong>100%</strong><span>PVE français</span></div>
+<div><strong>24/7</strong><span>Serveur actif</span></div>
+<div><strong>+18</strong><span>Staff à l’écoute</span></div>
+</div>
+</div>
+<div class="home-hero__side home-hero__side--network home-reveal">
+<aside aria-label="État du serveur" class="home-live-card">
+<div class="home-live-card__head">
+<span class="home-live-dot"></span>
+<span>État du réseau</span>
+<small>LIVE</small>
+</div>
+<div class="home-live-card__main">
+<span>Joueurs connectés</span>
+<strong id="statPlayers">— / —</strong>
+</div>
+<div class="home-live-card__grid">
+<div><span>Carte</span><strong>Chernarus+</strong></div>
+<div><span>Mode</span><strong>PVE</strong></div>
+<div><span>Votes du mois</span><strong id="statVotes">—</strong></div>
+<div><span>Prochain wipe</span><strong id="statWipe">—</strong></div>
+</div>
+<a href="https://top-serveurs.net/dayz/vote/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" rel="noopener" target="_blank">Voter pour Senzany <span>↗</span></a>
+</aside>
+</div>
+</div>
+<div aria-hidden="true" class="home-hero__ticker">
+<span>Senzany official portal</span><i></i><span>Expérience PVE</span><i></i><span>Contenus saisonniers</span><i></i><span>Communauté française</span>
+</div>
+</section>
+<section aria-labelledby="world-title" class="home-pillars" id="univers">
+<div class="wrap">
+<header class="home-pillars__head home-reveal">
+<div>
+<p class="home-kicker">02 Senzany // Bien plus qu’un serveur</p>
+<h2 id="world-title">Une expérience unique, construite pour durer.</h2>
+</div>
+<p>Découvrez les quatre piliers qui font vivre Senzany au quotidien. Cette section présente notre univers : elle ne remplace pas la navigation du portail.</p>
+</header>
+<div class="home-pillars__grid">
+<article class="home-pillar home-reveal" data-tilt="">
+<div class="home-pillar__media"><img alt="Volcan dominant une Chernarus transformée" loading="lazy" src="assets/images/accueil/monde-transforme.webp"/></div>
+<div class="home-pillar__body">
+<span class="home-pillar__index">01 // Monde</span>
+<h3>Un monde transformé</h3>
+<p>Le volcan a bouleversé Chernarus. De nouvelles zones, de nouveaux dangers et des secrets apparaissent au fil des saisons.</p>
+</div>
+</article>
+<article class="home-pillar home-reveal" data-tilt="">
+<div class="home-pillar__media"><img alt="Convoi militaire et survivants pendant un événement" loading="lazy" src="assets/images/accueil/evenements-permanents.webp"/></div>
+<div class="home-pillar__body">
+<span class="home-pillar__index">02 // Activité</span>
+<h3>Des événements permanents</h3>
+<p>Convois, boss, courses et rendez-vous communautaires rythment régulièrement la vie du serveur.</p>
+</div>
+</article>
+<article class="home-pillar home-reveal" data-tilt="">
+<div class="home-pillar__media"><img alt="Laboratoire technologique avec système DNA" loading="lazy" src="assets/images/accueil/progression-unique.webp"/></div>
+<div class="home-pillar__body">
+<span class="home-pillar__index">03 // Progression</span>
+<h3>Une progression unique</h3>
+<p>Quêtes, plus de 200 crafts, économie dynamique, systèmes DNA et futurs contenus récompensent chaque survivant.</p>
+</div>
+</article>
+<article class="home-pillar home-reveal" data-tilt="">
+<div class="home-pillar__media"><img alt="Communauté de survivants réunie autour d’un feu" loading="lazy" src="assets/images/accueil/communaute-vraie.webp"/></div>
+<div class="home-pillar__body">
+<span class="home-pillar__index">04 // Communauté</span>
+<h3>Une vraie communauté</h3>
+<p>Une communauté française soudée, un staff présent et une expérience PVE pensée pour durer.</p>
+</div>
+</article>
+</div>
+<div aria-label="Chiffres clés de Senzany" class="home-pillars__stats home-reveal">
+<div><strong>5000+</strong><span>Votes mensuels</span></div>
+<div><strong>200+</strong><span>Crafts disponibles</span></div>
+<div><strong>24/7</strong><span>Serveur actif</span></div>
+<div><strong>100%</strong><span>Expérience PVE</span></div>
+<div><strong>+18</strong><span>Staff à l’écoute</span></div>
+<div><strong>S4</strong><span>Nouvelle saison</span></div>
+</div>
+</div>
+</section>
+<section aria-labelledby="news-title" class="home-news">
+<div class="wrap">
+<header class="home-section-head home-reveal">
+<div>
+<p class="home-kicker">Transmission récente</p>
+<h2 id="news-title">Dernières actualités.</h2>
+</div>
+<p>Les annonces importantes du serveur et les nouveautés qui préparent la suite de l’aventure.</p>
+</header>
+<div class="home-news__grid">
+<article class="home-news-card home-reveal">
+<div class="home-news-card__media" style="background-image:url('assets/images/news/dayz-update-129.jpg')"><span>Mise à jour officielle</span></div>
+<div class="home-news-card__body">
+<small>15 juillet 2026</small>
+<h3>Mise à jour 1.29 — Road to Badlands</h3>
+<p>Nouvelle arme, équipements désertiques, convois militaires et nombreux ajustements.</p>
+<a href="https://steamcommunity.com/app/221100/announcements/?l=french" rel="noopener" target="_blank">Lire l’annonce ↗</a>
+</div>
+</article>
+<article class="home-news-card home-reveal">
+<div class="home-news-card__media" style="background-image:url('assets/images/news/senzany-summer-vibes-2026.png')"><span>Événement spécial été</span></div>
+<div class="home-news-card__body">
+<small>Collection limitée</small>
+<h3>Senzany Summer Vibes 2026</h3>
+<p>Une identité estivale exclusive, disponible pendant une période limitée.</p>
+<a href="https://senzany.tip4serv.com/category/senzany-summer-vibes-2026" rel="noopener" target="_blank">Voir la collection ↗</a>
+</div>
+</article>
+</div>
+</div>
+</section>
+<section aria-label="Monétisation officielle" class="home-trust">
+<div class="wrap">
+<a class="home-trust__banner home-reveal" href="https://www.bohemia.net/monetization/approved/dayz" rel="noopener" target="_blank">
+<span class="home-trust__seal">✓<small>Validé</small></span>
+<div><small>Bohemia Interactive // DayZ</small><strong>Monétisation officiellement autorisée</strong><p>Senzany figure dans la liste officielle des serveurs approuvés.</p></div>
+<b>Vérifier la liste officielle ↗</b>
+</a>
+</div>
+</section>
+</main>
+<div data-site-footer=""></div>
+<script defer="" src="assets/js/components.js"></script>
+<script defer="" src="assets/js/app.js"></script>
+<script defer="" src="assets/js/api.js"></script>
+<script defer="" src="assets/js/pages/accueil.js?v=2.7"></script>
+</body>
+</html>
