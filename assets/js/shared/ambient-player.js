@@ -408,6 +408,29 @@
     });
   }
 
+
+  const playIntroFromTerminal = () => {
+    introPending = false;
+    localStorage.removeItem(STORAGE.introSeen);
+    showIntroOnce(true);
+
+    if (enabled && audio.paused) {
+      startPlayback(true, false);
+    }
+  };
+
+  window.SenzanyIntro = Object.freeze({
+    play: playIntroFromTerminal,
+    replay: () => showIntroOnce(true)
+  });
+
+  window.addEventListener('senzany:terminal-access', playIntroFromTerminal);
+
+  if (window.__senzanyTerminalRequestedIntro) {
+    window.__senzanyTerminalRequestedIntro = false;
+    window.requestAnimationFrame(playIntroFromTerminal);
+  }
+
   // Mode développeur : F9 rejoue immédiatement la cinématique.
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'F9' || event.repeat) return;
