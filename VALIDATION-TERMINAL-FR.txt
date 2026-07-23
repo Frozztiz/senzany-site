@@ -1,0 +1,11 @@
+TERMINAL SENZANY — VERSION FRANÇAISE
+
+Modifications :
+- Nouveau décor de terminal militaire soviétique ancien.
+- Titre « TERMINAL SENZANY » clairement visible sur l'écran.
+- Tous les messages de connexion sont en français.
+- Vitesse de frappe accélérée tout en restant progressive et lisible.
+- Six étapes d'initialisation avant l'apparition du bouton.
+- Bouton « ACCÉDER AU TERMINAL » puis lancement de la cinématique existante.
+
+Test : ajoutez ?terminal à l'adresse du site pour forcer l'affichage.

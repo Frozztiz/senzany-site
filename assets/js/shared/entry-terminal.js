@@ -38,16 +38,16 @@
 
         <div class="entry-terminal__screen-content">
           <header class="entry-terminal__screen-header">
-            <span id="entry-terminal-title">ТЕРМИНАЛ СВЯЗИ СЕНЗАНИ</span>
-            <span>КМ-8 / 42</span>
+            <span id="entry-terminal-title">TERMINAL SENZANY</span>
+            <span>POSTE KM-8 / 42</span>
           </header>
 
-          <p class="entry-terminal__designation">СЕКРЕТНО // ЛИНИЯ ЧЕРНАРУС</p>
+          <p class="entry-terminal__designation">RÉSEAU SÉCURISÉ // LIGNE CHERNARUS</p>
           <div class="entry-terminal__log" aria-live="polite"></div>
 
           <div class="entry-terminal__ready" hidden>
             <p class="entry-terminal__ready-label">
-              <span>СИСТЕМА ГОТОВА</span>
+              <span>SYSTÈME PRÊT</span>
               <i class="entry-terminal__cursor" aria-hidden="true"></i>
             </p>
             <button class="entry-terminal__button" type="button">
@@ -59,14 +59,14 @@
           </div>
 
           <footer class="entry-terminal__screen-footer">
-            <span>СЕТЬ: CHERNARUS</span>
+            <span>RÉSEAU : CHERNARUS</span>
             <span class="entry-terminal__clock">--:--:--</span>
           </footer>
         </div>
 
         <div class="entry-terminal__grant" aria-hidden="true">
-          <span>ДОСТУП РАЗРЕШЕН</span>
-          <small>ACCÈS AUTORISÉ</small>
+          <span>ACCÈS AUTORISÉ</span>
+          <small>BIENVENUE SUR SENZANY</small>
         </div>
       </div>
     </div>`;
@@ -81,11 +81,12 @@
   const clock = terminal.querySelector('.entry-terminal__clock');
 
   const lines = [
-    { ru: 'ПОДАЧА ПИТАНИЯ', fr: 'ALIMENTATION PRINCIPALE' },
-    { ru: 'ПРОВЕРКА ЛАМПОВЫХ МОДУЛЕЙ', fr: 'CONTRÔLE DES MODULES' },
-    { ru: 'НАСТРОЙКА ЧАСТОТЫ 42.7', fr: 'RÉGLAGE DE LA FRÉQUENCE' },
-    { ru: 'СОЕДИНЕНИЕ С СЕТЬЮ CHERNARUS', fr: 'CONNEXION AU RÉSEAU' },
-    { ru: 'ПРОВЕРКА КАНАЛА БЕЗОПАСНОСТИ', fr: 'VÉRIFICATION DU CANAL' }
+    'MISE SOUS TENSION DU TERMINAL',
+    'CONTRÔLE DES MODULES SYSTÈME',
+    'ÉTABLISSEMENT DE LA LIAISON SÉCURISÉE',
+    'CONNEXION AU RÉSEAU CHERNARUS',
+    'VÉRIFICATION DE L’INTÉGRITÉ DU MONDE',
+    'SYNCHRONISATION DES DONNÉES SENZANY'
   ];
 
   const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
@@ -100,15 +101,15 @@
     });
   };
 
-  const typeText = async (element, text, speed = 34) => {
+  const typeText = async (element, text, speed = 18) => {
     for (const character of text) {
       element.textContent += character;
-      const naturalPause = character === ' ' ? 18 : Math.floor(Math.random() * 22);
+      const naturalPause = character === ' ' ? 8 : Math.floor(Math.random() * 10);
       await wait(speed + naturalPause);
     }
   };
 
-  const addLine = async ({ ru, fr }) => {
+  const addLine = async (textValue) => {
     const line = document.createElement('div');
     line.className = 'entry-terminal__line';
     line.innerHTML = `
@@ -116,36 +117,32 @@
         <span class="entry-terminal__prompt">&gt;</span>
         <span class="entry-terminal__typed"></span>
         <span class="entry-terminal__working">...</span>
-        <strong class="entry-terminal__ok">ГОТОВО</strong>
-      </div>
-      <small class="entry-terminal__translation"></small>`;
+        <strong class="entry-terminal__ok">OK</strong>
+      </div>`;
 
     log.appendChild(line);
 
     const typed = line.querySelector('.entry-terminal__typed');
     const working = line.querySelector('.entry-terminal__working');
     const ok = line.querySelector('.entry-terminal__ok');
-    const translation = line.querySelector('.entry-terminal__translation');
 
-    await typeText(typed, ru, 31);
+    await typeText(typed, textValue, 18);
     working.classList.add('is-active');
-    await wait(430 + Math.floor(Math.random() * 260));
+    await wait(240 + Math.floor(Math.random() * 150));
     working.classList.remove('is-active');
     working.hidden = true;
     ok.classList.add('is-visible');
-    translation.textContent = fr;
-    translation.classList.add('is-visible');
-    await wait(380);
+    await wait(210);
   };
 
   const run = async () => {
-    await wait(1050);
+    await wait(780);
 
     for (const line of lines) {
       await addLine(line);
     }
 
-    await wait(650);
+    await wait(420);
     ready.hidden = false;
     window.setTimeout(() => button.focus({ preventScroll: true }), 320);
   };

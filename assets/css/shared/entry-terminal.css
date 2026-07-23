@@ -76,10 +76,10 @@ html.senzany-terminal-active body {
 .entry-terminal__screen-wrap {
   position: absolute;
   z-index: 5;
-  left: 18.55%;
-  top: 13.2%;
-  width: 49.3%;
-  height: 63.3%;
+  left: 20.25%;
+  top: 15.15%;
+  width: 47.35%;
+  height: 59.15%;
   overflow: hidden;
   border-radius: 9% / 7%;
   transform: perspective(1100px) rotateY(-0.2deg);
@@ -127,7 +127,7 @@ html.senzany-terminal-active body {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  padding: 7.3% 9% 6%;
+  padding: 7.2% 8.2% 5.2%;
   text-shadow: 0 0 7px rgba(131,185,130,.28);
 }
 
@@ -138,22 +138,22 @@ html.senzany-terminal-active body {
   padding-bottom: 2.2%;
   border-bottom: 1px dashed rgba(131,185,130,.34);
   color: var(--entry-phosphor-bright);
-  font-size: clamp(7px, 1.14vw, 17px);
-  letter-spacing: .08em;
+  font-size: clamp(8px, 1.35vw, 20px);
+  letter-spacing: .12em;
   white-space: nowrap;
 }
 
 .entry-terminal__designation {
-  margin: 4.5% 0 3.6%;
+  margin: 3.8% 0 3.2%;
   color: rgba(183,221,177,.75);
-  font-size: clamp(6px, .95vw, 14px);
+  font-size: clamp(6px, .82vw, 12px);
   letter-spacing: .1em;
 }
 
 .entry-terminal__log {
   display: grid;
-  gap: clamp(3px, .78vw, 12px);
-  min-height: 48%;
+  gap: clamp(3px, .56vw, 9px);
+  min-height: 51%;
 }
 
 .entry-terminal__line {
@@ -166,7 +166,7 @@ html.senzany-terminal-active body {
   display: flex;
   align-items: baseline;
   min-width: 0;
-  font-size: clamp(6px, .98vw, 15px);
+  font-size: clamp(6px, .84vw, 13px);
   line-height: 1.25;
   white-space: nowrap;
 }
