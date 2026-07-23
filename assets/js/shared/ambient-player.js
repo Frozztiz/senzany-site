@@ -431,15 +431,72 @@
     window.requestAnimationFrame(playIntroFromTerminal);
   }
 
-  // Mode développeur : F9 rejoue immédiatement la cinématique.
-  document.addEventListener('keydown', (event) => {
+  // Mode développeur : F9 réinitialise complètement le site, puis relance
+  // le parcours comme lors d'une toute première visite : terminal, cinématique, accueil.
+  document.addEventListener('keydown', async (event) => {
     if (event.key !== 'F9' || event.repeat) return;
 
     event.preventDefault();
-    introPending = false;
-    localStorage.removeItem(STORAGE.introSeen);
-    showIntroOnce(true);
-  });
+    event.stopImmediatePropagation();
+
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Supprime tous les cookies accessibles depuis le site, y compris ceux
+      // définis sur différents chemins du domaine actuel.
+      const hostParts = window.location.hostname.split('.');
+      const domains = ['', window.location.hostname];
+
+      for (let index = 0; index < hostParts.length - 1; index += 1) {
+        domains.push(`.${hostParts.slice(index).join('.')}`);
+      }
+
+      const paths = ['/'];
+      const currentParts = window.location.pathname.split('/').filter(Boolean);
+      let currentPath = '';
+
+      for (const part of currentParts) {
+        currentPath += `/${part}`;
+        paths.push(currentPath);
+      }
+
+      document.cookie.split(';').forEach((rawCookie) => {
+        const cookieName = rawCookie.split('=')[0].trim();
+        if (!cookieName) return;
+
+        for (const path of paths) {
+          document.cookie = `${cookieName}=; Max-Age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}; SameSite=Lax`;
+
+          for (const domain of domains) {
+            if (!domain) continue;
+            document.cookie = `${cookieName}=; Max-Age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}; domain=${domain}; SameSite=Lax`;
+          }
+        }
+      });
+
+      // Nettoie également les caches et bases locales quand le navigateur
+      // permet de les lister. Les erreurs éventuelles ne bloquent pas le reload.
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.allSettled(cacheNames.map((name) => caches.delete(name)));
+      }
+
+      if ('indexedDB' in window && typeof indexedDB.databases === 'function') {
+        const databases = await indexedDB.databases();
+        for (const database of databases) {
+          if (database.name) indexedDB.deleteDatabase(database.name);
+        }
+      }
+    } catch (error) {
+      console.warn('[Senzany] Réinitialisation partielle :', error);
+    } finally {
+      // Le paramètre terminal force l'affichage même si un stockage résiduel
+      // n'a pas pu être supprimé par le navigateur. Le cache-buster empêche
+      // également de réutiliser une ancienne version de la page.
+      window.location.replace(`/?terminal&fresh=${Date.now()}`);
+    }
+  }, true);
 
   const fadeTo = (target, duration = FADE_DURATION, onComplete) => {
     if (fadeFrame) cancelAnimationFrame(fadeFrame);
