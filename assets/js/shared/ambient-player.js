@@ -298,6 +298,7 @@
     intro.style.visibility = 'visible';
     intro.style.pointerEvents = 'all';
     document.documentElement.classList.add('senzany-intro-running');
+    window.dispatchEvent(new CustomEvent('senzany:intro-started'));
 
     gsap.set(intro, { autoAlpha: 0 });
     gsap.set(canvas, { autoAlpha: 0, scale: 1.08 });
@@ -386,6 +387,7 @@
       console.warn('Cinématique GSAP indisponible.', error);
 
       intro.classList.add('is-visible');
+      window.dispatchEvent(new CustomEvent('senzany:intro-started'));
 
       window.setTimeout(() => {
         intro.classList.add('is-leaving');

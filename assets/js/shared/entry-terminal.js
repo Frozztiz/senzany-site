@@ -191,14 +191,26 @@
     sessionStorage.setItem(STORAGE_KEY, 'true');
     terminal.classList.add('is-granted');
 
+    // Le terminal reste au-dessus de l'accueil tant que la cinématique
+    // n'est pas réellement prête. Cela évite tout flash de la page d'accueil.
+    let transitionStarted = false;
+    const revealIntro = () => {
+      if (transitionStarted) return;
+      transitionStarted = true;
+      terminal.classList.add('is-leaving');
+      root.classList.remove('senzany-terminal-active');
+      window.setTimeout(() => terminal.remove(), 700);
+    };
+
+    window.addEventListener('senzany:intro-started', revealIntro, { once: true });
+
     window.setTimeout(() => {
       window.__senzanyTerminalRequestedIntro = true;
       window.dispatchEvent(new CustomEvent('senzany:terminal-access'));
-      terminal.classList.add('is-leaving');
-      root.classList.remove('senzany-terminal-active');
-    }, 900);
 
-    window.setTimeout(() => terminal.remove(), 1550);
+      // Sécurité : si la cinématique ne répond pas, on libère quand même l'écran.
+      window.setTimeout(revealIntro, 2500);
+    }, 900);
   };
 
   button?.addEventListener('pointerdown', (event) => event.stopPropagation());
