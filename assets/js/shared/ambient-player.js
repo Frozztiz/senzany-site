@@ -298,9 +298,10 @@
     intro.style.visibility = 'visible';
     intro.style.pointerEvents = 'all';
     document.documentElement.classList.add('senzany-intro-running');
-    window.dispatchEvent(new CustomEvent('senzany:intro-started'));
 
-    gsap.set(intro, { autoAlpha: 0 });
+    // L'overlay est immédiatement opaque : la scène démarre depuis le noir,
+    // sans laisser apparaître la page d'accueil entre le terminal et l'intro.
+    gsap.set(intro, { autoAlpha: 1 });
     gsap.set(canvas, { autoAlpha: 0, scale: 1.08 });
     gsap.set(q('.senzany-audio-intro__scene'), { scale: 1.28, filter: 'brightness(0.08) saturate(0.35)' });
     gsap.set(q('.senzany-audio-intro__moon'), { autoAlpha: 0, scale: 0.55 });
@@ -316,6 +317,10 @@
     gsap.set(q('.senzany-audio-intro__hint'), { autoAlpha: 0, y: 16 });
     gsap.set(q('.senzany-audio-intro__vignette'), { autoAlpha: 0 });
     gsap.set(q('.senzany-audio-intro__shutter'), { autoAlpha: 0 });
+
+    // À cet instant, l'intro est déjà visible et totalement opaque.
+    // Le terminal peut donc disparaître sans révéler l'accueil.
+    window.dispatchEvent(new CustomEvent('senzany:intro-ready'));
 
     const timeline = gsap.timeline({
       defaults: { ease: 'power2.out' },
@@ -387,7 +392,7 @@
       console.warn('Cinématique GSAP indisponible.', error);
 
       intro.classList.add('is-visible');
-      window.dispatchEvent(new CustomEvent('senzany:intro-started'));
+      window.dispatchEvent(new CustomEvent('senzany:intro-ready'));
 
       window.setTimeout(() => {
         intro.classList.add('is-leaving');

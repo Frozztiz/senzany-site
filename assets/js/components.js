@@ -4,14 +4,14 @@
   if (!document.querySelector('link[data-senzany-ambient-player]')) {
     const ambientLink = document.createElement('link');
     ambientLink.rel = 'stylesheet';
-    ambientLink.href = `${ambientStylesheet}?v=1.0.0`;
+    ambientLink.href = `${ambientStylesheet}?v=1.0.1`;
     ambientLink.dataset.senzanyAmbientPlayer = 'v1';
     document.head.appendChild(ambientLink);
   }
 
   if (!document.querySelector('script[data-senzany-ambient-player]')) {
     const ambientScript = document.createElement('script');
-    ambientScript.src = 'assets/js/shared/ambient-player.js?v=1.0.0';
+    ambientScript.src = 'assets/js/shared/ambient-player.js?v=1.0.1';
     ambientScript.defer = true;
     ambientScript.dataset.senzanyAmbientPlayer = 'v1';
     document.head.appendChild(ambientScript);

@@ -216,7 +216,7 @@ html.senzany-intro-running body {
 .senzany-audio-intro {
   position: fixed;
   inset: 0;
-  z-index: 10050;
+  z-index: 1000000;
   overflow: hidden;
   visibility: hidden;
   opacity: 0;
