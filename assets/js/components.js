@@ -50,14 +50,38 @@
           <img alt="Logo Senzany" class="badge" src="assets/images/branding/logo.png">
           <span class="brand-name">SENZANY</span>
         </a>
-        <div class="navlinks">${links}</div>
+        <div class="navlinks">${links}<span data-commandement-nav></span></div>
         <div class="nav-right">
           <a class="btn-join" href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Rejoindre le serveur</a>
           <button aria-label="Ouvrir le menu" aria-expanded="false" class="burger" id="burgerBtn">☰</button>
         </div>
       </nav>
-      <div class="mobile-menu" id="mobileMenu">${links}</div>
+      <div class="mobile-menu" id="mobileMenu">${links}<span data-commandement-nav-mobile></span></div>
     </header>`;
+
+  async function revealCommandementLink() {
+    try {
+      const response = await fetch('/api/commandement/access', {
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: { Accept: 'application/json' }
+      });
+      if (!response.ok) return;
+      const access = await response.json();
+      if (!access.authorized) return;
+
+      const active = current === 'commandement'
+        ? ' class="active commandement-link" aria-current="page"'
+        : ' class="commandement-link"';
+      const link = `<a href="senzany-admin.html"${active}>Commandement</a>`;
+      document.querySelectorAll('[data-commandement-nav], [data-commandement-nav-mobile]')
+        .forEach(slot => { slot.outerHTML = link; });
+    } catch (_) {
+      // En cas d'indisponibilité du backend, le lien reste invisible.
+    }
+  }
+
+  revealCommandementLink();
 
   const footer = document.querySelector('[data-site-footer]');
   if (footer) footer.innerHTML = `

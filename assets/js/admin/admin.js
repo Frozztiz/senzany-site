@@ -103,58 +103,47 @@ async function checkAccess() {
     }
 
     try {
-        const response = await fetch("/api/steam/me", {
+        const response = await fetch("/api/commandement/access", {
             method: "GET",
             credentials: "same-origin",
             cache: "no-store",
-            headers: {
-                Accept: "application/json"
-            }
+            headers: { Accept: "application/json" }
         });
 
-        if (!response.ok) {
-            throw new Error(
-                `Le serveur a répondu avec l’erreur ${response.status}.`
-            );
-        }
+        let access = {};
+        try { access = await response.json(); } catch (_) {}
 
-        const user = await response.json();
-
-        console.log("[Senzany Admin] Session Steam :", user);
-
-        if (!isLoggedIn(user)) {
+        if (response.status === 401 || access.loggedIn === false) {
             showAccessView("loggedOut");
             return;
         }
 
-        if (!isStaff(user)) {
+        if (response.status === 403 || access.authorized !== true) {
             showAccessView("denied");
             return;
+        }
+
+        if (!response.ok) {
+            throw new Error(access.error || `Le serveur a répondu avec l’erreur ${response.status}.`);
         }
 
         if (elements.backendStatus) {
             elements.backendStatus.textContent = "ONLINE";
         }
 
+        const sessionLabel = document.querySelector('.admin-status-bar strong');
+        if (sessionLabel) sessionLabel.textContent = `AUTORISÉ // ${access.clearance || "ALPHA"}`;
+
         showAccessView("dashboard");
         showHome();
 
     } catch (error) {
-        console.error(
-            "[Senzany Admin] Impossible de vérifier l’accès :",
-            error
-        );
+        console.error("[Senzany Commandement] Vérification impossible :", error);
 
-        if (elements.backendStatus) {
-            elements.backendStatus.textContent = "ERREUR";
-        }
-
+        if (elements.backendStatus) elements.backendStatus.textContent = "ERREUR";
         if (elements.errorMessage) {
-            elements.errorMessage.textContent =
-                error.message ||
-                "Impossible de vérifier ta session.";
+            elements.errorMessage.textContent = error.message || "Impossible de vérifier ta session.";
         }
-
         showAccessView("error");
     }
 }

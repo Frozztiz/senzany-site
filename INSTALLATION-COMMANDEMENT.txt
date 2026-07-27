@@ -1,0 +1,35 @@
+SENZANY — INSTALLATION DE LA RUBRIQUE COMMANDEMENT
+==================================================
+
+1) Remplace les fichiers du site par ceux de ce ZIP.
+
+2) Dans le VPS, copie le dossier "backend" vers le backend réellement utilisé :
+   /var/www/senzany/server
+
+3) Dans /var/www/senzany/server/.env, ajoute cette ligne :
+
+COMMAND_STEAM_IDS=76561198072963309,76561199273698198,76561198287646967,76561197985997015
+
+Accès configurés : Toad, Twixie, Soon et Frozzz.
+Pour ajouter quelqu'un, ajoute simplement son SteamID64 après une virgule.
+
+4) Redémarre le backend :
+
+cd /var/www/senzany/server
+pm2 restart senzany-api --update-env
+pm2 save
+
+5) Vérifie :
+
+http://213.32.88.222/api/commandement/access
+
+- Steam autorisé : authorized=true
+- Steam non autorisé : erreur 403
+- Non connecté : erreur 401
+
+SÉCURITÉ AJOUTÉE
+----------------
+- Le bouton « Commandement » est invisible pour les comptes non autorisés.
+- L'accès direct affiche l'écran immersif « ACCÈS REFUSÉ ».
+- Les routes API des livraisons sont désormais protégées côté serveur.
+- La liste d'autorisation est vérifiée par le backend, et pas seulement par JavaScript.

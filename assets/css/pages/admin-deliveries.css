@@ -1222,3 +1222,33 @@ body[data-page="admin"] [data-site-footer] {
   }
 }
 
+
+/* Commandement — accès restreint */
+.commandement-link {
+  color: #ffb0a8 !important;
+  border-color: rgba(202, 52, 42, .45) !important;
+  text-shadow: 0 0 14px rgba(218, 52, 42, .45);
+}
+.commandement-link::before {
+  content: "◆";
+  margin-right: .4rem;
+  font-size: .65em;
+}
+.admin-gate--danger {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(218, 52, 42, .75) !important;
+  box-shadow: inset 0 0 45px rgba(140, 14, 10, .16), 0 0 35px rgba(100, 10, 8, .16);
+}
+.admin-gate--danger::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.025) 4px);
+  animation: commandScan 7s linear infinite;
+}
+@keyframes commandScan {
+  from { transform: translateY(-10%); }
+  to { transform: translateY(10%); }
+}
