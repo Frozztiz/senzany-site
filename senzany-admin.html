@@ -8,10 +8,10 @@
   <title>Centre de commandement — SENZANY</title>
 
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=3.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.0.0" />
 </head>
 
-<body data-page="commandement" data-build="admin-control-center-v1">
+<body data-page="admin" data-build="admin-control-center-v1">
   <div data-site-header></div>
 
   <main class="admin-main">
@@ -121,120 +121,62 @@
           </section>
 
           <!-- Accueil du centre de commandement -->
-          <section id="adminHomeView" class="admin-command-center">
-            <div class="admin-section-heading">
+          <section id="adminHomeView" class="admin-command-center admin-command-center--v2">
+            <div class="command-topline">
               <div>
-                <span>TERMINAL PRINCIPAL</span>
-                <h2>Senzany Control Center</h2>
-                <p>
-                  Sélectionne un module. Seul le module Livraisons est actif
-                  dans cette première version.
-                </p>
+                <span>OPÉRATEUR AUTORISÉ</span>
+                <strong id="commandOperator">CHARGEMENT...</strong>
               </div>
-
-              <div class="admin-terminal-badge">V1.0</div>
+              <div>
+                <span>NIVEAU D’AUTORISATION</span>
+                <strong>ALPHA</strong>
+              </div>
+              <div>
+                <span>HEURE SERVEUR</span>
+                <strong id="commandClock">--:--:--</strong>
+              </div>
             </div>
 
-            <div class="admin-module-grid">
+            <div class="admin-section-heading admin-section-heading--compact">
+              <div>
+                <span>TERMINAL PRINCIPAL // SENZANY</span>
+                <h2>Senzany Control Center</h2>
+                <p>Supervision, opérations et accès aux outils sensibles du serveur.</p>
+              </div>
+              <div class="admin-terminal-badge">V2.0</div>
+            </div>
+
+            <div class="command-live-strip">
+              <div><i class="command-led"></i><span>SESSION</span><strong id="commandSessionState">AUTHENTIFIÉE</strong></div>
+              <div><i class="command-led"></i><span>STEAM</span><strong>CONNECTÉ</strong></div>
+              <div><i class="command-led"></i><span>DISCORD</span><strong>SYNCHRONISÉ</strong></div>
+              <div><i class="command-led"></i><span>BACKEND</span><strong>ONLINE</strong></div>
+              <div><i class="command-led command-led--amber"></i><span>DAYZ</span><strong>SUPERVISION</strong></div>
+            </div>
+
+            <div class="admin-module-grid admin-module-grid--v2">
+              <button class="admin-module-card admin-module-card--rcon" type="button" disabled>
+                <span class="admin-module-card__index">01</span><span class="admin-module-card__icon">›_</span>
+                <strong>RCON</strong><small>Console distante, annonces, actions joueurs et maintenance.</small>
+                <div class="module-metrics"><b>ONLINE</b><span>Connexion à finaliser</span></div><em>PRIORITÉ ALPHA</em>
+              </button>
+              <button class="admin-module-card" type="button" disabled>
+                <span class="admin-module-card__index">02</span><span class="admin-module-card__icon">◎</span>
+                <strong>Joueurs</strong><small>Profils, connexions, sanctions et actions rapides.</small>
+                <div class="module-metrics"><b>-- / --</b><span>Joueurs actifs</span></div><em>À VENIR</em>
+              </button>
               <button class="admin-module-card admin-module-card--active" type="button" data-admin-module="deliveries">
-                <span class="admin-module-card__accent" aria-hidden="true"></span>
-                <span class="admin-module-card__sheen" aria-hidden="true"></span>
-                <span class="admin-module-card__index">01</span>
-                <span class="admin-module-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h16v11H4z"/><path d="M7 7.5V5h10v2.5"/><path d="M8 11h8M8 14.5h5"/></svg></span>
-                <strong>Livraisons</strong>
-                <small>Créer, suivre et préparer les récompenses joueurs.</small>
-                <em><span class="admin-module-card__status-dot" aria-hidden="true"></span>MODULE ACTIF</em>
+                <span class="admin-module-card__index">03</span><span class="admin-module-card__icon">▣</span>
+                <strong>Livraisons</strong><small>Créer, suivre et préparer les récompenses joueurs.</small>
+                <div class="module-metrics"><b>ACTIF</b><span>Module opérationnel</span></div><em>OUVRIR LE MODULE</em>
               </button>
-
-              <button class="admin-module-card" type="button" disabled>
-                <span class="admin-module-card__accent" aria-hidden="true"></span>
-                <span class="admin-module-card__sheen" aria-hidden="true"></span>
-                <span class="admin-module-card__index">02</span>
-                <span class="admin-module-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 20c.7-4 3.2-6 7-6s6.3 2 7 6"/></svg></span>
-                <strong>Joueurs</strong>
-                <small>Profils, connexions et informations liées au serveur.</small>
-                <em><span class="admin-module-card__status-dot" aria-hidden="true"></span>À VENIR</em>
-              </button>
-
-              <button class="admin-module-card" type="button" disabled>
-                <span class="admin-module-card__accent" aria-hidden="true"></span>
-                <span class="admin-module-card__sheen" aria-hidden="true"></span>
-                <span class="admin-module-card__index">03</span>
-                <span class="admin-module-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14h18l-2-5H5z"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></span>
-                <strong>Véhicules</strong>
-                <small>Suivi et outils de gestion du parc automobile.</small>
-                <em><span class="admin-module-card__status-dot" aria-hidden="true"></span>À VENIR</em>
-              </button>
-
-              <button class="admin-module-card" type="button" disabled>
-                <span class="admin-module-card__accent" aria-hidden="true"></span>
-                <span class="admin-module-card__sheen" aria-hidden="true"></span>
-                <span class="admin-module-card__index">04</span>
-                <span class="admin-module-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7.5h12l-1 12H6L5 5h-2"/><path d="M9 10h6M10 14h4"/></svg></span>
-                <strong>Boutique</strong>
-                <small>Récompenses, achats et opérations commerciales.</small>
-                <em><span class="admin-module-card__status-dot" aria-hidden="true"></span>À VENIR</em>
-              </button>
-
-              <button class="admin-module-card" type="button" disabled>
-                <span class="admin-module-card__accent" aria-hidden="true"></span>
-                <span class="admin-module-card__sheen" aria-hidden="true"></span>
-                <span class="admin-module-card__index">05</span>
-                <span class="admin-module-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.5 6.1.9-4.4 4.3 1 6-5.4-2.9-5.4 2.9 1-6-4.4-4.3 6.1-.9z"/></svg></span>
-                <strong>Battle Pass</strong>
-                <small>Paliers, récompenses et progression saisonnière.</small>
-                <em><span class="admin-module-card__status-dot" aria-hidden="true"></span>À VENIR</em>
-              </button>
-
-              <button class="admin-module-card" type="button" disabled>
-                <span class="admin-module-card__accent" aria-hidden="true"></span>
-                <span class="admin-module-card__sheen" aria-hidden="true"></span>
-                <span class="admin-module-card__index">06</span>
-                <span class="admin-module-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4c4 2 4 6 8 8M16 4c-4 2-4 6-8 8M8 12c4 2 4 6 8 8M16 12c-4 2-4 6-8 8"/></svg></span>
-                <strong>DNA</strong>
-                <small>Données et récompenses liées au système DNA.</small>
-                <em><span class="admin-module-card__status-dot" aria-hidden="true"></span>À VENIR</em>
-              </button>
-
-              <button class="admin-module-card" type="button" disabled>
-                <span class="admin-module-card__accent" aria-hidden="true"></span>
-                <span class="admin-module-card__sheen" aria-hidden="true"></span>
-                <span class="admin-module-card__index">07</span>
-                <span class="admin-module-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span>
-                <strong>Quêtes</strong>
-                <small>Gestion des objectifs et contenus scénarisés.</small>
-                <em><span class="admin-module-card__status-dot" aria-hidden="true"></span>À VENIR</em>
-              </button>
-
-              <button class="admin-module-card" type="button" disabled>
-                <span class="admin-module-card__accent" aria-hidden="true"></span>
-                <span class="admin-module-card__sheen" aria-hidden="true"></span>
-                <span class="admin-module-card__index">08</span>
-                <span class="admin-module-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="7" width="14" height="11" rx="2"/><path d="M9 11v3M15 11v3M9 4v3M15 4v3M3 11h2M19 11h2"/></svg></span>
-                <strong>Intelligence artificielle</strong>
-                <small>Paramètres des interactions et systèmes IA.</small>
-                <em><span class="admin-module-card__status-dot" aria-hidden="true"></span>À VENIR</em>
-              </button>
-
-              <button class="admin-module-card" type="button" disabled>
-                <span class="admin-module-card__accent" aria-hidden="true"></span>
-                <span class="admin-module-card__sheen" aria-hidden="true"></span>
-                <span class="admin-module-card__index">09</span>
-                <span class="admin-module-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h10"/><circle cx="18" cy="18" r="1"/></svg></span>
-                <strong>Logs</strong>
-                <small>Historique des actions sensibles du centre de contrôle.</small>
-                <em><span class="admin-module-card__status-dot" aria-hidden="true"></span>À VENIR</em>
-              </button>
-
-              <button class="admin-module-card" type="button" disabled>
-                <span class="admin-module-card__accent" aria-hidden="true"></span>
-                <span class="admin-module-card__sheen" aria-hidden="true"></span>
-                <span class="admin-module-card__index">10</span>
-                <span class="admin-module-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></svg></span>
-                <strong>Paramètres</strong>
-                <small>Configuration générale et autorisations du portail.</small>
-                <em><span class="admin-module-card__status-dot" aria-hidden="true"></span>À VENIR</em>
-              </button>
+              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">04</span><span class="admin-module-card__icon">▤</span><strong>Véhicules</strong><small>Suivi du parc et outils de restitution.</small><div class="module-metrics"><b>--</b><span>Entrées suivies</span></div><em>À VENIR</em></button>
+              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">05</span><span class="admin-module-card__icon">◉</span><strong>Discord</strong><small>État du réseau, membres et outils communautaires.</small><div class="module-metrics"><b>SYNC</b><span>API connectée</span></div><em>À VENIR</em></button>
+              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">06</span><span class="admin-module-card__icon">≡</span><strong>Logs</strong><small>Historique des actions sensibles et incidents.</small><div class="module-metrics"><b>LIVE</b><span>Journal sécurisé</span></div><em>À VENIR</em></button>
+              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">07</span><span class="admin-module-card__icon">₽</span><strong>Économie</strong><small>Flux, boutique, récompenses et équilibrage.</small><div class="module-metrics"><b>STABLE</b><span>État économie</span></div><em>À VENIR</em></button>
+              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">08</span><span class="admin-module-card__icon">★</span><strong>Battle Pass</strong><small>Paliers, progression et contenus saisonniers.</small><div class="module-metrics"><b>S01</b><span>Saison préparatoire</span></div><em>À VENIR</em></button>
+              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">09</span><span class="admin-module-card__icon">◇</span><strong>Quêtes & IA</strong><small>Objectifs scénarisés et interactions intelligentes.</small><div class="module-metrics"><b>DEV</b><span>Systèmes en cours</span></div><em>À VENIR</em></button>
+              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">10</span><span class="admin-module-card__icon">⚙</span><strong>Paramètres</strong><small>Configuration générale et autorisations.</small><div class="module-metrics"><b>ALPHA</b><span>Accès restreint</span></div><em>À VENIR</em></button>
             </div>
           </section>
 
@@ -390,6 +332,6 @@
 
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin.js?v=1.0.0"></script>
+  <script type="module" src="assets/js/admin/admin.js?v=2.0.0"></script>
 </body>
 </html>

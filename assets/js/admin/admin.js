@@ -134,6 +134,9 @@ async function checkAccess() {
         const sessionLabel = document.querySelector('.admin-status-bar strong');
         if (sessionLabel) sessionLabel.textContent = `AUTORISÉ // ${access.clearance || "ALPHA"}`;
 
+        const operator = document.getElementById("commandOperator");
+        if (operator) operator.textContent = access.name || access.personaName || access.steamName || "OPÉRATEUR SENZANY";
+
         showAccessView("dashboard");
         showHome();
 
@@ -148,7 +151,15 @@ async function checkAccess() {
     }
 }
 
+function startCommandClock() {
+    const clock = document.getElementById("commandClock");
+    if (!clock) return;
+    const tick = () => { clock.textContent = new Intl.DateTimeFormat("fr-FR", {hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(new Date()); };
+    tick(); setInterval(tick, 1000);
+}
+
 function initializeAdmin() {
+    startCommandClock();
     elements.deliveriesButton?.addEventListener(
         "click",
         showDeliveries
