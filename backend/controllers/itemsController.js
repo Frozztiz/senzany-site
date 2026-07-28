@@ -4,14 +4,26 @@ const { getImageStats, processImageBatch, resetImageSearch } = require("../servi
 
 async function search(req, res, next) {
   try {
+    console.log("[ITEMS SEARCH] requête reçue :", req.query);
+
     const result = await searchItems({
       query: req.query.q || "",
       mod: req.query.mod || "",
       limit: req.query.limit || 50,
       offset: req.query.offset || 0
     });
+
+    console.log(
+      "[ITEMS SEARCH] résultat OK :",
+      Array.isArray(result?.items) ? result.items.length : 0,
+      "objet(s)"
+    );
+
     res.json(result);
-  } catch (error) { next(error); }
+  } catch (error) {
+    console.error("[ITEMS SEARCH] ERREUR COMPLÈTE :", error);
+    next(error);
+  }
 }
 
 async function stats(req, res, next) {
@@ -30,29 +42,50 @@ async function processImages(req, res, next) {
       batchSize: req.body?.batchSize || 20,
       retryMissing: Boolean(req.body?.retryMissing)
     });
+
     res.json({ ok: true, ...result });
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function resetImages(req, res, next) {
   try {
-    const stats = await resetImageSearch({ onlyMissing: req.body?.onlyMissing !== false });
+    const stats = await resetImageSearch({
+      onlyMissing: req.body?.onlyMissing !== false
+    });
+
     res.json({ ok: true, stats });
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function importArchive(req, res, next) {
   try {
     const result = await importZipBuffer(req.body);
-    console.log(`[ITEMS] Import par ${req.commandSteamId}: ${result.uniqueItems} objets / ${result.files} XML`);
+
+    console.log(
+      `[ITEMS] Import par ${req.commandSteamId}: ${result.uniqueItems} objets / ${result.files} XML`
+    );
+
     res.status(201).json({ ok: true, ...result });
   } catch (error) {
     const message = String(error?.message || "");
+
     if (/ZIP|types.*xml|25 Mo|chemin non sécurisé|trop de fichiers/i.test(message)) {
       return res.status(400).json({ error: message });
     }
+
     next(error);
   }
 }
 
-module.exports = { search, stats, imageStats, processImages, resetImages, importArchive };
+module.exports = {
+  search,
+  stats,
+  imageStats,
+  processImages,
+  resetImages,
+  importArchive
+};
