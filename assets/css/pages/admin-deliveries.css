@@ -1333,3 +1333,26 @@ body[data-page="admin"] .admin-hero--v3{min-height:0;height:auto;text-align:cent
 .admin-item-row.is-item-selected .admin-item-picker input {
   border-color: rgba(88, 214, 141, 0.55);
 }
+
+/* Livraison — correctif visibilité de la liste de recherche (v4.1.2) */
+#adminDeliveriesView .admin-layout > .admin-card:first-child,
+#adminDeliveriesView #deliveryForm,
+#adminDeliveriesView .admin-items,
+#adminDeliveriesView #deliveryItemsList {
+  overflow: visible;
+}
+
+#adminDeliveriesView .admin-item-row {
+  position: relative;
+  z-index: 1;
+}
+
+#adminDeliveriesView .admin-item-row:focus-within {
+  z-index: 100;
+}
+
+#adminDeliveriesView .admin-item-suggestions {
+  z-index: 1000;
+  max-height: min(330px, 45vh);
+  overscroll-behavior: contain;
+}
