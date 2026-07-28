@@ -3,7 +3,7 @@
  * Fichier : assets/js/admin/api.js
  */
 
-async function request(url, options = {}) {
+export async function apiRequest(url, options = {}) {
     const response = await fetch(url, {
         method: options.method || "GET",
         credentials: "same-origin",
@@ -39,7 +39,7 @@ async function request(url, options = {}) {
 }
 
 export async function getSteamSession() {
-    return request("/api/steam/me");
+    return apiRequest("/api/steam/me");
 }
 
 export async function getDeliveries(status = "") {
@@ -47,11 +47,11 @@ export async function getDeliveries(status = "") {
         ? `?status=${encodeURIComponent(status)}`
         : "";
 
-    return request(`/api/admin/deliveries${query}`);
+    return apiRequest(`/api/admin/deliveries${query}`);
 }
 
 export async function createDelivery(payload) {
-    return request("/api/admin/deliveries", {
+    return apiRequest("/api/admin/deliveries", {
         method: "POST",
         body: payload
     });

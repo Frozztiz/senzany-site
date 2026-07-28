@@ -83,7 +83,7 @@ async function searchItems() {
 
     if (elements.searchButton) elements.searchButton.disabled = true;
     try {
-        const data = await apiRequest(`/api/admin/items?search=${encodeURIComponent(query)}&limit=50`);
+        const data = await apiRequest(`/api/admin/items?q=${encodeURIComponent(query)}&limit=50`);
         renderItems(Array.isArray(data.items) ? data.items : []);
         if (elements.empty) elements.empty.textContent = "Aucun objet trouvé.";
     } catch (error) {

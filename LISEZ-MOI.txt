@@ -1,15 +1,13 @@
-SENZANY — Amélioration du bloc État du réseau
+SENZANY — Correctif Base des objets v4.0.3
 
-Fichiers à remplacer :
-- assets/js/pages/accueil.js
-- assets/css/pages/accueil.css
+Fichiers à copier dans le dépôt en conservant l'arborescence :
+- senzany-admin.html
+- assets/js/admin/admin.js
+- assets/js/admin/api.js
+- assets/js/admin/catalog.js
 
-Ajouts :
-- compteur joueurs animé
-- point d'état vert/rouge dynamique
-- libellé LIVE/OFFLINE dynamique
-- barre de remplissage selon l'occupation
-- couleur de la barre selon l'affluence
-- carte récupérée automatiquement depuis l'API Steam
+Correction principale : catalog.js importait apiRequest, mais api.js ne l'exportait pas.
+Cette erreur empêchait admin.js de démarrer et bloquait la page sur l'initialisation.
 
-Après déploiement : Ctrl + F5.
+Après copie : Commit, Push origin, puis Ctrl + F5.
+Aucun redémarrage PM2 n'est nécessaire pour ce correctif frontend.
