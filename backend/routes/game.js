@@ -22,6 +22,36 @@ function toValidNumber(value) {
     : null;
 }
 
+function getServerConfig() {
+  const host =
+    process.env.DAYZ_SERVER_HOST ||
+    process.env.DAYZ_SERVER_IP ||
+    DEFAULT_SERVER_HOST;
+
+  const gamePort = Number(
+    process.env.DAYZ_SERVER_PORT ||
+      process.env.DAYZ_GAME_PORT ||
+      DEFAULT_GAME_PORT
+  );
+
+  const queryPort = Number(
+    process.env.DAYZ_QUERY_PORT ||
+      DEFAULT_QUERY_PORT
+  );
+
+  const fallbackMaxPlayers = Number(
+    process.env.DAYZ_MAX_PLAYERS ||
+      DEFAULT_MAX_PLAYERS
+  );
+
+  return {
+    host,
+    gamePort,
+    queryPort,
+    fallbackMaxPlayers,
+  };
+}
+
 function extractPlayerCount(state) {
   const candidates = [
     state?.numplayers,
@@ -150,25 +180,139 @@ async function getFreshServerState({
   return payload;
 }
 
+function serializeError(error) {
+  if (!(error instanceof Error)) {
+    return {
+      message: String(error),
+    };
+  }
+
+  return {
+    name: error.name,
+    message: error.message,
+    code: error.code || null,
+    stack: error.stack || null,
+  };
+}
+
+router.get("/debug", async (req, res) => {
+  const {
+    host,
+    gamePort,
+    queryPort,
+    fallbackMaxPlayers,
+  } = getServerConfig();
+
+  res.set(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, private"
+  );
+
+  const startedAt = Date.now();
+
+  try {
+    const state = await queryDayzServer(
+      host,
+      queryPort
+    );
+
+    return res.status(200).json({
+      ok: true,
+      configuration: {
+        host,
+        gamePort,
+        queryPort,
+        fallbackMaxPlayers,
+        serverAddress: `${host}:${gamePort}`,
+        queryAddress: `${host}:${queryPort}`,
+        environmentSources: {
+          host:
+            process.env.DAYZ_SERVER_HOST
+              ? "DAYZ_SERVER_HOST"
+              : process.env.DAYZ_SERVER_IP
+                ? "DAYZ_SERVER_IP"
+                : "DEFAULT_SERVER_HOST",
+          gamePort:
+            process.env.DAYZ_SERVER_PORT
+              ? "DAYZ_SERVER_PORT"
+              : process.env.DAYZ_GAME_PORT
+                ? "DAYZ_GAME_PORT"
+                : "DEFAULT_GAME_PORT",
+          queryPort: process.env.DAYZ_QUERY_PORT
+            ? "DAYZ_QUERY_PORT"
+            : "DEFAULT_QUERY_PORT",
+          maxPlayers: process.env.DAYZ_MAX_PLAYERS
+            ? "DAYZ_MAX_PLAYERS"
+            : "DEFAULT_MAX_PLAYERS",
+        },
+      },
+      durationMs: Date.now() - startedAt,
+      extracted: {
+        players: extractPlayerCount(state),
+        maxPlayers: extractMaxPlayers(
+          state,
+          fallbackMaxPlayers
+        ),
+      },
+      stateKeys:
+        state && typeof state === "object"
+          ? Object.keys(state)
+          : [],
+      rawKeys:
+        state?.raw && typeof state.raw === "object"
+          ? Object.keys(state.raw)
+          : [],
+      state,
+    });
+  } catch (error) {
+    console.error(
+      "Diagnostic GameDig DayZ :",
+      error
+    );
+
+    return res.status(502).json({
+      ok: false,
+      configuration: {
+        host,
+        gamePort,
+        queryPort,
+        fallbackMaxPlayers,
+        serverAddress: `${host}:${gamePort}`,
+        queryAddress: `${host}:${queryPort}`,
+        environmentSources: {
+          host:
+            process.env.DAYZ_SERVER_HOST
+              ? "DAYZ_SERVER_HOST"
+              : process.env.DAYZ_SERVER_IP
+                ? "DAYZ_SERVER_IP"
+                : "DEFAULT_SERVER_HOST",
+          gamePort:
+            process.env.DAYZ_SERVER_PORT
+              ? "DAYZ_SERVER_PORT"
+              : process.env.DAYZ_GAME_PORT
+                ? "DAYZ_GAME_PORT"
+                : "DEFAULT_GAME_PORT",
+          queryPort: process.env.DAYZ_QUERY_PORT
+            ? "DAYZ_QUERY_PORT"
+            : "DEFAULT_QUERY_PORT",
+          maxPlayers: process.env.DAYZ_MAX_PLAYERS
+            ? "DAYZ_MAX_PLAYERS"
+            : "DEFAULT_MAX_PLAYERS",
+        },
+      },
+      durationMs: Date.now() - startedAt,
+      error: serializeError(error),
+    });
+  }
+});
+
 router.get("/stats", async (req, res) => {
-  const host =
-    process.env.DAYZ_SERVER_HOST ||
-    DEFAULT_SERVER_HOST;
-
-  const gamePort = Number(
-    process.env.DAYZ_SERVER_PORT ||
-      DEFAULT_GAME_PORT
-  );
-
-  const queryPort = Number(
-    process.env.DAYZ_QUERY_PORT ||
-      DEFAULT_QUERY_PORT
-  );
-
-  const fallbackMaxPlayers = Number(
-    process.env.DAYZ_MAX_PLAYERS ||
-      DEFAULT_MAX_PLAYERS
-  );
+  const {
+    host,
+    gamePort,
+    queryPort,
+    fallbackMaxPlayers,
+  } = getServerConfig();
 
   res.set(
     "Cache-Control",
