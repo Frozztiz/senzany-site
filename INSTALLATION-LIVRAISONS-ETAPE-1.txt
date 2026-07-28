@@ -1,0 +1,56 @@
+SENZANY - LIVRAISONS AUTOMATIQUES - ETAPE 1
+============================================
+
+Cette étape ajoute le pont sécurisé côté portail/backend.
+Elle ne fait pas encore apparaître les objets en jeu : ce sera l'étape 2, le mod DayZ.
+
+1. SUPABASE
+-----------
+Ouvrir Supabase > SQL Editor.
+Créer une nouvelle requête.
+Copier tout le contenu de :
+  supabase/003_delivery_agent.sql
+Puis cliquer sur Run.
+
+2. BACKEND .ENV SUR UBUNTU
+--------------------------
+Ajouter une clé très longue :
+  DELIVERY_AGENT_KEY=une-cle-privee-tres-longue-et-aleatoire
+
+Ne jamais mettre cette clé dans le frontend ni sur GitHub.
+
+3. FICHIERS À ENVOYER SUR GITHUB
+--------------------------------
+- backend/server.js
+- backend/.env.example
+- backend/middleware/deliveryAgentAuth.js
+- backend/services/deliveryAgentService.js
+- backend/controllers/deliveryAgentController.js
+- backend/routes/deliveryAgent.js
+- supabase/003_delivery_agent.sql
+
+4. REDÉMARRAGE
+--------------
+pm2 restart senzany-api
+
+5. TEST DE L'API (depuis Ubuntu)
+-------------------------------
+Remplacer LA_CLE par la valeur du .env :
+
+curl -H "x-delivery-agent-key: LA_CLE" \
+  http://127.0.0.1:3000/api/delivery-agent/health
+
+Résultat attendu :
+  {"ok":true,"service":"Senzany Delivery Agent API"}
+
+6. TEST D'UNE RÉCLAMATION
+-------------------------
+Créer d'abord une livraison depuis le portail pour un vrai SteamID64, puis :
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "x-delivery-agent-key: LA_CLE" \
+  -d '{"steamId":"7656119XXXXXXXXXX","agentId":"serveur-test"}' \
+  http://127.0.0.1:3000/api/delivery-agent/claim
+
+La réponse doit contenir la livraison et ses objets, ou {"delivery":null}.

@@ -21,6 +21,7 @@ app.use("/api/discord", require("./routes/discord"));
 app.use("/api/game", require("./routes/game"));
 app.use("/api/steam", require("./routes/steam"));
 app.use("/api/commandement", require("./routes/commandement"));
+app.use("/api/delivery-agent", require("./routes/deliveryAgent"));
 app.use(
   "/api/admin/deliveries",
   require("./middleware/commandAuth"),
