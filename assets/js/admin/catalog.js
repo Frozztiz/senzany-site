@@ -1,7 +1,6 @@
 import { apiRequest } from "./api.js";
 
 const elements = {
-    view: document.getElementById("adminItemsView"),
     back: document.getElementById("backToAdminHomeFromItems"),
     file: document.getElementById("itemsZipFile"),
     importButton: document.getElementById("importItemsButton"),
@@ -22,6 +21,17 @@ function escapeHtml(value) {
         .replaceAll("'", "&#039;");
 }
 
+function normalizeItem(item = {}) {
+    const className = item.className || item.classname || "";
+    return {
+        className,
+        displayName: item.displayName || item.display_name || className,
+        category: item.category || "Non classé",
+        modName: item.modName || item.mod_name || "Source non identifiée",
+        sourceFile: item.sourceFile || item.source_file || ""
+    };
+}
+
 function setFeedback(message, type = "info") {
     if (!elements.importFeedback) return;
     elements.importFeedback.hidden = false;
@@ -38,8 +48,9 @@ async function loadStats() {
     }
 }
 
-function renderItems(items) {
+function renderItems(rawItems) {
     if (!elements.results || !elements.empty) return;
+    const items = rawItems.map(normalizeItem).filter(item => item.className);
     elements.results.innerHTML = "";
     elements.empty.hidden = items.length > 0;
 
@@ -47,15 +58,16 @@ function renderItems(items) {
         const card = document.createElement("article");
         card.className = "admin-item-result";
         card.innerHTML = `
-            <div>
-                <strong>${escapeHtml(item.display_name || item.classname)}</strong>
-                <code>${escapeHtml(item.classname)}</code>
+            <div class="admin-item-result__identity">
+                <strong>${escapeHtml(item.className)}</strong>
+                ${item.displayName !== item.className ? `<span>${escapeHtml(item.displayName)}</span>` : ""}
+                ${item.sourceFile ? `<small>Source : ${escapeHtml(item.sourceFile)}</small>` : ""}
             </div>
             <div class="admin-item-result__meta">
-                <span>${escapeHtml(item.category || "Autres")}</span>
-                <span>${escapeHtml(item.mod_name || "Inconnu")}</span>
+                <span>${escapeHtml(item.category)}</span>
+                <span>${escapeHtml(item.modName)}</span>
             </div>
-            <button class="admin-button admin-button--small" type="button" data-copy="${escapeHtml(item.classname)}">Copier</button>
+            <button class="admin-button admin-button--small" type="button" data-copy="${escapeHtml(item.className)}">Copier</button>
         `;
         elements.results.appendChild(card);
     }
@@ -74,10 +86,8 @@ async function searchItems() {
     const query = elements.search?.value.trim() || "";
     if (query.length < 2) {
         renderItems([]);
-        if (elements.empty) {
-            elements.empty.hidden = false;
-            elements.empty.textContent = "Saisis au moins 2 caractères.";
-        }
+        elements.empty.hidden = false;
+        elements.empty.textContent = "Saisis au moins 2 caractères.";
         return;
     }
 
@@ -85,13 +95,11 @@ async function searchItems() {
     try {
         const data = await apiRequest(`/api/admin/items?q=${encodeURIComponent(query)}&limit=50`);
         renderItems(Array.isArray(data.items) ? data.items : []);
-        if (elements.empty) elements.empty.textContent = "Aucun objet trouvé.";
+        elements.empty.textContent = "Aucun objet trouvé.";
     } catch (error) {
         renderItems([]);
-        if (elements.empty) {
-            elements.empty.hidden = false;
-            elements.empty.textContent = error.message || "Recherche impossible.";
-        }
+        elements.empty.hidden = false;
+        elements.empty.textContent = error.message || "Recherche impossible.";
     } finally {
         if (elements.searchButton) elements.searchButton.disabled = false;
     }
@@ -99,14 +107,8 @@ async function searchItems() {
 
 async function importZip() {
     const file = elements.file?.files?.[0];
-    if (!file) {
-        setFeedback("Sélectionne d’abord le ZIP contenant tes fichiers types*.xml.", "error");
-        return;
-    }
-    if (!/\.zip$/i.test(file.name)) {
-        setFeedback("Le fichier sélectionné doit être une archive .zip.", "error");
-        return;
-    }
+    if (!file) return setFeedback("Sélectionne d’abord le ZIP contenant tes fichiers types*.xml.", "error");
+    if (!/\.zip$/i.test(file.name)) return setFeedback("Le fichier sélectionné doit être une archive .zip.", "error");
 
     elements.importButton.disabled = true;
     setFeedback("Import en cours… Le backend analyse les XML et remplit Supabase.");
@@ -120,11 +122,7 @@ async function importZip() {
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
-
-        setFeedback(
-            `Import terminé : ${Number(data.imported || 0).toLocaleString("fr-FR")} objets, ${data.files || 0} fichiers XML, ${Number(data.duplicates || 0).toLocaleString("fr-FR")} doublons fusionnés.`,
-            "success"
-        );
+        setFeedback(`Import terminé : ${Number(data.imported || 0).toLocaleString("fr-FR")} objets, ${data.files || 0} fichiers XML, ${Number(data.duplicates || 0).toLocaleString("fr-FR")} doublons fusionnés.`, "success");
         await loadStats();
     } catch (error) {
         setFeedback(error.message || "L’import a échoué.", "error");
@@ -138,13 +136,8 @@ export function initializeCatalog({ onBack } = {}) {
     elements.importButton?.addEventListener("click", importZip);
     elements.searchButton?.addEventListener("click", searchItems);
     elements.search?.addEventListener("keydown", event => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            searchItems();
-        }
+        if (event.key === "Enter") { event.preventDefault(); searchItems(); }
     });
 }
 
-export async function openCatalog() {
-    await loadStats();
-}
+export async function openCatalog() { await loadStats(); }

@@ -8,7 +8,7 @@
   <title>Centre de commandement — SENZANY</title>
 
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.1.0" />
 </head>
 
 <body data-page="admin" data-build="admin-control-center-v3">
@@ -332,20 +332,9 @@
             </div>
 
             <div class="admin-layout admin-layout--items">
-              <section class="admin-card">
-                <div class="admin-card__header"><div><span>SYNCHRONISATION</span><h2>Importer les types.xml</h2></div><b>01</b></div>
-                <div class="admin-items-database-stat"><span>Objets actifs dans Supabase</span><strong id="itemsDatabaseTotal">--</strong></div>
-                <div class="admin-field">
-                  <label for="itemsZipFile">Archive ZIP des fichiers types*.xml</label>
-                  <input id="itemsZipFile" type="file" accept=".zip,application/zip" />
-                  <small>Le ZIP est analysé par le backend. Les objets sont ensuite stockés définitivement dans Supabase.</small>
-                </div>
-                <div id="itemsImportFeedback" class="admin-feedback" hidden></div>
-                <button id="importItemsButton" class="admin-button admin-button--primary admin-button--submit" type="button">Importer dans la base</button>
-              </section>
-
-              <section class="admin-card">
-                <div class="admin-card__header"><div><span>CATALOGUE</span><h2>Rechercher un objet</h2></div><b>02</b></div>
+              <section class="admin-card admin-card--catalog-main">
+                <div class="admin-card__header"><div><span>CATALOGUE SUPABASE</span><h2>Rechercher un objet du serveur</h2></div><b>01</b></div>
+                <div class="admin-items-database-stat"><span>Objets actifs et disponibles</span><strong id="itemsDatabaseTotal">--</strong></div>
                 <div class="admin-item-searchbar">
                   <input id="itemsDatabaseSearch" type="search" autocomplete="off" placeholder="Exemple : M4A1, Cannabis, Raptor…" />
                   <button id="searchItemsButton" class="admin-button admin-button--small" type="button">Rechercher</button>
@@ -353,6 +342,22 @@
                 <div id="itemsDatabaseEmpty" class="admin-list-message">Saisis au moins 2 caractères.</div>
                 <div id="itemsDatabaseResults" class="admin-items-database-results"></div>
               </section>
+
+              <details class="admin-card admin-catalog-maintenance">
+                <summary>
+                  <span><b>MAINTENANCE DU CATALOGUE</b><strong>Importer ou actualiser les types.xml</strong></span>
+                  <em>Ouvrir</em>
+                </summary>
+                <div class="admin-catalog-maintenance__body">
+                  <div class="admin-field">
+                    <label for="itemsZipFile">Archive ZIP des fichiers types*.xml</label>
+                    <input id="itemsZipFile" type="file" accept=".zip,application/zip" />
+                    <small>Cette opération met à jour les objets stockés dans Supabase. Elle n'est utile que lorsque les fichiers du serveur changent.</small>
+                  </div>
+                  <div id="itemsImportFeedback" class="admin-feedback" hidden></div>
+                  <button id="importItemsButton" class="admin-button admin-button--primary" type="button">Importer dans la base</button>
+                </div>
+              </details>
             </div>
           </section>
         </div>
@@ -364,6 +369,6 @@
 
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin.js?v=4.0.3"></script>
+  <script type="module" src="assets/js/admin/admin.js?v=4.1.0"></script>
 </body>
 </html>

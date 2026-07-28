@@ -13,13 +13,23 @@ function getSupabaseClient() {
   });
 }
 
+function humanizeSourceFile(sourceFile) {
+  const value = String(sourceFile || "").replace(/\.xml$/i, "");
+  if (!value) return "Source non identifiée";
+  if (/^types$/i.test(value)) return "Vanilla";
+  return value
+    .replace(/^types[_-]?/i, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase()) || "Source non identifiée";
+}
+
 function normalizeItem(row) {
   return {
     id: row.id,
     className: row.classname,
     displayName: row.display_name || row.classname,
-    category: row.category || "Autre",
-    modName: row.mod_name || "Inconnu",
+    category: row.category || "Non classé",
+    modName: row.mod_name || humanizeSourceFile(row.source_file),
     sourceFile: row.source_file || null,
     active: row.is_active !== false,
     updatedAt: row.updated_at

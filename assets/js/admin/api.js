@@ -8,6 +8,7 @@ export async function apiRequest(url, options = {}) {
         method: options.method || "GET",
         credentials: "same-origin",
         cache: "no-store",
+        signal: options.signal,
         headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
