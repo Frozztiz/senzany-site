@@ -9,18 +9,26 @@ function getSupabaseClient() {
   }
 
   return createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false }
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
   });
 }
 
 function humanizeSourceFile(sourceFile) {
   const value = String(sourceFile || "").replace(/\.xml$/i, "");
+
   if (!value) return "Source non identifiée";
   if (/^types$/i.test(value)) return "Vanilla";
-  return value
-    .replace(/^types[_-]?/i, "")
-    .replace(/[_-]+/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase()) || "Source non identifiée";
+
+  return (
+    value
+      .replace(/^types[_-]?/i, "")
+      .replace(/[_-]+/g, " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase()) ||
+    "Source non identifiée"
+  );
 }
 
 function normalizeItem(row) {
@@ -33,27 +41,47 @@ function normalizeItem(row) {
     sourceFile: row.source_file || null,
     active: row.is_active !== false,
     updatedAt: row.updated_at,
-    imageUrl: row.image_url || null,
-    imageStatus: row.image_status || null
+
+    // Ces colonnes n'existent pas encore dans ta base
+    imageUrl: null,
+    imageStatus: null
   };
 }
 
-async function searchItems({ query = "", mod = "", limit = 50, offset = 0 } = {}) {
+async function searchItems({
+  query = "",
+  mod = "",
+  limit = 50,
+  offset = 0
+} = {}) {
   const supabase = getSupabaseClient();
+
   const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
   const safeOffset = Math.max(Number(offset) || 0, 0);
 
   let request = supabase
     .from("items")
-    .select("id,classname,display_name,category,mod_name,source_file,is_active,updated_at,image_url,image_status", { count: "exact" })
+    .select(
+      "id,classname,display_name,category,mod_name,source_file,is_active,updated_at",
+      {
+        count: "exact"
+      }
+    )
     .eq("is_active", true)
-    .order("classname", { ascending: true })
+    .order("classname", {
+      ascending: true
+    })
     .range(safeOffset, safeOffset + safeLimit - 1);
 
   if (query) {
-    const escaped = String(query).replace(/[,%()]/g, " ").trim();
+    const escaped = String(query)
+      .replace(/[,%()]/g, " ")
+      .trim();
+
     if (escaped) {
-      request = request.or(`classname.ilike.%${escaped}%,display_name.ilike.%${escaped}%`);
+      request = request.or(
+        `classname.ilike.%${escaped}%,display_name.ilike.%${escaped}%`
+      );
     }
   }
 
@@ -63,13 +91,15 @@ async function searchItems({ query = "", mod = "", limit = 50, offset = 0 } = {}
 
   const { data, error, count } = await request;
 
-if (error) {
+  if (error) {
     console.error("ERREUR SUPABASE ITEMS :", error);
     throw error;
-}
+  }
 
   return {
-    items: Array.isArray(data) ? data.map(normalizeItem) : [],
+    items: Array.isArray(data)
+      ? data.map(normalizeItem)
+      : [],
     total: Number(count) || 0,
     limit: safeLimit,
     offset: safeOffset
@@ -79,9 +109,23 @@ if (error) {
 async function getItemStats() {
   const supabase = getSupabaseClient();
 
-  const [{ count, error: countError }, { data: mods, error: modsError }] = await Promise.all([
-    supabase.from("items").select("id", { count: "exact", head: true }).eq("is_active", true),
-    supabase.from("items").select("mod_name").eq("is_active", true).order("mod_name")
+  const [
+    { count, error: countError },
+    { data: mods, error: modsError }
+  ] = await Promise.all([
+    supabase
+      .from("items")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq("is_active", true),
+
+    supabase
+      .from("items")
+      .select("mod_name")
+      .eq("is_active", true)
+      .order("mod_name")
   ]);
 
   if (countError) throw countError;
@@ -95,19 +139,29 @@ async function getItemStats() {
 
 async function upsertItems(items, batchSize = 400) {
   const supabase = getSupabaseClient();
+
   let processed = 0;
 
   for (let index = 0; index < items.length; index += batchSize) {
     const batch = items.slice(index, index + batchSize);
+
     const { error } = await supabase
       .from("items")
-      .upsert(batch, { onConflict: "classname", ignoreDuplicates: false });
+      .upsert(batch, {
+        onConflict: "classname",
+        ignoreDuplicates: false
+      });
 
     if (error) throw error;
+
     processed += batch.length;
   }
 
   return processed;
 }
 
-module.exports = { searchItems, getItemStats, upsertItems };
+module.exports = {
+  searchItems,
+  getItemStats,
+  upsertItems
+};
