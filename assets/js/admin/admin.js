@@ -4,6 +4,7 @@
  */
 
 import { loadDeliveries } from "./deliveries.js";
+import { loadItemStats, loadItemCatalog } from "./item-catalog.js";
 
 const elements = {
     loading: document.getElementById("adminLoading"),
@@ -18,12 +19,17 @@ const elements = {
 
     homeView: document.getElementById("adminHomeView"),
     deliveriesView: document.getElementById("adminDeliveriesView"),
+    itemsView: document.getElementById("adminItemsView"),
 
     deliveriesButton: document.querySelector(
         '[data-admin-module="deliveries"]'
     ),
+    itemsButton: document.querySelector(
+        '[data-admin-module="items"]'
+    ),
 
-    backButton: document.getElementById("backToAdminHome")
+    backButton: document.getElementById("backToAdminHome"),
+    backFromItemsButton: document.getElementById("backToAdminHomeFromItems")
 };
 
 function setHidden(element, hidden) {
@@ -64,16 +70,30 @@ function showAccessView(view) {
     }
 }
 
-function showHome() {
-    setHidden(elements.homeView, false);
+function hideModuleViews() {
     setHidden(elements.deliveriesView, true);
+    setHidden(elements.itemsView, true);
+}
+
+function showHome() {
+    hideModuleViews();
+    setHidden(elements.homeView, false);
 }
 
 async function showDeliveries() {
     setHidden(elements.homeView, true);
+    hideModuleViews();
     setHidden(elements.deliveriesView, false);
 
     await loadDeliveries();
+}
+
+async function showItems() {
+    setHidden(elements.homeView, true);
+    hideModuleViews();
+    setHidden(elements.itemsView, false);
+
+    await Promise.all([loadItemStats(), loadItemCatalog()]);
 }
 
 function isLoggedIn(user) {
@@ -203,7 +223,17 @@ function initializeAdmin() {
         showDeliveries
     );
 
+    elements.itemsButton?.addEventListener(
+        "click",
+        () => showItems().catch((error) => console.error("[Senzany Items]", error))
+    );
+
     elements.backButton?.addEventListener(
+        "click",
+        showHome
+    );
+
+    elements.backFromItemsButton?.addEventListener(
         "click",
         showHome
     );
