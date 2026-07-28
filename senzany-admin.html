@@ -335,6 +335,30 @@
               <section class="admin-card admin-card--catalog-main">
                 <div class="admin-card__header"><div><span>CATALOGUE SUPABASE</span><h2>Rechercher un objet du serveur</h2></div><b>01</b></div>
                 <div class="admin-items-database-stat"><span>Objets actifs et disponibles</span><strong id="itemsDatabaseTotal">--</strong></div>
+
+                <div class="admin-image-finder">
+                  <div class="admin-image-finder__header">
+                    <div>
+                      <span>IMAGES AUTOMATIQUES</span>
+                      <strong>Recherche publique par classname</strong>
+                      <small>Le portail traite les objets par lots et reprend automatiquement.</small>
+                    </div>
+                    <button id="startItemImagesButton" class="admin-button admin-button--primary" type="button">Rechercher les images</button>
+                  </div>
+                  <div class="admin-image-finder__stats">
+                    <span>Trouvées <strong id="itemImagesFound">--</strong></span>
+                    <span>Introuvables <strong id="itemImagesMissing">--</strong></span>
+                    <span>Erreurs <strong id="itemImagesErrors">--</strong></span>
+                    <span>À traiter <strong id="itemImagesPending">--</strong></span>
+                  </div>
+                  <div class="admin-image-finder__progress"><i id="itemImagesProgressBar"></i></div>
+                  <div class="admin-image-finder__actions">
+                    <small id="itemImagesStatus">Prêt.</small>
+                    <button id="stopItemImagesButton" class="admin-button admin-button--small" type="button" disabled>Arrêter</button>
+                    <button id="retryItemImagesButton" class="admin-button admin-button--small" type="button">Relancer les absentes</button>
+                  </div>
+                </div>
+
                 <div class="admin-item-searchbar">
                   <input id="itemsDatabaseSearch" type="search" autocomplete="off" placeholder="Exemple : M4A1, Cannabis, Raptor…" />
                   <button id="searchItemsButton" class="admin-button admin-button--small" type="button">Rechercher</button>
@@ -369,6 +393,6 @@
 
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin.js?v=4.1.1"></script>
+  <script type="module" src="assets/js/admin/admin.js?v=4.2.0"></script>
 </body>
 </html>

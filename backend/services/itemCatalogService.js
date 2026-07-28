@@ -32,7 +32,9 @@ function normalizeItem(row) {
     modName: row.mod_name || humanizeSourceFile(row.source_file),
     sourceFile: row.source_file || null,
     active: row.is_active !== false,
-    updatedAt: row.updated_at
+    updatedAt: row.updated_at,
+    imageUrl: row.image_url || null,
+    imageStatus: row.image_status || null
   };
 }
 
@@ -43,7 +45,7 @@ async function searchItems({ query = "", mod = "", limit = 50, offset = 0 } = {}
 
   let request = supabase
     .from("items")
-    .select("id,classname,display_name,category,mod_name,source_file,is_active,updated_at", { count: "exact" })
+    .select("id,classname,display_name,category,mod_name,source_file,is_active,updated_at,image_url,image_status", { count: "exact" })
     .eq("is_active", true)
     .order("classname", { ascending: true })
     .range(safeOffset, safeOffset + safeLimit - 1);

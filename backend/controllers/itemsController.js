@@ -1,5 +1,6 @@
 const { searchItems, getItemStats } = require("../services/itemCatalogService");
 const { importZipBuffer } = require("../services/itemImportService");
+const { getImageStats, processImageBatch, resetImageSearch } = require("../services/itemImageService");
 
 async function search(req, res, next) {
   try {
@@ -18,6 +19,28 @@ async function stats(req, res, next) {
   catch (error) { next(error); }
 }
 
+async function imageStats(req, res, next) {
+  try { res.json(await getImageStats()); }
+  catch (error) { next(error); }
+}
+
+async function processImages(req, res, next) {
+  try {
+    const result = await processImageBatch({
+      batchSize: req.body?.batchSize || 20,
+      retryMissing: Boolean(req.body?.retryMissing)
+    });
+    res.json({ ok: true, ...result });
+  } catch (error) { next(error); }
+}
+
+async function resetImages(req, res, next) {
+  try {
+    const stats = await resetImageSearch({ onlyMissing: req.body?.onlyMissing !== false });
+    res.json({ ok: true, stats });
+  } catch (error) { next(error); }
+}
+
 async function importArchive(req, res, next) {
   try {
     const result = await importZipBuffer(req.body);
@@ -32,4 +55,4 @@ async function importArchive(req, res, next) {
   }
 }
 
-module.exports = { search, stats, importArchive };
+module.exports = { search, stats, imageStats, processImages, resetImages, importArchive };

@@ -1391,3 +1391,30 @@ body[data-page="admin"] [data-site-footer] {
 #adminDeliveriesView .admin-item-suggestions {
   z-index: 99999;
 }
+
+/* Catalogue — recherche automatique des images (v4.2) */
+.admin-image-finder { margin: 0 26px 20px; padding: 18px 20px; border: 1px solid rgba(255,59,59,.24); border-radius: 12px; background: linear-gradient(135deg,rgba(145,0,0,.08),rgba(255,255,255,.018)); }
+.admin-image-finder__header { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.admin-image-finder__header > div { display: grid; gap: 4px; }
+.admin-image-finder__header span { color: var(--admin-accent-strong); font: 800 .67rem monospace; letter-spacing: .16em; }
+.admin-image-finder__header strong { color: #fff; }
+.admin-image-finder__header small, .admin-image-finder__actions small { color: var(--admin-muted); }
+.admin-image-finder__stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; margin-top: 16px; }
+.admin-image-finder__stats span { display: grid; gap: 4px; padding: 10px 12px; border: 1px solid rgba(255,255,255,.08); border-radius: 9px; color: #8f8f8f; font-size: .72rem; }
+.admin-image-finder__stats strong { color: #fff; font-size: 1.05rem; }
+.admin-image-finder__progress { height: 5px; margin-top: 13px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.07); }
+.admin-image-finder__progress i { display: block; width: 0; height: 100%; background: #ff3b3b; transition: width .25s ease; }
+.admin-image-finder__actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.admin-image-finder__actions small { margin-right: auto; }
+.admin-item-result { grid-template-columns: 72px minmax(0,1fr) minmax(220px,.65fr) auto; }
+.admin-item-result__image { width: 72px; height: 72px; display: grid; place-items: center; overflow: hidden; border: 1px solid rgba(255,255,255,.09); border-radius: 10px; background: rgba(0,0,0,.28); }
+.admin-item-result__image img { width: 100%; height: 100%; object-fit: contain; }
+.admin-item-result__placeholder { color: #555; font: 900 1.5rem monospace; }
+@media (max-width: 800px) {
+  .admin-image-finder__header { align-items: stretch; flex-direction: column; }
+  .admin-image-finder__stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .admin-image-finder__actions { flex-wrap: wrap; }
+  .admin-image-finder__actions small { width: 100%; }
+  .admin-item-result { grid-template-columns: 72px minmax(0,1fr); }
+  .admin-item-result__meta, .admin-item-result > button { grid-column: 1 / -1; }
+}

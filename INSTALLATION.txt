@@ -1,0 +1,26 @@
+SENZANY — IMAGES AUTOMATIQUES DU CATALOGUE
+==========================================
+
+1. Copie les fichiers du ZIP dans ton projet en conservant les dossiers.
+2. Dans Supabase > SQL Editor, exécute le fichier :
+   supabase/003_item_images.sql
+3. Envoie les fichiers sur GitHub avec GitHub Desktop.
+4. Sur Ubuntu, dans le dossier backend :
+   pm2 restart senzany-api
+   (utilise le vrai nom de ton processus PM2 si différent)
+5. Recharge la page avec Ctrl + F5.
+6. Ouvre Base des objets DayZ puis clique sur "Rechercher les images".
+
+FONCTIONNEMENT
+--------------
+- Le navigateur demande au backend de traiter 20 objets à la fois.
+- Les résultats sont sauvegardés dans Supabase après chaque objet.
+- Tu peux arrêter et reprendre sans recommencer.
+- "Relancer les absentes" retente uniquement les objets introuvables ou en erreur.
+- Les recherches utilisent les images publiques du wiki DayZ.
+- Les mods privés resteront sans image lorsqu'aucune image publique fiable n'existe.
+
+IMPORTANT
+---------
+Laisse la page ouverte pendant la recherche. Pour 10 471 objets, le traitement peut être long,
+car le système évite volontairement d'envoyer des milliers de requêtes simultanées au wiki.

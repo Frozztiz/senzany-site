@@ -9,8 +9,20 @@ const elements = {
     search: document.getElementById("itemsDatabaseSearch"),
     searchButton: document.getElementById("searchItemsButton"),
     results: document.getElementById("itemsDatabaseResults"),
-    empty: document.getElementById("itemsDatabaseEmpty")
+    empty: document.getElementById("itemsDatabaseEmpty"),
+    imageStart: document.getElementById("startItemImagesButton"),
+    imageStop: document.getElementById("stopItemImagesButton"),
+    imageRetry: document.getElementById("retryItemImagesButton"),
+    imageFound: document.getElementById("itemImagesFound"),
+    imageMissing: document.getElementById("itemImagesMissing"),
+    imageErrors: document.getElementById("itemImagesErrors"),
+    imagePending: document.getElementById("itemImagesPending"),
+    imageProgress: document.getElementById("itemImagesProgressBar"),
+    imageStatus: document.getElementById("itemImagesStatus")
 };
+
+let imageSearchRunning = false;
+let stopImageSearchRequested = false;
 
 function escapeHtml(value) {
     return String(value ?? "")
@@ -28,7 +40,9 @@ function normalizeItem(item = {}) {
         displayName: item.displayName || item.display_name || className,
         category: item.category || "Non classé",
         modName: item.modName || item.mod_name || "Source non identifiée",
-        sourceFile: item.sourceFile || item.source_file || ""
+        sourceFile: item.sourceFile || item.source_file || "",
+        imageUrl: item.imageUrl || item.image_url || "",
+        imageStatus: item.imageStatus || item.image_status || ""
     };
 }
 
@@ -48,6 +62,33 @@ async function loadStats() {
     }
 }
 
+function updateImageStats(stats = {}) {
+    const total = Number(stats.total || 0);
+    const found = Number(stats.found || 0);
+    const missing = Number(stats.notFound || 0);
+    const errors = Number(stats.errors || 0);
+    const pending = Number(stats.pending || 0);
+    if (elements.imageFound) elements.imageFound.textContent = found.toLocaleString("fr-FR");
+    if (elements.imageMissing) elements.imageMissing.textContent = missing.toLocaleString("fr-FR");
+    if (elements.imageErrors) elements.imageErrors.textContent = errors.toLocaleString("fr-FR");
+    if (elements.imagePending) elements.imagePending.textContent = pending.toLocaleString("fr-FR");
+    if (elements.imageProgress) {
+        const completed = Math.max(total - pending, 0);
+        elements.imageProgress.style.width = `${total ? Math.min((completed / total) * 100, 100) : 0}%`;
+    }
+}
+
+async function loadImageStats() {
+    try {
+        const stats = await apiRequest("/api/admin/items/images/stats");
+        updateImageStats(stats);
+        return stats;
+    } catch (error) {
+        if (elements.imageStatus) elements.imageStatus.textContent = "Exécute d’abord supabase/003_item_images.sql.";
+        return null;
+    }
+}
+
 function renderItems(rawItems) {
     if (!elements.results || !elements.empty) return;
     const items = rawItems.map(normalizeItem).filter(item => item.className);
@@ -57,7 +98,11 @@ function renderItems(rawItems) {
     for (const item of items) {
         const card = document.createElement("article");
         card.className = "admin-item-result";
+        const image = item.imageUrl
+            ? `<img src="${escapeHtml(item.imageUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" />`
+            : `<span class="admin-item-result__placeholder">?</span>`;
         card.innerHTML = `
+            <div class="admin-item-result__image">${image}</div>
             <div class="admin-item-result__identity">
                 <strong>${escapeHtml(item.className)}</strong>
                 ${item.displayName !== item.className ? `<span>${escapeHtml(item.displayName)}</span>` : ""}
@@ -66,6 +111,7 @@ function renderItems(rawItems) {
             <div class="admin-item-result__meta">
                 <span>${escapeHtml(item.category)}</span>
                 <span>${escapeHtml(item.modName)}</span>
+                <span>${item.imageUrl ? "Image trouvée" : (item.imageStatus === "not_found" ? "Sans image publique" : "Image à rechercher")}</span>
             </div>
             <button class="admin-button admin-button--small" type="button" data-copy="${escapeHtml(item.className)}">Copier</button>
         `;
@@ -105,6 +151,57 @@ async function searchItems() {
     }
 }
 
+async function runImageSearch({ retryMissing = false } = {}) {
+    if (imageSearchRunning) return;
+    imageSearchRunning = true;
+    stopImageSearchRequested = false;
+    elements.imageStart.disabled = true;
+    elements.imageRetry.disabled = true;
+    elements.imageStop.disabled = false;
+    elements.imageStatus.textContent = retryMissing ? "Relance des images absentes…" : "Recherche en cours…";
+
+    try {
+        while (!stopImageSearchRequested) {
+            const data = await apiRequest("/api/admin/items/images/process", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ batchSize: 20, retryMissing })
+            });
+            updateImageStats(data.stats);
+            if (!data.processed) break;
+            elements.imageStatus.textContent = `${Number(data.processed).toLocaleString("fr-FR")} objets traités dans le dernier lot…`;
+        }
+        elements.imageStatus.textContent = stopImageSearchRequested
+            ? "Arrêt effectué. Clique à nouveau pour reprendre."
+            : "Traitement terminé pour cette sélection.";
+    } catch (error) {
+        elements.imageStatus.textContent = error.message || "La recherche d’images a échoué.";
+    } finally {
+        imageSearchRunning = false;
+        elements.imageStart.disabled = false;
+        elements.imageRetry.disabled = false;
+        elements.imageStop.disabled = true;
+        await loadImageStats();
+    }
+}
+
+async function retryMissingImages() {
+    if (imageSearchRunning) return;
+    try {
+        elements.imageRetry.disabled = true;
+        elements.imageStatus.textContent = "Préparation de la relance…";
+        await apiRequest("/api/admin/items/images/reset", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ onlyMissing: true })
+        });
+        await runImageSearch();
+    } catch (error) {
+        elements.imageStatus.textContent = error.message || "Impossible de relancer les absentes.";
+        elements.imageRetry.disabled = false;
+    }
+}
+
 async function importZip() {
     const file = elements.file?.files?.[0];
     if (!file) return setFeedback("Sélectionne d’abord le ZIP contenant tes fichiers types*.xml.", "error");
@@ -123,7 +220,7 @@ async function importZip() {
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
         setFeedback(`Import terminé : ${Number(data.imported || 0).toLocaleString("fr-FR")} objets, ${data.files || 0} fichiers XML, ${Number(data.duplicates || 0).toLocaleString("fr-FR")} doublons fusionnés.`, "success");
-        await loadStats();
+        await Promise.all([loadStats(), loadImageStats()]);
     } catch (error) {
         setFeedback(error.message || "L’import a échoué.", "error");
     } finally {
@@ -135,9 +232,14 @@ export function initializeCatalog({ onBack } = {}) {
     elements.back?.addEventListener("click", onBack);
     elements.importButton?.addEventListener("click", importZip);
     elements.searchButton?.addEventListener("click", searchItems);
+    elements.imageStart?.addEventListener("click", () => runImageSearch());
+    elements.imageStop?.addEventListener("click", () => { stopImageSearchRequested = true; });
+    elements.imageRetry?.addEventListener("click", retryMissingImages);
     elements.search?.addEventListener("keydown", event => {
         if (event.key === "Enter") { event.preventDefault(); searchItems(); }
     });
 }
 
-export async function openCatalog() { await loadStats(); }
+export async function openCatalog() {
+    await Promise.all([loadStats(), loadImageStats()]);
+}
