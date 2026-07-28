@@ -9,6 +9,7 @@
 
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
   <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-deliveries-v31.css?v=3.1.0" />
 </head>
 
 <body data-page="admin" data-build="admin-control-center-v3">
@@ -295,7 +296,22 @@
                   <b>02</b>
                 </div>
 
-                <div class="admin-filters">
+                <div class="delivery-stats" aria-label="Résumé des livraisons">
+                  <div><span>Total</span><strong id="deliveryCountTotal">0</strong></div>
+                  <div><span>En attente</span><strong id="deliveryCountPending">0</strong></div>
+                  <div><span>En traitement</span><strong id="deliveryCountProcessing">0</strong></div>
+                  <div><span>Livrées</span><strong id="deliveryCountDelivered">0</strong></div>
+                </div>
+
+                <div class="admin-filters admin-filters--deliveries">
+                  <input
+                    id="deliverySearchInput"
+                    type="search"
+                    autocomplete="off"
+                    placeholder="Rechercher : joueur, SteamID, titre..."
+                    aria-label="Rechercher dans les livraisons"
+                  />
+
                   <select id="deliveryStatusFilter" aria-label="Filtrer les livraisons par statut">
                     <option value="">Tous les statuts</option>
                     <option value="pending">En attente</option>
@@ -332,6 +348,6 @@
 
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin.js?v=3.0.0"></script>
+  <script type="module" src="assets/js/admin/admin.js?v=3.1.0"></script>
 </body>
 </html>
