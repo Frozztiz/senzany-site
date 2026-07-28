@@ -26,6 +26,11 @@ app.use(
   require("./middleware/commandAuth"),
   require("./routes/adminDeliveries")
 );
+app.use(
+  "/api/admin/items",
+  require("./middleware/commandAuth"),
+  require("./routes/adminItems")
+);
 
 app.use((req, res) => {
   res.status(404).json({

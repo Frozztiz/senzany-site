@@ -176,7 +176,7 @@
               <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">07</span><span class="admin-module-card__icon">₽</span><strong>Économie</strong><small>Flux, boutique, récompenses et équilibrage.</small><div class="module-metrics"><b>STABLE</b><span>État économie</span></div><em>À VENIR</em></button>
               <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">08</span><span class="admin-module-card__icon">★</span><strong>Battle Pass</strong><small>Paliers, progression et contenus saisonniers.</small><div class="module-metrics"><b>S01</b><span>Saison préparatoire</span></div><em>À VENIR</em></button>
               <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">09</span><span class="admin-module-card__icon">◇</span><strong>Quêtes & IA</strong><small>Objectifs scénarisés et interactions intelligentes.</small><div class="module-metrics"><b>DEV</b><span>Systèmes en cours</span></div><em>À VENIR</em></button>
-              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">10</span><span class="admin-module-card__icon">⚙</span><strong>Paramètres</strong><small>Configuration générale et autorisations.</small><div class="module-metrics"><b>ALPHA</b><span>Accès restreint</span></div><em>À VENIR</em></button>
+              <button class="admin-module-card admin-module-card--active" type="button" data-admin-module="items"><span class="admin-module-card__index">10</span><span class="admin-module-card__icon">⌕</span><strong>Base des objets</strong><small>Importer les types.xml et rechercher les classnames du serveur.</small><div class="module-metrics"><b>ACTIF</b><span>Catalogue Supabase</span></div><em>OUVRIR LE MODULE</em></button>
             </div>
           </section>
 
@@ -323,6 +323,38 @@
               </section>
             </div>
           </section>
+
+          <!-- Module Base des objets -->
+          <section id="adminItemsView" class="admin-module-view" hidden>
+            <div class="admin-module-toolbar">
+              <button id="backToAdminHomeFromItems" class="admin-button admin-button--small" type="button">← Retour au centre</button>
+              <div><span>MODULE 02</span><strong>Base des objets DayZ</strong></div>
+            </div>
+
+            <div class="admin-layout admin-layout--items">
+              <section class="admin-card">
+                <div class="admin-card__header"><div><span>SYNCHRONISATION</span><h2>Importer les types.xml</h2></div><b>01</b></div>
+                <div class="admin-items-database-stat"><span>Objets actifs dans Supabase</span><strong id="itemsDatabaseTotal">--</strong></div>
+                <div class="admin-field">
+                  <label for="itemsZipFile">Archive ZIP des fichiers types*.xml</label>
+                  <input id="itemsZipFile" type="file" accept=".zip,application/zip" />
+                  <small>Le ZIP est analysé par le backend. Les objets sont ensuite stockés définitivement dans Supabase.</small>
+                </div>
+                <div id="itemsImportFeedback" class="admin-feedback" hidden></div>
+                <button id="importItemsButton" class="admin-button admin-button--primary admin-button--submit" type="button">Importer dans la base</button>
+              </section>
+
+              <section class="admin-card">
+                <div class="admin-card__header"><div><span>CATALOGUE</span><h2>Rechercher un objet</h2></div><b>02</b></div>
+                <div class="admin-item-searchbar">
+                  <input id="itemsDatabaseSearch" type="search" autocomplete="off" placeholder="Exemple : M4A1, Cannabis, Raptor…" />
+                  <button id="searchItemsButton" class="admin-button admin-button--small" type="button">Rechercher</button>
+                </div>
+                <div id="itemsDatabaseEmpty" class="admin-list-message">Saisis au moins 2 caractères.</div>
+                <div id="itemsDatabaseResults" class="admin-items-database-results"></div>
+              </section>
+            </div>
+          </section>
         </div>
       </div>
     </section>
@@ -332,6 +364,6 @@
 
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin.js?v=3.0.0"></script>
+  <script type="module" src="assets/js/admin/admin.js?v=4.0.0"></script>
 </body>
 </html>

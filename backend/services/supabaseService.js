@@ -26,6 +26,7 @@ async function request(path, options = {}) {
   });
 
   const text = await response.text();
+  const contentRange = response.headers.get("content-range");
 
   let data = null;
 
@@ -40,6 +41,11 @@ async function request(path, options = {}) {
     error.status = response.status;
     error.data = data;
     throw error;
+  }
+
+  if (options.returnMeta) {
+    const countMatch = contentRange ? contentRange.match(/\/(\d+)$/) : null;
+    return { data, count: countMatch ? Number(countMatch[1]) : 0 };
   }
 
   return data;
@@ -143,6 +149,7 @@ async function unlinkBySteamId(steamId) {
 }
 
 module.exports = {
+  request,
   getLinkBySteamId,
   getLinkByDiscordId,
   upsertLink,
