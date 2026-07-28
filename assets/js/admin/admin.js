@@ -4,7 +4,7 @@
  */
 
 import { loadDeliveries } from "./deliveries.js";
-import { loadItemStats, loadItemCatalog } from "./item-catalog.js";
+import { initializeCatalog, openCatalog } from "./catalog.js";
 
 const elements = {
     loading: document.getElementById("adminLoading"),
@@ -24,12 +24,9 @@ const elements = {
     deliveriesButton: document.querySelector(
         '[data-admin-module="deliveries"]'
     ),
-    itemsButton: document.querySelector(
-        '[data-admin-module="items"]'
-    ),
+    itemsButton: document.querySelector('[data-admin-module="items"]'),
 
-    backButton: document.getElementById("backToAdminHome"),
-    backFromItemsButton: document.getElementById("backToAdminHomeFromItems")
+    backButton: document.getElementById("backToAdminHome")
 };
 
 function setHidden(element, hidden) {
@@ -70,19 +67,15 @@ function showAccessView(view) {
     }
 }
 
-function hideModuleViews() {
+function showHome() {
+    setHidden(elements.homeView, false);
     setHidden(elements.deliveriesView, true);
     setHidden(elements.itemsView, true);
 }
 
-function showHome() {
-    hideModuleViews();
-    setHidden(elements.homeView, false);
-}
-
 async function showDeliveries() {
     setHidden(elements.homeView, true);
-    hideModuleViews();
+    setHidden(elements.itemsView, true);
     setHidden(elements.deliveriesView, false);
 
     await loadDeliveries();
@@ -90,10 +83,9 @@ async function showDeliveries() {
 
 async function showItems() {
     setHidden(elements.homeView, true);
-    hideModuleViews();
+    setHidden(elements.deliveriesView, true);
     setHidden(elements.itemsView, false);
-
-    await Promise.all([loadItemStats(), loadItemCatalog()]);
+    await openCatalog();
 }
 
 function isLoggedIn(user) {
@@ -223,20 +215,13 @@ function initializeAdmin() {
         showDeliveries
     );
 
-    elements.itemsButton?.addEventListener(
-        "click",
-        () => showItems().catch((error) => console.error("[Senzany Items]", error))
-    );
-
     elements.backButton?.addEventListener(
         "click",
         showHome
     );
 
-    elements.backFromItemsButton?.addEventListener(
-        "click",
-        showHome
-    );
+    elements.itemsButton?.addEventListener("click", showItems);
+    initializeCatalog({ onBack: showHome });
 
     elements.retryButton?.addEventListener(
         "click",
