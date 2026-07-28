@@ -62,7 +62,11 @@ async function searchItems({ query = "", mod = "", limit = 50, offset = 0 } = {}
   }
 
   const { data, error, count } = await request;
-  if (error) throw error;
+
+if (error) {
+    console.error("ERREUR SUPABASE ITEMS :", error);
+    throw error;
+}
 
   return {
     items: Array.isArray(data) ? data.map(normalizeItem) : [],

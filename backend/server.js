@@ -9,7 +9,21 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-    console.log(new Date().toISOString(), req.method, req.url);
+    const startedAt = Date.now();
+
+    res.on("finish", () => {
+        console.log(
+            new Date().toISOString(),
+            req.method,
+            req.url,
+            "STATUS:",
+            res.statusCode,
+            "DUREE:",
+            Date.now() - startedAt,
+            "ms"
+        );
+    });
+
     next();
 });
 
