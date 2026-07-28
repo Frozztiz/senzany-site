@@ -1,0 +1,8 @@
+SENZANY — CENTRE DE COMMANDEMENT V3
+
+1. Remplacer les fichiers du site par ceux de ce ZIP.
+2. Vérifier que STAFF_STEAM_IDS contient les SteamID autorisés dans /var/www/senzany/server/.env.
+3. Redémarrer : pm2 restart senzany-api --update-env
+4. Forcer l’actualisation du navigateur avec Ctrl + F5.
+
+La V3 ajoute : hero centré et compact, opérateur Steam dynamique, avatar, SteamID, animation d’ouverture et mise en page resserrée.

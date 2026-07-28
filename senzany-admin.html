@@ -11,26 +11,30 @@
   <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.0.0" />
 </head>
 
-<body data-page="admin" data-build="admin-control-center-v1">
+<body data-page="admin" data-build="admin-control-center-v3">
+  <div id="commandBoot" class="command-boot" aria-hidden="true">
+    <div class="command-boot__panel">
+      <span>SENZANY // SECURE TERMINAL</span>
+      <strong>INITIALISATION DU CENTRE DE COMMANDEMENT</strong>
+      <div id="commandBootLines" class="command-boot__lines"></div>
+      <div class="command-boot__bar"><i></i></div>
+    </div>
+  </div>
   <div data-site-header></div>
 
   <main class="admin-main">
-    <section class="admin-hero">
+    <section class="admin-hero admin-hero--v3">
       <div class="admin-hero__grid" aria-hidden="true"></div>
-
-      <div class="admin-wrap admin-hero__content">
-        <span class="admin-kicker">SENZANY NETWORK // ACCÈS RESTREINT</span>
-
-        <h1>
-          CENTRE DE
-          <strong>COMMANDEMENT</strong>
-        </h1>
-
-        <p>
-          Interface sécurisée destinée au staff Senzany pour superviser les
-          joueurs, préparer les livraisons et administrer les futurs modules du
-          portail.
-        </p>
+      <div class="admin-hero__scan" aria-hidden="true"></div>
+      <div class="admin-wrap admin-hero__content admin-hero__content--v3">
+        <div class="admin-hero__eyebrow">SENZANY NETWORK // TERMINAL SÉCURISÉ</div>
+        <h1><span>CENTRE DE</span><strong>COMMANDEMENT</strong></h1>
+        <p>Terminal militaire Alpha — accès réservé au personnel autorisé.</p>
+        <div class="admin-hero__protocol" aria-label="État du protocole">
+          <span><i></i> AUTHORIZATION // ALPHA</span>
+          <span><i></i> NETWORK // SENZANY</span>
+          <span><i></i> PROTOCOL // ACTIVE</span>
+        </div>
       </div>
     </section>
 
@@ -122,19 +126,15 @@
 
           <!-- Accueil du centre de commandement -->
           <section id="adminHomeView" class="admin-command-center admin-command-center--v2">
-            <div class="command-topline">
-              <div>
+            <div class="command-identity">
+              <div class="command-identity__avatar"><img id="commandAvatar" alt="Avatar de l’opérateur" hidden><span id="commandAvatarFallback">S</span></div>
+              <div class="command-identity__main">
                 <span>OPÉRATEUR AUTORISÉ</span>
                 <strong id="commandOperator">CHARGEMENT...</strong>
+                <small id="commandSteamId">STEAMID // --</small>
               </div>
-              <div>
-                <span>NIVEAU D’AUTORISATION</span>
-                <strong>ALPHA</strong>
-              </div>
-              <div>
-                <span>HEURE SERVEUR</span>
-                <strong id="commandClock">--:--:--</strong>
-              </div>
+              <div class="command-identity__stat"><span>NIVEAU D’AUTORISATION</span><strong>ALPHA</strong></div>
+              <div class="command-identity__stat"><span>HEURE SERVEUR</span><strong id="commandClock">--:--:--</strong></div>
             </div>
 
             <div class="admin-section-heading admin-section-heading--compact">
@@ -143,7 +143,7 @@
                 <h2>Senzany Control Center</h2>
                 <p>Supervision, opérations et accès aux outils sensibles du serveur.</p>
               </div>
-              <div class="admin-terminal-badge">V2.0</div>
+              <div class="admin-terminal-badge">V3.0</div>
             </div>
 
             <div class="command-live-strip">
@@ -332,6 +332,6 @@
 
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin.js?v=2.0.0"></script>
+  <script type="module" src="assets/js/admin/admin.js?v=3.0.0"></script>
 </body>
 </html>

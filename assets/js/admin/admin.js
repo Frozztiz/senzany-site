@@ -134,11 +134,30 @@ async function checkAccess() {
         const sessionLabel = document.querySelector('.admin-status-bar strong');
         if (sessionLabel) sessionLabel.textContent = `AUTORISÉ // ${access.clearance || "ALPHA"}`;
 
+        let profile = {};
+        try {
+            const profileResponse = await fetch("/api/steam/me", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
+            if (profileResponse.ok) profile = await profileResponse.json();
+        } catch (_) {}
+
+        const operatorName = profile.name || profile.personaName || access.name || access.personaName || "OPÉRATEUR SENZANY";
         const operator = document.getElementById("commandOperator");
-        if (operator) operator.textContent = access.name || access.personaName || access.steamName || "OPÉRATEUR SENZANY";
+        if (operator) operator.textContent = operatorName.toUpperCase();
+        const steamIdLabel = document.getElementById("commandSteamId");
+        if (steamIdLabel) steamIdLabel.textContent = `STEAMID // ${profile.steamId || access.steamId || "--"}`;
+        const avatar = document.getElementById("commandAvatar");
+        const avatarFallback = document.getElementById("commandAvatarFallback");
+        if (avatar && profile.avatar) {
+            avatar.src = profile.avatar;
+            avatar.hidden = false;
+            if (avatarFallback) avatarFallback.hidden = true;
+        } else if (avatarFallback) {
+            avatarFallback.textContent = operatorName.charAt(0).toUpperCase();
+        }
 
         showAccessView("dashboard");
         showHome();
+        runBootSequence();
 
     } catch (error) {
         console.error("[Senzany Commandement] Vérification impossible :", error);
@@ -156,6 +175,25 @@ function startCommandClock() {
     if (!clock) return;
     const tick = () => { clock.textContent = new Intl.DateTimeFormat("fr-FR", {hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(new Date()); };
     tick(); setInterval(tick, 1000);
+}
+
+function runBootSequence() {
+    const boot = document.getElementById("commandBoot");
+    const lines = document.getElementById("commandBootLines");
+    if (!boot || !lines || sessionStorage.getItem("senzany_command_boot_v3") === "done") {
+        if (boot) boot.remove();
+        return;
+    }
+    const sequence = ["SESSION STEAM ........ OK", "LIAISON DISCORD ...... OK", "BACKEND SENZANY ...... ONLINE", "AUTORISATION ALPHA ... VALIDÉE"];
+    boot.classList.add("is-visible");
+    sequence.forEach((text, index) => setTimeout(() => {
+        const line = document.createElement("div"); line.textContent = text; lines.appendChild(line);
+    }, 180 + index * 210));
+    setTimeout(() => {
+        boot.classList.add("is-complete");
+        sessionStorage.setItem("senzany_command_boot_v3", "done");
+        setTimeout(() => boot.remove(), 550);
+    }, 1250);
 }
 
 function initializeAdmin() {
