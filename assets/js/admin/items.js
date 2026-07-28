@@ -44,6 +44,7 @@ function attachItemAutocomplete(row) {
     const selectItem = (item) => {
         input.value = item.className;
         input.dataset.selectedClassname = item.className;
+        row.classList.add("is-item-selected");
         if (meta) {
             meta.hidden = false;
             meta.textContent = `${item.category} • ${item.modName}`;
@@ -98,9 +99,20 @@ function attachItemAutocomplete(row) {
             const data = await apiRequest(`/api/admin/items?q=${encodeURIComponent(query)}&limit=12`, {
                 signal: controller.signal
             });
+            const normalizedQuery = query.toLowerCase();
             const items = (Array.isArray(data?.items) ? data.items : [])
                 .map(normalizeItem)
-                .filter(item => item.className);
+                .filter(item => item.className)
+                .sort((a, b) => {
+                    const aName = a.className.toLowerCase();
+                    const bName = b.className.toLowerCase();
+                    const rank = (name) => {
+                        if (name === normalizedQuery) return 0;
+                        if (name.startsWith(normalizedQuery)) return 1;
+                        return 2;
+                    };
+                    return rank(aName) - rank(bName) || aName.localeCompare(bName, "fr");
+                });
             render(items, "Aucun classname correspondant");
         } catch (error) {
             if (error?.name !== "AbortError") {
@@ -111,6 +123,7 @@ function attachItemAutocomplete(row) {
 
     input.addEventListener("input", () => {
         delete input.dataset.selectedClassname;
+        row.classList.remove("is-item-selected");
         if (meta) meta.hidden = true;
         clearTimeout(timer);
         timer = setTimeout(search, 250);

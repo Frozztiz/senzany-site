@@ -1,19 +1,14 @@
-SENZANY — Correctif catalogue + recherche dans les livraisons v4.1.0
+SENZANY — Correctif catalogue + recherche d'objets dans les livraisons v4.1.1
 
-INSTALLATION AVEC GITHUB DESKTOP
-1. Ouvrir le dossier de ce ZIP.
-2. Copier tout son contenu dans le dossier racine du projet senzany-site.
-3. Accepter le remplacement des fichiers existants.
-4. Vérifier les changements dans GitHub Desktop.
-5. Commit puis Push origin.
-6. Sur le VPS : git pull puis redémarrer le backend avec PM2 si nécessaire.
+1. Copiez tout le contenu de ce dossier à la racine du projet.
+2. Acceptez le remplacement des fichiers existants.
+3. Dans GitHub Desktop, vérifiez les changements puis faites Commit et Push.
+4. Sur le VPS : git pull, puis pm2 restart all (ou le nom précis du processus backend).
+5. Rechargez la page avec Ctrl+F5.
 
-MODIFICATIONS
-- Le classname est désormais affiché correctement dans la Base des objets.
-- Compatibilité avec les réponses camelCase du backend (cause réelle du texte « Inconnu »).
-- Le mod est déduit du fichier source lorsqu'il manque en base.
-- Le catalogue est placé en premier ; l'import XML est déplacé dans une section Maintenance repliée.
-- Le champ objet des livraisons recherche directement dans Supabase après 2 caractères.
-- Liste déroulante, navigation clavier, sélection automatique du classname.
-- Catégorie et nom du mod affichés sous chaque suggestion.
-- Aucun système d'images ajouté : priorité maintenue sur le flux livraisons/RCON.
+TEST :
+- Ouvrir Gestion des livraisons.
+- Dans "Objets de la livraison", taper au moins 2 caractères, par exemple M4.
+- Choisir un résultat dans la liste.
+- Le classname est rempli et le mod/catégorie s'affichent sous le champ.
+- La quantité reste modifiable et plusieurs objets peuvent être ajoutés.

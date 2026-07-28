@@ -1322,3 +1322,14 @@ body[data-page="admin"] .admin-hero--v3{min-height:0;height:auto;text-align:cent
   .admin-item-result { grid-template-columns: 1fr; }
   .admin-item-searchbar { grid-template-columns: 1fr; }
 }
+
+
+/* Livraison — recherche directe dans le catalogue Supabase (v4.1.1) */
+.admin-item-row.is-item-selected {
+  border-color: rgba(88, 214, 141, 0.38);
+  background: rgba(88, 214, 141, 0.035);
+}
+
+.admin-item-row.is-item-selected .admin-item-picker input {
+  border-color: rgba(88, 214, 141, 0.55);
+}
