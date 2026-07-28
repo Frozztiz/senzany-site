@@ -16,13 +16,10 @@ let inFlightQuery = null;
 
 function toValidNumber(value) {
   const number = Number(value);
-
-  return Number.isFinite(number) && number >= 0
-    ? number
-    : null;
+  return Number.isFinite(number) && number >= 0 ? number : null;
 }
 
-function getServerConfig() {
+function getConfiguration() {
   const host =
     process.env.DAYZ_SERVER_HOST ||
     process.env.DAYZ_SERVER_IP ||
@@ -35,13 +32,11 @@ function getServerConfig() {
   );
 
   const queryPort = Number(
-    process.env.DAYZ_QUERY_PORT ||
-      DEFAULT_QUERY_PORT
+    process.env.DAYZ_QUERY_PORT || DEFAULT_QUERY_PORT
   );
 
   const fallbackMaxPlayers = Number(
-    process.env.DAYZ_MAX_PLAYERS ||
-      DEFAULT_MAX_PLAYERS
+    process.env.DAYZ_MAX_PLAYERS || DEFAULT_MAX_PLAYERS
   );
 
   return {
@@ -66,10 +61,7 @@ function extractPlayerCount(state) {
 
   for (const candidate of candidates) {
     const value = toValidNumber(candidate);
-
-    if (value !== null) {
-      return value;
-    }
+    if (value !== null) return value;
   }
 
   if (Array.isArray(state?.players)) {
@@ -79,10 +71,7 @@ function extractPlayerCount(state) {
   return null;
 }
 
-function extractMaxPlayers(
-  state,
-  fallbackMaxPlayers
-) {
+function extractMaxPlayers(state, fallbackMaxPlayers) {
   const candidates = [
     state?.maxplayers,
     state?.maxPlayers,
@@ -95,19 +84,13 @@ function extractMaxPlayers(
 
   for (const candidate of candidates) {
     const value = toValidNumber(candidate);
-
-    if (value !== null && value > 0) {
-      return value;
-    }
+    if (value !== null && value > 0) return value;
   }
 
   return fallbackMaxPlayers;
 }
 
-async function queryDayzServer(
-  host,
-  queryPort
-) {
+async function queryDayzServer(host, queryPort) {
   return GameDig.query({
     type: "dayz",
     host,
@@ -126,27 +109,17 @@ function buildOnlinePayload({
   fallbackMaxPlayers,
 }) {
   const players = extractPlayerCount(state);
-
-  const maxPlayers = extractMaxPlayers(
-    state,
-    fallbackMaxPlayers
-  );
+  const maxPlayers = extractMaxPlayers(state, fallbackMaxPlayers);
 
   return {
     online: true,
     degraded: players === null,
     players,
     maxPlayers,
-    map:
-      state?.map ||
-      state?.raw?.map ||
-      "chernarusplus",
-    name:
-      state?.name ||
-      state?.raw?.name ||
-      "Senzany",
-    bots: Number(state?.bots || 0),
-    ping: Number(state?.ping || 0),
+    map: state?.map || state?.raw?.map || "chernarusplus",
+    name: state?.name || state?.raw?.name || "Senzany",
+    bots: toValidNumber(state?.bots) ?? 0,
+    ping: toValidNumber(state?.ping) ?? 0,
     source: "direct-dayz-query",
     serverAddress: `${host}:${gamePort}`,
     queryAddress: `${host}:${queryPort}`,
@@ -154,175 +127,32 @@ function buildOnlinePayload({
   };
 }
 
-async function getFreshServerState({
-  host,
-  gamePort,
-  queryPort,
-  fallbackMaxPlayers,
-}) {
+async function getFreshServerState(configuration) {
   const state = await queryDayzServer(
-    host,
-    queryPort
+    configuration.host,
+    configuration.queryPort
   );
 
   const payload = buildOnlinePayload({
     state,
-    host,
-    gamePort,
-    queryPort,
-    fallbackMaxPlayers,
+    ...configuration,
   });
 
   cachedPayload = payload;
-  cacheExpiresAt =
-    Date.now() + CACHE_DURATION_MS;
+  cacheExpiresAt = Date.now() + CACHE_DURATION_MS;
 
   return payload;
 }
 
-function serializeError(error) {
-  if (!(error instanceof Error)) {
-    return {
-      message: String(error),
-    };
-  }
-
-  return {
-    name: error.name,
-    message: error.message,
-    code: error.code || null,
-    stack: error.stack || null,
-  };
-}
-
-router.get("/debug", async (req, res) => {
-  const {
-    host,
-    gamePort,
-    queryPort,
-    fallbackMaxPlayers,
-  } = getServerConfig();
-
-  res.set(
-    "Cache-Control",
-    "no-store, no-cache, must-revalidate, private"
-  );
-
-  const startedAt = Date.now();
-
-  try {
-    const state = await queryDayzServer(
-      host,
-      queryPort
-    );
-
-    return res.status(200).json({
-      ok: true,
-      configuration: {
-        host,
-        gamePort,
-        queryPort,
-        fallbackMaxPlayers,
-        serverAddress: `${host}:${gamePort}`,
-        queryAddress: `${host}:${queryPort}`,
-        environmentSources: {
-          host:
-            process.env.DAYZ_SERVER_HOST
-              ? "DAYZ_SERVER_HOST"
-              : process.env.DAYZ_SERVER_IP
-                ? "DAYZ_SERVER_IP"
-                : "DEFAULT_SERVER_HOST",
-          gamePort:
-            process.env.DAYZ_SERVER_PORT
-              ? "DAYZ_SERVER_PORT"
-              : process.env.DAYZ_GAME_PORT
-                ? "DAYZ_GAME_PORT"
-                : "DEFAULT_GAME_PORT",
-          queryPort: process.env.DAYZ_QUERY_PORT
-            ? "DAYZ_QUERY_PORT"
-            : "DEFAULT_QUERY_PORT",
-          maxPlayers: process.env.DAYZ_MAX_PLAYERS
-            ? "DAYZ_MAX_PLAYERS"
-            : "DEFAULT_MAX_PLAYERS",
-        },
-      },
-      durationMs: Date.now() - startedAt,
-      extracted: {
-        players: extractPlayerCount(state),
-        maxPlayers: extractMaxPlayers(
-          state,
-          fallbackMaxPlayers
-        ),
-      },
-      stateKeys:
-        state && typeof state === "object"
-          ? Object.keys(state)
-          : [],
-      rawKeys:
-        state?.raw && typeof state.raw === "object"
-          ? Object.keys(state.raw)
-          : [],
-      state,
-    });
-  } catch (error) {
-    console.error(
-      "Diagnostic GameDig DayZ :",
-      error
-    );
-
-    return res.status(502).json({
-      ok: false,
-      configuration: {
-        host,
-        gamePort,
-        queryPort,
-        fallbackMaxPlayers,
-        serverAddress: `${host}:${gamePort}`,
-        queryAddress: `${host}:${queryPort}`,
-        environmentSources: {
-          host:
-            process.env.DAYZ_SERVER_HOST
-              ? "DAYZ_SERVER_HOST"
-              : process.env.DAYZ_SERVER_IP
-                ? "DAYZ_SERVER_IP"
-                : "DEFAULT_SERVER_HOST",
-          gamePort:
-            process.env.DAYZ_SERVER_PORT
-              ? "DAYZ_SERVER_PORT"
-              : process.env.DAYZ_GAME_PORT
-                ? "DAYZ_GAME_PORT"
-                : "DEFAULT_GAME_PORT",
-          queryPort: process.env.DAYZ_QUERY_PORT
-            ? "DAYZ_QUERY_PORT"
-            : "DEFAULT_QUERY_PORT",
-          maxPlayers: process.env.DAYZ_MAX_PLAYERS
-            ? "DAYZ_MAX_PLAYERS"
-            : "DEFAULT_MAX_PLAYERS",
-        },
-      },
-      durationMs: Date.now() - startedAt,
-      error: serializeError(error),
-    });
-  }
-});
-
 router.get("/stats", async (req, res) => {
-  const {
-    host,
-    gamePort,
-    queryPort,
-    fallbackMaxPlayers,
-  } = getServerConfig();
+  const configuration = getConfiguration();
 
   res.set(
     "Cache-Control",
     "public, max-age=15, stale-while-revalidate=45"
   );
 
-  if (
-    cachedPayload &&
-    Date.now() < cacheExpiresAt
-  ) {
+  if (cachedPayload && Date.now() < cacheExpiresAt) {
     return res.status(200).json({
       ...cachedPayload,
       source: "memory-cache",
@@ -331,18 +161,12 @@ router.get("/stats", async (req, res) => {
 
   try {
     if (!inFlightQuery) {
-      inFlightQuery = getFreshServerState({
-        host,
-        gamePort,
-        queryPort,
-        fallbackMaxPlayers,
-      }).finally(() => {
+      inFlightQuery = getFreshServerState(configuration).finally(() => {
         inFlightQuery = null;
       });
     }
 
     const payload = await inFlightQuery;
-
     return res.status(200).json(payload);
   } catch (error) {
     const message =
@@ -350,10 +174,7 @@ router.get("/stats", async (req, res) => {
         ? error.message
         : "Impossible d’interroger le serveur DayZ.";
 
-    console.error(
-      "Erreur interrogation serveur DayZ :",
-      message
-    );
+    console.error("Erreur interrogation serveur DayZ :", message);
 
     if (cachedPayload) {
       return res.status(200).json({
@@ -366,17 +187,66 @@ router.get("/stats", async (req, res) => {
     }
 
     return res.status(200).json({
-      online: true,
+      online: false,
       degraded: true,
       players: null,
-      maxPlayers: fallbackMaxPlayers,
+      maxPlayers: configuration.fallbackMaxPlayers,
       map: "chernarusplus",
       name: "Senzany",
       source: "query-unavailable",
-      serverAddress: `${host}:${gamePort}`,
-      queryAddress: `${host}:${queryPort}`,
+      serverAddress: `${configuration.host}:${configuration.gamePort}`,
+      queryAddress: `${configuration.host}:${configuration.queryPort}`,
       error: message,
       updatedAt: new Date().toISOString(),
+    });
+  }
+});
+
+router.get("/debug", async (req, res) => {
+  const startedAt = Date.now();
+  const configuration = getConfiguration();
+
+  res.set("Cache-Control", "no-store");
+
+  try {
+    const state = await queryDayzServer(
+      configuration.host,
+      configuration.queryPort
+    );
+
+    return res.status(200).json({
+      ok: true,
+      configuration: {
+        ...configuration,
+        serverAddress: `${configuration.host}:${configuration.gamePort}`,
+        queryAddress: `${configuration.host}:${configuration.queryPort}`,
+      },
+      durationMs: Date.now() - startedAt,
+      extracted: {
+        players: extractPlayerCount(state),
+        maxPlayers: extractMaxPlayers(
+          state,
+          configuration.fallbackMaxPlayers
+        ),
+      },
+      stateKeys: Object.keys(state || {}),
+      state,
+    });
+  } catch (error) {
+    return res.status(502).json({
+      ok: false,
+      configuration: {
+        ...configuration,
+        serverAddress: `${configuration.host}:${configuration.gamePort}`,
+        queryAddress: `${configuration.host}:${configuration.queryPort}`,
+      },
+      durationMs: Date.now() - startedAt,
+      error: {
+        name: error?.name || "Error",
+        message: error?.message || String(error),
+        code: error?.code || null,
+        stack: error?.stack || null,
+      },
     });
   }
 });
