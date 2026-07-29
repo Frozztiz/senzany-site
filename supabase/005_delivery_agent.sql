@@ -1,25 +1,6 @@
--- SENZANY - Pont sécurisé entre le portail et le futur agent DayZ
--- Ce script est idempotent : il peut être relancé sans supprimer les livraisons existantes.
+-- SENZANY — Pont sécurisé entre le portail et l’agent DayZ
 
 begin;
-
-create extension if not exists pgcrypto;
-
-alter table public.deliveries
-  add column if not exists claim_token uuid,
-  add column if not exists claimed_by text,
-  add column if not exists claimed_at timestamptz,
-  add column if not exists processing_at timestamptz,
-  add column if not exists delivered_at timestamptz,
-  add column if not exists failed_at timestamptz,
-  add column if not exists cancelled_at timestamptz,
-  add column if not exists error_message text,
-  add column if not exists retry_count integer not null default 0,
-  add column if not exists updated_at timestamptz not null default now();
-
-create index if not exists deliveries_pending_steam_idx
-  on public.deliveries (steam_id, created_at)
-  where status = 'pending';
 
 create or replace function public.claim_next_delivery(
   p_steam_id text,
@@ -39,7 +20,6 @@ begin
     raise exception 'SteamID64 invalide';
   end if;
 
-  -- Libère automatiquement les anciennes réclamations restées bloquées plus de 10 minutes.
   update public.deliveries
   set status = 'pending',
       claim_token = null,
@@ -47,8 +27,10 @@ begin
       claimed_at = null,
       processing_at = null,
       retry_count = retry_count + 1,
+      error_message = 'Réclamation expirée : remise automatiquement en attente.',
       updated_at = now()
   where status in ('claimed', 'processing')
+    and claimed_at is not null
     and claimed_at < now() - interval '10 minutes';
 
   select * into v_delivery
@@ -66,7 +48,7 @@ begin
   update public.deliveries
   set status = 'claimed',
       claim_token = v_token,
-      claimed_by = nullif(trim(p_agent_id), ''),
+      claimed_by = coalesce(nullif(trim(p_agent_id), ''), 'dayz-server'),
       claimed_at = now(),
       processing_at = now(),
       error_message = null,
@@ -117,8 +99,8 @@ declare
 begin
   update public.deliveries
   set status = case when p_success then 'delivered' else 'failed' end,
-      delivered_at = case when p_success then now() else delivered_at end,
-      failed_at = case when not p_success then now() else failed_at end,
+      delivered_at = case when p_success then now() else null end,
+      failed_at = case when p_success then null else now() end,
       error_message = case when p_success then null else nullif(trim(p_error_message), '') end,
       updated_at = now()
   where id = p_delivery_id

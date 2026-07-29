@@ -84,7 +84,7 @@ async function loadImageStats() {
         updateImageStats(stats);
         return stats;
     } catch (error) {
-        if (elements.imageStatus) elements.imageStatus.textContent = "Exécute d’abord supabase/003_item_images.sql.";
+        if (elements.imageStatus) elements.imageStatus.textContent = "Exécute d’abord les migrations Supabase dans l’ordre indiqué dans supabase/README.md.";
         return null;
     }
 }

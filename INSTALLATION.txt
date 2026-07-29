@@ -3,7 +3,7 @@ SENZANY — IMAGES AUTOMATIQUES DU CATALOGUE
 
 1. Copie les fichiers du ZIP dans ton projet en conservant les dossiers.
 2. Dans Supabase > SQL Editor, exécute le fichier :
-   supabase/003_item_images.sql
+   supabase/002_items.sql
 3. Envoie les fichiers sur GitHub avec GitHub Desktop.
 4. Sur Ubuntu, dans le dossier backend :
    pm2 restart senzany-api

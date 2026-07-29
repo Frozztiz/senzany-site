@@ -1,0 +1,16 @@
+# Secrets locaux
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Dépendances et journaux
+backend/node_modules/
+node_modules/
+*.log
+npm-debug.log*
+
+# Fichiers système et temporaires
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak

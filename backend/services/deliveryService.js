@@ -5,9 +5,7 @@ function getSupabaseClient() {
   const key = process.env.SUPABASE_SECRET_KEY;
 
   if (!url || !key) {
-    throw new Error(
-      "SUPABASE_URL ou SUPABASE_SECRET_KEY manquante."
-    );
+    throw new Error("SUPABASE_URL ou SUPABASE_SECRET_KEY manquante.");
   }
 
   return createClient(url, key, {
@@ -40,14 +38,11 @@ function mapDelivery(row) {
     title: row.title,
     message: row.message,
     status: row.status,
-
     createdBy: row.created_by,
     createdByName: row.created_by_name,
-
     claimToken: row.claim_token,
     errorMessage: row.error_message,
     retryCount: row.retry_count,
-
     createdAt: row.created_at,
     claimedAt: row.claimed_at,
     processingAt: row.processing_at,
@@ -55,7 +50,6 @@ function mapDelivery(row) {
     failedAt: row.failed_at,
     cancelledAt: row.cancelled_at,
     updatedAt: row.updated_at,
-
     items: Array.isArray(row.delivery_items)
       ? row.delivery_items.map(mapItem)
       : []
@@ -78,9 +72,7 @@ async function getDeliveries(status = "") {
         created_at
       )
     `)
-    .order("created_at", {
-      ascending: false
-    });
+    .order("created_at", { ascending: false });
 
   if (status) {
     query = query.eq("status", status);
@@ -92,9 +84,7 @@ async function getDeliveries(status = "") {
     throw error;
   }
 
-  return Array.isArray(data)
-    ? data.map(mapDelivery)
-    : [];
+  return Array.isArray(data) ? data.map(mapDelivery) : [];
 }
 
 async function getDeliveryById(id) {
@@ -134,13 +124,6 @@ async function createDelivery({
 }) {
   const supabase = getSupabaseClient();
 
-  /*
-   * La livraison est d'abord créée en "processing".
-   *
-   * L'agent DayZ ne réclame que les livraisons "pending".
-   * Cela empêche l'agent de récupérer la livraison avant que
-   * tous les objets aient été enregistrés dans delivery_items.
-   */
   const { data: delivery, error: deliveryError } = await supabase
     .from("deliveries")
     .insert({
@@ -163,24 +146,16 @@ async function createDelivery({
   const deliveryItems = items
     .map((item) => {
       const className = String(
-        item.className ||
-        item.classname ||
-        item.name ||
-        ""
+        item.className || item.classname || item.name || ""
       ).trim();
 
       const displayName = String(
-        item.name ||
-        item.displayName ||
-        className
+        item.name || item.displayName || className
       ).trim();
 
       const quantity = Math.max(
         1,
-        Math.min(
-          1000,
-          Number(item.quantity) || 1
-        )
+        Math.min(1000, Number(item.quantity) || 1)
       );
 
       return {
@@ -189,8 +164,7 @@ async function createDelivery({
         display_name: displayName || className,
         quantity,
         metadata:
-          item.metadata &&
-          typeof item.metadata === "object"
+          item.metadata && typeof item.metadata === "object"
             ? item.metadata
             : {}
       };
@@ -198,14 +172,8 @@ async function createDelivery({
     .filter((item) => item.classname);
 
   if (!deliveryItems.length) {
-    await supabase
-      .from("deliveries")
-      .delete()
-      .eq("id", delivery.id);
-
-    throw new Error(
-      "La livraison ne contient aucun objet valide."
-    );
+    await supabase.from("deliveries").delete().eq("id", delivery.id);
+    throw new Error("La livraison ne contient aucun objet valide.");
   }
 
   const { error: itemsError } = await supabase
@@ -213,18 +181,10 @@ async function createDelivery({
     .insert(deliveryItems);
 
   if (itemsError) {
-    await supabase
-      .from("deliveries")
-      .delete()
-      .eq("id", delivery.id);
-
+    await supabase.from("deliveries").delete().eq("id", delivery.id);
     throw itemsError;
   }
 
-  /*
-   * Les objets sont maintenant tous enregistrés.
-   * La livraison peut devenir visible pour l'agent DayZ.
-   */
   const { error: activateError } = await supabase
     .from("deliveries")
     .update({
@@ -237,11 +197,7 @@ async function createDelivery({
     .eq("status", "processing");
 
   if (activateError) {
-    await supabase
-      .from("deliveries")
-      .delete()
-      .eq("id", delivery.id);
-
+    await supabase.from("deliveries").delete().eq("id", delivery.id);
     throw activateError;
   }
 
@@ -254,32 +210,20 @@ async function createDelivery({
 
 async function updateDelivery(id, updates = {}) {
   const supabase = getSupabaseClient();
-
   const payload = {};
 
   if (updates.status) {
     payload.status = updates.status;
-
     const now = new Date().toISOString();
 
-    if (updates.status === "claimed") {
-      payload.claimed_at = now;
-    }
+    if (updates.status === "claimed") payload.claimed_at = now;
+    if (updates.status === "processing") payload.processing_at = now;
+    if (updates.status === "delivered") payload.delivered_at = now;
+    if (updates.status === "failed") payload.failed_at = now;
+    if (updates.status === "cancelled") payload.cancelled_at = now;
 
-    if (updates.status === "processing") {
-      payload.processing_at = now;
-    }
-
-    if (updates.status === "delivered") {
-      payload.delivered_at = now;
-    }
-
-    if (updates.status === "failed") {
-      payload.failed_at = now;
-    }
-
-    if (updates.status === "cancelled") {
-      payload.cancelled_at = now;
+    if (updates.status !== "failed") {
+      payload.error_message = null;
     }
   }
 
@@ -287,25 +231,40 @@ async function updateDelivery(id, updates = {}) {
     payload.message = updates.message || null;
   }
 
-  const { error } = await supabase
+  if (!Object.keys(payload).length) {
+    return getDeliveryById(id);
+  }
+
+  const { data, error } = await supabase
     .from("deliveries")
     .update(payload)
-    .eq("id", id);
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     throw error;
   }
 
-  return getDeliveryById(id);
+  return data ? getDeliveryById(id) : null;
 }
 
-async function deleteDelivery(id) {
+async function cancelDelivery(id) {
   const supabase = getSupabaseClient();
+  const now = new Date().toISOString();
 
   const { data, error } = await supabase
     .from("deliveries")
-    .delete()
+    .update({
+      status: "cancelled",
+      cancelled_at: now,
+      claim_token: null,
+      claimed_by: null,
+      error_message: null,
+      updated_at: now
+    })
     .eq("id", id)
+    .in("status", ["pending", "failed"])
     .select("id")
     .maybeSingle();
 
@@ -321,5 +280,5 @@ module.exports = {
   getDeliveryById,
   createDelivery,
   updateDelivery,
-  deleteDelivery
+  cancelDelivery
 };

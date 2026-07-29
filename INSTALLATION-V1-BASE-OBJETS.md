@@ -7,7 +7,7 @@ Les fichiers XML ne sont jamais utilisés par le navigateur : le ZIP est envoyé
 
 Dans **Supabase > SQL Editor**, ouvre un nouvel onglet puis exécute :
 
-`supabase/002_items_schema.sql`
+`supabase/002_items.sql`
 
 Garde ton SQL Livraisons actuel. Ce nouveau SQL ajoute seulement la table `items`.
 
