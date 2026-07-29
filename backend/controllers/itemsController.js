@@ -1,39 +1,43 @@
 const { searchItems, getItemStats } = require("../services/itemCatalogService");
 const { importZipBuffer } = require("../services/itemImportService");
-const { getImageStats, processImageBatch, resetImageSearch } = require("../services/itemImageService");
+const {
+  getImageStats,
+  processImageBatch,
+  resetImageSearch
+} = require("../services/itemImageService");
 
 async function search(req, res, next) {
   try {
-    console.log("[ITEMS SEARCH] requête reçue :", req.query);
-
     const result = await searchItems({
       query: req.query.q || "",
       mod: req.query.mod || "",
+      category: req.query.category || "",
+      availability: req.query.availability || "",
       limit: req.query.limit || 50,
       offset: req.query.offset || 0
     });
 
-    console.log(
-      "[ITEMS SEARCH] résultat OK :",
-      Array.isArray(result?.items) ? result.items.length : 0,
-      "objet(s)"
-    );
-
     res.json(result);
   } catch (error) {
-    console.error("[ITEMS SEARCH] ERREUR COMPLÈTE :", error);
+    console.error("[ITEMS SEARCH]", error);
     next(error);
   }
 }
 
 async function stats(req, res, next) {
-  try { res.json(await getItemStats()); }
-  catch (error) { next(error); }
+  try {
+    res.json(await getItemStats());
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function imageStats(req, res, next) {
-  try { res.json(await getImageStats()); }
-  catch (error) { next(error); }
+  try {
+    res.json(await getImageStats());
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function processImages(req, res, next) {
@@ -66,7 +70,7 @@ async function importArchive(req, res, next) {
     const result = await importZipBuffer(req.body);
 
     console.log(
-      `[ITEMS] Import par ${req.commandSteamId}: ${result.uniqueItems} objets / ${result.files} XML`
+      `[ITEMS] Import par ${req.commandSteamId}: ${result.uniqueItems} objets, ${result.files} XML, ${result.mods} mods/source(s)`
     );
 
     res.status(201).json({ ok: true, ...result });
