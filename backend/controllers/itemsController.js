@@ -1,4 +1,8 @@
-const { searchItems, getItemStats } = require("../services/itemCatalogService");
+const {
+  searchItems,
+  getItemStats,
+  updateItem
+} = require("../services/itemCatalogService");
 const { importZipBuffer } = require("../services/itemImportService");
 const {
   getImageStats,
@@ -28,6 +32,35 @@ async function stats(req, res, next) {
   try {
     res.json(await getItemStats());
   } catch (error) {
+    next(error);
+  }
+}
+
+async function update(req, res, next) {
+  try {
+    const id = String(req.params.id || "").trim();
+    if (!id) {
+      return res.status(400).json({ error: "Identifiant de l'objet manquant." });
+    }
+
+    const item = await updateItem(id, req.body || {});
+
+    console.log(
+      `[ITEMS] Objet ${item.className} modifié par ${req.commandSteamId || "staff inconnu"}`
+    );
+
+    res.json({ ok: true, item });
+  } catch (error) {
+    const message = String(error?.message || "");
+
+    if (/nom affiché|catégorie|sous-catégorie|nom du mod|URL de l'image|aucun champ/i.test(message)) {
+      return res.status(400).json({ error: message });
+    }
+
+    if (error?.code === "PGRST116") {
+      return res.status(404).json({ error: "Objet introuvable." });
+    }
+
     next(error);
   }
 }
@@ -88,6 +121,7 @@ async function importArchive(req, res, next) {
 module.exports = {
   search,
   stats,
+  update,
   imageStats,
   processImages,
   resetImages,

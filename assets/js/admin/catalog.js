@@ -6,10 +6,39 @@ const elements = {
     importButton: document.getElementById("importItemsButton"),
     importFeedback: document.getElementById("itemsImportFeedback"),
     total: document.getElementById("itemsDatabaseTotal"),
+    deliveryTotal: document.getElementById("itemsDeliveryTotal"),
+    shopTotal: document.getElementById("itemsShopTotal"),
+    battlePassTotal: document.getElementById("itemsBattlePassTotal"),
+    rewardTotal: document.getElementById("itemsRewardTotal"),
     search: document.getElementById("itemsDatabaseSearch"),
+    modFilter: document.getElementById("itemsModFilter"),
+    categoryFilter: document.getElementById("itemsCategoryFilter"),
+    availabilityFilter: document.getElementById("itemsAvailabilityFilter"),
     searchButton: document.getElementById("searchItemsButton"),
+    resetButton: document.getElementById("resetItemsFiltersButton"),
     results: document.getElementById("itemsDatabaseResults"),
     empty: document.getElementById("itemsDatabaseEmpty"),
+    count: document.getElementById("itemsResultsCount"),
+    previous: document.getElementById("itemsPreviousPage"),
+    next: document.getElementById("itemsNextPage"),
+    page: document.getElementById("itemsPageLabel"),
+    editor: document.getElementById("itemEditorDialog"),
+    editorForm: document.getElementById("itemEditorForm"),
+    editorClose: document.getElementById("closeItemEditor"),
+    editorCancel: document.getElementById("cancelItemEditor"),
+    editorFeedback: document.getElementById("itemEditorFeedback"),
+    editorClassname: document.getElementById("itemEditorClassname"),
+    editorDisplayName: document.getElementById("itemEditorDisplayName"),
+    editorCategory: document.getElementById("itemEditorCategory"),
+    editorSubcategory: document.getElementById("itemEditorSubcategory"),
+    editorModName: document.getElementById("itemEditorModName"),
+    editorImageUrl: document.getElementById("itemEditorImageUrl"),
+    editorActive: document.getElementById("itemEditorActive"),
+    editorDelivery: document.getElementById("itemEditorDelivery"),
+    editorShop: document.getElementById("itemEditorShop"),
+    editorBattlePass: document.getElementById("itemEditorBattlePass"),
+    editorReward: document.getElementById("itemEditorReward"),
+    editorSave: document.getElementById("saveItemEditor"),
     imageStart: document.getElementById("startItemImagesButton"),
     imageStop: document.getElementById("stopItemImagesButton"),
     imageRetry: document.getElementById("retryItemImagesButton"),
@@ -19,6 +48,15 @@ const elements = {
     imagePending: document.getElementById("itemImagesPending"),
     imageProgress: document.getElementById("itemImagesProgressBar"),
     imageStatus: document.getElementById("itemImagesStatus")
+};
+
+const state = {
+    items: [],
+    selectedItem: null,
+    total: 0,
+    limit: 40,
+    offset: 0,
+    loading: false
 };
 
 let imageSearchRunning = false;
@@ -36,11 +74,19 @@ function escapeHtml(value) {
 function normalizeItem(item = {}) {
     const className = item.className || item.classname || "";
     return {
+        id: item.id || "",
         className,
         displayName: item.displayName || item.display_name || className,
         category: item.category || "Non classé",
+        subcategory: item.subcategory || "",
         modName: item.modName || item.mod_name || "Source non identifiée",
         sourceFile: item.sourceFile || item.source_file || "",
+        sourcePath: item.sourcePath || item.source_path || "",
+        active: item.active !== false && item.is_active !== false,
+        deliveryEnabled: item.deliveryEnabled !== false && item.delivery_enabled !== false,
+        shopEnabled: item.shopEnabled === true || item.shop_enabled === true,
+        battlePassEnabled: item.battlePassEnabled === true || item.battle_pass_enabled === true,
+        rewardEnabled: item.rewardEnabled !== false && item.reward_enabled !== false,
         imageUrl: item.imageUrl || item.image_url || "",
         imageStatus: item.imageStatus || item.image_status || ""
     };
@@ -53,13 +99,219 @@ function setFeedback(message, type = "info") {
     elements.importFeedback.textContent = message;
 }
 
+function setEditorFeedback(message = "", type = "info") {
+    if (!elements.editorFeedback) return;
+    elements.editorFeedback.hidden = !message;
+    elements.editorFeedback.dataset.type = type;
+    elements.editorFeedback.textContent = message;
+}
+
+function populateSelect(select, values, placeholder) {
+    if (!select) return;
+    const current = select.value;
+    select.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>`;
+    for (const value of values || []) {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+    }
+    select.value = [...select.options].some(option => option.value === current) ? current : "";
+}
+
 async function loadStats() {
     try {
         const data = await apiRequest("/api/admin/items/stats");
-        if (elements.total) elements.total.textContent = Number(data.total || 0).toLocaleString("fr-FR");
+        elements.total.textContent = Number(data.total || 0).toLocaleString("fr-FR");
+        if (elements.deliveryTotal) elements.deliveryTotal.textContent = Number(data.availability?.delivery || 0).toLocaleString("fr-FR");
+        if (elements.shopTotal) elements.shopTotal.textContent = Number(data.availability?.shop || 0).toLocaleString("fr-FR");
+        if (elements.battlePassTotal) elements.battlePassTotal.textContent = Number(data.availability?.battlePass || 0).toLocaleString("fr-FR");
+        if (elements.rewardTotal) elements.rewardTotal.textContent = Number(data.availability?.reward || 0).toLocaleString("fr-FR");
+        populateSelect(elements.modFilter, data.mods, "Tous les mods");
+        populateSelect(elements.categoryFilter, data.categories, "Toutes les catégories");
     } catch (_) {
         if (elements.total) elements.total.textContent = "--";
     }
+}
+
+function availabilityBadge(label, active) {
+    return `<span class="catalog-badge ${active ? "is-enabled" : "is-disabled"}">${escapeHtml(label)}</span>`;
+}
+
+function renderItems(rawItems) {
+    if (!elements.results || !elements.empty) return;
+    const items = rawItems.map(normalizeItem).filter(item => item.className);
+    state.items = items;
+    elements.results.innerHTML = "";
+    elements.empty.hidden = items.length > 0;
+
+    for (const item of items) {
+        const card = document.createElement("article");
+        card.className = "admin-item-result admin-item-result--manager";
+        card.dataset.itemId = item.id;
+        const image = item.imageUrl
+            ? `<img src="${escapeHtml(item.imageUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" />`
+            : `<span class="admin-item-result__placeholder">?</span>`;
+
+        card.innerHTML = `
+            <div class="admin-item-result__image">${image}</div>
+            <div class="admin-item-result__identity">
+                <strong>${escapeHtml(item.className)}</strong>
+                <span>${escapeHtml(item.displayName)}</span>
+                <small>${escapeHtml(item.modName)}${item.sourceFile ? ` // ${escapeHtml(item.sourceFile)}` : ""}</small>
+            </div>
+            <div class="admin-item-result__classification">
+                <span>${escapeHtml(item.category)}</span>
+                <small>${escapeHtml(item.subcategory || "Sans sous-catégorie")}</small>
+            </div>
+            <div class="admin-item-result__availability">
+                ${availabilityBadge("Livraison", item.deliveryEnabled)}
+                ${availabilityBadge("Boutique", item.shopEnabled)}
+                ${availabilityBadge("Battle Pass", item.battlePassEnabled)}
+                ${availabilityBadge("Récompense", item.rewardEnabled)}
+            </div>
+            <div class="admin-item-result__actions">
+                <button class="admin-button admin-button--small" type="button" data-edit-item="${escapeHtml(item.id)}">Modifier</button>
+                <button class="admin-button admin-button--small" type="button" data-copy="${escapeHtml(item.className)}">Copier</button>
+            </div>
+        `;
+        elements.results.appendChild(card);
+    }
+
+    elements.results.querySelectorAll("[data-edit-item]").forEach(button => {
+        button.addEventListener("click", () => {
+            const item = state.items.find(entry => entry.id === button.dataset.editItem);
+            if (item) openEditor(item);
+        });
+    });
+
+    elements.results.querySelectorAll("[data-copy]").forEach(button => {
+        button.addEventListener("click", async () => {
+            await navigator.clipboard.writeText(button.dataset.copy || "");
+            const original = button.textContent;
+            button.textContent = "Copié";
+            setTimeout(() => { button.textContent = original; }, 1200);
+        });
+    });
+}
+
+function renderPagination() {
+    const first = state.total ? state.offset + 1 : 0;
+    const last = Math.min(state.offset + state.limit, state.total);
+    const currentPage = Math.floor(state.offset / state.limit) + 1;
+    const totalPages = Math.max(Math.ceil(state.total / state.limit), 1);
+
+    if (elements.count) elements.count.textContent = `${first.toLocaleString("fr-FR")}–${last.toLocaleString("fr-FR")} sur ${state.total.toLocaleString("fr-FR")}`;
+    if (elements.page) elements.page.textContent = `Page ${currentPage} / ${totalPages}`;
+    if (elements.previous) elements.previous.disabled = state.offset <= 0 || state.loading;
+    if (elements.next) elements.next.disabled = state.offset + state.limit >= state.total || state.loading;
+}
+
+function getSearchParams() {
+    const params = new URLSearchParams({
+        limit: String(state.limit),
+        offset: String(state.offset)
+    });
+    const query = elements.search?.value.trim();
+    if (query) params.set("q", query);
+    if (elements.modFilter?.value) params.set("mod", elements.modFilter.value);
+    if (elements.categoryFilter?.value) params.set("category", elements.categoryFilter.value);
+    if (elements.availabilityFilter?.value) params.set("availability", elements.availabilityFilter.value);
+    return params;
+}
+
+async function searchItems({ resetPage = false } = {}) {
+    if (resetPage) state.offset = 0;
+    state.loading = true;
+    renderPagination();
+    if (elements.searchButton) elements.searchButton.disabled = true;
+    elements.empty.hidden = false;
+    elements.empty.textContent = "Chargement du catalogue…";
+
+    try {
+        const data = await apiRequest(`/api/admin/items?${getSearchParams().toString()}`);
+        state.total = Number(data.total || 0);
+        state.offset = Number(data.offset || state.offset);
+        renderItems(Array.isArray(data.items) ? data.items : []);
+        elements.empty.textContent = "Aucun objet ne correspond aux filtres.";
+    } catch (error) {
+        state.total = 0;
+        renderItems([]);
+        elements.empty.hidden = false;
+        elements.empty.textContent = error.message || "Recherche impossible.";
+    } finally {
+        state.loading = false;
+        if (elements.searchButton) elements.searchButton.disabled = false;
+        renderPagination();
+    }
+}
+
+function openEditor(item) {
+    state.selectedItem = item;
+    elements.editorClassname.textContent = item.className;
+    elements.editorDisplayName.value = item.displayName || "";
+    elements.editorCategory.value = item.category || "Autre";
+    elements.editorSubcategory.value = item.subcategory || "";
+    elements.editorModName.value = item.modName || "Inconnu";
+    elements.editorImageUrl.value = item.imageUrl || "";
+    elements.editorActive.checked = item.active;
+    elements.editorDelivery.checked = item.deliveryEnabled;
+    elements.editorShop.checked = item.shopEnabled;
+    elements.editorBattlePass.checked = item.battlePassEnabled;
+    elements.editorReward.checked = item.rewardEnabled;
+    setEditorFeedback();
+    elements.editor.showModal();
+}
+
+function closeEditor() {
+    if (elements.editor?.open) elements.editor.close();
+    state.selectedItem = null;
+    setEditorFeedback();
+}
+
+async function saveEditor(event) {
+    event.preventDefault();
+    if (!state.selectedItem?.id) return;
+
+    elements.editorSave.disabled = true;
+    setEditorFeedback("Enregistrement en cours…");
+
+    try {
+        const data = await apiRequest(`/api/admin/items/${encodeURIComponent(state.selectedItem.id)}`, {
+            method: "PATCH",
+            body: {
+                displayName: elements.editorDisplayName.value,
+                category: elements.editorCategory.value,
+                subcategory: elements.editorSubcategory.value,
+                modName: elements.editorModName.value,
+                imageUrl: elements.editorImageUrl.value,
+                active: elements.editorActive.checked,
+                deliveryEnabled: elements.editorDelivery.checked,
+                shopEnabled: elements.editorShop.checked,
+                battlePassEnabled: elements.editorBattlePass.checked,
+                rewardEnabled: elements.editorReward.checked
+            }
+        });
+
+        const updated = normalizeItem(data.item);
+        state.items = state.items.map(item => item.id === updated.id ? updated : item);
+        renderItems(state.items);
+        setEditorFeedback("Objet enregistré.", "success");
+        await loadStats();
+        setTimeout(closeEditor, 650);
+    } catch (error) {
+        setEditorFeedback(error.message || "Impossible d'enregistrer l'objet.", "error");
+    } finally {
+        elements.editorSave.disabled = false;
+    }
+}
+
+function resetFilters() {
+    elements.search.value = "";
+    elements.modFilter.value = "";
+    elements.categoryFilter.value = "";
+    elements.availabilityFilter.value = "";
+    searchItems({ resetPage: true });
 }
 
 function updateImageStats(stats = {}) {
@@ -83,71 +335,9 @@ async function loadImageStats() {
         const stats = await apiRequest("/api/admin/items/images/stats");
         updateImageStats(stats);
         return stats;
-    } catch (error) {
-        if (elements.imageStatus) elements.imageStatus.textContent = "Exécute d’abord les migrations Supabase dans l’ordre indiqué dans supabase/README.md.";
+    } catch (_) {
+        if (elements.imageStatus) elements.imageStatus.textContent = "Statistiques des images indisponibles.";
         return null;
-    }
-}
-
-function renderItems(rawItems) {
-    if (!elements.results || !elements.empty) return;
-    const items = rawItems.map(normalizeItem).filter(item => item.className);
-    elements.results.innerHTML = "";
-    elements.empty.hidden = items.length > 0;
-
-    for (const item of items) {
-        const card = document.createElement("article");
-        card.className = "admin-item-result";
-        const image = item.imageUrl
-            ? `<img src="${escapeHtml(item.imageUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" />`
-            : `<span class="admin-item-result__placeholder">?</span>`;
-        card.innerHTML = `
-            <div class="admin-item-result__image">${image}</div>
-            <div class="admin-item-result__identity">
-                <strong>${escapeHtml(item.className)}</strong>
-                ${item.displayName !== item.className ? `<span>${escapeHtml(item.displayName)}</span>` : ""}
-                ${item.sourceFile ? `<small>Source : ${escapeHtml(item.sourceFile)}</small>` : ""}
-            </div>
-            <div class="admin-item-result__meta">
-                <span>${escapeHtml(item.category)}</span>
-                <span>${escapeHtml(item.modName)}</span>
-                <span>${item.imageUrl ? "Image trouvée" : (item.imageStatus === "not_found" ? "Sans image publique" : "Image à rechercher")}</span>
-            </div>
-            <button class="admin-button admin-button--small" type="button" data-copy="${escapeHtml(item.className)}">Copier</button>
-        `;
-        elements.results.appendChild(card);
-    }
-
-    elements.results.querySelectorAll("[data-copy]").forEach(button => {
-        button.addEventListener("click", async () => {
-            await navigator.clipboard.writeText(button.dataset.copy || "");
-            const original = button.textContent;
-            button.textContent = "Copié";
-            setTimeout(() => { button.textContent = original; }, 1200);
-        });
-    });
-}
-
-async function searchItems() {
-    const query = elements.search?.value.trim() || "";
-    if (query.length < 2) {
-        renderItems([]);
-        elements.empty.hidden = false;
-        elements.empty.textContent = "Saisis au moins 2 caractères.";
-        return;
-    }
-
-    if (elements.searchButton) elements.searchButton.disabled = true;
-    try {
-        const data = await apiRequest(`/api/admin/items?q=${encodeURIComponent(query)}&limit=50`);
-        renderItems(Array.isArray(data.items) ? data.items : []);
-        elements.empty.textContent = "Aucun objet trouvé.";
-    } catch (error) {
-        renderItems([]);
-        elements.empty.hidden = false;
-        elements.empty.textContent = error.message || "Recherche impossible.";
-    } finally {
-        if (elements.searchButton) elements.searchButton.disabled = false;
     }
 }
 
@@ -164,8 +354,7 @@ async function runImageSearch({ retryMissing = false } = {}) {
         while (!stopImageSearchRequested) {
             const data = await apiRequest("/api/admin/items/images/process", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ batchSize: 20, retryMissing })
+                body: { batchSize: 20, retryMissing }
             });
             updateImageStats(data.stats);
             if (!data.processed) break;
@@ -175,7 +364,7 @@ async function runImageSearch({ retryMissing = false } = {}) {
             ? "Arrêt effectué. Clique à nouveau pour reprendre."
             : "Traitement terminé pour cette sélection.";
     } catch (error) {
-        elements.imageStatus.textContent = error.message || "La recherche d’images a échoué.";
+        elements.imageStatus.textContent = error.message || "La recherche d'images a échoué.";
     } finally {
         imageSearchRunning = false;
         elements.imageStart.disabled = false;
@@ -192,10 +381,9 @@ async function retryMissingImages() {
         elements.imageStatus.textContent = "Préparation de la relance…";
         await apiRequest("/api/admin/items/images/reset", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ onlyMissing: true })
+            body: { onlyMissing: true }
         });
-        await runImageSearch();
+        await runImageSearch({ retryMissing: true });
     } catch (error) {
         elements.imageStatus.textContent = error.message || "Impossible de relancer les absentes.";
         elements.imageRetry.disabled = false;
@@ -204,7 +392,7 @@ async function retryMissingImages() {
 
 async function importZip() {
     const file = elements.file?.files?.[0];
-    if (!file) return setFeedback("Sélectionne d’abord le ZIP contenant tes fichiers types*.xml.", "error");
+    if (!file) return setFeedback("Sélectionne d'abord le ZIP contenant tes fichiers types*.xml.", "error");
     if (!/\.zip$/i.test(file.name)) return setFeedback("Le fichier sélectionné doit être une archive .zip.", "error");
 
     elements.importButton.disabled = true;
@@ -220,9 +408,9 @@ async function importZip() {
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
         setFeedback(`Import terminé : ${Number(data.imported || 0).toLocaleString("fr-FR")} objets, ${data.files || 0} fichiers XML, ${Number(data.duplicates || 0).toLocaleString("fr-FR")} doublons fusionnés.`, "success");
-        await Promise.all([loadStats(), loadImageStats()]);
+        await Promise.all([loadStats(), loadImageStats(), searchItems({ resetPage: true })]);
     } catch (error) {
-        setFeedback(error.message || "L’import a échoué.", "error");
+        setFeedback(error.message || "L'import a échoué.", "error");
     } finally {
         elements.importButton.disabled = false;
     }
@@ -231,15 +419,37 @@ async function importZip() {
 export function initializeCatalog({ onBack } = {}) {
     elements.back?.addEventListener("click", onBack);
     elements.importButton?.addEventListener("click", importZip);
-    elements.searchButton?.addEventListener("click", searchItems);
+    elements.searchButton?.addEventListener("click", () => searchItems({ resetPage: true }));
+    elements.resetButton?.addEventListener("click", resetFilters);
+    elements.modFilter?.addEventListener("change", () => searchItems({ resetPage: true }));
+    elements.categoryFilter?.addEventListener("change", () => searchItems({ resetPage: true }));
+    elements.availabilityFilter?.addEventListener("change", () => searchItems({ resetPage: true }));
+    elements.previous?.addEventListener("click", () => {
+        state.offset = Math.max(state.offset - state.limit, 0);
+        searchItems();
+    });
+    elements.next?.addEventListener("click", () => {
+        state.offset += state.limit;
+        searchItems();
+    });
+    elements.editorForm?.addEventListener("submit", saveEditor);
+    elements.editorClose?.addEventListener("click", closeEditor);
+    elements.editorCancel?.addEventListener("click", closeEditor);
+    elements.editor?.addEventListener("click", event => {
+        if (event.target === elements.editor) closeEditor();
+    });
     elements.imageStart?.addEventListener("click", () => runImageSearch());
     elements.imageStop?.addEventListener("click", () => { stopImageSearchRequested = true; });
     elements.imageRetry?.addEventListener("click", retryMissingImages);
     elements.search?.addEventListener("keydown", event => {
-        if (event.key === "Enter") { event.preventDefault(); searchItems(); }
+        if (event.key === "Enter") {
+            event.preventDefault();
+            searchItems({ resetPage: true });
+        }
     });
 }
 
 export async function openCatalog() {
     await Promise.all([loadStats(), loadImageStats()]);
+    await searchItems({ resetPage: true });
 }

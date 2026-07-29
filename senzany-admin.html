@@ -8,7 +8,7 @@
   <title>Centre de commandement — SENZANY</title>
 
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.1.3" />
+  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.2.0" />
 </head>
 
 <body data-page="admin" data-build="admin-control-center-v3">
@@ -334,7 +334,13 @@
             <div class="admin-layout admin-layout--items">
               <section class="admin-card admin-card--catalog-main">
                 <div class="admin-card__header"><div><span>CATALOGUE SUPABASE</span><h2>Rechercher un objet du serveur</h2></div><b>01</b></div>
-                <div class="admin-items-database-stat"><span>Objets actifs et disponibles</span><strong id="itemsDatabaseTotal">--</strong></div>
+                <div class="admin-catalog-stats">
+                  <div><span>Objets actifs</span><strong id="itemsDatabaseTotal">--</strong></div>
+                  <div><span>Livraisons</span><strong id="itemsDeliveryTotal">--</strong></div>
+                  <div><span>Boutique</span><strong id="itemsShopTotal">--</strong></div>
+                  <div><span>Battle Pass</span><strong id="itemsBattlePassTotal">--</strong></div>
+                  <div><span>Récompenses</span><strong id="itemsRewardTotal">--</strong></div>
+                </div>
 
                 <div class="admin-image-finder">
                   <div class="admin-image-finder__header">
@@ -359,12 +365,33 @@
                   </div>
                 </div>
 
-                <div class="admin-item-searchbar">
-                  <input id="itemsDatabaseSearch" type="search" autocomplete="off" placeholder="Exemple : M4A1, Cannabis, Raptor…" />
-                  <button id="searchItemsButton" class="admin-button admin-button--small" type="button">Rechercher</button>
+                <div class="admin-catalog-filters">
+                  <div class="admin-item-searchbar">
+                    <input id="itemsDatabaseSearch" type="search" autocomplete="off" placeholder="Rechercher un classname ou un nom…" />
+                    <button id="searchItemsButton" class="admin-button admin-button--small" type="button">Rechercher</button>
+                  </div>
+                  <select id="itemsModFilter" aria-label="Filtrer par mod"><option value="">Tous les mods</option></select>
+                  <select id="itemsCategoryFilter" aria-label="Filtrer par catégorie"><option value="">Toutes les catégories</option></select>
+                  <select id="itemsAvailabilityFilter" aria-label="Filtrer par disponibilité">
+                    <option value="">Toutes les disponibilités</option>
+                    <option value="delivery">Disponible en livraison</option>
+                    <option value="shop">Disponible en boutique</option>
+                    <option value="battle_pass">Disponible dans le Battle Pass</option>
+                    <option value="reward">Disponible en récompense</option>
+                  </select>
+                  <button id="resetItemsFiltersButton" class="admin-button admin-button--small" type="button">Réinitialiser</button>
                 </div>
-                <div id="itemsDatabaseEmpty" class="admin-list-message">Saisis au moins 2 caractères.</div>
+                <div class="admin-catalog-results-head">
+                  <strong id="itemsResultsCount">0 résultat</strong>
+                  <small>Clique sur Modifier pour enrichir un objet.</small>
+                </div>
+                <div id="itemsDatabaseEmpty" class="admin-list-message">Chargement du catalogue…</div>
                 <div id="itemsDatabaseResults" class="admin-items-database-results"></div>
+                <div class="admin-catalog-pagination">
+                  <button id="itemsPreviousPage" class="admin-button admin-button--small" type="button">← Précédent</button>
+                  <span id="itemsPageLabel">Page 1 / 1</span>
+                  <button id="itemsNextPage" class="admin-button admin-button--small" type="button">Suivant →</button>
+                </div>
               </section>
 
               <details class="admin-card admin-catalog-maintenance">
@@ -389,10 +416,40 @@
     </section>
   </main>
 
+  <dialog id="itemEditorDialog" class="admin-item-editor">
+    <form id="itemEditorForm" method="dialog">
+      <div class="admin-item-editor__header">
+        <div><span>FICHE OBJET</span><strong id="itemEditorClassname">--</strong></div>
+        <button id="closeItemEditor" class="admin-item-editor__close" type="button" aria-label="Fermer">×</button>
+      </div>
+      <div class="admin-item-editor__body">
+        <div class="admin-item-editor__grid">
+          <label>Nom affiché<input id="itemEditorDisplayName" type="text" maxlength="160" /></label>
+          <label>Nom du mod<input id="itemEditorModName" type="text" maxlength="160" required /></label>
+          <label>Catégorie<input id="itemEditorCategory" type="text" maxlength="100" required /></label>
+          <label>Sous-catégorie<input id="itemEditorSubcategory" type="text" maxlength="100" /></label>
+        </div>
+        <label class="admin-item-editor__full">URL de l'image<input id="itemEditorImageUrl" type="url" maxlength="1000" placeholder="https://…" /></label>
+        <div class="admin-item-editor__switches">
+          <label><input id="itemEditorActive" type="checkbox" /><span>Objet actif</span></label>
+          <label><input id="itemEditorDelivery" type="checkbox" /><span>Livraisons</span></label>
+          <label><input id="itemEditorShop" type="checkbox" /><span>Boutique</span></label>
+          <label><input id="itemEditorBattlePass" type="checkbox" /><span>Battle Pass</span></label>
+          <label><input id="itemEditorReward" type="checkbox" /><span>Récompenses</span></label>
+        </div>
+        <div id="itemEditorFeedback" class="admin-feedback" hidden></div>
+      </div>
+      <div class="admin-item-editor__footer">
+        <button id="cancelItemEditor" class="admin-button" type="button">Annuler</button>
+        <button id="saveItemEditor" class="admin-button admin-button--primary" type="submit">Enregistrer l'objet</button>
+      </div>
+    </form>
+  </dialog>
+
   <div data-site-footer></div>
 
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin.js?v=4.2.0"></script>
+  <script type="module" src="assets/js/admin/admin.js?v=4.2.1"></script>
 </body>
 </html>

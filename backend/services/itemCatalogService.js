@@ -295,8 +295,104 @@ async function upsertImportedItems(items, batchSize = 300) {
   return processed;
 }
 
+
+function cleanText(value, label, maxLength, { allowEmpty = true } = {}) {
+  const text = String(value ?? "").trim();
+
+  if (!allowEmpty && !text) {
+    throw new Error(`${label} obligatoire.`);
+  }
+
+  if (text.length > maxLength) {
+    throw new Error(`${label} trop long (${maxLength} caractères maximum).`);
+  }
+
+  return text || null;
+}
+
+function cleanBoolean(value) {
+  if (typeof value === "boolean") return value;
+  if (value === "true" || value === 1 || value === "1") return true;
+  if (value === "false" || value === 0 || value === "0") return false;
+  return undefined;
+}
+
+function cleanImageUrl(value) {
+  const imageUrl = cleanText(value, "URL de l'image", 1000);
+  if (!imageUrl) return null;
+
+  let parsed;
+  try {
+    parsed = new URL(imageUrl);
+  } catch {
+    throw new Error("URL de l'image invalide.");
+  }
+
+  if (!["http:", "https:"].includes(parsed.protocol)) {
+    throw new Error("URL de l'image invalide.");
+  }
+
+  return parsed.toString();
+}
+
+async function updateItem(id, payload = {}) {
+  const supabase = getSupabaseClient();
+  const update = {};
+
+  if (Object.prototype.hasOwnProperty.call(payload, "displayName")) {
+    update.display_name = cleanText(payload.displayName, "Nom affiché", 160);
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, "category")) {
+    update.category = cleanText(payload.category, "Catégorie", 100, { allowEmpty: false });
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, "subcategory")) {
+    update.subcategory = cleanText(payload.subcategory, "Sous-catégorie", 100);
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, "modName")) {
+    update.mod_name = cleanText(payload.modName, "Nom du mod", 160, { allowEmpty: false });
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, "imageUrl")) {
+    update.image_url = cleanImageUrl(payload.imageUrl);
+    update.image_status = update.image_url ? "found" : "pending";
+    update.image_checked_at = null;
+  }
+
+  const booleanFields = {
+    active: "is_active",
+    deliveryEnabled: "delivery_enabled",
+    shopEnabled: "shop_enabled",
+    battlePassEnabled: "battle_pass_enabled",
+    rewardEnabled: "reward_enabled"
+  };
+
+  for (const [inputName, columnName] of Object.entries(booleanFields)) {
+    if (!Object.prototype.hasOwnProperty.call(payload, inputName)) continue;
+    const value = cleanBoolean(payload[inputName]);
+    if (value !== undefined) update[columnName] = value;
+  }
+
+  if (!Object.keys(update).length) {
+    throw new Error("Aucun champ valide à modifier.");
+  }
+
+  update.updated_at = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("items")
+    .update(update)
+    .eq("id", id)
+    .select(
+      "id,classname,display_name,category,subcategory,mod_name,source_file,source_path,is_active,delivery_enabled,shop_enabled,battle_pass_enabled,reward_enabled,image_url,image_status,first_seen_at,last_seen_at,updated_at"
+    )
+    .single();
+
+  if (error) throw error;
+  return normalizeItem(data);
+}
+
 module.exports = {
   searchItems,
   getItemStats,
+  updateItem,
   upsertImportedItems
 };
