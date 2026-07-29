@@ -1,7 +1,8 @@
 const {
   searchItems,
   getItemStats,
-  updateItem
+  updateItem,
+  autoClassifyItems
 } = require("../services/itemCatalogService");
 const { importZipBuffer } = require("../services/itemImportService");
 const {
@@ -17,6 +18,7 @@ async function search(req, res, next) {
       mod: req.query.mod || "",
       category: req.query.category || "",
       availability: req.query.availability || "",
+      imageStatus: req.query.imageStatus || "",
       limit: req.query.limit || 50,
       offset: req.query.offset || 0
     });
@@ -61,6 +63,22 @@ async function update(req, res, next) {
       return res.status(404).json({ error: "Objet introuvable." });
     }
 
+    next(error);
+  }
+}
+
+async function classify(req, res, next) {
+  try {
+    const result = await autoClassifyItems({
+      batchSize: req.body?.batchSize || 250
+    });
+
+    console.log(
+      `[ITEMS] Classement automatique par ${req.commandSteamId || "staff inconnu"}: ${result.updated} objet(s) classé(s)`
+    );
+
+    res.json({ ok: true, ...result });
+  } catch (error) {
     next(error);
   }
 }
@@ -122,6 +140,7 @@ module.exports = {
   search,
   stats,
   update,
+  classify,
   imageStats,
   processImages,
   resetImages,

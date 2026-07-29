@@ -14,6 +14,9 @@ const elements = {
     modFilter: document.getElementById("itemsModFilter"),
     categoryFilter: document.getElementById("itemsCategoryFilter"),
     availabilityFilter: document.getElementById("itemsAvailabilityFilter"),
+    imageFilter: document.getElementById("itemsImageFilter"),
+    classifyButton: document.getElementById("classifyItemsButton"),
+    classificationStatus: document.getElementById("itemClassificationStatus"),
     searchButton: document.getElementById("searchItemsButton"),
     resetButton: document.getElementById("resetItemsFiltersButton"),
     results: document.getElementById("itemsDatabaseResults"),
@@ -33,6 +36,7 @@ const elements = {
     editorSubcategory: document.getElementById("itemEditorSubcategory"),
     editorModName: document.getElementById("itemEditorModName"),
     editorImageUrl: document.getElementById("itemEditorImageUrl"),
+    editorImagePreview: document.getElementById("itemEditorImagePreview"),
     editorActive: document.getElementById("itemEditorActive"),
     editorDelivery: document.getElementById("itemEditorDelivery"),
     editorShop: document.getElementById("itemEditorShop"),
@@ -217,6 +221,7 @@ function getSearchParams() {
     if (elements.modFilter?.value) params.set("mod", elements.modFilter.value);
     if (elements.categoryFilter?.value) params.set("category", elements.categoryFilter.value);
     if (elements.availabilityFilter?.value) params.set("availability", elements.availabilityFilter.value);
+    if (elements.imageFilter?.value) params.set("imageStatus", elements.imageFilter.value);
     return params;
 }
 
@@ -246,6 +251,65 @@ async function searchItems({ resetPage = false } = {}) {
     }
 }
 
+function updateEditorImagePreview(url = "") {
+    if (!elements.editorImagePreview) return;
+    const safeUrl = String(url || "").trim();
+    elements.editorImagePreview.innerHTML = "";
+
+    if (!safeUrl) {
+        elements.editorImagePreview.innerHTML = "<span>Aucune image</span>";
+        return;
+    }
+
+    const image = document.createElement("img");
+    image.src = safeUrl;
+    image.alt = "Aperçu de l'objet";
+    image.loading = "lazy";
+    image.referrerPolicy = "no-referrer";
+    image.addEventListener("error", () => {
+        elements.editorImagePreview.innerHTML = "<span>Image inaccessible</span>";
+    });
+    elements.editorImagePreview.appendChild(image);
+}
+
+async function classifyItems() {
+    if (!elements.classifyButton) return;
+    elements.classifyButton.disabled = true;
+    if (elements.classificationStatus) elements.classificationStatus.textContent = "Classement en cours…";
+
+    let totalUpdated = 0;
+    let totalProcessed = 0;
+
+    try {
+        for (let batch = 0; batch < 50; batch += 1) {
+            const data = await apiRequest("/api/admin/items/classify", {
+                method: "POST",
+                body: { batchSize: 250 }
+            });
+
+            totalUpdated += Number(data.updated || 0);
+            totalProcessed += Number(data.processed || 0);
+
+            if (elements.classificationStatus) {
+                elements.classificationStatus.textContent = `${totalUpdated.toLocaleString("fr-FR")} objet(s) classé(s)…`;
+            }
+
+            if (!data.processed || !data.updated) break;
+        }
+
+        if (elements.classificationStatus) {
+            elements.classificationStatus.textContent = `${totalUpdated.toLocaleString("fr-FR")} objet(s) classé(s) automatiquement.`;
+        }
+        await Promise.all([loadStats(), searchItems({ resetPage: true })]);
+    } catch (error) {
+        if (elements.classificationStatus) {
+            elements.classificationStatus.textContent = error.message || "Le classement automatique a échoué.";
+        }
+    } finally {
+        elements.classifyButton.disabled = false;
+    }
+}
+
 function openEditor(item) {
     state.selectedItem = item;
     elements.editorClassname.textContent = item.className;
@@ -254,6 +318,7 @@ function openEditor(item) {
     elements.editorSubcategory.value = item.subcategory || "";
     elements.editorModName.value = item.modName || "Inconnu";
     elements.editorImageUrl.value = item.imageUrl || "";
+    updateEditorImagePreview(item.imageUrl || "");
     elements.editorActive.checked = item.active;
     elements.editorDelivery.checked = item.deliveryEnabled;
     elements.editorShop.checked = item.shopEnabled;
@@ -311,6 +376,7 @@ function resetFilters() {
     elements.modFilter.value = "";
     elements.categoryFilter.value = "";
     elements.availabilityFilter.value = "";
+    if (elements.imageFilter) elements.imageFilter.value = "";
     searchItems({ resetPage: true });
 }
 
@@ -421,9 +487,12 @@ export function initializeCatalog({ onBack } = {}) {
     elements.importButton?.addEventListener("click", importZip);
     elements.searchButton?.addEventListener("click", () => searchItems({ resetPage: true }));
     elements.resetButton?.addEventListener("click", resetFilters);
+    elements.classifyButton?.addEventListener("click", classifyItems);
+    elements.editorImageUrl?.addEventListener("input", (event) => updateEditorImagePreview(event.target.value));
     elements.modFilter?.addEventListener("change", () => searchItems({ resetPage: true }));
     elements.categoryFilter?.addEventListener("change", () => searchItems({ resetPage: true }));
     elements.availabilityFilter?.addEventListener("change", () => searchItems({ resetPage: true }));
+    elements.imageFilter?.addEventListener("change", () => searchItems({ resetPage: true }));
     elements.previous?.addEventListener("click", () => {
         state.offset = Math.max(state.offset - state.limit, 0);
         searchItems();

@@ -3,6 +3,86 @@ const { createClient } = require("@supabase/supabase-js");
 const DEFAULT_CATEGORY = "Autre";
 const DEFAULT_MOD_NAME = "Inconnu";
 
+
+const CATEGORY_RULES = [
+  { category: "Chargeurs", subcategory: "Chargeurs", pattern: /(mag|magazine)(_|$)/i },
+  { category: "Munitions", subcategory: "Boîtes et cartouches", pattern: /(ammo|ammunition|bullet|round|cartridge)/i },
+  { category: "Armes", subcategory: "Pistolets", pattern: /(pistol|glock|deagle|makarov|cz75|fnx45|colt1911|magnum)/i },
+  { category: "Armes", subcategory: "Fusils et carabines", pattern: /(rifle|akm|ak74|m4a1|fal|famas|scar|svd|mosin|winchester|shotgun|mp5|ump45)/i },
+  { category: "Optiques", subcategory: "Viseurs", pattern: /(optic|scope|sight|reddot|acog)/i },
+  { category: "Vêtements", subcategory: "Sacs", pattern: /(backpack|rucksack|bag$|_bag|pouch)/i },
+  { category: "Vêtements", subcategory: "Casques et chapeaux", pattern: /(helmet|hat$|cap$|beanie|balaclava)/i },
+  { category: "Vêtements", subcategory: "Tenues", pattern: /(jacket|pants|trousers|shirt|hoodie|vest|boots|gloves)/i },
+  { category: "Nourriture", subcategory: "Aliments", pattern: /(food|meat|steak|can_|canned|apple|pear|potato|mushroom|rice)/i },
+  { category: "Boissons", subcategory: "Boissons", pattern: /(drink|water|soda|cola|canteen|bottle)/i },
+  { category: "Médical", subcategory: "Soins", pattern: /(medical|bandage|saline|morphine|epinephrine|syringe|bloodbag|antibiotic)/i },
+  { category: "Outils", subcategory: "Outils", pattern: /(hammer|hatchet|axe|pliers|screwdriver|wrench|shovel|pickaxe|knife|saw)/i },
+  { category: "Construction", subcategory: "Matériaux", pattern: /(plank|nail|sheetmetal|woodenlog|barbedwire|fence|watchtower|territory)/i },
+  { category: "Conteneurs", subcategory: "Stockage", pattern: /(crate|chest|locker|storage|container|barrel)/i },
+  { category: "Véhicules", subcategory: "Pièces et véhicules", pattern: /(car_|vehicle|wheel|radiator|sparkplug|carbattery|truckbattery|engine)/i }
+];
+
+function classifyClassname(classname) {
+  const value = String(classname || "");
+  const rule = CATEGORY_RULES.find((entry) => entry.pattern.test(value));
+  return rule ? { category: rule.category, subcategory: rule.subcategory } : null;
+}
+
+async function autoClassifyItems({ batchSize = 250 } = {}) {
+  const supabase = getSupabaseClient();
+  const safeBatchSize = Math.min(Math.max(Number(batchSize) || 250, 1), 500);
+
+  const { data, error } = await supabase
+    .from("items")
+    .select("id,classname,category,subcategory")
+    .eq("is_active", true)
+    .in("category", ["Autre", "Non classé"])
+    .order("classname", { ascending: true })
+    .limit(safeBatchSize);
+
+  if (error) throw error;
+
+  let updated = 0;
+  let skipped = 0;
+  const now = new Date().toISOString();
+
+  for (const row of data || []) {
+    const classification = classifyClassname(row.classname);
+    if (!classification) {
+      skipped += 1;
+      continue;
+    }
+
+    const { error: updateError } = await supabase
+      .from("items")
+      .update({
+        category: classification.category,
+        subcategory: row.subcategory || classification.subcategory,
+        updated_at: now
+      })
+      .eq("id", row.id)
+      .in("category", ["Autre", "Non classé"]);
+
+    if (updateError) throw updateError;
+    updated += 1;
+  }
+
+  const { count, error: countError } = await supabase
+    .from("items")
+    .select("id", { count: "exact", head: true })
+    .eq("is_active", true)
+    .in("category", ["Autre", "Non classé"]);
+
+  if (countError) throw countError;
+
+  return {
+    processed: (data || []).length,
+    updated,
+    skipped,
+    remaining: Number(count) || 0
+  };
+}
+
 function getSupabaseClient() {
   const url = String(process.env.SUPABASE_URL || "").replace(/\/$/, "");
   const key = process.env.SUPABASE_SECRET_KEY;
@@ -68,6 +148,7 @@ async function searchItems({
   mod = "",
   category = "",
   availability = "",
+  imageStatus = "",
   limit = 50,
   offset = 0
 } = {}) {
@@ -127,6 +208,11 @@ async function searchItems({
 
   if (availabilityColumns[availability]) {
     request = request.eq(availabilityColumns[availability], true);
+  }
+
+  const allowedImageStatuses = new Set(["found", "pending", "not_found", "error"]);
+  if (allowedImageStatuses.has(imageStatus)) {
+    request = request.eq("image_status", imageStatus);
   }
 
   const { data, error, count } = await request;
@@ -394,5 +480,6 @@ module.exports = {
   searchItems,
   getItemStats,
   updateItem,
-  upsertImportedItems
+  upsertImportedItems,
+  autoClassifyItems
 };

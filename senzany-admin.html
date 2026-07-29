@@ -365,6 +365,19 @@
                   </div>
                 </div>
 
+
+                <div class="admin-catalog-tools">
+                  <div>
+                    <span>CLASSEMENT AUTOMATIQUE</span>
+                    <strong>Ranger les objets encore classés dans « Autre »</strong>
+                    <small>Le classement utilise uniquement le classname et ne remplace jamais une catégorie déjà définie manuellement.</small>
+                  </div>
+                  <div class="admin-catalog-tools__actions">
+                    <small id="itemClassificationStatus">Prêt.</small>
+                    <button id="classifyItemsButton" class="admin-button admin-button--small" type="button">Classer automatiquement</button>
+                  </div>
+                </div>
+
                 <div class="admin-catalog-filters">
                   <div class="admin-item-searchbar">
                     <input id="itemsDatabaseSearch" type="search" autocomplete="off" placeholder="Rechercher un classname ou un nom…" />
@@ -372,6 +385,13 @@
                   </div>
                   <select id="itemsModFilter" aria-label="Filtrer par mod"><option value="">Tous les mods</option></select>
                   <select id="itemsCategoryFilter" aria-label="Filtrer par catégorie"><option value="">Toutes les catégories</option></select>
+                  <select id="itemsImageFilter" aria-label="Filtrer par image">
+                    <option value="">Toutes les images</option>
+                    <option value="found">Avec image</option>
+                    <option value="pending">Image à rechercher</option>
+                    <option value="not_found">Image introuvable</option>
+                    <option value="error">Erreur d'image</option>
+                  </select>
                   <select id="itemsAvailabilityFilter" aria-label="Filtrer par disponibilité">
                     <option value="">Toutes les disponibilités</option>
                     <option value="delivery">Disponible en livraison</option>
@@ -429,7 +449,10 @@
           <label>Catégorie<input id="itemEditorCategory" type="text" maxlength="100" required /></label>
           <label>Sous-catégorie<input id="itemEditorSubcategory" type="text" maxlength="100" /></label>
         </div>
-        <label class="admin-item-editor__full">URL de l'image<input id="itemEditorImageUrl" type="url" maxlength="1000" placeholder="https://…" /></label>
+        <div class="admin-item-editor__image-block">
+          <div id="itemEditorImagePreview" class="admin-item-editor__preview"><span>Aucune image</span></div>
+          <label class="admin-item-editor__full">URL de l'image<input id="itemEditorImageUrl" type="url" maxlength="1000" placeholder="https://…" /></label>
+        </div>
         <div class="admin-item-editor__switches">
           <label><input id="itemEditorActive" type="checkbox" /><span>Objet actif</span></label>
           <label><input id="itemEditorDelivery" type="checkbox" /><span>Livraisons</span></label>
