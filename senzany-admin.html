@@ -446,8 +446,8 @@
         <div class="admin-item-editor__grid">
           <label>Nom affiché<input id="itemEditorDisplayName" type="text" maxlength="160" /></label>
           <label>Nom du mod<input id="itemEditorModName" type="text" maxlength="160" required /></label>
-          <label>Catégorie<input id="itemEditorCategory" type="text" list="itemEditorCategoryList" maxlength="100" autocomplete="off" required /><datalist id="itemEditorCategoryList"></datalist></label>
-          <label>Sous-catégorie<input id="itemEditorSubcategory" type="text" list="itemEditorSubcategoryList" maxlength="100" autocomplete="off" /><datalist id="itemEditorSubcategoryList"></datalist></label>
+          <label>Catégorie<select id="itemEditorCategory" required><option value="Autre">Autre</option></select></label>
+          <label>Sous-catégorie<select id="itemEditorSubcategory"><option value="">Sans sous-catégorie</option></select></label>
         </div>
         <div class="admin-item-editor__image-block">
           <div id="itemEditorImagePreview" class="admin-item-editor__preview"><span>Aucune image</span></div>
