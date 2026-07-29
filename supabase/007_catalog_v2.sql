@@ -34,7 +34,8 @@ alter table public.items
   check (import_count >= 1)
   not valid;
 
-validate constraint items_import_count_check on public.items;
+alter table public.items
+  validate constraint items_import_count_check;
 
 create index if not exists items_subcategory_idx
   on public.items (subcategory);
