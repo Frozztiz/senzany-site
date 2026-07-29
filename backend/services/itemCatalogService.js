@@ -81,29 +81,45 @@ function classifyClassname(classname) {
 async function autoClassifyItems({ batchSize = 250 } = {}) {
   const supabase = getSupabaseClient();
   const safeBatchSize = Math.min(Math.max(Number(batchSize) || 250, 1), 500);
+  const scanPageSize = 1000;
+  const candidates = [];
+  let scanned = 0;
+  let offset = 0;
 
-  const { data, error } = await supabase
-    .from("items")
-    .select("id,classname,category,subcategory")
-    .eq("is_active", true)
-    .in("category", ["Autre", "Non classé"])
-    .order("classname", { ascending: true })
-    .limit(safeBatchSize);
+  // Parcourt tous les objets encore non classés afin de ne pas rester bloqué
+  // sur les premiers classnames qu'aucune règle ne reconnaît.
+  while (candidates.length < safeBatchSize) {
+    const { data, error } = await supabase
+      .from("items")
+      .select("id,classname,category,subcategory")
+      .eq("is_active", true)
+      .in("category", ["Autre", "Non classé"])
+      .order("classname", { ascending: true })
+      .order("id", { ascending: true })
+      .range(offset, offset + scanPageSize - 1);
 
-  if (error) throw error;
+    if (error) throw error;
 
-  let updated = 0;
-  let skipped = 0;
-  const now = new Date().toISOString();
+    const rows = data || [];
+    scanned += rows.length;
 
-  for (const row of data || []) {
-    const classification = classifyClassname(row.classname);
-    if (!classification) {
-      skipped += 1;
-      continue;
+    for (const row of rows) {
+      const classification = classifyClassname(row.classname);
+      if (!classification) continue;
+
+      candidates.push({ row, classification });
+      if (candidates.length >= safeBatchSize) break;
     }
 
-    const { error: updateError } = await supabase
+    if (rows.length < scanPageSize) break;
+    offset += scanPageSize;
+  }
+
+  let updated = 0;
+  const now = new Date().toISOString();
+
+  for (const { row, classification } of candidates) {
+    const { data: changed, error: updateError } = await supabase
       .from("items")
       .update({
         category: classification.category,
@@ -111,10 +127,11 @@ async function autoClassifyItems({ batchSize = 250 } = {}) {
         updated_at: now
       })
       .eq("id", row.id)
-      .in("category", ["Autre", "Non classé"]);
+      .in("category", ["Autre", "Non classé"])
+      .select("id");
 
     if (updateError) throw updateError;
-    updated += 1;
+    if (changed && changed.length) updated += 1;
   }
 
   const { count, error: countError } = await supabase
@@ -126,9 +143,9 @@ async function autoClassifyItems({ batchSize = 250 } = {}) {
   if (countError) throw countError;
 
   return {
-    processed: (data || []).length,
+    processed: scanned,
     updated,
-    skipped,
+    skipped: Math.max(scanned - candidates.length, 0),
     remaining: Number(count) || 0
   };
 }
