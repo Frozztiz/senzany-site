@@ -149,7 +149,7 @@ function renderItems(rawItems) {
     elements.results.innerHTML = "";
     elements.empty.hidden = items.length > 0;
 
-    for (const item of items) {
+    items.forEach((item, itemIndex) => {
         const card = document.createElement("article");
         card.className = "admin-item-result admin-item-result--manager";
         card.dataset.itemId = item.id;
@@ -175,17 +175,27 @@ function renderItems(rawItems) {
                 ${availabilityBadge("Récompense", item.rewardEnabled)}
             </div>
             <div class="admin-item-result__actions">
-                <button class="admin-button admin-button--small" type="button" data-edit-item="${escapeHtml(item.id)}">Modifier</button>
+                <button class="admin-button admin-button--small" type="button" data-edit-index="${itemIndex}">Modifier</button>
                 <button class="admin-button admin-button--small" type="button" data-copy="${escapeHtml(item.className)}">Copier</button>
             </div>
         `;
         elements.results.appendChild(card);
-    }
+    });
 
-    elements.results.querySelectorAll("[data-edit-item]").forEach(button => {
+    elements.results.querySelectorAll("[data-edit-index]").forEach(button => {
         button.addEventListener("click", () => {
-            const item = state.items.find(entry => entry.id === button.dataset.editItem);
-            if (item) openEditor(item);
+            const itemIndex = Number(button.dataset.editIndex);
+            const item = Number.isInteger(itemIndex) ? state.items[itemIndex] : null;
+
+            if (!item) {
+                console.error("[Senzany Catalogue] Objet introuvable pour l’édition.", {
+                    itemIndex,
+                    availableItems: state.items.length
+                });
+                return;
+            }
+
+            openEditor(item);
         });
     });
 
