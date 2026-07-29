@@ -191,9 +191,32 @@ function renderItems(rawItems) {
 
     elements.results.querySelectorAll("[data-copy]").forEach(button => {
         button.addEventListener("click", async () => {
-            await navigator.clipboard.writeText(button.dataset.copy || "");
+            const value = button.dataset.copy || "";
             const original = button.textContent;
-            button.textContent = "Copié";
+
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(value);
+                } else {
+                    const textarea = document.createElement("textarea");
+                    textarea.value = value;
+                    textarea.setAttribute("readonly", "");
+                    textarea.style.position = "fixed";
+                    textarea.style.opacity = "0";
+                    textarea.style.pointerEvents = "none";
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    const copied = document.execCommand("copy");
+                    textarea.remove();
+                    if (!copied) throw new Error("La copie a été refusée par le navigateur.");
+                }
+
+                button.textContent = "Copié";
+            } catch (error) {
+                console.error("[Senzany Catalogue] Copie impossible :", error);
+                button.textContent = "Échec";
+            }
+
             setTimeout(() => { button.textContent = original; }, 1200);
         });
     });
@@ -311,6 +334,11 @@ async function classifyItems() {
 }
 
 function openEditor(item) {
+    if (!elements.editor || typeof elements.editor.showModal !== "function") {
+        console.error("[Senzany Catalogue] La fenêtre d’édition est introuvable ou invalide.");
+        return;
+    }
+
     state.selectedItem = item;
     elements.editorClassname.textContent = item.className;
     elements.editorDisplayName.value = item.displayName || "";
@@ -325,11 +353,20 @@ function openEditor(item) {
     elements.editorBattlePass.checked = item.battlePassEnabled;
     elements.editorReward.checked = item.rewardEnabled;
     setEditorFeedback();
-    elements.editor.showModal();
+
+    if (!elements.editor.open) elements.editor.showModal();
+    elements.editor.classList.add("is-open");
+
+    // Sécurité contre une ancienne règle CSS qui masquerait encore le dialogue.
+    if (getComputedStyle(elements.editor).display === "none") {
+        elements.editor.style.display = "block";
+    }
 }
 
 function closeEditor() {
     if (elements.editor?.open) elements.editor.close();
+    elements.editor?.classList.remove("is-open");
+    if (elements.editor) elements.editor.style.removeProperty("display");
     state.selectedItem = null;
     setEditorFeedback();
 }
