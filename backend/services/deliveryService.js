@@ -134,6 +134,13 @@ async function createDelivery({
 }) {
   const supabase = getSupabaseClient();
 
+  /*
+   * La livraison est d'abord créée en "processing".
+   *
+   * L'agent DayZ ne réclame que les livraisons "pending".
+   * Cela empêche l'agent de récupérer la livraison avant que
+   * tous les objets aient été enregistrés dans delivery_items.
+   */
   const { data: delivery, error: deliveryError } = await supabase
     .from("deliveries")
     .insert({
@@ -141,7 +148,8 @@ async function createDelivery({
       player_name: playerName || null,
       title,
       message: message || null,
-      status: "pending",
+      status: "processing",
+      processing_at: new Date().toISOString(),
       created_by: createdBy,
       created_by_name: createdByName
     })
@@ -152,13 +160,53 @@ async function createDelivery({
     throw deliveryError;
   }
 
-  const deliveryItems = items.map((item) => ({
-    delivery_id: delivery.id,
-    classname: item.className || item.name,
-    display_name: item.name || item.className || null,
-    quantity: item.quantity,
-    metadata: item.metadata || {}
-  }));
+  const deliveryItems = items
+    .map((item) => {
+      const className = String(
+        item.className ||
+        item.classname ||
+        item.name ||
+        ""
+      ).trim();
+
+      const displayName = String(
+        item.name ||
+        item.displayName ||
+        className
+      ).trim();
+
+      const quantity = Math.max(
+        1,
+        Math.min(
+          1000,
+          Number(item.quantity) || 1
+        )
+      );
+
+      return {
+        delivery_id: delivery.id,
+        classname: className,
+        display_name: displayName || className,
+        quantity,
+        metadata:
+          item.metadata &&
+          typeof item.metadata === "object"
+            ? item.metadata
+            : {}
+      };
+    })
+    .filter((item) => item.classname);
+
+  if (!deliveryItems.length) {
+    await supabase
+      .from("deliveries")
+      .delete()
+      .eq("id", delivery.id);
+
+    throw new Error(
+      "La livraison ne contient aucun objet valide."
+    );
+  }
 
   const { error: itemsError } = await supabase
     .from("delivery_items")
@@ -172,6 +220,34 @@ async function createDelivery({
 
     throw itemsError;
   }
+
+  /*
+   * Les objets sont maintenant tous enregistrés.
+   * La livraison peut devenir visible pour l'agent DayZ.
+   */
+  const { error: activateError } = await supabase
+    .from("deliveries")
+    .update({
+      status: "pending",
+      processing_at: null,
+      error_message: null,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", delivery.id)
+    .eq("status", "processing");
+
+  if (activateError) {
+    await supabase
+      .from("deliveries")
+      .delete()
+      .eq("id", delivery.id);
+
+    throw activateError;
+  }
+
+  console.log(
+    `[DELIVERY CREATED] ${delivery.id} - ${deliveryItems.length} objet(s) - statut pending`
+  );
 
   return getDeliveryById(delivery.id);
 }
