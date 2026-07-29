@@ -4,6 +4,14 @@ const DEFAULT_CATEGORY = "Autre";
 const DEFAULT_MOD_NAME = "Inconnu";
 
 
+const CLASSNAME_OVERRIDES = new Map([
+  // ItemsServer / objets AC observés dans le catalogue Senzany.
+  ["ac_cigarettepack", { category: "Consommables", subcategory: "Tabac" }],
+  ["ac_cigarettepack_empty", { category: "Consommables", subcategory: "Tabac" }],
+  ["ac_rollingpapers", { category: "Consommables", subcategory: "Tabac" }],
+  ["ac_emptybag", { category: "Conteneurs", subcategory: "Sacs et pochettes" }]
+]);
+
 const CATEGORY_RULES = [
   // Les règles les plus précises passent avant les règles générales.
   { category: "Chargeurs", subcategory: "Chargeurs", pattern: /(^|_)(mag|magazine)($|_)|drummag|(^|_)clip($|_)/i },
@@ -66,14 +74,21 @@ const CATEGORY_RULES = [
   { category: "Chasse et pêche", subcategory: "Chasse", pattern: /(pelt|hide|fur|antlers|beartrap|snaretrap)/i },
 
   { category: "Clés", subcategory: "Clés et cartes", pattern: /(^|_)(key|keycard|key_card|accesscard|access_card)($|_)/i },
+  { category: "Consommables", subcategory: "Tabac", pattern: /(cigarette|cigar|rollingpapers|rolling_papers|tobacco)/i },
   { category: "Livres et documents", subcategory: "Documents", pattern: /(book|note|paper|document|map|photo|newspaper)/i },
-  { category: "Consommables", subcategory: "Tabac", pattern: /(cigarette|cigar|rollingpapers|tobacco)/i },
   { category: "Objets spéciaux", subcategory: "Monnaies et valeurs", pattern: /(currency|money|rouble|ruble|coin|goldbar|silverbar|diamond|gem)/i },
   { category: "Objets spéciaux", subcategory: "Événement et récompense", pattern: /(event|quest|reward|battlepass|battle_pass|token|voucher|gift|present)/i }
 ];
 
 function classifyClassname(classname) {
-  const value = String(classname || "");
+  const value = String(classname || "").trim();
+  if (!value) return null;
+
+  const override = CLASSNAME_OVERRIDES.get(value.toLowerCase());
+  if (override) {
+    return { category: override.category, subcategory: override.subcategory };
+  }
+
   const rule = CATEGORY_RULES.find((entry) => entry.pattern.test(value));
   return rule ? { category: rule.category, subcategory: rule.subcategory } : null;
 }
