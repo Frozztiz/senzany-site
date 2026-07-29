@@ -34,6 +34,8 @@ const elements = {
     editorDisplayName: document.getElementById("itemEditorDisplayName"),
     editorCategory: document.getElementById("itemEditorCategory"),
     editorSubcategory: document.getElementById("itemEditorSubcategory"),
+    editorCategoryList: document.getElementById("itemEditorCategoryList"),
+    editorSubcategoryList: document.getElementById("itemEditorSubcategoryList"),
     editorModName: document.getElementById("itemEditorModName"),
     editorImageUrl: document.getElementById("itemEditorImageUrl"),
     editorImagePreview: document.getElementById("itemEditorImagePreview"),
@@ -60,7 +62,9 @@ const state = {
     total: 0,
     limit: 40,
     offset: 0,
-    loading: false
+    loading: false,
+    categories: [],
+    subcategories: {}
 };
 
 let imageSearchRunning = false;
@@ -123,6 +127,25 @@ function populateSelect(select, values, placeholder) {
     select.value = [...select.options].some(option => option.value === current) ? current : "";
 }
 
+function populateDatalist(datalist, values) {
+    if (!datalist) return;
+    datalist.innerHTML = "";
+    for (const value of values || []) {
+        const option = document.createElement("option");
+        option.value = value;
+        datalist.appendChild(option);
+    }
+}
+
+function refreshEditorSubcategories({ keepCurrent = true } = {}) {
+    const category = String(elements.editorCategory?.value || "").trim();
+    const current = keepCurrent ? String(elements.editorSubcategory?.value || "") : "";
+    const values = state.subcategories[category] || [];
+    populateDatalist(elements.editorSubcategoryList, values);
+    if (!keepCurrent && elements.editorSubcategory) elements.editorSubcategory.value = "";
+    else if (elements.editorSubcategory) elements.editorSubcategory.value = current;
+}
+
 async function loadStats() {
     try {
         const data = await apiRequest("/api/admin/items/stats");
@@ -131,8 +154,12 @@ async function loadStats() {
         if (elements.shopTotal) elements.shopTotal.textContent = Number(data.availability?.shop || 0).toLocaleString("fr-FR");
         if (elements.battlePassTotal) elements.battlePassTotal.textContent = Number(data.availability?.battlePass || 0).toLocaleString("fr-FR");
         if (elements.rewardTotal) elements.rewardTotal.textContent = Number(data.availability?.reward || 0).toLocaleString("fr-FR");
+        state.categories = Array.isArray(data.categories) ? data.categories : [];
+        state.subcategories = data.subcategories && typeof data.subcategories === "object" ? data.subcategories : {};
         populateSelect(elements.modFilter, data.mods, "Tous les mods");
-        populateSelect(elements.categoryFilter, data.categories, "Toutes les catégories");
+        populateSelect(elements.categoryFilter, state.categories, "Toutes les catégories");
+        populateDatalist(elements.editorCategoryList, state.categories);
+        refreshEditorSubcategories();
     } catch (_) {
         if (elements.total) elements.total.textContent = "--";
     }
@@ -362,6 +389,8 @@ function openEditor(item) {
     elements.editorShop.checked = item.shopEnabled;
     elements.editorBattlePass.checked = item.battlePassEnabled;
     elements.editorReward.checked = item.rewardEnabled;
+    populateDatalist(elements.editorCategoryList, state.categories);
+    refreshEditorSubcategories();
     setEditorFeedback();
 
     if (!elements.editor.open) elements.editor.showModal();
@@ -536,6 +565,8 @@ export function initializeCatalog({ onBack } = {}) {
     elements.resetButton?.addEventListener("click", resetFilters);
     elements.classifyButton?.addEventListener("click", classifyItems);
     elements.editorImageUrl?.addEventListener("input", (event) => updateEditorImagePreview(event.target.value));
+    elements.editorCategory?.addEventListener("input", () => refreshEditorSubcategories({ keepCurrent: false }));
+    elements.editorCategory?.addEventListener("change", () => refreshEditorSubcategories({ keepCurrent: false }));
     elements.modFilter?.addEventListener("change", () => searchItems({ resetPage: true }));
     elements.categoryFilter?.addEventListener("change", () => searchItems({ resetPage: true }));
     elements.availabilityFilter?.addEventListener("change", () => searchItems({ resetPage: true }));

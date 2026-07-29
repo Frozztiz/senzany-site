@@ -446,8 +446,8 @@
         <div class="admin-item-editor__grid">
           <label>Nom affiché<input id="itemEditorDisplayName" type="text" maxlength="160" /></label>
           <label>Nom du mod<input id="itemEditorModName" type="text" maxlength="160" required /></label>
-          <label>Catégorie<input id="itemEditorCategory" type="text" maxlength="100" required /></label>
-          <label>Sous-catégorie<input id="itemEditorSubcategory" type="text" maxlength="100" /></label>
+          <label>Catégorie<input id="itemEditorCategory" type="text" list="itemEditorCategoryList" maxlength="100" autocomplete="off" required /><datalist id="itemEditorCategoryList"></datalist></label>
+          <label>Sous-catégorie<input id="itemEditorSubcategory" type="text" list="itemEditorSubcategoryList" maxlength="100" autocomplete="off" /><datalist id="itemEditorSubcategoryList"></datalist></label>
         </div>
         <div class="admin-item-editor__image-block">
           <div id="itemEditorImagePreview" class="admin-item-editor__preview"><span>Aucune image</span></div>
@@ -473,6 +473,6 @@
 
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin.js?v=4.2.1"></script>
+  <script type="module" src="assets/js/admin/admin.js?v=4.2.2"></script>
 </body>
 </html>
