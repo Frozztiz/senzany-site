@@ -1,4 +1,5 @@
 const steamService = require("../services/steamService");
+const { isCommandAuthorized } = require("../utils/commandAccess");
 
 const {
   signSteamId,
@@ -107,16 +108,7 @@ exports.me = async (req, res) => {
       steamId
     );
 
-    const staffSteamIds = String(
-      process.env.STAFF_STEAM_IDS || ""
-    )
-      .split(",")
-      .map((id) => id.trim())
-      .filter(Boolean);
-
-    const isStaff = staffSteamIds.includes(
-      String(steamId)
-    );
+    const isStaff = isCommandAuthorized(steamId);
 
     return res.json({
       ...(profile || {}),
