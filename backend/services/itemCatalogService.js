@@ -5,21 +5,71 @@ const DEFAULT_MOD_NAME = "Inconnu";
 
 
 const CATEGORY_RULES = [
-  { category: "Chargeurs", subcategory: "Chargeurs", pattern: /(mag|magazine)(_|$)/i },
-  { category: "Munitions", subcategory: "Boîtes et cartouches", pattern: /(ammo|ammunition|bullet|round|cartridge)/i },
-  { category: "Armes", subcategory: "Pistolets", pattern: /(pistol|glock|deagle|makarov|cz75|fnx45|colt1911|magnum)/i },
-  { category: "Armes", subcategory: "Fusils et carabines", pattern: /(rifle|akm|ak74|m4a1|fal|famas|scar|svd|mosin|winchester|shotgun|mp5|ump45)/i },
-  { category: "Optiques", subcategory: "Viseurs", pattern: /(optic|scope|sight|reddot|acog)/i },
-  { category: "Vêtements", subcategory: "Sacs", pattern: /(backpack|rucksack|bag$|_bag|pouch)/i },
-  { category: "Vêtements", subcategory: "Casques et chapeaux", pattern: /(helmet|hat$|cap$|beanie|balaclava)/i },
-  { category: "Vêtements", subcategory: "Tenues", pattern: /(jacket|pants|trousers|shirt|hoodie|vest|boots|gloves)/i },
-  { category: "Nourriture", subcategory: "Aliments", pattern: /(food|meat|steak|can_|canned|apple|pear|potato|mushroom|rice)/i },
-  { category: "Boissons", subcategory: "Boissons", pattern: /(drink|water|soda|cola|canteen|bottle)/i },
-  { category: "Médical", subcategory: "Soins", pattern: /(medical|bandage|saline|morphine|epinephrine|syringe|bloodbag|antibiotic)/i },
-  { category: "Outils", subcategory: "Outils", pattern: /(hammer|hatchet|axe|pliers|screwdriver|wrench|shovel|pickaxe|knife|saw)/i },
-  { category: "Construction", subcategory: "Matériaux", pattern: /(plank|nail|sheetmetal|woodenlog|barbedwire|fence|watchtower|territory)/i },
-  { category: "Conteneurs", subcategory: "Stockage", pattern: /(crate|chest|locker|storage|container|barrel)/i },
-  { category: "Véhicules", subcategory: "Pièces et véhicules", pattern: /(car_|vehicle|wheel|radiator|sparkplug|carbattery|truckbattery|engine)/i }
+  // Les règles les plus précises passent avant les règles générales.
+  { category: "Chargeurs", subcategory: "Chargeurs", pattern: /(^|_)(mag|magazine)($|_)|drummag|(^|_)clip($|_)/i },
+  { category: "Munitions", subcategory: "Boîtes et cartouches", pattern: /(^|_)(ammo|ammunition|ammobox|cartridge|bullet|rounds?)($|_)|box_?(9x|22|45|308|357|380|545|556|762|12ga)/i },
+
+  { category: "Armes", subcategory: "Fusils à pompe", pattern: /(aa12|shotgun|saiga|benelli|remington|mossberg|bk43|bk133|vaiga)/i },
+  { category: "Armes", subcategory: "Fusils de précision", pattern: /(sniper|svd|vss|mosin|winchester|tundra|m70|savana|kar98|awm|m24|barrett|cheytac|dmr)/i },
+  { category: "Armes", subcategory: "Mitrailleuses", pattern: /(^|_)(lmg|mg42|m249|m240|pkm|rpk|minigun)($|_)/i },
+  { category: "Armes", subcategory: "Pistolets-mitrailleurs", pattern: /(^|_)(smg|mp5|mp7|mp9|ump45|uzi|vector|scorpion|cz61|pp19|p90)($|_)/i },
+  { category: "Armes", subcategory: "Pistolets", pattern: /(^|_)(pistol|handgun|glock|deagle|makarov|ij70|cz75|fnx45|colt1911|magnum|revolver|derringer)($|_)/i },
+  { category: "Armes", subcategory: "Fusils et carabines", pattern: /(^|_)(gun|rifle|weapon)($|_)|(m4a1|m16|m14|akm|ak74|ak101|ak102|ak103|ak104|ak105|ak47|famas|fal|scar|aug|g36|hk416|acr|mk18|lemas|lar|ka101|ka74|kas74|sks|b95|cr527|cr550|repeater)/i },
+  { category: "Armes", subcategory: "Armes de mêlée", pattern: /(sword|katana|machete|baseballbat|brassknuckle|sledgehammer)/i },
+
+  { category: "Accessoires d'armes", subcategory: "Optiques et viseurs", pattern: /(optic|scope|sight|reddot|red_dot|acog|holo|reflex|nightvisionoptic|pso1|kashtan)/i },
+  { category: "Accessoires d'armes", subcategory: "Silencieux", pattern: /(suppressor|silencer|compensator|muzzle)/i },
+  { category: "Accessoires d'armes", subcategory: "Pièces et accessoires", pattern: /(gunstock|handguard|buttstock|weaponlight|bipod|bayonet|foregrip|weaponrail)/i },
+
+  { category: "Explosifs", subcategory: "Grenades et charges", pattern: /(grenade|landmine|claymore|explosive|plasticexplosive|detonator|tripwire|(^|_)c4($|_)|(^|_)ied($|_))/i },
+
+  { category: "Véhicules", subcategory: "Roues", pattern: /(wheel|tire|tyre)/i },
+  { category: "Véhicules", subcategory: "Pièces moteur", pattern: /(radiator|sparkplug|glowplug|carbattery|truckbattery|engine|alternator|carburetor|gearbox|fueltank)/i },
+  { category: "Véhicules", subcategory: "Carrosserie", pattern: /(cardoor|vehicledoor|carhood|cartrunk|bumper|fender|windshield)/i },
+  { category: "Véhicules", subcategory: "Véhicules", pattern: /(^|_)(vehicle|car|truck|boat|helicopter|aircraft|motorcycle|bike|quad)($|_)|(olga|sarka|ada4x4|gunter|m3s|hummer|landrover|ural|kamaz)/i },
+
+  { category: "Médical", subcategory: "Médicaments", pattern: /(antibiotic|tetracycline|painkiller|charcoaltablets|vitamin|epinephrine|morphine|antidote|medicalpill)/i },
+  { category: "Médical", subcategory: "Poches et perfusions", pattern: /(saline|bloodbag|ivstartkit|bloodtestkit|bloodcollection|plasmabag)/i },
+  { category: "Médical", subcategory: "Soins", pattern: /(medical|bandage|firstaid|first_aid|syringe|thermometer|defibrillator|splint|disinfect|alcoholtincture)/i },
+
+  { category: "Nourriture", subcategory: "Viandes et poissons", pattern: /(meat|steak|fillet|fish|carp|mackerel|sardine|chickenbreast|goatsteak|beefsteak|porksteak|venison)/i },
+  { category: "Nourriture", subcategory: "Conserves", pattern: /(canned|foodcan|can_?(beans|peaches|sardines|tuna|pork|spaghetti))/i },
+  { category: "Nourriture", subcategory: "Fruits et légumes", pattern: /(apple|pear|plum|potato|tomato|pepper|pumpkin|zucchini|mushroom|berry|banana|orange|carrot)/i },
+  { category: "Nourriture", subcategory: "Aliments", pattern: /(^|_)(food|rice|cereal|powderedmilk|honey|jam|chocolate|biscuit|cracker|bread)($|_)/i },
+  { category: "Boissons", subcategory: "Eau et contenants", pattern: /(canteen|waterbottle|water_bottle|waterskin)/i },
+  { category: "Boissons", subcategory: "Boissons", pattern: /(^|_)(drink|soda|cola|kvass|juice|energy|coffee|tea|beer|vodka|whisky|wine)($|_)/i },
+
+  { category: "Vêtements", subcategory: "Sacs", pattern: /(backpack|rucksack|drybag|courierbag|taloonbag|mountainbag|assaultbag|waistbag)/i },
+  { category: "Vêtements", subcategory: "Casques et chapeaux", pattern: /(helmet|headgear|hat($|_)|cap($|_)|beanie|balaclava|ushanka|boonie|beret|bandana|gasmask)/i },
+  { category: "Vêtements", subcategory: "Gilets et protections", pattern: /(platecarrier|ballisticvest|pressvest|stabvest|tacticalvest|chestholster|armor|armour)/i },
+  { category: "Vêtements", subcategory: "Chaussures", pattern: /(boots|shoes|sneakers|wellies|moccasins)/i },
+  { category: "Vêtements", subcategory: "Mains", pattern: /(gloves|gauntlet)/i },
+  { category: "Vêtements", subcategory: "Pantalons", pattern: /(pants|trousers|jeans|shorts|skirt)/i },
+  { category: "Vêtements", subcategory: "Vestes et hauts", pattern: /(jacket|shirt|hoodie|sweater|tshirt|coat|parka|blouse|jersey|suit)/i },
+
+  { category: "Conteneurs", subcategory: "Sacs et pochettes", pattern: /(^|_)(bag|pouch)($|_)/i },
+  { category: "Conteneurs", subcategory: "Stockage", pattern: /(crate|chest|locker|storage|container|barrel|safe|cabinet|wardrobe|shelter|tent)/i },
+
+  { category: "Construction", subcategory: "Matériaux", pattern: /(plank|nail|sheetmetal|metalplate|woodenlog|lumber|cement|concrete|brick|barbedwire|wiremesh)/i },
+  { category: "Construction", subcategory: "Structures", pattern: /(fence|watchtower|territory|flagpole|foundation|wallkit|floorkit|roofkit|doorway|gatekit|workbench)/i },
+
+  { category: "Outils", subcategory: "Couteaux", pattern: /(knife|cleaver|scalpel)/i },
+  { category: "Outils", subcategory: "Outils de coupe", pattern: /(hatchet|firefighteraxe|woodaxe|handsaw|hacksaw|chainsaw)/i },
+  { category: "Outils", subcategory: "Outils", pattern: /(hammer|pliers|screwdriver|wrench|shovel|pickaxe|hoe|crowbar|lockpick|canopener|compass|binoculars|rangefinder|fishingrod)/i },
+
+  { category: "Électronique", subcategory: "Éclairage", pattern: /(flashlight|headtorch|spotlight|chemlight|lamp|lantern)/i },
+  { category: "Électronique", subcategory: "Énergie", pattern: /(battery|powerbank|generator|cable|extensioncord|charger|solar)/i },
+  { category: "Électronique", subcategory: "Communication", pattern: /(radio|transmitter|walkietalkie|gps|tablet|phone)/i },
+
+  { category: "Agriculture", subcategory: "Graines et plantes", pattern: /(seed|seeds|plantmaterial|cannabis|tobacco|hemp|pepperseeds|tomatoseeds|pumpkinseeds)/i },
+  { category: "Chasse et pêche", subcategory: "Pêche", pattern: /(fishing|hook|bait|netting|fishtrap)/i },
+  { category: "Chasse et pêche", subcategory: "Chasse", pattern: /(pelt|hide|fur|antlers|beartrap|snaretrap)/i },
+
+  { category: "Clés", subcategory: "Clés et cartes", pattern: /(^|_)(key|keycard|key_card|accesscard|access_card)($|_)/i },
+  { category: "Livres et documents", subcategory: "Documents", pattern: /(book|note|paper|document|map|photo|newspaper)/i },
+  { category: "Consommables", subcategory: "Tabac", pattern: /(cigarette|cigar|rollingpapers|tobacco)/i },
+  { category: "Objets spéciaux", subcategory: "Monnaies et valeurs", pattern: /(currency|money|rouble|ruble|coin|goldbar|silverbar|diamond|gem)/i },
+  { category: "Objets spéciaux", subcategory: "Événement et récompense", pattern: /(event|quest|reward|battlepass|battle_pass|token|voucher|gift|present)/i }
 ];
 
 function classifyClassname(classname) {
