@@ -312,45 +312,113 @@ async function searchItems({
   };
 }
 
+async function fetchAllActiveItemTaxonomy(supabase) {
+  const pageSize = 1000;
+  const rows = [];
+  let offset = 0;
+
+  while (true) {
+    const { data, error } = await supabase
+      .from("items")
+      .select("mod_name,category,subcategory")
+      .eq("is_active", true)
+      .order("id", { ascending: true })
+      .range(offset, offset + pageSize - 1);
+
+    if (error) throw error;
+
+    const page = data || [];
+    rows.push(...page);
+
+    if (page.length < pageSize) break;
+    offset += pageSize;
+  }
+
+  return rows;
+}
+
+function buildKnownTaxonomy(rows = []) {
+  const mods = new Set();
+  const categories = new Set([DEFAULT_CATEGORY]);
+  const subcategories = new Map();
+
+  const addTaxonomy = (category, subcategory) => {
+    const safeCategory = String(category || "").trim();
+    const safeSubcategory = String(subcategory || "").trim();
+    if (!safeCategory) return;
+
+    categories.add(safeCategory);
+    if (!subcategories.has(safeCategory)) subcategories.set(safeCategory, new Set());
+    if (safeSubcategory) subcategories.get(safeCategory).add(safeSubcategory);
+  };
+
+  for (const rule of CATEGORY_RULES) {
+    addTaxonomy(rule.category, rule.subcategory);
+  }
+
+  for (const override of CLASSNAME_OVERRIDES.values()) {
+    addTaxonomy(override.category, override.subcategory);
+  }
+
+  for (const row of rows) {
+    const modName = String(row.mod_name || "").trim();
+    if (modName) mods.add(modName);
+    addTaxonomy(row.category, row.subcategory);
+  }
+
+  const sortedCategories = [...categories].sort((a, b) => a.localeCompare(b, "fr"));
+  const sortedSubcategories = {};
+
+  for (const category of sortedCategories) {
+    sortedSubcategories[category] = [...(subcategories.get(category) || [])]
+      .sort((a, b) => a.localeCompare(b, "fr"));
+  }
+
+  return {
+    mods: [...mods].sort((a, b) => a.localeCompare(b, "fr")),
+    categories: sortedCategories,
+    subcategories: sortedSubcategories
+  };
+}
+
 async function getItemStats() {
   const supabase = getSupabaseClient();
 
   const [
     totalResult,
-    modsResult,
-    categoriesResult,
+    taxonomyRows,
     deliveryResult,
     shopResult,
     battlePassResult,
     rewardResult
   ] = await Promise.all([
     supabase.from("items").select("id", { count: "exact", head: true }).eq("is_active", true),
-    supabase.from("items").select("mod_name").eq("is_active", true).order("mod_name"),
-    supabase.from("items").select("category").eq("is_active", true).order("category"),
+    fetchAllActiveItemTaxonomy(supabase),
     supabase.from("items").select("id", { count: "exact", head: true }).eq("is_active", true).eq("delivery_enabled", true),
     supabase.from("items").select("id", { count: "exact", head: true }).eq("is_active", true).eq("shop_enabled", true),
     supabase.from("items").select("id", { count: "exact", head: true }).eq("is_active", true).eq("battle_pass_enabled", true),
     supabase.from("items").select("id", { count: "exact", head: true }).eq("is_active", true).eq("reward_enabled", true)
   ]);
 
-  const results = [
+  const countResults = [
     totalResult,
-    modsResult,
-    categoriesResult,
     deliveryResult,
     shopResult,
     battlePassResult,
     rewardResult
   ];
 
-  for (const result of results) {
+  for (const result of countResults) {
     if (result.error) throw result.error;
   }
 
+  const taxonomy = buildKnownTaxonomy(taxonomyRows);
+
   return {
     total: Number(totalResult.count) || 0,
-    mods: [...new Set((modsResult.data || []).map((row) => row.mod_name).filter(Boolean))],
-    categories: [...new Set((categoriesResult.data || []).map((row) => row.category).filter(Boolean))],
+    mods: taxonomy.mods,
+    categories: taxonomy.categories,
+    subcategories: taxonomy.subcategories,
     availability: {
       delivery: Number(deliveryResult.count) || 0,
       shop: Number(shopResult.count) || 0,
