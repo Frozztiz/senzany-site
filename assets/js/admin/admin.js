@@ -5,7 +5,7 @@
 
 import { loadDeliveries } from "./deliveries.js";
 import { initializeCatalog, openCatalog } from "./catalog.js";
-import { initializePlayers, openPlayers, stopPlayersAutoRefresh, loadPlayers } from "./players.js";
+import { initializePlayers, openPlayers, stopPlayersAutoRefresh, loadPlayers } from "./players.js?v=4.7.0";
 
 const PLAYERS_CARD_REFRESH_MS = 20000;
 let playersCardRefreshTimer = null;

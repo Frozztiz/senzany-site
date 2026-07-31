@@ -56,11 +56,23 @@ function formatDuration(seconds) {
 
 
 function getLiveDurationSeconds(player) {
-    const connectedAt = new Date(player?.connectedAt || "").getTime();
+    if (!player) return NaN;
+
+    // Base fiable reçue du backend + temps écoulé dans le navigateur.
+    // Cette méthode continue de progresser même si connectedAt est absent,
+    // mal interprété par le navigateur ou si la réponse vient du cache API.
+    const baseSeconds = Number(player._durationBaseSeconds ?? player.timeSeconds);
+    const receivedAt = Number(player._durationReceivedAt);
+    if (Number.isFinite(baseSeconds) && Number.isFinite(receivedAt)) {
+        return Math.max(0, Math.floor(baseSeconds + (Date.now() - receivedAt) / 1000));
+    }
+
+    const connectedAt = Date.parse(String(player.connectedAt || ""));
     if (Number.isFinite(connectedAt)) {
         return Math.max(0, Math.floor((Date.now() - connectedAt) / 1000));
     }
-    return Number(player?.timeSeconds);
+
+    return Number(player.timeSeconds);
 }
 
 function getPingClass(ping) {
@@ -188,7 +200,12 @@ function refreshVisibleDurations() {
 }
 
 function renderPlayers(payload) {
-    currentPlayers = Array.isArray(payload.players) ? payload.players : [];
+    const receivedAt = Date.now();
+    currentPlayers = (Array.isArray(payload.players) ? payload.players : []).map((player) => ({
+        ...player,
+        _durationBaseSeconds: Number.isFinite(Number(player.timeSeconds)) ? Number(player.timeSeconds) : 0,
+        _durationReceivedAt: receivedAt
+    }));
     const playerCount = Number.isFinite(Number(payload.playerCount)) ? Number(payload.playerCount) : currentPlayers.length;
     const maxPlayers = Number.isFinite(Number(payload.maxPlayers)) ? Number(payload.maxPlayers) : "--";
     const countLabel = `${playerCount} / ${maxPlayers}`;

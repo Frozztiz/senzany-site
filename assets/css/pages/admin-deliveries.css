@@ -1877,3 +1877,9 @@ body[data-page="admin"] [data-site-footer] {
 .command-player-action-feedback.is-error { background:rgba(190,45,55,.13); color:#ff9298; }
 .command-player-modal__panel { width:min(720px,100%); max-height:calc(100vh - 44px); overflow:auto; }
 @media (max-width:780px){.command-player-link-grid{grid-template-columns:1fr}.command-player-action-buttons{grid-template-columns:1fr}.command-player-tempban{grid-template-columns:1fr}.command-player-row{grid-template-columns:48px minmax(160px,1fr) 100px}.command-player-row>div:last-child,.command-player-row--header>div:last-child{display:none}}
+
+/* Étape 7 — compteur joueurs en ligne */
+#commandPlayersCardCount {
+  color: #55df91;
+  text-shadow: 0 0 12px rgba(85, 223, 145, .42);
+}
