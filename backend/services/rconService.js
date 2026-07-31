@@ -2,6 +2,7 @@ const dgram = require("node:dgram");
 
 const PACKET_PREFIX = Buffer.from("BE", "ascii");
 const PAYLOAD_MARKER = 0xff;
+const MULTIPART_MARKER = 0x00;
 
 function crc32(buffer) {
   let crc = 0xffffffff;
@@ -108,6 +109,98 @@ function waitForPacket(socket, timeoutMs, predicate) {
   });
 }
 
+/**
+ * Attend une réponse à une commande BattlEye et reconstitue automatiquement
+ * les réponses fragmentées en plusieurs paquets UDP.
+ *
+ * Format commande simple :      01 <sequence> <texte>
+ * Format commande fragmentée :  01 <sequence> 00 <total> <index> <texte>
+ */
+function waitForCommandResponse(socket, timeoutMs, sequence) {
+  return new Promise((resolve, reject) => {
+    let timer = null;
+    let expectedParts = null;
+    const parts = new Map();
+
+    function armTimeout() {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        cleanup();
+        const received = [...parts.keys()].sort((a, b) => a - b).join(", ") || "aucun";
+        reject(
+          new Error(
+            expectedParts === null
+              ? "Le serveur RCON n'a pas répondu dans le délai prévu."
+              : `Réponse RCON incomplète : fragments reçus ${received} sur ${expectedParts}.`
+          )
+        );
+      }, timeoutMs);
+    }
+
+    function cleanup() {
+      clearTimeout(timer);
+      socket.off("message", onMessage);
+      socket.off("error", onError);
+    }
+
+    function onError(error) {
+      cleanup();
+      reject(error);
+    }
+
+    function onMessage(packet) {
+      try {
+        const payload = parsePacket(packet);
+
+        // Les messages serveur (type 02) peuvent arriver entre deux fragments.
+        if (payload[0] !== 0x01 || payload[1] !== sequence) return;
+
+        armTimeout();
+
+        const isMultipart = payload.length >= 5 && payload[2] === MULTIPART_MARKER;
+        if (!isMultipart) {
+          cleanup();
+          resolve(payload.subarray(2).toString("utf8").replace(/\0+$/g, ""));
+          return;
+        }
+
+        const total = payload[3];
+        const index = payload[4];
+
+        if (total < 1 || index >= total) {
+          throw new Error("Réponse RCON fragmentée invalide.");
+        }
+
+        if (expectedParts === null) expectedParts = total;
+        if (expectedParts !== total) {
+          throw new Error("Réponse RCON fragmentée incohérente.");
+        }
+
+        parts.set(index, payload.subarray(5));
+
+        if (parts.size === expectedParts) {
+          const ordered = [];
+          for (let partIndex = 0; partIndex < expectedParts; partIndex += 1) {
+            const part = parts.get(partIndex);
+            if (!part) return;
+            ordered.push(part);
+          }
+
+          cleanup();
+          resolve(Buffer.concat(ordered).toString("utf8").replace(/\0+$/g, ""));
+        }
+      } catch (error) {
+        cleanup();
+        reject(error);
+      }
+    }
+
+    socket.on("message", onMessage);
+    socket.on("error", onError);
+    armTimeout();
+  });
+}
+
 function sendPacket(socket, packet, port, host) {
   return new Promise((resolve, reject) => {
     socket.send(packet, port, host, (error) => {
@@ -143,22 +236,15 @@ async function executeCommand(socket, config, command, sequence = 0) {
     Buffer.from(command, "utf8")
   ]);
 
-  const responsePromise = waitForPacket(
-    socket,
-    config.timeoutMs,
-    (payload) => payload[0] === 0x01 && payload[1] === sequence
-  );
-
+  const responsePromise = waitForCommandResponse(socket, config.timeoutMs, sequence);
   await sendPacket(socket, createPacket(commandPayload), config.port, config.host);
-  const response = await responsePromise;
-
-  return response.subarray(2).toString("utf8").replace(/\0+$/g, "");
+  return responsePromise;
 }
 
 /**
  * Transforme la sortie texte de la commande BattlEye `players` en objets JSON.
- * Une ligne habituelle ressemble à :
- * 12  1.2.3.4:2304  45  abcdef...(?)  Nom du joueur
+ * Le pseudo est toujours lu comme tout ce qui suit le GUID : espaces,
+ * parenthèses et caractères spéciaux restent donc acceptés.
  */
 function parsePlayersResponse(rawResponse) {
   const lines = String(rawResponse || "")
@@ -168,24 +254,30 @@ function parsePlayersResponse(rawResponse) {
     .filter(Boolean);
 
   const players = [];
+  const ignoredLines = [];
 
   for (const line of lines) {
     if (/^players on server:/i.test(line)) continue;
     if (/^\[#\]/i.test(line)) continue;
     if (/^-{3,}$/.test(line)) continue;
 
+    // Le port et le marqueur (?) sont optionnels selon les versions de BE.
     const match = line.match(
-      /^(\d+)\s+(\S+):(\d+)\s+(\d+)\s+([a-f0-9]{32})(\(\?\))?\s+(.+)$/i
+      /^(\d+)\s+(\S+?)(?::(\d+))?\s+(\d+)\s+([a-f0-9]{32})(\(\?\))?\s+(.+)$/i
     );
 
     if (!match) {
-      // BattlEye peut ajouter une ligne de statut finale : on l'ignore proprement.
+      // Ligne de total/statut finale ou format inattendu, conservé pour le debug.
+      ignoredLines.push(line);
       continue;
     }
 
     const [, id, ip, port, ping, guid, unverifiedMarker, rawName] = match;
     const name = rawName.trim();
-    if (!name) continue;
+    if (!name) {
+      ignoredLines.push(line);
+      continue;
+    }
 
     players.push({
       id,
@@ -194,11 +286,18 @@ function parsePlayersResponse(rawResponse) {
       guid: guid.toLowerCase(),
       guidVerified: !unverifiedMarker,
       ip,
-      port: Number.parseInt(port, 10),
+      port: port ? Number.parseInt(port, 10) : null,
       timeSeconds: null,
       score: null
     });
   }
+
+  // Compatibilité avec le reste du projet : le tableau reste directement utilisable,
+  // et les diagnostics sont attachés sans modifier son contenu JSON normal.
+  Object.defineProperty(players, "diagnostics", {
+    value: { rawLineCount: lines.length, ignoredLines },
+    enumerable: false
+  });
 
   return players;
 }
@@ -227,7 +326,8 @@ async function getPlayers() {
       command: "players",
       players,
       playerCount: players.length,
-      rawResponse
+      rawResponse,
+      diagnostics: players.diagnostics || { rawLineCount: 0, ignoredLines: [] }
     };
   });
 }

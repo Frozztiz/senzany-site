@@ -1883,3 +1883,21 @@ body[data-page="admin"] [data-site-footer] {
   color: #55df91;
   text-shadow: 0 0 12px rgba(85, 223, 145, .42);
 }
+
+
+/* Étape 8 — fiche joueur temps réel et identité staff */
+.command-player-modal__title-line { display:flex; align-items:center; gap:12px; margin:9px 0 6px; }
+.command-player-modal__title-line h3 { margin:0; }
+.command-player-staff-badge,.command-player-row__staff { display:inline-flex; align-items:center; min-height:22px; padding:3px 8px; border:1px solid rgba(234,182,93,.45); border-radius:999px; background:rgba(234,182,93,.10); color:#ffd786; font:800 .58rem monospace; letter-spacing:.12em; box-shadow:0 0 12px rgba(234,182,93,.10); }
+.command-player-staff-badge[hidden] { display:none; }
+.command-player-name-line { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.command-player-row__staff { min-height:18px; padding:2px 6px; font-size:.5rem; }
+.command-player-platform-label { display:flex !important; align-items:center; gap:7px; }
+.command-player-platform-label i { display:inline-grid; place-items:center; width:19px; height:19px; border-radius:50%; color:#fff; font:900 .58rem monospace; font-style:normal; }
+.command-player-platform-label--steam i { background:#173b59; box-shadow:0 0 10px rgba(53,128,180,.22); }
+.command-player-platform-label--discord i { background:#5865f2; box-shadow:0 0 10px rgba(88,101,242,.22); }
+#commandPlayerModalPing.command-player-ping--good { color:#63dc91; }
+#commandPlayerModalPing.command-player-ping--medium { color:#e8b85f; }
+#commandPlayerModalPing.command-player-ping--high { color:#ff6b63; }
+#commandPlayerModalTime { font-variant-numeric:tabular-nums; }
+.command-players-summary > strong { color:#55df91; text-shadow:0 0 12px rgba(85,223,145,.25); }

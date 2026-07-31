@@ -19,6 +19,7 @@ const elements = {
     backButton: document.getElementById("backFromPlayers"),
     modal: document.getElementById("commandPlayerModal"),
     modalName: document.getElementById("commandPlayerModalName"),
+    staffBadge: document.getElementById("commandPlayerStaffBadge"),
     modalPing: document.getElementById("commandPlayerModalPing"),
     modalTime: document.getElementById("commandPlayerModalTime"),
     modalGuid: document.getElementById("commandPlayerModalGuid"),
@@ -54,6 +55,17 @@ function formatDuration(seconds) {
     return hours > 0 ? `${hours} h ${String(minutes).padStart(2, "0")}` : `${minutes} min`;
 }
 
+function formatDurationDetailed(seconds) {
+    const value = Number(seconds);
+    if (!Number.isFinite(value) || value < 0) return "—";
+    const total = Math.max(0, Math.floor(value));
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    const secondsLeft = total % 60;
+    if (hours > 0) return `${hours} h ${String(minutes).padStart(2, "0")} min`;
+    if (minutes > 0) return `${minutes} min ${String(secondsLeft).padStart(2, "0")} s`;
+    return `${secondsLeft} s`;
+}
 
 function getLiveDurationSeconds(player) {
     if (!player) return NaN;
@@ -103,6 +115,7 @@ function setLinkStatus(element, linked, linkedText, unlinkedText) {
 }
 
 function resetIdentity() {
+    if (elements.staffBadge) elements.staffBadge.hidden = true;
     if (elements.identityNote) elements.identityNote.textContent = "Vérification…";
     if (elements.steamStatus) {
         elements.steamStatus.textContent = "Vérification…";
@@ -137,11 +150,18 @@ async function loadPlayerIdentity(player) {
             return;
         }
 
+        player.portalIdentity = identity;
+        const current = currentPlayers.find((entry) => String(entry.id) === String(player.id));
+        if (current) current.portalIdentity = identity;
+        if (elements.staffBadge) elements.staffBadge.hidden = !identity.isStaff;
         setLinkStatus(elements.steamStatus, identity.steamLinked, "Lié au portail", "Non lié");
         setLinkStatus(elements.discordStatus, identity.discordLinked, "Lié au portail", "Non lié");
         if (elements.steamId) elements.steamId.textContent = identity.steamId || "—";
         if (elements.discordName) elements.discordName.textContent = identity.discordUsername || "—";
-        if (elements.identityNote) elements.identityNote.textContent = "Correspondance confirmée par le pseudo Steam";
+        if (elements.identityNote) elements.identityNote.textContent = identity.isStaff
+            ? "Compte portail reconnu — membre du staff"
+            : "Correspondance confirmée par le pseudo Steam";
+        renderPlayerRows();
     } catch (error) {
         setLinkStatus(elements.steamStatus, false, "Lié", "Vérification impossible");
         setLinkStatus(elements.discordStatus, false, "Lié", "Vérification impossible");
@@ -154,7 +174,9 @@ function openPlayerModal(player) {
     selectedPlayer = player;
     elements.modalName.textContent = player.name || "Joueur";
     elements.modalPing.textContent = player.ping == null ? "—" : `${player.ping} ms`;
-    elements.modalTime.textContent = formatDuration(getLiveDurationSeconds(player));
+    elements.modalPing.className = getPingClass(player.ping);
+    elements.modalTime.textContent = formatDurationDetailed(getLiveDurationSeconds(player));
+    if (elements.staffBadge) elements.staffBadge.hidden = !player.portalIdentity?.isStaff;
     elements.modalGuid.textContent = player.guid || "Non disponible";
     if (elements.reason) elements.reason.value = "";
     if (elements.feedback) elements.feedback.hidden = true;
@@ -184,7 +206,7 @@ function renderPlayerRows() {
     elements.list.innerHTML = filtered.map((player, index) => `
         <article class="command-player-row command-player-row--clickable" data-player-index="${currentPlayers.indexOf(player)}" tabindex="0" role="button" aria-label="Ouvrir la fiche de ${escapeHtml(player.name)}">
             <div class="command-player-row__rank">${String(index + 1).padStart(2, "0")}</div>
-            <div class="command-player-row__identity"><i aria-hidden="true"></i><div><strong>${escapeHtml(player.name)}</strong><span>SESSION DAYZ ACTIVE</span></div></div>
+            <div class="command-player-row__identity"><i aria-hidden="true"></i><div><div class="command-player-name-line"><strong>${escapeHtml(player.name)}</strong>${player.portalIdentity?.isStaff ? '<b class="command-player-row__staff">STAFF</b>' : ''}</div><span>SESSION DAYZ ACTIVE</span></div></div>
             <div class="command-player-ping ${getPingClass(player.ping)}"><span>PING</span><strong>${player.ping == null ? "—" : `${player.ping} ms`}</strong></div>
             <div><span>TEMPS</span><strong>${formatDuration(getLiveDurationSeconds(player))}</strong></div>
         </article>`).join("");
@@ -195,7 +217,9 @@ function refreshVisibleDurations() {
     if (selectedPlayer && elements.modal && !elements.modal.hidden && elements.modalTime) {
         const latest = currentPlayers.find((player) => String(player.id) === String(selectedPlayer.id));
         if (latest) selectedPlayer = latest;
-        elements.modalTime.textContent = formatDuration(getLiveDurationSeconds(selectedPlayer));
+        elements.modalTime.textContent = formatDurationDetailed(getLiveDurationSeconds(selectedPlayer));
+        elements.modalPing.textContent = selectedPlayer.ping == null ? "—" : `${selectedPlayer.ping} ms`;
+        elements.modalPing.className = getPingClass(selectedPlayer.ping);
     }
 }
 

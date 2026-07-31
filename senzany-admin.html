@@ -8,7 +8,7 @@
   <title>Centre de commandement — SENZANY</title>
 
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.7.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
 </head>
 
 <body data-page="admin" data-build="admin-control-center-v3">
@@ -524,20 +524,20 @@
     <section class="command-player-modal__panel" role="dialog" aria-modal="true" aria-labelledby="commandPlayerModalName">
       <button class="command-player-modal__close" type="button" data-close-player-modal aria-label="Fermer">×</button>
       <span class="command-player-modal__eyebrow">FICHE JOUEUR // RCON</span>
-      <h3 id="commandPlayerModalName">Joueur</h3>
+      <div class="command-player-modal__title-line"><h3 id="commandPlayerModalName">Joueur</h3><span id="commandPlayerStaffBadge" class="command-player-staff-badge" hidden>STAFF</span></div>
       <div class="command-player-modal__status"><i></i> SESSION DAYZ ACTIVE</div>
 
       <dl class="command-player-modal__details">
         <div><dt>Ping</dt><dd id="commandPlayerModalPing">—</dd></div>
-        <div><dt>Temps détecté</dt><dd id="commandPlayerModalTime">—</dd></div>
+        <div><dt>Temps de connexion</dt><dd id="commandPlayerModalTime">—</dd></div>
         <div><dt>GUID BattlEye</dt><dd id="commandPlayerModalGuid">—</dd></div>
       </dl>
 
       <section class="command-player-identity">
         <div class="command-player-section-title"><span>IDENTITÉ PORTAIL</span><small id="commandPlayerIdentityNote">Vérification…</small></div>
         <div class="command-player-link-grid">
-          <div><span>Steam</span><strong id="commandPlayerSteamStatus">Vérification…</strong><small id="commandPlayerSteamId">—</small></div>
-          <div><span>Discord</span><strong id="commandPlayerDiscordStatus">Vérification…</strong><small id="commandPlayerDiscordName">—</small></div>
+          <div><span class="command-player-platform-label command-player-platform-label--steam"><i aria-hidden="true">S</i>Steam</span><strong id="commandPlayerSteamStatus">Vérification…</strong><small id="commandPlayerSteamId">—</small></div>
+          <div><span class="command-player-platform-label command-player-platform-label--discord"><i aria-hidden="true">D</i>Discord</span><strong id="commandPlayerDiscordStatus">Vérification…</strong><small id="commandPlayerDiscordName">—</small></div>
         </div>
       </section>
 
@@ -572,6 +572,6 @@
 
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin.js?v=4.7.0"></script>
+  <script type="module" src="assets/js/admin/admin.js?v=4.8.0"></script>
 </body>
 </html>

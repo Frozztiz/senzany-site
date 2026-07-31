@@ -72,7 +72,8 @@ async function getPortalIdentityByPlayerName(playerName) {
     discordId: link.discord_id ? String(link.discord_id) : null,
     discordUsername: link.discord_username || null,
     linkedAt: link.created_at || null,
-    matchMethod: "exact-steam-name"
+    matchMethod: "exact-steam-name",
+    isStaff: isCommandAuthorized(String(profile.steamid))
   };
 }
 
@@ -146,6 +147,7 @@ async function queryConnectedPlayers() {
     maxPlayers: configuration.maxPlayers,
     namesAvailable: true,
     source: "battleye-rcon",
+    rconDiagnostics: result.diagnostics || null,
     updatedAt: new Date().toISOString(),
   };
 
