@@ -19,12 +19,9 @@ function crc32(buffer) {
 }
 
 function createPacket(payload) {
-  const protectedPayload = Buffer.concat([
-    Buffer.from([PAYLOAD_MARKER]),
-    payload
-  ]);
-
+  const protectedPayload = Buffer.concat([Buffer.from([PAYLOAD_MARKER]), payload]);
   const packet = Buffer.alloc(2 + 4 + protectedPayload.length);
+
   PACKET_PREFIX.copy(packet, 0);
   packet.writeUInt32LE(crc32(protectedPayload), 2);
   protectedPayload.copy(packet, 6);
@@ -60,29 +57,19 @@ function getConfig() {
   const host = String(process.env.DAYZ_RCON_HOST || "").trim();
   const port = Number.parseInt(process.env.DAYZ_RCON_PORT || "", 10);
   const password = String(process.env.DAYZ_RCON_PASSWORD || "");
-  const timeoutMs = Number.parseInt(
-    process.env.DAYZ_RCON_TIMEOUT_MS || "6000",
-    10
-  );
+  const timeoutMs = Number.parseInt(process.env.DAYZ_RCON_TIMEOUT_MS || "6000", 10);
 
-  if (!host) {
-    throw new Error("DAYZ_RCON_HOST est manquant.");
-  }
-
+  if (!host) throw new Error("DAYZ_RCON_HOST est manquant.");
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new Error("DAYZ_RCON_PORT est invalide.");
   }
-
-  if (!password) {
-    throw new Error("DAYZ_RCON_PASSWORD est manquant.");
-  }
+  if (!password) throw new Error("DAYZ_RCON_PASSWORD est manquant.");
 
   return {
     host,
     port,
     password,
-    timeoutMs:
-      Number.isInteger(timeoutMs) && timeoutMs >= 1000 ? timeoutMs : 6000
+    timeoutMs: Number.isInteger(timeoutMs) && timeoutMs >= 1000 ? timeoutMs : 6000
   };
 }
 
@@ -107,11 +94,7 @@ function waitForPacket(socket, timeoutMs, predicate) {
     function onMessage(packet) {
       try {
         const payload = parsePacket(packet);
-
-        if (!predicate(payload)) {
-          return;
-        }
-
+        if (!predicate(payload)) return;
         cleanup();
         resolve(payload);
       } catch (error) {
@@ -128,11 +111,7 @@ function waitForPacket(socket, timeoutMs, predicate) {
 function sendPacket(socket, packet, port, host) {
   return new Promise((resolve, reject) => {
     socket.send(packet, port, host, (error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-
+      if (error) return reject(error);
       resolve();
     });
   });
@@ -150,13 +129,7 @@ async function login(socket, config) {
     (payload) => payload[0] === 0x00
   );
 
-  await sendPacket(
-    socket,
-    createPacket(loginPayload),
-    config.port,
-    config.host
-  );
-
+  await sendPacket(socket, createPacket(loginPayload), config.port, config.host);
   const response = await responsePromise;
 
   if (response[1] !== 0x01) {
@@ -176,37 +149,95 @@ async function executeCommand(socket, config, command, sequence = 0) {
     (payload) => payload[0] === 0x01 && payload[1] === sequence
   );
 
-  await sendPacket(
-    socket,
-    createPacket(commandPayload),
-    config.port,
-    config.host
-  );
-
+  await sendPacket(socket, createPacket(commandPayload), config.port, config.host);
   const response = await responsePromise;
+
   return response.subarray(2).toString("utf8").replace(/\0+$/g, "");
 }
 
-async function testPlayersCommand() {
+/**
+ * Transforme la sortie texte de la commande BattlEye `players` en objets JSON.
+ * Une ligne habituelle ressemble à :
+ * 12  1.2.3.4:2304  45  abcdef...(?)  Nom du joueur
+ */
+function parsePlayersResponse(rawResponse) {
+  const lines = String(rawResponse || "")
+    .replace(/\r/g, "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const players = [];
+
+  for (const line of lines) {
+    if (/^players on server:/i.test(line)) continue;
+    if (/^\[#\]/i.test(line)) continue;
+    if (/^-{3,}$/.test(line)) continue;
+
+    const match = line.match(
+      /^(\d+)\s+(\S+):(\d+)\s+(\d+)\s+([a-f0-9]{32})(\(\?\))?\s+(.+)$/i
+    );
+
+    if (!match) {
+      // BattlEye peut ajouter une ligne de statut finale : on l'ignore proprement.
+      continue;
+    }
+
+    const [, id, ip, port, ping, guid, unverifiedMarker, rawName] = match;
+    const name = rawName.trim();
+    if (!name) continue;
+
+    players.push({
+      id,
+      name,
+      ping: Number.parseInt(ping, 10),
+      guid: guid.toLowerCase(),
+      guidVerified: !unverifiedMarker,
+      ip,
+      port: Number.parseInt(port, 10),
+      timeSeconds: null,
+      score: null
+    });
+  }
+
+  return players;
+}
+
+async function withAuthenticatedSocket(callback) {
   const config = getConfig();
   const socket = dgram.createSocket("udp4");
 
   try {
     await login(socket, config);
+    return await callback(socket, config);
+  } finally {
+    socket.close();
+  }
+}
+
+async function getPlayers() {
+  return withAuthenticatedSocket(async (socket, config) => {
     const rawResponse = await executeCommand(socket, config, "players");
+    const players = parsePlayersResponse(rawResponse);
 
     return {
       connected: true,
       host: config.host,
       port: config.port,
       command: "players",
+      players,
+      playerCount: players.length,
       rawResponse
     };
-  } finally {
-    socket.close();
-  }
+  });
+}
+
+async function testPlayersCommand() {
+  return getPlayers();
 }
 
 module.exports = {
-  testPlayersCommand
+  getPlayers,
+  testPlayersCommand,
+  parsePlayersResponse
 };

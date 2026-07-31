@@ -94,7 +94,7 @@ function renderPlayers(payload) {
                 <i aria-hidden="true"></i>
                 <div>
                     <strong>${escapeHtml(player.name)}</strong>
-                    <span>SESSION DAYZ ACTIVE</span>
+                    <span>SESSION BATTLEYE RCON ACTIVE</span>
                 </div>
             </div>
             <div><span>PING</span><strong>${player.ping == null ? "—" : `${player.ping} ms`}</strong></div>
