@@ -1,0 +1,8 @@
+{
+  "apiUrl": "http://213.32.88.222",
+  "apiKey": "REMPLACER_PAR_LA_MEME_CLE_QUE_DELIVERY_AGENT_KEY",
+  "agentId": "senzany-dayz-officiel-01",
+  "pollIntervalSeconds": 30,
+  "maxQuantityPerItem": 100,
+  "groundDropDistance": 1.5
+}
