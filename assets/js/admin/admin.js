@@ -5,6 +5,7 @@
 
 import { loadDeliveries } from "./deliveries.js";
 import { initializeCatalog, openCatalog } from "./catalog.js";
+import { initializePlayers, openPlayers, stopPlayersAutoRefresh } from "./players.js";
 
 const elements = {
     loading: document.getElementById("adminLoading"),
@@ -18,9 +19,11 @@ const elements = {
     backendStatus: document.getElementById("adminBackendStatus"),
 
     homeView: document.getElementById("adminHomeView"),
+    playersView: document.getElementById("adminPlayersView"),
     deliveriesView: document.getElementById("adminDeliveriesView"),
     itemsView: document.getElementById("adminItemsView"),
 
+    playersButton: document.querySelector('[data-admin-module="players"]'),
     deliveriesButton: document.querySelector(
         '[data-admin-module="deliveries"]'
     ),
@@ -68,13 +71,25 @@ function showAccessView(view) {
 }
 
 function showHome() {
+    stopPlayersAutoRefresh();
     setHidden(elements.homeView, false);
+    setHidden(elements.playersView, true);
     setHidden(elements.deliveriesView, true);
     setHidden(elements.itemsView, true);
 }
 
-async function showDeliveries() {
+async function showPlayers() {
     setHidden(elements.homeView, true);
+    setHidden(elements.deliveriesView, true);
+    setHidden(elements.itemsView, true);
+    setHidden(elements.playersView, false);
+    await openPlayers();
+}
+
+async function showDeliveries() {
+    stopPlayersAutoRefresh();
+    setHidden(elements.homeView, true);
+    setHidden(elements.playersView, true);
     setHidden(elements.itemsView, true);
     setHidden(elements.deliveriesView, false);
 
@@ -82,7 +97,9 @@ async function showDeliveries() {
 }
 
 async function showItems() {
+    stopPlayersAutoRefresh();
     setHidden(elements.homeView, true);
+    setHidden(elements.playersView, true);
     setHidden(elements.deliveriesView, true);
     setHidden(elements.itemsView, false);
     await openCatalog();
@@ -210,6 +227,9 @@ function runBootSequence() {
 
 function initializeAdmin() {
     startCommandClock();
+    elements.playersButton?.addEventListener("click", showPlayers);
+    initializePlayers({ onBack: showHome });
+
     elements.deliveriesButton?.addEventListener(
         "click",
         showDeliveries
