@@ -1,6 +1,7 @@
 const express = require("express");
 const rconService = require("../services/rconService");
 const supabaseService = require("../services/supabaseService");
+const playerSessionService = require("../services/playerSessionService");
 
 const router = express.Router();
 
@@ -21,6 +22,8 @@ let playersQueryInFlight = null;
 // Le compteur repart à zéro uniquement lors d'un redémarrage du backend.
 const playerSessions = new Map();
 const PLAYER_SESSION_GRACE_MS = 120000;
+let sessionsHydrated = false;
+let sessionsHydrationPromise = null;
 
 function normalizePlayerName(value) {
   return String(value || "")
@@ -91,9 +94,40 @@ async function getCurrentPlayer(playerId) {
   return player || null;
 }
 
-function enrichPlayersWithSessionTime(players) {
+async function hydratePlayerSessions() {
+  if (sessionsHydrated) return;
+  if (sessionsHydrationPromise) return sessionsHydrationPromise;
+
+  sessionsHydrationPromise = (async () => {
+    try {
+      const rows = await playerSessionService.loadRecentOnlineSessions();
+      for (const row of rows) {
+        const sessionKey = String(row.session_key || "").toLowerCase();
+        if (!sessionKey) continue;
+        const session = playerSessionService.rowToSession(row);
+        if (!session.connectedAt || !session.lastSeenAt) continue;
+        playerSessions.set(sessionKey, session);
+      }
+      console.log(`[COMMANDEMENT] ${playerSessions.size} session(s) RCON restaurée(s) depuis Supabase.`);
+    } catch (error) {
+      // Le module continue en mémoire si la table n'est pas encore installée.
+      console.error("[COMMANDEMENT] Restauration des sessions Supabase impossible :", error?.message || error);
+    } finally {
+      sessionsHydrated = true;
+      sessionsHydrationPromise = null;
+    }
+  })();
+
+  return sessionsHydrationPromise;
+}
+
+async function enrichPlayersWithSessionTime(players) {
+  await hydratePlayerSessions();
+
   const now = Date.now();
+  const nowIso = new Date(now).toISOString();
   const connectedKeys = new Set();
+  const rowsToPersist = [];
 
   const enrichedPlayers = players.map((player) => {
     const sessionKey = String(player.guid || `${player.name}:${player.ip || "unknown"}`).toLowerCase();
@@ -102,7 +136,20 @@ function enrichPlayersWithSessionTime(players) {
     const existing = playerSessions.get(sessionKey);
     const session = existing || { connectedAt: now, lastSeenAt: now };
     session.lastSeenAt = now;
+    session.playerName = player.name;
+    session.guid = player.guid || null;
     playerSessions.set(sessionKey, session);
+
+    rowsToPersist.push({
+      session_key: sessionKey,
+      battleye_guid: player.guid || null,
+      player_name: player.name,
+      connected_at: new Date(session.connectedAt).toISOString(),
+      last_seen_at: nowIso,
+      disconnected_at: null,
+      is_online: true,
+      updated_at: nowIso,
+    });
 
     return {
       ...player,
@@ -112,12 +159,20 @@ function enrichPlayersWithSessionTime(players) {
     };
   });
 
-  // Une réponse RCON peut exceptionnellement omettre un joueur pendant un cycle.
-  // On conserve donc sa session deux minutes avant de la considérer terminée.
+  const offlineKeys = [];
   for (const [sessionKey, session] of playerSessions.entries()) {
     if (!connectedKeys.has(sessionKey) && now - session.lastSeenAt > PLAYER_SESSION_GRACE_MS) {
       playerSessions.delete(sessionKey);
+      offlineKeys.push(sessionKey);
     }
+  }
+
+  try {
+    await playerSessionService.upsertSessions(rowsToPersist);
+    await playerSessionService.markOffline(offlineKeys, nowIso);
+  } catch (error) {
+    // Une panne Supabase ne doit jamais empêcher la supervision RCON.
+    console.error("[COMMANDEMENT] Sauvegarde des sessions Supabase impossible :", error?.message || error);
   }
 
   return enrichedPlayers;
@@ -138,7 +193,7 @@ async function queryConnectedPlayers() {
   const configuration = getDayzConfiguration();
   const result = await rconService.getPlayers();
   const rawPlayers = Array.isArray(result.players) ? result.players : [];
-  const players = enrichPlayersWithSessionTime(rawPlayers);
+  const players = await enrichPlayersWithSessionTime(rawPlayers);
 
   const payload = {
     online: true,
