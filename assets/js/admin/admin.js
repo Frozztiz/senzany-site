@@ -5,7 +5,10 @@
 
 import { loadDeliveries } from "./deliveries.js";
 import { initializeCatalog, openCatalog } from "./catalog.js";
-import { initializePlayers, openPlayers, stopPlayersAutoRefresh } from "./players.js";
+import { initializePlayers, openPlayers, stopPlayersAutoRefresh, loadPlayers } from "./players.js";
+
+const PLAYERS_CARD_REFRESH_MS = 20000;
+let playersCardRefreshTimer = null;
 
 const elements = {
     loading: document.getElementById("adminLoading"),
@@ -70,15 +73,30 @@ function showAccessView(view) {
     }
 }
 
+function stopPlayersCardRefresh() {
+    if (playersCardRefreshTimer) {
+        window.clearInterval(playersCardRefreshTimer);
+        playersCardRefreshTimer = null;
+    }
+}
+
+function startPlayersCardRefresh() {
+    stopPlayersCardRefresh();
+    loadPlayers();
+    playersCardRefreshTimer = window.setInterval(loadPlayers, PLAYERS_CARD_REFRESH_MS);
+}
+
 function showHome() {
     stopPlayersAutoRefresh();
     setHidden(elements.homeView, false);
     setHidden(elements.playersView, true);
     setHidden(elements.deliveriesView, true);
     setHidden(elements.itemsView, true);
+    startPlayersCardRefresh();
 }
 
 async function showPlayers() {
+    stopPlayersCardRefresh();
     setHidden(elements.homeView, true);
     setHidden(elements.deliveriesView, true);
     setHidden(elements.itemsView, true);
@@ -87,6 +105,7 @@ async function showPlayers() {
 }
 
 async function showDeliveries() {
+    stopPlayersCardRefresh();
     stopPlayersAutoRefresh();
     setHidden(elements.homeView, true);
     setHidden(elements.playersView, true);
@@ -97,6 +116,7 @@ async function showDeliveries() {
 }
 
 async function showItems() {
+    stopPlayersCardRefresh();
     stopPlayersAutoRefresh();
     setHidden(elements.homeView, true);
     setHidden(elements.playersView, true);

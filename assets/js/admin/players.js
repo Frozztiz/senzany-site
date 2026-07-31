@@ -213,7 +213,7 @@ function renderPlayers(payload) {
     renderPlayerRows();
 }
 
-async function loadPlayers() {
+export async function loadPlayers() {
     if (requestInFlight) return;
     requestInFlight = true;
     if (elements.refreshButton) { elements.refreshButton.disabled = true; elements.refreshButton.textContent = "Actualisation…"; }
