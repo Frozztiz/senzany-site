@@ -1,23 +1,16 @@
 const express = require("express");
-const { GameDig } = require("gamedig");
+const rconService = require("../services/rconService");
 
 const router = express.Router();
 
 const DEFAULT_SERVER_HOST = "208.115.196.109";
 const DEFAULT_GAME_PORT = 2302;
-const DEFAULT_QUERY_PORT = 2303;
 const DEFAULT_MAX_PLAYERS = 50;
-
-const CACHE_DURATION_MS = 20000;
+const CACHE_DURATION_MS = 15000;
 
 let cachedPayload = null;
 let cacheExpiresAt = 0;
 let inFlightQuery = null;
-
-function toValidNumber(value) {
-  const number = Number(value);
-  return Number.isFinite(number) && number >= 0 ? number : null;
-}
 
 function getConfiguration() {
   const host =
@@ -31,10 +24,6 @@ function getConfiguration() {
       DEFAULT_GAME_PORT
   );
 
-  const queryPort = Number(
-    process.env.DAYZ_QUERY_PORT || DEFAULT_QUERY_PORT
-  );
-
   const fallbackMaxPlayers = Number(
     process.env.DAYZ_MAX_PLAYERS || DEFAULT_MAX_PLAYERS
   );
@@ -42,101 +31,28 @@ function getConfiguration() {
   return {
     host,
     gamePort,
-    queryPort,
     fallbackMaxPlayers,
   };
 }
 
-function extractPlayerCount(state) {
-  const candidates = [
-    state?.numplayers,
-    state?.numPlayers,
-    state?.raw?.numplayers,
-    state?.raw?.numPlayers,
-    state?.raw?.clients,
-    state?.raw?.online,
-    state?.raw?.rules?.numplayers,
-    state?.raw?.rules?.players,
-  ];
+async function getFreshServerState(configuration) {
+  const result = await rconService.getPlayers();
+  const players = Array.isArray(result?.players) ? result.players : [];
 
-  for (const candidate of candidates) {
-    const value = toValidNumber(candidate);
-    if (value !== null) return value;
-  }
-
-  if (Array.isArray(state?.players)) {
-    return state.players.length;
-  }
-
-  return null;
-}
-
-function extractMaxPlayers(state, fallbackMaxPlayers) {
-  const candidates = [
-    state?.maxplayers,
-    state?.maxPlayers,
-    state?.raw?.maxplayers,
-    state?.raw?.maxPlayers,
-    state?.raw?.max_clients,
-    state?.raw?.rules?.maxplayers,
-    state?.raw?.rules?.maxPlayers,
-  ];
-
-  for (const candidate of candidates) {
-    const value = toValidNumber(candidate);
-    if (value !== null && value > 0) return value;
-  }
-
-  return fallbackMaxPlayers;
-}
-
-async function queryDayzServer(host, queryPort) {
-  return GameDig.query({
-    type: "dayz",
-    host,
-    port: queryPort,
-    socketTimeout: 2500,
-    attemptTimeout: 4500,
-    maxRetries: 1,
-  });
-}
-
-function buildOnlinePayload({
-  state,
-  host,
-  gamePort,
-  queryPort,
-  fallbackMaxPlayers,
-}) {
-  const players = extractPlayerCount(state);
-  const maxPlayers = extractMaxPlayers(state, fallbackMaxPlayers);
-
-  return {
+  const payload = {
     online: true,
-    degraded: players === null,
-    players,
-    maxPlayers,
-    map: state?.map || state?.raw?.map || "chernarusplus",
-    name: state?.name || state?.raw?.name || "Senzany",
-    bots: toValidNumber(state?.bots) ?? 0,
-    ping: toValidNumber(state?.ping) ?? 0,
-    source: "direct-dayz-query",
-    serverAddress: `${host}:${gamePort}`,
-    queryAddress: `${host}:${queryPort}`,
+    degraded: false,
+    players: players.length,
+    maxPlayers: configuration.fallbackMaxPlayers,
+    map: "chernarusplus",
+    name: "Senzany",
+    bots: 0,
+    ping: 0,
+    source: "battleye-rcon",
+    serverAddress: `${configuration.host}:${configuration.gamePort}`,
+    rconDiagnostics: result?.diagnostics || null,
     updatedAt: new Date().toISOString(),
   };
-}
-
-async function getFreshServerState(configuration) {
-  const state = await queryDayzServer(
-    configuration.host,
-    configuration.queryPort
-  );
-
-  const payload = buildOnlinePayload({
-    state,
-    ...configuration,
-  });
 
   cachedPayload = payload;
   cacheExpiresAt = Date.now() + CACHE_DURATION_MS;
@@ -149,7 +65,7 @@ router.get("/stats", async (req, res) => {
 
   res.set(
     "Cache-Control",
-    "public, max-age=15, stale-while-revalidate=45"
+    "public, max-age=10, stale-while-revalidate=30"
   );
 
   if (cachedPayload && Date.now() < cacheExpiresAt) {
@@ -172,15 +88,15 @@ router.get("/stats", async (req, res) => {
     const message =
       error instanceof Error
         ? error.message
-        : "Impossible d’interroger le serveur DayZ.";
+        : "Impossible d’interroger le serveur RCON.";
 
-    console.error("Erreur interrogation serveur DayZ :", message);
+    console.error("Erreur interrogation RCON pour l'accueil :", message);
 
     if (cachedPayload) {
       return res.status(200).json({
         ...cachedPayload,
         degraded: true,
-        source: "stale-memory-cache",
+        source: "stale-rcon-cache",
         error: message,
         updatedAt: new Date().toISOString(),
       });
@@ -193,9 +109,10 @@ router.get("/stats", async (req, res) => {
       maxPlayers: configuration.fallbackMaxPlayers,
       map: "chernarusplus",
       name: "Senzany",
-      source: "query-unavailable",
+      bots: 0,
+      ping: 0,
+      source: "rcon-unavailable",
       serverAddress: `${configuration.host}:${configuration.gamePort}`,
-      queryAddress: `${configuration.host}:${configuration.queryPort}`,
       error: message,
       updatedAt: new Date().toISOString(),
     });
@@ -209,28 +126,22 @@ router.get("/debug", async (req, res) => {
   res.set("Cache-Control", "no-store");
 
   try {
-    const state = await queryDayzServer(
-      configuration.host,
-      configuration.queryPort
-    );
+    const result = await rconService.getPlayers();
+    const players = Array.isArray(result?.players) ? result.players : [];
 
     return res.status(200).json({
       ok: true,
       configuration: {
         ...configuration,
         serverAddress: `${configuration.host}:${configuration.gamePort}`,
-        queryAddress: `${configuration.host}:${configuration.queryPort}`,
       },
       durationMs: Date.now() - startedAt,
       extracted: {
-        players: extractPlayerCount(state),
-        maxPlayers: extractMaxPlayers(
-          state,
-          configuration.fallbackMaxPlayers
-        ),
+        players: players.length,
+        maxPlayers: configuration.fallbackMaxPlayers,
       },
-      stateKeys: Object.keys(state || {}),
-      state,
+      source: "battleye-rcon",
+      diagnostics: result?.diagnostics || null,
     });
   } catch (error) {
     return res.status(502).json({
@@ -238,14 +149,13 @@ router.get("/debug", async (req, res) => {
       configuration: {
         ...configuration,
         serverAddress: `${configuration.host}:${configuration.gamePort}`,
-        queryAddress: `${configuration.host}:${configuration.queryPort}`,
       },
       durationMs: Date.now() - startedAt,
+      source: "battleye-rcon",
       error: {
         name: error?.name || "Error",
         message: error?.message || String(error),
         code: error?.code || null,
-        stack: error?.stack || null,
       },
     });
   }
