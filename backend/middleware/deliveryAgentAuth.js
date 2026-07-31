@@ -16,6 +16,7 @@ function deliveryAgentAuth(req, res, next) {
   const providedKey = String(
     req.get("x-delivery-agent-key") ||
       req.get("authorization")?.replace(/^Bearer\s+/i, "") ||
+      req.body?.agentKey ||
       ""
   ).trim();
 
