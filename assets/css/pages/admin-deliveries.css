@@ -1846,3 +1846,34 @@ body[data-page="admin"] [data-site-footer] {
   .command-players-search input { width: 100%; }
   .command-player-modal__details > div { grid-template-columns: 1fr; gap: 5px; }
 }
+
+/* Étape 4 — identité portail et actions RCON */
+.command-players-toolbar__actions { display:flex; align-items:center; gap:10px; }
+.command-players-search input { width:min(310px,42vw); min-height:38px; padding:0 13px; border:1px solid rgba(255,255,255,.12); border-radius:7px; background:#0d0c0c; color:#fff; outline:none; }
+.command-players-search input:focus { border-color:rgba(255,92,85,.72); box-shadow:0 0 0 3px rgba(255,92,85,.10); }
+.command-player-row { grid-template-columns:64px minmax(220px,1fr) 130px 140px; }
+.command-player-row--clickable { cursor:pointer; transition:border-color .18s ease, background .18s ease, transform .18s ease; }
+.command-player-row--clickable:hover,.command-player-row--clickable:focus-visible { background:rgba(255,255,255,.035); border-color:rgba(255,92,85,.26); transform:translateY(-1px); outline:none; }
+.command-player-section-title { display:flex; justify-content:space-between; gap:15px; align-items:center; margin-bottom:11px; }
+.command-player-section-title span { color:#fff; font:800 .67rem monospace; letter-spacing:.13em; }
+.command-player-section-title small { color:var(--admin-muted); font-size:.72rem; }
+.command-player-identity,.command-player-actions { margin-top:18px; padding:17px; border:1px solid rgba(255,255,255,.08); border-radius:10px; background:rgba(255,255,255,.018); }
+.command-player-link-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.command-player-link-grid > div { padding:13px; border:1px solid rgba(255,255,255,.07); border-radius:8px; background:#100e0e; }
+.command-player-link-grid span,.command-player-link-grid small { display:block; color:var(--admin-muted); font-size:.72rem; }
+.command-player-link-grid strong { display:block; margin:5px 0; color:#fff; }
+.command-player-link-grid strong.is-linked { color:#65dc91; }
+.command-player-link-grid strong.is-unlinked { color:#eab65d; }
+.command-player-reason { display:grid; gap:7px; }
+.command-player-reason span { color:var(--admin-muted); font-size:.72rem; }
+.command-player-reason input,.command-player-tempban select { min-height:40px; padding:0 12px; border:1px solid rgba(255,255,255,.11); border-radius:7px; background:#0d0c0c; color:#fff; }
+.command-player-action-buttons { display:grid; grid-template-columns:120px minmax(230px,1fr) 150px; gap:10px; margin-top:12px; }
+.command-player-tempban { display:grid; grid-template-columns:1fr auto; gap:8px; }
+.admin-button--warning { border-color:rgba(234,182,93,.35); color:#ffd993; }
+.admin-button--danger { border-color:rgba(239,101,107,.42); color:#ff9ba0; }
+.admin-button--danger-strong { background:rgba(152,22,30,.25); }
+.command-player-action-feedback { margin-top:12px; padding:10px 12px; border-radius:7px; font-size:.8rem; }
+.command-player-action-feedback.is-success { background:rgba(50,160,90,.12); color:#7ce3a0; }
+.command-player-action-feedback.is-error { background:rgba(190,45,55,.13); color:#ff9298; }
+.command-player-modal__panel { width:min(720px,100%); max-height:calc(100vh - 44px); overflow:auto; }
+@media (max-width:780px){.command-player-link-grid{grid-template-columns:1fr}.command-player-action-buttons{grid-template-columns:1fr}.command-player-tempban{grid-template-columns:1fr}.command-player-row{grid-template-columns:48px minmax(160px,1fr) 100px}.command-player-row>div:last-child,.command-player-row--header>div:last-child{display:none}}

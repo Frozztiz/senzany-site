@@ -232,12 +232,23 @@ async function getPlayers() {
   });
 }
 
+async function executeAdminCommand(command) {
+  const cleanCommand = String(command || "").replace(/[\r\n\0]/g, " ").trim();
+  if (!cleanCommand) throw new Error("Commande RCON vide.");
+
+  return withAuthenticatedSocket(async (socket, config) => {
+    const rawResponse = await executeCommand(socket, config, cleanCommand);
+    return { connected: true, command: cleanCommand, rawResponse };
+  });
+}
+
 async function testPlayersCommand() {
   return getPlayers();
 }
 
 module.exports = {
   getPlayers,
+  executeAdminCommand,
   testPlayersCommand,
   parsePlayersResponse
 };

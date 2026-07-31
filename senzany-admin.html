@@ -211,7 +211,7 @@
                 <div class="command-players-toolbar__actions">
                   <label class="command-players-search">
                     <span class="sr-only">Rechercher un joueur</span>
-                    <input id="commandPlayersSearch" type="search" placeholder="Rechercher un joueur…" autocomplete="off">
+                    <input id="commandPlayersSearch" type="search" autocomplete="off" placeholder="Rechercher un joueur…" />
                   </label>
                   <button id="refreshCommandPlayers" class="admin-button admin-button--small" type="button">Actualiser</button>
                 </div>
@@ -227,22 +227,6 @@
                 <div class="command-players-empty">Connexion au serveur DayZ…</div>
               </div>
             </section>
-
-            <div id="commandPlayerModal" class="command-player-modal" hidden>
-              <button class="command-player-modal__backdrop" type="button" data-close-player-modal aria-label="Fermer la fiche joueur"></button>
-              <section class="command-player-modal__panel" role="dialog" aria-modal="true" aria-labelledby="commandPlayerModalName">
-                <button class="command-player-modal__close" type="button" data-close-player-modal aria-label="Fermer">×</button>
-                <span class="command-player-modal__eyebrow">FICHE JOUEUR // BATTLEYE</span>
-                <h3 id="commandPlayerModalName">Joueur</h3>
-                <p class="command-player-modal__status"><i></i> Connecté au serveur</p>
-                <dl class="command-player-modal__details">
-                  <div><dt>Ping</dt><dd id="commandPlayerModalPing">—</dd></div>
-                  <div><dt>Temps détecté</dt><dd id="commandPlayerModalTime">—</dd></div>
-                  <div><dt>GUID BattlEye</dt><dd id="commandPlayerModalGuid">—</dd></div>
-                </dl>
-                <p class="command-player-modal__note">Les actions RCON seront ajoutées dans une prochaine étape.</p>
-              </section>
-            </div>
           </section>
 
           <!-- Module Livraisons -->
@@ -533,6 +517,56 @@
       </div>
     </form>
   </dialog>
+
+
+  <div id="commandPlayerModal" class="command-player-modal" hidden>
+    <button class="command-player-modal__backdrop" type="button" data-close-player-modal aria-label="Fermer la fiche joueur"></button>
+    <section class="command-player-modal__panel" role="dialog" aria-modal="true" aria-labelledby="commandPlayerModalName">
+      <button class="command-player-modal__close" type="button" data-close-player-modal aria-label="Fermer">×</button>
+      <span class="command-player-modal__eyebrow">FICHE JOUEUR // RCON</span>
+      <h3 id="commandPlayerModalName">Joueur</h3>
+      <div class="command-player-modal__status"><i></i> SESSION DAYZ ACTIVE</div>
+
+      <dl class="command-player-modal__details">
+        <div><dt>Ping</dt><dd id="commandPlayerModalPing">—</dd></div>
+        <div><dt>Temps détecté</dt><dd id="commandPlayerModalTime">—</dd></div>
+        <div><dt>GUID BattlEye</dt><dd id="commandPlayerModalGuid">—</dd></div>
+      </dl>
+
+      <section class="command-player-identity">
+        <div class="command-player-section-title"><span>IDENTITÉ PORTAIL</span><small id="commandPlayerIdentityNote">Vérification…</small></div>
+        <div class="command-player-link-grid">
+          <div><span>Steam</span><strong id="commandPlayerSteamStatus">Vérification…</strong><small id="commandPlayerSteamId">—</small></div>
+          <div><span>Discord</span><strong id="commandPlayerDiscordStatus">Vérification…</strong><small id="commandPlayerDiscordName">—</small></div>
+        </div>
+      </section>
+
+      <section class="command-player-actions">
+        <div class="command-player-section-title"><span>ACTIONS RCON</span><small>Motif obligatoire</small></div>
+        <label class="command-player-reason">
+          <span>Motif</span>
+          <input id="commandPlayerActionReason" type="text" maxlength="160" autocomplete="off" placeholder="Indiquer la raison de l’action…" />
+        </label>
+        <div class="command-player-action-buttons">
+          <button id="commandPlayerKick" class="admin-button admin-button--warning" type="button">Kick</button>
+          <label class="command-player-tempban">
+            <select id="commandPlayerBanDuration" aria-label="Durée du bannissement temporaire">
+              <option value="60">1 heure</option>
+              <option value="360">6 heures</option>
+              <option value="1440" selected>1 jour</option>
+              <option value="4320">3 jours</option>
+              <option value="10080">7 jours</option>
+              <option value="43200">30 jours</option>
+            </select>
+            <button id="commandPlayerTempBan" class="admin-button admin-button--danger" type="button">Ban temporaire</button>
+          </label>
+          <button id="commandPlayerPermanentBan" class="admin-button admin-button--danger admin-button--danger-strong" type="button">Ban définitif</button>
+        </div>
+        <div id="commandPlayerActionFeedback" class="command-player-action-feedback" hidden></div>
+      </section>
+      <p class="command-player-modal__note">Les actions sont exécutées côté serveur et restent réservées aux SteamID autorisés dans Commandement.</p>
+    </section>
+  </div>
 
   <div data-site-footer></div>
 
