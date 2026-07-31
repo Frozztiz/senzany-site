@@ -20,6 +20,7 @@ let playersQueryInFlight = null;
 // Suivi en mémoire de l'heure d'arrivée des joueurs.
 // Le compteur repart à zéro uniquement lors d'un redémarrage du backend.
 const playerSessions = new Map();
+const PLAYER_SESSION_GRACE_MS = 120000;
 
 function normalizePlayerName(value) {
   return String(value || "")
@@ -94,25 +95,26 @@ function enrichPlayersWithSessionTime(players) {
   const connectedKeys = new Set();
 
   const enrichedPlayers = players.map((player) => {
-    const sessionKey = player.guid || `${player.name}:${player.ip || "unknown"}`;
+    const sessionKey = String(player.guid || `${player.name}:${player.ip || "unknown"}`).toLowerCase();
     connectedKeys.add(sessionKey);
 
-    if (!playerSessions.has(sessionKey)) {
-      playerSessions.set(sessionKey, now);
-    }
-
-    const connectedAt = playerSessions.get(sessionKey);
+    const existing = playerSessions.get(sessionKey);
+    const session = existing || { connectedAt: now, lastSeenAt: now };
+    session.lastSeenAt = now;
+    playerSessions.set(sessionKey, session);
 
     return {
       ...player,
-      connectedAt: new Date(connectedAt).toISOString(),
-      timeSeconds: Math.max(0, Math.floor((now - connectedAt) / 1000)),
+      connectedAt: new Date(session.connectedAt).toISOString(),
+      timeSeconds: Math.max(0, Math.floor((now - session.connectedAt) / 1000)),
       status: "online",
     };
   });
 
-  for (const sessionKey of playerSessions.keys()) {
-    if (!connectedKeys.has(sessionKey)) {
+  // Une réponse RCON peut exceptionnellement omettre un joueur pendant un cycle.
+  // On conserve donc sa session deux minutes avant de la considérer terminée.
+  for (const [sessionKey, session] of playerSessions.entries()) {
+    if (!connectedKeys.has(sessionKey) && now - session.lastSeenAt > PLAYER_SESSION_GRACE_MS) {
       playerSessions.delete(sessionKey);
     }
   }

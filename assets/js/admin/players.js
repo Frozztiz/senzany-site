@@ -1,6 +1,7 @@
 const AUTO_REFRESH_MS = 20000;
 
 let refreshTimer = null;
+let durationTimer = null;
 let requestInFlight = false;
 let currentPlayers = [];
 let currentSearch = "";
@@ -51,6 +52,15 @@ function formatDuration(seconds) {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     return hours > 0 ? `${hours} h ${String(minutes).padStart(2, "0")}` : `${minutes} min`;
+}
+
+
+function getLiveDurationSeconds(player) {
+    const connectedAt = new Date(player?.connectedAt || "").getTime();
+    if (Number.isFinite(connectedAt)) {
+        return Math.max(0, Math.floor((Date.now() - connectedAt) / 1000));
+    }
+    return Number(player?.timeSeconds);
 }
 
 function getPingClass(ping) {
@@ -132,7 +142,7 @@ function openPlayerModal(player) {
     selectedPlayer = player;
     elements.modalName.textContent = player.name || "Joueur";
     elements.modalPing.textContent = player.ping == null ? "—" : `${player.ping} ms`;
-    elements.modalTime.textContent = formatDuration(player.timeSeconds);
+    elements.modalTime.textContent = formatDuration(getLiveDurationSeconds(player));
     elements.modalGuid.textContent = player.guid || "Non disponible";
     if (elements.reason) elements.reason.value = "";
     if (elements.feedback) elements.feedback.hidden = true;
@@ -164,8 +174,17 @@ function renderPlayerRows() {
             <div class="command-player-row__rank">${String(index + 1).padStart(2, "0")}</div>
             <div class="command-player-row__identity"><i aria-hidden="true"></i><div><strong>${escapeHtml(player.name)}</strong><span>SESSION DAYZ ACTIVE</span></div></div>
             <div class="command-player-ping ${getPingClass(player.ping)}"><span>PING</span><strong>${player.ping == null ? "—" : `${player.ping} ms`}</strong></div>
-            <div><span>TEMPS</span><strong>${formatDuration(player.timeSeconds)}</strong></div>
+            <div><span>TEMPS</span><strong>${formatDuration(getLiveDurationSeconds(player))}</strong></div>
         </article>`).join("");
+}
+
+function refreshVisibleDurations() {
+    if (currentPlayers.length > 0) renderPlayerRows();
+    if (selectedPlayer && elements.modal && !elements.modal.hidden && elements.modalTime) {
+        const latest = currentPlayers.find((player) => String(player.id) === String(selectedPlayer.id));
+        if (latest) selectedPlayer = latest;
+        elements.modalTime.textContent = formatDuration(getLiveDurationSeconds(selectedPlayer));
+    }
 }
 
 function renderPlayers(payload) {
@@ -276,8 +295,10 @@ export async function openPlayers() {
     await loadPlayers();
     stopPlayersAutoRefresh();
     refreshTimer = window.setInterval(loadPlayers, AUTO_REFRESH_MS);
+    durationTimer = window.setInterval(refreshVisibleDurations, 1000);
 }
 
 export function stopPlayersAutoRefresh() {
     if (refreshTimer) { window.clearInterval(refreshTimer); refreshTimer = null; }
+    if (durationTimer) { window.clearInterval(durationTimer); durationTimer = null; }
 }
