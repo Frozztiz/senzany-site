@@ -16,6 +16,41 @@ let cachedPlayersPayload = null;
 let playersCacheExpiresAt = 0;
 let playersQueryInFlight = null;
 
+// Suivi en mémoire de l'heure d'arrivée des joueurs.
+// Le compteur repart à zéro uniquement lors d'un redémarrage du backend.
+const playerSessions = new Map();
+
+function enrichPlayersWithSessionTime(players) {
+  const now = Date.now();
+  const connectedKeys = new Set();
+
+  const enrichedPlayers = players.map((player) => {
+    const sessionKey = player.guid || `${player.name}:${player.ip || "unknown"}`;
+    connectedKeys.add(sessionKey);
+
+    if (!playerSessions.has(sessionKey)) {
+      playerSessions.set(sessionKey, now);
+    }
+
+    const connectedAt = playerSessions.get(sessionKey);
+
+    return {
+      ...player,
+      connectedAt: new Date(connectedAt).toISOString(),
+      timeSeconds: Math.max(0, Math.floor((now - connectedAt) / 1000)),
+      status: "online",
+    };
+  });
+
+  for (const sessionKey of playerSessions.keys()) {
+    if (!connectedKeys.has(sessionKey)) {
+      playerSessions.delete(sessionKey);
+    }
+  }
+
+  return enrichedPlayers;
+}
+
 function getDayzConfiguration() {
   return {
     host:
@@ -30,7 +65,8 @@ function getDayzConfiguration() {
 async function queryConnectedPlayers() {
   const configuration = getDayzConfiguration();
   const result = await rconService.getPlayers();
-  const players = Array.isArray(result.players) ? result.players : [];
+  const rawPlayers = Array.isArray(result.players) ? result.players : [];
+  const players = enrichPlayersWithSessionTime(rawPlayers);
 
   const payload = {
     online: true,

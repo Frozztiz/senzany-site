@@ -33,6 +33,15 @@ function formatDuration(seconds) {
     return hours > 0 ? `${hours} h ${String(minutes).padStart(2, "0")}` : `${minutes} min`;
 }
 
+
+function getPingClass(ping) {
+    const value = Number(ping);
+    if (!Number.isFinite(value)) return "";
+    if (value <= 60) return "command-player-ping--good";
+    if (value <= 120) return "command-player-ping--medium";
+    return "command-player-ping--high";
+}
+
 function formatUpdatedAt(value) {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return "--:--:--";
@@ -94,12 +103,12 @@ function renderPlayers(payload) {
                 <i aria-hidden="true"></i>
                 <div>
                     <strong>${escapeHtml(player.name)}</strong>
-                    <span>SESSION BATTLEYE RCON ACTIVE</span>
+                    <span>SESSION DAYZ ACTIVE</span>
                 </div>
             </div>
-            <div><span>PING</span><strong>${player.ping == null ? "—" : `${player.ping} ms`}</strong></div>
+            <div class="command-player-ping ${getPingClass(player.ping)}"><span>PING</span><strong>${player.ping == null ? "—" : `${player.ping} ms`}</strong></div>
             <div><span>TEMPS</span><strong>${formatDuration(player.timeSeconds)}</strong></div>
-            <div><span>SCORE</span><strong>${player.score == null ? "—" : player.score}</strong></div>
+            <div><span>ÉTAT</span><strong class="command-player-state">EN JEU</strong></div>
         </article>`).join("");
 }
 

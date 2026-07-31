@@ -1801,6 +1801,10 @@ body[data-page="admin"] [data-site-footer] {
 .command-player-row__identity strong { display: block; color: #fff; font-size: 1rem; }
 .command-player-row__identity span, .command-player-row > div:not(.command-player-row__identity):not(.command-player-row__rank) > span { display: block; margin-bottom: 4px; color: var(--admin-muted); font: 700 .58rem monospace; letter-spacing: .11em; }
 .command-player-row > div:not(.command-player-row__identity):not(.command-player-row__rank) > strong { color: #e8e2de; font-size: .88rem; }
+.command-player-ping--good > strong { color: #63dc91 !important; }
+.command-player-ping--medium > strong { color: #e8b85f !important; }
+.command-player-ping--high > strong { color: #ff6b63 !important; }
+.command-player-state { color: #63dc91 !important; font-family: monospace; letter-spacing: .06em; }
 .command-players-empty { display: grid; place-items: center; min-height: 220px; padding: 34px; color: var(--admin-muted); text-align: center; }
 .command-players-empty--warning { gap: 9px; }
 .command-players-empty--warning strong { color: #fff; font-size: 1.15rem; }
