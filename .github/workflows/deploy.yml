@@ -36,7 +36,8 @@ jobs:
                 chmod 600 /tmp/senzany-server.env
                 echo "Fichier .env sauvegardé."
               else
-                echo "Attention : aucun fichier .env trouvé avant le déploiement."
+                echo "ERREUR : aucun fichier .env trouvé dans /var/www/senzany/server."
+                exit 1
               fi
 
               echo "=== Synchronisation Git ==="
@@ -44,7 +45,8 @@ jobs:
               git reset --hard origin/main
               git clean -fd
 
-              echo "=== Préparation du backend ==="
+              echo "=== Reconstruction propre du backend d exécution ==="
+              rm -rf /var/www/senzany/server
               mkdir -p /var/www/senzany/server
 
               cp -f backend/server.js server/server.js
@@ -62,16 +64,9 @@ jobs:
               done
 
               echo "=== Restauration du fichier .env ==="
-
-              if [ -f "/tmp/senzany-server.env" ]; then
-                cp /tmp/senzany-server.env /var/www/senzany/server/.env
-                chmod 600 /var/www/senzany/server/.env
-                rm -f /tmp/senzany-server.env
-                echo "Fichier .env restauré."
-              else
-                echo "ERREUR : aucune sauvegarde du fichier .env disponible."
-                exit 1
-              fi
+              cp /tmp/senzany-server.env /var/www/senzany/server/.env
+              chmod 600 /var/www/senzany/server/.env
+              rm -f /tmp/senzany-server.env
 
               cd /var/www/senzany/server
 
