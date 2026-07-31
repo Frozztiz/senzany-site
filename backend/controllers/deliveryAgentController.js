@@ -41,6 +41,37 @@ exports.health = (req, res) => {
   });
 };
 
+exports.check = async (req, res) => {
+  res.set("Cache-Control", "no-store");
+
+  try {
+    const steamId = cleanString(req.body?.steamId, 17);
+    const agentId = cleanString(req.body?.agentId || "dayz-server", 100);
+
+    if (!/^\d{17}$/.test(steamId)) {
+      return res.status(400).json({
+        error: "steamId doit contenir exactement 17 chiffres."
+      });
+    }
+
+    const count = await deliveryAgentService.countPendingDeliveries({
+      steamId,
+      agentId
+    });
+
+    return res.json({
+      available: count > 0,
+      count
+    });
+  } catch (error) {
+    console.error("Vérification des livraisons :", error);
+
+    return res.status(500).json({
+      error: "Impossible de vérifier les livraisons en attente."
+    });
+  }
+};
+
 exports.claim = async (req, res) => {
   res.set("Cache-Control", "no-store");
 

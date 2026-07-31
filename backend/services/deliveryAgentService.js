@@ -13,6 +13,21 @@ function getSupabaseClient() {
   });
 }
 
+async function countPendingDeliveries({ steamId, agentId }) {
+  // agentId est conservé dans la signature pour journalisation et évolution future.
+  void agentId;
+
+  const supabase = getSupabaseClient();
+  const { count, error } = await supabase
+    .from("deliveries")
+    .select("id", { count: "exact", head: true })
+    .eq("steam_id", steamId)
+    .eq("status", "pending");
+
+  if (error) throw error;
+  return Number(count || 0);
+}
+
 async function claimNextDelivery({ steamId, agentId }) {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase.rpc("claim_next_delivery", {
@@ -38,6 +53,7 @@ async function completeDelivery({ deliveryId, claimToken, success, errorMessage 
 }
 
 module.exports = {
+  countPendingDeliveries,
   claimNextDelivery,
   completeDelivery
 };
