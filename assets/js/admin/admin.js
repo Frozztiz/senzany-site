@@ -6,7 +6,6 @@
 import { loadDeliveries } from "./deliveries.js";
 import { initializeCatalog, openCatalog } from "./catalog.js";
 import { initializePlayers, openPlayers, stopPlayersAutoRefresh, loadPlayers } from "./players.js?v=4.7.0";
-import { initializeVotes, loadVotes } from "./votes.js?v=1.0.0";
 
 const PLAYERS_CARD_REFRESH_MS = 20000;
 let playersCardRefreshTimer = null;
@@ -25,7 +24,6 @@ const elements = {
     homeView: document.getElementById("adminHomeView"),
     playersView: document.getElementById("adminPlayersView"),
     deliveriesView: document.getElementById("adminDeliveriesView"),
-    votesView: document.getElementById("adminVotesView"),
     itemsView: document.getElementById("adminItemsView"),
 
     playersButton: document.querySelector('[data-admin-module="players"]'),
@@ -33,7 +31,7 @@ const elements = {
         '[data-admin-module="deliveries"]'
     ),
     itemsButton: document.querySelector('[data-admin-module="items"]'),
-    votesButton: document.querySelector('[data-admin-module="votes"]'),
+    votesLink: document.querySelector('[data-admin-link="senzany-admin-votes.html"]'),
 
     backButton: document.getElementById("backToAdminHome")
 };
@@ -95,9 +93,8 @@ function showHome() {
     setHidden(elements.playersView, true);
     setHidden(elements.deliveriesView, true);
     setHidden(elements.itemsView, true);
-    setHidden(elements.votesView, true);
     startPlayersCardRefresh();
-    loadVotes().catch(() => {});
+    loadVotesCardCount();
 }
 
 async function showPlayers() {
@@ -105,7 +102,6 @@ async function showPlayers() {
     setHidden(elements.homeView, true);
     setHidden(elements.deliveriesView, true);
     setHidden(elements.itemsView, true);
-    setHidden(elements.votesView, true);
     setHidden(elements.playersView, false);
     await openPlayers();
 }
@@ -116,7 +112,6 @@ async function showDeliveries() {
     setHidden(elements.homeView, true);
     setHidden(elements.playersView, true);
     setHidden(elements.itemsView, true);
-    setHidden(elements.votesView, true);
     setHidden(elements.deliveriesView, false);
 
     await loadDeliveries();
@@ -128,21 +123,22 @@ async function showItems() {
     setHidden(elements.homeView, true);
     setHidden(elements.playersView, true);
     setHidden(elements.deliveriesView, true);
-    setHidden(elements.votesView, true);
     setHidden(elements.itemsView, false);
     await openCatalog();
 }
 
 
-async function showVotes() {
-    stopPlayersCardRefresh();
-    stopPlayersAutoRefresh();
-    setHidden(elements.homeView, true);
-    setHidden(elements.playersView, true);
-    setHidden(elements.deliveriesView, true);
-    setHidden(elements.itemsView, true);
-    setHidden(elements.votesView, false);
-    await loadVotes();
+async function loadVotesCardCount() {
+    const card = document.getElementById("commandVotesCardCount");
+    if (!card) return;
+    try {
+        const response = await fetch("/api/commandement/votes", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error();
+        const payload = await response.json();
+        card.textContent = payload.totals?.votes ?? 0;
+    } catch (_) {
+        card.textContent = "--";
+    }
 }
 
 function isLoggedIn(user) {
@@ -281,8 +277,7 @@ function initializeAdmin() {
     );
 
     elements.itemsButton?.addEventListener("click", showItems);
-    elements.votesButton?.addEventListener("click", () => showVotes().catch(console.error));
-    initializeVotes({ onBack: showHome });
+    elements.votesLink?.addEventListener("click", () => { window.location.href = elements.votesLink.dataset.adminLink; });
     initializeCatalog({ onBack: showHome });
 
     elements.retryButton?.addEventListener(
