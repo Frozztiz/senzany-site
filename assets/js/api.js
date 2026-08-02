@@ -3,7 +3,8 @@
     const response = await fetch(path, {
       credentials: 'same-origin',
       cache: 'no-store',
-      ...options
+      ...options,
+      headers: { Accept: 'application/json', ...(options.headers || {}) }
     });
 
     const data = await response.json().catch(() => null);

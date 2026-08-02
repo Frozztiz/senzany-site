@@ -49,7 +49,7 @@ router.get("/aliases", async (req, res) => {
     return res.json({ aliases, limit: voteAliasService.MAX_ALIASES_PER_PLAYER });
   } catch (error) {
     console.error("Top-Serveurs aliases list:", error);
-    return res.status(500).json({ error: "Impossible de récupérer les pseudos de vote." });
+    return res.status(500).json({ error: error.message || "Impossible de récupérer les pseudos de vote." });
   }
 });
 
