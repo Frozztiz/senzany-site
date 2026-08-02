@@ -31,7 +31,15 @@
   function renderVoteAliases(aliases){
     const list=document.getElementById("voteAliasesList"),counter=document.getElementById("voteAliasesCounter"),input=document.getElementById("voteAliasInput"),button=document.getElementById("voteAliasAddButton");
     if(!list||!counter)return;
-    const safeAliases=Array.isArray(aliases)?aliases:[];
+    const safeAliases=Array.isArray(aliases)?[...aliases]:[];
+    safeAliases.sort((a,b)=>{
+      const detailA=voteAliasDetails.get(String(a.alias||"").toLowerCase())||{};
+      const detailB=voteAliasDetails.get(String(b.alias||"").toLowerCase())||{};
+      if(Boolean(detailA.found)!==Boolean(detailB.found))return detailA.found?-1:1;
+      const voteDifference=Number(detailB.votes||0)-Number(detailA.votes||0);
+      if(voteDifference!==0)return voteDifference;
+      return String(a.alias||"").localeCompare(String(b.alias||""),"fr",{sensitivity:"base"});
+    });
     counter.textContent=`${safeAliases.length} / ${voteAliasesLimit}`;
     list.innerHTML="";
     if(input)input.disabled=safeAliases.length>=voteAliasesLimit;
@@ -46,24 +54,40 @@
     safeAliases.forEach(entry=>{
       const detail=voteAliasDetails.get(String(entry.alias||"").toLowerCase())||null;
       const row=document.createElement("div");
-      row.className="vote-alias-item";
+      row.className=`vote-alias-item ${detail?.found?"vote-alias-item--found":"vote-alias-item--missing"}`;
 
       const identity=document.createElement("div");
       identity.className="vote-alias-item__identity";
       const name=document.createElement("strong");
       name.textContent=entry.alias;
       const meta=document.createElement("small");
-      meta.textContent=detail?.found&&detail.matchedName&&detail.matchedName!==entry.alias?`RETROUVÉ COMME ${detail.matchedName}`:"PSEUDO TOP-SERVEURS ENREGISTRÉ";
+      const metaParts=[];
+      if(detail?.found&&detail.matchedName){
+        metaParts.push(`RETROUVÉ COMME ${detail.matchedName}`);
+        if(detail.position)metaParts.push(`CLASSEMENT #${detail.position}`);
+      }else if(detail){
+        metaParts.push("PSEUDO NON RETROUVÉ DANS LE CLASSEMENT ACTUEL");
+      }else{
+        metaParts.push("VÉRIFICATION EN COURS…");
+      }
+      meta.textContent=metaParts.join(" // ");
       identity.append(name,meta);
 
       const stats=document.createElement("div");
       stats.className="vote-alias-item__stats";
       const votes=document.createElement("strong");
       votes.textContent=detail?Number(detail.votes||0).toLocaleString("fr-FR"):"—";
+      votes.setAttribute("aria-label",`${Number(detail?.votes||0)} vote${Number(detail?.votes||0)>1?"s":""}`);
+      const votesLabel=document.createElement("small");
+      votesLabel.className="vote-alias-item__votes-label";
+      votesLabel.textContent=`VOTE${Number(detail?.votes||0)>1?"S":""}`;
+      const voteBlock=document.createElement("div");
+      voteBlock.className="vote-alias-item__vote-block";
+      voteBlock.append(votes,votesLabel);
       const status=document.createElement("span");
       status.className=`vote-alias-status ${detail?.found?"vote-alias-status--found":"vote-alias-status--missing"}`;
-      status.textContent=detail?detail.found?"Trouvé":"Aucun vote":"Vérification…";
-      stats.append(votes,status);
+      status.textContent=detail?detail.found?"Trouvé":"Non trouvé":"Vérification…";
+      stats.append(voteBlock,status);
 
       const remove=document.createElement("button");
       remove.className="vote-alias-remove";
@@ -107,13 +131,14 @@
         if(matchCount)matchCount.textContent="AUCUN PSEUDO CONFIGURÉ";
         return result;
       }
-      state.textContent=result.found?"SYNCHRONISÉ":"AUCUN VOTE";
-      text.textContent=result.found?"Total cumulé de tous tes pseudos de vote ce mois-ci.":"Aucun vote trouvé ce mois-ci avec tes pseudos enregistrés.";
-      foot.innerHTML=result.found?`SOURCE // TOP-SERVEURS <b>${result.position?"MEILLEURE POSITION #"+result.position:"À JOUR"}</b>`:"SOURCE // TOP-SERVEURS <b>0 VOTE TROUVÉ</b>";
+      state.textContent=result.found?"SYNCHRONISÉ":"NON RETROUVÉ";
+      text.textContent=result.found?"Total cumulé de tous tes pseudos de vote ce mois-ci.":"Aucun de tes pseudos n’apparaît dans le classement actuel.";
+      foot.innerHTML=result.found?`SOURCE // TOP-SERVEURS <b>${result.position?"MEILLEURE POSITION #"+result.position:"À JOUR"}</b>`:"SOURCE // TOP-SERVEURS <b>PSEUDOS NON RETROUVÉS</b>";
       if(matchCount){
         const count=Array.isArray(result.aliasDetails)?result.aliasDetails.filter(entry=>entry.found).length:Array.isArray(result.matchedNames)?result.matchedNames.length:0;
         const configured=Array.isArray(result.aliases)?result.aliases.length:0;
-        matchCount.textContent=`${count} / ${configured} PSEUDO${configured>1?"S":""} RETROUVÉ${configured>1?"S":""}`;
+        const rank=result.position?` // MEILLEUR RANG #${result.position}`:"";
+        matchCount.textContent=`${count} / ${configured} PSEUDO${configured>1?"S":""} RETROUVÉ${configured>1?"S":""}${rank}`;
       }
       if(Array.isArray(result.aliases))renderVoteAliases(result.aliases);
       return result;
@@ -163,6 +188,23 @@
     }finally{
       button.disabled=Boolean(input?.disabled);
       button.textContent="Ajouter le pseudo";
+    }
+  });
+
+  const voteAliasesRefreshButton=document.getElementById("voteAliasesRefreshButton");
+  if(voteAliasesRefreshButton)voteAliasesRefreshButton.addEventListener("click",async()=>{
+    voteAliasesRefreshButton.disabled=true;
+    voteAliasesRefreshButton.textContent="Actualisation…";
+    showVoteAliasFeedback("Actualisation du classement Top-Serveurs en cours…");
+    try{
+      await loadPersonalVotes();
+      showVoteAliasFeedback("Les votes ont été actualisés avec le classement Top-Serveurs.");
+      appendLog("Votes Top-Serveurs actualisés",0);
+    }catch(error){
+      showVoteAliasFeedback(error.message||"Impossible d’actualiser les votes.",true);
+    }finally{
+      voteAliasesRefreshButton.disabled=false;
+      voteAliasesRefreshButton.textContent="Actualiser les votes";
     }
   });
 

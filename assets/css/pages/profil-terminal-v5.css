@@ -124,3 +124,16 @@ main,header,footer{position:relative;z-index:2}
 .vote-alias-status--found{border-color:rgba(95,196,118,.42);background:rgba(95,196,118,.08);color:#8bdd9c}
 .vote-alias-status--missing{border-color:rgba(209,43,49,.42);background:rgba(209,43,49,.08);color:#ec9699}
 @media(max-width:680px){.vote-alias-item{grid-template-columns:1fr auto}.vote-alias-item__stats{grid-column:1/2;justify-content:start;text-align:left}.vote-alias-remove{grid-column:2;grid-row:1/3}}
+
+
+/* Votes Top-Serveurs — détails, tri et actualisation */
+.vote-alias-list-head__actions{display:flex;align-items:center;gap:12px}
+.vote-alias-refresh{min-height:28px;padding:0 10px;border:1px solid rgba(216,166,55,.36);background:rgba(216,166,55,.05);color:var(--amber);font:600 8px 'IBM Plex Mono';letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.vote-alias-refresh:hover{border-color:var(--amber);background:rgba(216,166,55,.12);color:#f2cf78}
+.vote-alias-refresh:disabled{opacity:.45;cursor:wait}
+.vote-alias-item--found{border-color:rgba(95,196,118,.22)}
+.vote-alias-item--missing{opacity:.82}
+.vote-alias-item__vote-block{display:flex;align-items:flex-end;justify-content:flex-end;gap:5px;min-width:58px}
+.vote-alias-item__vote-block>strong{font:28px/1 'Anton';color:var(--paper)}
+.vote-alias-item__votes-label{padding-bottom:2px;font:600 7px 'IBM Plex Mono';letter-spacing:.08em;color:var(--muted)}
+@media(max-width:680px){.vote-alias-list-head{align-items:flex-start;gap:10px}.vote-alias-list-head__actions{align-items:flex-end;flex-direction:column}.vote-alias-refresh{min-height:32px}.vote-alias-item__vote-block{justify-content:flex-start}}
