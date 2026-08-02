@@ -19,6 +19,23 @@
 
   let voteAliasesLimit=20;
   let voteAliasDetails=new Map();
+  let previousVoteTotal=null;
+  let previousAliasVotes=new Map();
+
+  function setVoteSyncState(type,label){
+    const state=document.getElementById("voteAliasesSyncState");
+    if(!state)return;
+    state.className=`vote-alias-sync-state vote-alias-sync-state--${type}`;
+    state.textContent=label;
+  }
+
+  function setVoteLastSync(date=new Date()){
+    const target=document.getElementById("voteAliasesLastSync");
+    if(!target)return;
+    const formatted=new Intl.DateTimeFormat("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}).format(date);
+    target.textContent=`DERNIÈRE SYNCHRONISATION ${formatted}`;
+  }
+
 
   function showVoteAliasFeedback(message,isError=false){
     const feedback=document.getElementById("voteAliasFeedback");
@@ -76,7 +93,10 @@
       const stats=document.createElement("div");
       stats.className="vote-alias-item__stats";
       const votes=document.createElement("strong");
-      votes.textContent=detail?Number(detail.votes||0).toLocaleString("fr-FR"):"—";
+      const currentVotes=detail?Number(detail.votes||0):0;
+      votes.textContent=detail?currentVotes.toLocaleString("fr-FR"):"—";
+      const previousVotes=previousAliasVotes.get(String(entry.alias||"").toLowerCase());
+      if(previousVotes!==undefined&&currentVotes>previousVotes)votes.classList.add("vote-alias-pulse");
       votes.setAttribute("aria-label",`${Number(detail?.votes||0)} vote${Number(detail?.votes||0)>1?"s":""}`);
       const votesLabel=document.createElement("small");
       votesLabel.className="vote-alias-item__votes-label";
@@ -107,8 +127,27 @@
           remove.textContent="Supprimer";
         }
       });
-      row.append(identity,stats,remove);
+      const details=document.createElement("div");
+      details.className="vote-alias-item__details";
+      const detailValues=[
+        ["PSEUDO ENREGISTRÉ",entry.alias||"—"],
+        ["PSEUDO RETROUVÉ",detail?.matchedName||"Non retrouvé"],
+        ["VOTES DU MOIS",detail?String(Number(detail.votes||0)):"—"],
+        ["CLASSEMENT",detail?.position?`#${detail.position}`:"—"]
+      ];
+      detailValues.forEach(([label,value])=>{
+        const block=document.createElement("div");block.className="vote-alias-detail";
+        const caption=document.createElement("span");caption.textContent=label;
+        const content=document.createElement("strong");content.textContent=value;
+        block.append(caption,content);details.appendChild(block);
+      });
+      row.addEventListener("click",event=>{
+        if(event.target.closest("button"))return;
+        row.classList.toggle("is-open");
+      });
+      row.append(identity,stats,remove,details);
       list.appendChild(row);
+      previousAliasVotes.set(String(entry.alias||"").toLowerCase(),currentVotes);
     });
   }
 
@@ -116,6 +155,7 @@
     const value=document.getElementById("personalVotesValue"),state=document.getElementById("votesModuleState"),text=document.getElementById("personalVotesText"),foot=document.getElementById("personalVotesFoot"),total=document.getElementById("voteAliasesTotal"),matchCount=document.getElementById("voteAliasesMatchCount");
     if(!value||!state||!text||!foot)return;
     value.textContent="…";state.textContent="SYNCHRONISATION";
+    setVoteSyncState("loading","Synchronisation…");
     if(total)total.textContent="…";
     if(matchCount)matchCount.textContent="LECTURE TOP-SERVEURS…";
     try{
@@ -123,15 +163,27 @@
       voteAliasDetails=new Map((Array.isArray(result.aliasDetails)?result.aliasDetails:[]).map(entry=>[String(entry.alias||"").toLowerCase(),entry]));
       const votes=Number(result.votes||0);
       value.textContent=votes.toLocaleString("fr-FR");
-      if(total)total.textContent=votes.toLocaleString("fr-FR");
+      if(total){
+        total.textContent=votes.toLocaleString("fr-FR");
+        if(previousVoteTotal!==null&&votes>previousVoteTotal){
+          const box=total.closest(".vote-alias-total");
+          box?.classList.remove("is-updated");
+          requestAnimationFrame(()=>box?.classList.add("is-updated"));
+          setTimeout(()=>box?.classList.remove("is-updated"),1000);
+        }
+      }
+      previousVoteTotal=votes;
+      setVoteLastSync(new Date());
       if(!result.configured){
         state.textContent="PSEUDOS REQUIS";
         text.textContent="Ajoute les pseudos avec lesquels tu votes pour calculer ton total.";
         foot.innerHTML="SOURCE // TOP-SERVEURS <b>CONFIGURATION REQUISE</b>";
         if(matchCount)matchCount.textContent="AUCUN PSEUDO CONFIGURÉ";
+        setVoteSyncState("waiting","Configuration requise");
         return result;
       }
       state.textContent=result.found?"SYNCHRONISÉ":"NON RETROUVÉ";
+      setVoteSyncState(result.found?"ok":"waiting",result.found?"Synchronisé":"En attente Top-Serveurs");
       text.textContent=result.found?"Total cumulé de tous tes pseudos de vote ce mois-ci.":"Aucun de tes pseudos n’apparaît dans le classement actuel.";
       foot.innerHTML=result.found?`SOURCE // TOP-SERVEURS <b>${result.position?"MEILLEURE POSITION #"+result.position:"À JOUR"}</b>`:"SOURCE // TOP-SERVEURS <b>PSEUDOS NON RETROUVÉS</b>";
       if(matchCount){
@@ -146,6 +198,7 @@
       value.textContent="—";state.textContent="INDISPONIBLE";text.textContent="Impossible de récupérer les votes pour le moment.";foot.innerHTML="SOURCE // TOP-SERVEURS <b>ERREUR API</b>";
       if(total)total.textContent="—";
       if(matchCount)matchCount.textContent="API INDISPONIBLE";
+      setVoteSyncState("error","API indisponible");
       console.warn("Votes personnels indisponibles",error);
       return null;
     }
