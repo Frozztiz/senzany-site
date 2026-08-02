@@ -1,5 +1,7 @@
 const byId = (id) => document.getElementById(id);
 let payload = null;
+let pendingAssociation = null;
+let associationInProgress = false;
 
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
 const number = (value) => Number(value || 0);
@@ -82,7 +84,72 @@ function renderLinkedCard(row) {
 }
 
 function renderUnknownCard(row) {
-  return `<article class="votes-unknown-card"><b>#${number(row.position)}</b><div><strong>${escapeHtml(row.playerName)}</strong><small>Non rattaché à un profil Senzany</small></div><em>${number(row.votes)} <span>votes</span></em></article>`;
+  return `<article class="votes-unknown-card"><b>#${number(row.position)}</b><div><strong>${escapeHtml(row.playerName)}</strong><small>Non rattaché à un profil Senzany</small></div><em>${number(row.votes)} <span>votes</span></em><button class="votes-associate-button" type="button" data-associate-alias="${escapeHtml(row.playerName)}" data-associate-votes="${number(row.votes)}">Associer</button></article>`;
+}
+
+function availableMembers() {
+  return Array.isArray(payload?.members) ? payload.members : [];
+}
+
+function closeAssociateModal() {
+  if (associationInProgress) return;
+  pendingAssociation = null;
+  const modal = byId("votesAssociateModal");
+  modal.hidden = true;
+  modal.setAttribute("aria-hidden", "true");
+  byId("votesMemberSearch").value = "";
+  byId("votesAssociateFeedback").hidden = true;
+}
+
+function renderMemberResults() {
+  const query = String(byId("votesMemberSearch").value || "").trim().toLocaleLowerCase("fr-FR");
+  const members = availableMembers().filter((member) => {
+    if (!query) return true;
+    return [member.discordUsername, member.steamId].join(" ").toLocaleLowerCase("fr-FR").includes(query);
+  }).slice(0, 50);
+  byId("votesMemberResults").innerHTML = members.length ? members.map((member) => `<button type="button" class="votes-member-result" data-member-steamid="${escapeHtml(member.steamId)}"><span><strong>${escapeHtml(member.discordUsername || "Compte Senzany")}</strong><small>SteamID ${escapeHtml(member.steamId)}</small></span><em>Associer</em></button>`).join("") : '<div class="admin-list-message">Aucun membre correspondant.</div>';
+}
+
+function openAssociateModal(alias, votes) {
+  pendingAssociation = { alias, votes: number(votes) };
+  byId("votesAssociateAlias").textContent = alias;
+  byId("votesAssociateVotes").textContent = `${number(votes)} vote${number(votes) > 1 ? "s" : ""}`;
+  const modal = byId("votesAssociateModal");
+  modal.hidden = false;
+  modal.setAttribute("aria-hidden", "false");
+  renderMemberResults();
+  setTimeout(() => byId("votesMemberSearch")?.focus(), 0);
+}
+
+async function associateAlias(steamId) {
+  if (!pendingAssociation || associationInProgress) return;
+  associationInProgress = true;
+  const feedback = byId("votesAssociateFeedback");
+  feedback.hidden = false;
+  feedback.dataset.state = "loading";
+  feedback.textContent = "Association en cours…";
+  document.querySelectorAll(".votes-member-result").forEach((button) => { button.disabled = true; });
+  try {
+    const response = await fetch("/api/commandement/votes/associate", {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ steamId, alias: pendingAssociation.alias })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
+    feedback.dataset.state = "success";
+    feedback.textContent = `Le pseudo « ${pendingAssociation.alias} » est maintenant associé.`;
+    associationInProgress = false;
+    await loadVotes();
+    setTimeout(closeAssociateModal, 450);
+  } catch (error) {
+    associationInProgress = false;
+    feedback.dataset.state = "error";
+    feedback.textContent = error.message || "Association impossible.";
+    renderMemberResults();
+  }
 }
 
 function render() {
@@ -140,3 +207,17 @@ byId("votesRefresh")?.addEventListener("click", () => loadVotes().catch(showLoad
 byId("votesExport")?.addEventListener("click", exportCsv);
 ["votesSearch", "votesOnlyLinked", "votesOnlyUnknown", "votesTop10"].forEach((id) => byId(id)?.addEventListener(id === "votesSearch" ? "input" : "change", render));
 checkAccess();
+
+
+byId("votesUnknownList")?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-associate-alias]");
+  if (!button) return;
+  openAssociateModal(button.dataset.associateAlias, button.dataset.associateVotes);
+});
+byId("votesMemberSearch")?.addEventListener("input", renderMemberResults);
+byId("votesMemberResults")?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-member-steamid]");
+  if (button) associateAlias(button.dataset.memberSteamid);
+});
+document.querySelectorAll("[data-close-associate]").forEach((element) => element.addEventListener("click", closeAssociateModal));
+document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !byId("votesAssociateModal")?.hidden) closeAssociateModal(); });

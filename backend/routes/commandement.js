@@ -266,7 +266,7 @@ router.get("/votes", commandAuth, async (req, res) => {
       topServeursService.getPlayersRanking(),
       voteAliasService.listAll(),
       supabaseService.request(
-        "user_links?select=steam_id,discord_username&limit=5000",
+        "user_links?select=steam_id,discord_id,discord_username&limit=5000",
         { method: "GET" }
       ).catch(() => [])
     ]);
@@ -319,11 +319,73 @@ router.get("/votes", commandAuth, async (req, res) => {
         identifiedPlayers: identified.length,
         unidentifiedNames: unidentified.length
       },
+      members: (Array.isArray(links) ? links : [])
+        .map((row) => ({
+          steamId: String(row.steam_id || ""),
+          discordId: row.discord_id ? String(row.discord_id) : null,
+          discordUsername: row.discord_username || null
+        }))
+        .filter((row) => /^\d{17}$/.test(row.steamId))
+        .sort((a, b) => String(a.discordUsername || a.steamId).localeCompare(String(b.discordUsername || b.steamId), "fr")),
       updatedAt: new Date().toISOString()
     });
   } catch (error) {
     console.error("[COMMANDEMENT] Votes indisponibles :", error);
     return res.status(502).json({ error: error.message || "Classement des votes indisponible." });
+  }
+});
+
+router.post("/votes/associate", commandAuth, async (req, res) => {
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
+
+  const steamId = String(req.body?.steamId || "").trim();
+  const alias = voteAliasService.cleanAlias(req.body?.alias);
+
+  if (!/^\d{17}$/.test(steamId)) {
+    return res.status(400).json({ error: "SteamID64 invalide." });
+  }
+
+  if (!alias) {
+    return res.status(400).json({ error: "Pseudo Top-Serveurs manquant." });
+  }
+
+  try {
+    const [memberRows, ranking] = await Promise.all([
+      supabaseService.request(
+        `user_links?steam_id=eq.${encodeURIComponent(steamId)}&select=steam_id,discord_username&limit=1`,
+        { method: "GET" }
+      ),
+      topServeursService.getPlayersRanking()
+    ]);
+
+    if (!Array.isArray(memberRows) || memberRows.length === 0) {
+      return res.status(404).json({ error: "Ce compte Senzany est introuvable." });
+    }
+
+    const normalizedAlias = voteAliasService.normalizeAlias(alias);
+    const rankingEntry = (Array.isArray(ranking) ? ranking : []).find(
+      (entry) => voteAliasService.normalizeAlias(entry.playerName) === normalizedAlias
+    );
+
+    if (!rankingEntry) {
+      return res.status(404).json({ error: "Ce pseudo n’est plus présent dans le classement Top-Serveurs actuel." });
+    }
+
+    const created = await voteAliasService.addForSteamId(steamId, rankingEntry.playerName);
+    return res.status(201).json({
+      success: true,
+      alias: created,
+      member: {
+        steamId,
+        discordUsername: memberRows[0].discord_username || null
+      }
+    });
+  } catch (error) {
+    console.error("[COMMANDEMENT] Association du pseudo impossible :", error);
+    if (error.code === "ALIAS_ALREADY_USED") return res.status(409).json({ error: error.message });
+    if (error.code === "ALIAS_LIMIT_REACHED") return res.status(422).json({ error: error.message });
+    if (["INVALID_ALIAS_LENGTH", "INVALID_ALIAS"].includes(error.code)) return res.status(400).json({ error: error.message });
+    return res.status(500).json({ error: error.message || "Association impossible." });
   }
 });
 
