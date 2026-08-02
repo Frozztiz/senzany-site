@@ -140,27 +140,28 @@ async function getDiscordNames(discordId, storedUsername) {
   return [...names];
 }
 
-async function getPlayerVotes({ discordId, discordUsername }) {
-  const [ranking, discordNames] = await Promise.all([
-    getPlayersRanking(),
-    getDiscordNames(discordId, discordUsername),
-  ]);
+async function getPlayerVotes({ aliases = [] }) {
+  const ranking = await getPlayersRanking();
+  const checkedNames = [...new Set(aliases.map((name) => String(name || "").trim()).filter(Boolean))];
+  const normalizedCandidates = new Set(checkedNames.map(normalizePlayerName).filter(Boolean));
 
-  const normalizedCandidates = discordNames
-    .map(normalizePlayerName)
-    .filter(Boolean);
-
-  const player = ranking.find((entry) =>
-    normalizedCandidates.includes(normalizePlayerName(entry.playerName))
+  const matches = ranking.filter((entry) =>
+    normalizedCandidates.has(normalizePlayerName(entry.playerName))
   );
 
+  const votes = matches.reduce((total, entry) => total + Number(entry.votes || 0), 0);
+  const bestPosition = matches.reduce((best, entry) => {
+    const position = Number(entry.position);
+    if (!Number.isFinite(position)) return best;
+    return best === null || position < best ? position : best;
+  }, null);
+
   return {
-    linked: true,
-    found: Boolean(player),
-    votes: player?.votes ?? 0,
-    position: player?.position ?? null,
-    matchedName: player?.playerName ?? null,
-    checkedNames: discordNames,
+    found: matches.length > 0,
+    votes,
+    position: bestPosition,
+    matchedNames: matches.map((entry) => entry.playerName),
+    checkedNames,
   };
 }
 

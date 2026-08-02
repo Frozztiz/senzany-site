@@ -2,8 +2,32 @@ const express = require("express");
 const router = express.Router();
 
 const topServeursService = require("../services/topServeursService");
-const supabaseService = require("../services/supabaseService");
+const voteAliasService = require("../services/voteAliasService");
 const { verifySteamId } = require("../utils/steamSession");
+
+function getAuthenticatedSteamId(req, res) {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    res.status(500).json({ error: "SESSION_SECRET manquant." });
+    return null;
+  }
+
+  const steamId = verifySteamId(req.cookies?.senzany_session, secret);
+  if (!steamId) {
+    res.status(401).json({ error: "Connexion Steam requise." });
+    return null;
+  }
+
+  return steamId;
+}
+
+function aliasErrorStatus(error) {
+  if (["INVALID_ALIAS_LENGTH", "INVALID_ALIAS", "INVALID_ALIAS_ID"].includes(error.code)) return 400;
+  if (error.code === "ALIAS_ALREADY_USED") return 409;
+  if (error.code === "ALIAS_LIMIT_REACHED") return 422;
+  if (error.code === "ALIAS_NOT_FOUND") return 404;
+  return 500;
+}
 
 router.get("/stats", async (req, res) => {
   try {
@@ -15,27 +39,64 @@ router.get("/stats", async (req, res) => {
   }
 });
 
-router.get("/my-votes", async (req, res) => {
+router.get("/aliases", async (req, res) => {
   res.set("Cache-Control", "no-store");
+  const steamId = getAuthenticatedSteamId(req, res);
+  if (!steamId) return;
 
   try {
-    const secret = process.env.SESSION_SECRET;
-    if (!secret) return res.status(500).json({ error: "SESSION_SECRET manquant." });
+    const aliases = await voteAliasService.listBySteamId(steamId);
+    return res.json({ aliases, limit: voteAliasService.MAX_ALIASES_PER_PLAYER });
+  } catch (error) {
+    console.error("Top-Serveurs aliases list:", error);
+    return res.status(500).json({ error: "Impossible de récupérer les pseudos de vote." });
+  }
+});
 
-    const steamId = verifySteamId(req.cookies?.senzany_session, secret);
-    if (!steamId) return res.status(401).json({ error: "Connexion Steam requise." });
+router.post("/aliases", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  const steamId = getAuthenticatedSteamId(req, res);
+  if (!steamId) return;
 
-    const discordLink = await supabaseService.getLinkBySteamId(steamId);
-    if (!discordLink?.discord_id) {
-      return res.json({ linked: false, found: false, votes: null, position: null });
-    }
+  try {
+    const alias = await voteAliasService.addForSteamId(steamId, req.body?.alias);
+    return res.status(201).json({ alias });
+  } catch (error) {
+    console.error("Top-Serveurs alias add:", error);
+    return res.status(aliasErrorStatus(error)).json({ error: error.message });
+  }
+});
 
+router.delete("/aliases/:aliasId", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  const steamId = getAuthenticatedSteamId(req, res);
+  if (!steamId) return;
+
+  try {
+    await voteAliasService.removeForSteamId(steamId, req.params.aliasId);
+    return res.json({ success: true });
+  } catch (error) {
+    console.error("Top-Serveurs alias delete:", error);
+    return res.status(aliasErrorStatus(error)).json({ error: error.message });
+  }
+});
+
+router.get("/my-votes", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  const steamId = getAuthenticatedSteamId(req, res);
+  if (!steamId) return;
+
+  try {
+    const aliases = await voteAliasService.listBySteamId(steamId);
     const result = await topServeursService.getPlayerVotes({
-      discordId: discordLink.discord_id,
-      discordUsername: discordLink.discord_username,
+      aliases: aliases.map((entry) => entry.alias),
     });
 
-    return res.json(result);
+    return res.json({
+      ...result,
+      configured: aliases.length > 0,
+      aliases,
+    });
   } catch (err) {
     console.error("Top-Serveurs my-votes:", err);
     return res.status(502).json({ error: "Classement Top-Serveurs indisponible." });

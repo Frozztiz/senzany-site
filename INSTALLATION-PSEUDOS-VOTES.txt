@@ -1,0 +1,50 @@
+SENZANY — INSTALLATION DU REGROUPEMENT DES PSEUDOS DE VOTE
+===========================================================
+
+1. SUPABASE
+-----------
+Ouvrir Supabase > SQL Editor.
+
+Exécuter intégralement le fichier :
+
+supabase/009_topserveurs_vote_aliases.sql
+
+Cette migration crée la table utilisée pour enregistrer les pseudos Top-Serveurs de chaque joueur.
+Elle ne supprime et ne modifie aucune donnée existante.
+
+2. DÉPLOIEMENT DU SITE ET DU BACKEND
+------------------------------------
+Déployer le projet normalement depuis GitHub Desktop, puis sur le VPS :
+
+  git pull
+  cd backend
+  npm install
+  pm2 restart all
+
+3. VÉRIFICATION
+---------------
+- Se connecter à la page Profil avec Steam.
+- Dans « Mes pseudos de vote », ajouter un ou plusieurs pseudos utilisés sur Top-Serveurs.
+- Vérifier que chaque pseudo apparaît dans la liste.
+- Vérifier que le total mensuel est recalculé automatiquement.
+- Tester la suppression d'un pseudo.
+
+RÈGLES DU SYSTÈME
+-----------------
+- Maximum : 20 pseudos par compte Steam.
+- Un pseudo ne peut appartenir qu'à un seul compte Senzany.
+- Les espaces, accents, tirets et caractères spéciaux sont neutralisés uniquement pour la comparaison.
+- Le pseudo original reste affiché exactement comme il a été saisi.
+- Tous les votes correspondant aux pseudos enregistrés sont additionnés automatiquement.
+
+
+MODULE ADMIN VOTES
+------------------
+La carte Véhicules a été remplacée par la carte Votes dans senzany-admin.html.
+Le module récupère /api/commandement/votes et affiche :
+- le classement regroupé par compte ;
+- les pseudos Top-Serveurs non identifiés ;
+- les totaux du mois ;
+- une recherche instantanée.
+
+Redémarrer le backend après déploiement : pm2 restart <nom-du-processus>.

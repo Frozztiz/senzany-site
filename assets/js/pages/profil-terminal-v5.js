@@ -17,23 +17,142 @@
   function showDiscordFeedback(){const code=new URLSearchParams(location.search).get("discord");if(!code)return;const messages={linked:"Compte Discord associé avec succès.",cancelled:"Association Discord annulée.",already_linked:"Ce compte Discord est déjà lié à un autre compte Steam.",steam_required:"Reconnecte-toi à Steam avant d’associer Discord.",invalid_state:"La demande a expiré. Recommence.",invalid_callback:"Réponse Discord invalide.",token_error:"Discord n’a pas finalisé l’autorisation.",user_error:"Impossible de lire le profil Discord.",server_error:"Impossible d’enregistrer l’association."};const feedback=document.getElementById("discordFeedback");feedback.textContent=messages[code]||"État Discord mis à jour.";feedback.hidden=false;feedback.classList.toggle("discord-feedback--error",code!=="linked");history.replaceState({},document.title,location.pathname)}
   function updateTerminalTime(){const now=new Intl.DateTimeFormat("fr-FR",{dateStyle:"short",timeStyle:"short"}).format(new Date());document.getElementById("terminalUpdatedAt").textContent="MISE À JOUR — "+now}
 
-  async function loadPersonalVotes(discord){
-    const value=document.getElementById("personalVotesValue"),state=document.getElementById("votesModuleState"),text=document.getElementById("personalVotesText"),foot=document.getElementById("personalVotesFoot");
-    if(!value||!state||!text||!foot)return;
-    if(!discord||!discord.linked){value.textContent="—";state.textContent="DISCORD REQUIS";text.textContent="Associe ton compte Discord pour retrouver tes votes.";foot.innerHTML="SOURCE // TOP-SERVEURS <b>EN ATTENTE</b>";return}
-    value.textContent="…";state.textContent="SYNCHRONISATION";
-    try{
-      const result=await window.SenzanyAPI.topServeurs.getMyVotes();
-      if(!result.linked){value.textContent="—";state.textContent="DISCORD REQUIS";return}
-      value.textContent=Number(result.votes||0).toLocaleString("fr-FR");
-      state.textContent=result.found?"SYNCHRONISÉ":"NON TROUVÉ";
-      text.textContent=result.found?"Votes personnels enregistrés ce mois-ci.":"Aucun vote trouvé avec ton pseudo Discord actuel.";
-      foot.innerHTML=result.found?`SOURCE // TOP-SERVEURS <b>${result.position?"CLASSEMENT #"+result.position:"À JOUR"}</b>`:"SOURCE // TOP-SERVEURS <b>VÉRIFIER LE PSEUDO</b>";
-    }catch(error){value.textContent="—";state.textContent="INDISPONIBLE";text.textContent="Impossible de récupérer les votes pour le moment.";foot.innerHTML="SOURCE // TOP-SERVEURS <b>ERREUR API</b>";console.warn("Votes personnels indisponibles",error)}
+  let voteAliasesLimit=20;
+
+  function showVoteAliasFeedback(message,isError=false){
+    const feedback=document.getElementById("voteAliasFeedback");
+    if(!feedback)return;
+    feedback.textContent=message;
+    feedback.hidden=false;
+    feedback.classList.toggle("vote-alias-feedback--error",isError);
   }
 
+  function renderVoteAliases(aliases){
+    const list=document.getElementById("voteAliasesList"),counter=document.getElementById("voteAliasesCounter"),input=document.getElementById("voteAliasInput"),button=document.getElementById("voteAliasAddButton");
+    if(!list||!counter)return;
+    const safeAliases=Array.isArray(aliases)?aliases:[];
+    counter.textContent=`${safeAliases.length} / ${voteAliasesLimit}`;
+    list.innerHTML="";
+    if(input)input.disabled=safeAliases.length>=voteAliasesLimit;
+    if(button)button.disabled=safeAliases.length>=voteAliasesLimit;
+    if(safeAliases.length===0){
+      const empty=document.createElement("p");
+      empty.className="vote-alias-empty";
+      empty.textContent="Aucun pseudo enregistré. Ajoute tous les noms avec lesquels tu votes sur Top-Serveurs.";
+      list.appendChild(empty);
+      return;
+    }
+    safeAliases.forEach(entry=>{
+      const row=document.createElement("div");
+      row.className="vote-alias-item";
+      const identity=document.createElement("div");
+      identity.className="vote-alias-item__identity";
+      const name=document.createElement("strong");
+      name.textContent=entry.alias;
+      const meta=document.createElement("small");
+      meta.textContent="PSEUDO TOP-SERVEURS ENREGISTRÉ";
+      identity.append(name,meta);
+      const remove=document.createElement("button");
+      remove.className="vote-alias-remove";
+      remove.type="button";
+      remove.textContent="Supprimer";
+      remove.addEventListener("click",async()=>{
+        if(!confirm(`Supprimer le pseudo « ${entry.alias} » ?`))return;
+        remove.disabled=true;
+        remove.textContent="Suppression…";
+        try{
+          await window.SenzanyAPI.topServeurs.deleteVoteAlias(entry.id);
+          showVoteAliasFeedback(`Le pseudo « ${entry.alias} » a été supprimé.`);
+          await refreshVoteAliasesAndTotal();
+        }catch(error){
+          showVoteAliasFeedback(error.message||"Impossible de supprimer ce pseudo.",true);
+          remove.disabled=false;
+          remove.textContent="Supprimer";
+        }
+      });
+      row.append(identity,remove);
+      list.appendChild(row);
+    });
+  }
+
+  async function loadPersonalVotes(){
+    const value=document.getElementById("personalVotesValue"),state=document.getElementById("votesModuleState"),text=document.getElementById("personalVotesText"),foot=document.getElementById("personalVotesFoot"),total=document.getElementById("voteAliasesTotal"),matchCount=document.getElementById("voteAliasesMatchCount");
+    if(!value||!state||!text||!foot)return;
+    value.textContent="…";state.textContent="SYNCHRONISATION";
+    if(total)total.textContent="…";
+    if(matchCount)matchCount.textContent="LECTURE TOP-SERVEURS…";
+    try{
+      const result=await window.SenzanyAPI.topServeurs.getMyVotes();
+      const votes=Number(result.votes||0);
+      value.textContent=votes.toLocaleString("fr-FR");
+      if(total)total.textContent=votes.toLocaleString("fr-FR");
+      if(!result.configured){
+        state.textContent="PSEUDOS REQUIS";
+        text.textContent="Ajoute les pseudos avec lesquels tu votes pour calculer ton total.";
+        foot.innerHTML="SOURCE // TOP-SERVEURS <b>CONFIGURATION REQUISE</b>";
+        if(matchCount)matchCount.textContent="AUCUN PSEUDO CONFIGURÉ";
+        return result;
+      }
+      state.textContent=result.found?"SYNCHRONISÉ":"AUCUN VOTE";
+      text.textContent=result.found?"Total cumulé de tous tes pseudos de vote ce mois-ci.":"Aucun vote trouvé ce mois-ci avec tes pseudos enregistrés.";
+      foot.innerHTML=result.found?`SOURCE // TOP-SERVEURS <b>${result.position?"MEILLEURE POSITION #"+result.position:"À JOUR"}</b>`:"SOURCE // TOP-SERVEURS <b>0 VOTE TROUVÉ</b>";
+      if(matchCount){
+        const count=Array.isArray(result.matchedNames)?result.matchedNames.length:0;
+        matchCount.textContent=`${count} PSEUDO${count>1?"S":""} RETROUVÉ${count>1?"S":""}`;
+      }
+      return result;
+    }catch(error){
+      value.textContent="—";state.textContent="INDISPONIBLE";text.textContent="Impossible de récupérer les votes pour le moment.";foot.innerHTML="SOURCE // TOP-SERVEURS <b>ERREUR API</b>";
+      if(total)total.textContent="—";
+      if(matchCount)matchCount.textContent="API INDISPONIBLE";
+      console.warn("Votes personnels indisponibles",error);
+      return null;
+    }
+  }
+
+  async function loadVoteAliases(){
+    try{
+      const result=await window.SenzanyAPI.topServeurs.getVoteAliases();
+      voteAliasesLimit=Number(result.limit)||20;
+      renderVoteAliases(result.aliases);
+      return result.aliases||[];
+    }catch(error){
+      const list=document.getElementById("voteAliasesList");
+      if(list)list.innerHTML='<p class="vote-alias-empty">Impossible de charger les pseudos enregistrés.</p>';
+      showVoteAliasFeedback(error.message||"Impossible de charger les pseudos.",true);
+      return [];
+    }
+  }
+
+  async function refreshVoteAliasesAndTotal(){
+    await Promise.all([loadVoteAliases(),loadPersonalVotes()]);
+  }
+
+  const voteAliasForm=document.getElementById("voteAliasForm");
+  if(voteAliasForm)voteAliasForm.addEventListener("submit",async event=>{
+    event.preventDefault();
+    const input=document.getElementById("voteAliasInput"),button=document.getElementById("voteAliasAddButton");
+    const alias=input?.value?.trim();
+    if(!alias)return;
+    button.disabled=true;
+    button.textContent="Ajout…";
+    try{
+      await window.SenzanyAPI.topServeurs.addVoteAlias(alias);
+      input.value="";
+      showVoteAliasFeedback(`Le pseudo « ${alias} » a été ajouté. Les votes sont recalculés automatiquement.`);
+      appendLog(`Pseudo de vote ajouté : ${alias}`,0);
+      await refreshVoteAliasesAndTotal();
+    }catch(error){
+      showVoteAliasFeedback(error.message||"Impossible d’ajouter ce pseudo.",true);
+    }finally{
+      button.disabled=Boolean(input?.disabled);
+      button.textContent="Ajouter le pseudo";
+    }
+  });
+
+
   document.querySelectorAll(".js-discord-unlink").forEach(button=>button.addEventListener("click",function(){if(!confirm("Dissocier ton compte Discord de ton compte Steam Senzany ?"))return;const buttons=document.querySelectorAll(".js-discord-unlink");buttons.forEach(item=>{item.disabled=true;item.textContent="Dissociation…"});window.SenzanyAPI.discord.unlink().then(()=>{renderDiscord({linked:false});const feedback=document.getElementById("discordFeedback");feedback.textContent="Compte Discord dissocié avec succès.";feedback.hidden=false;feedback.classList.remove("discord-feedback--error")}).catch(()=>{const feedback=document.getElementById("discordFeedback");feedback.textContent="Impossible de dissocier Discord pour le moment.";feedback.hidden=false;feedback.classList.add("discord-feedback--error")}).finally(()=>{buttons.forEach(item=>{item.disabled=false;item.textContent="Dissocier Discord"})})}));
-  window.SenzanyAPI.steam.getMe().then(data=>{if(!data.loggedIn){reveal("out");return}document.getElementById("profileTag").textContent="ACCÈS PERSONNEL // IDENTITÉ SYNCHRONISÉE";document.getElementById("steamAvatar").src=data.avatar||"";document.getElementById("steamName").textContent=data.name||"Survivant";document.getElementById("identityName").textContent=data.name||"—";document.getElementById("steamIdValue").textContent=data.steamId||"—";document.getElementById("steamStatusValue").textContent=personaStates[data.personaState]||"Statut inconnu";document.getElementById("lastLogoffValue").textContent=formatLastActivity(data.lastLogoff);document.getElementById("steamProfileLink").href=data.profileUrl||("https://steamcommunity.com/profiles/"+data.steamId);renderDayz(data.dayz);renderDiscord(data.discord);loadPersonalVotes(data.discord);updateTerminalTime();appendLog("Steam synchronisé",120);appendLog(data.discord&&data.discord.linked?"Discord synchronisé":"Discord en attente",430);appendLog("API OVH opérationnelle",740);appendLog("Battle Pass en attente de données serveur",1050);reveal("in");showDiscordFeedback()}).catch(()=>reveal("out"));
+  window.SenzanyAPI.steam.getMe().then(data=>{if(!data.loggedIn){reveal("out");return}document.getElementById("profileTag").textContent="ACCÈS PERSONNEL // IDENTITÉ SYNCHRONISÉE";document.getElementById("steamAvatar").src=data.avatar||"";document.getElementById("steamName").textContent=data.name||"Survivant";document.getElementById("identityName").textContent=data.name||"—";document.getElementById("steamIdValue").textContent=data.steamId||"—";document.getElementById("steamStatusValue").textContent=personaStates[data.personaState]||"Statut inconnu";document.getElementById("lastLogoffValue").textContent=formatLastActivity(data.lastLogoff);document.getElementById("steamProfileLink").href=data.profileUrl||("https://steamcommunity.com/profiles/"+data.steamId);renderDayz(data.dayz);renderDiscord(data.discord);refreshVoteAliasesAndTotal();updateTerminalTime();appendLog("Steam synchronisé",120);appendLog(data.discord&&data.discord.linked?"Discord synchronisé":"Discord en attente",430);appendLog("API OVH opérationnelle",740);appendLog("Battle Pass en attente de données serveur",1050);reveal("in");showDiscordFeedback()}).catch(()=>reveal("out"));
 
 
   const moduleToast=document.getElementById("moduleToast");

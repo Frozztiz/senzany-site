@@ -2,6 +2,8 @@ const express = require("express");
 const rconService = require("../services/rconService");
 const supabaseService = require("../services/supabaseService");
 const playerSessionService = require("../services/playerSessionService");
+const topServeursService = require("../services/topServeursService");
+const voteAliasService = require("../services/voteAliasService");
 
 const router = express.Router();
 
@@ -253,6 +255,76 @@ router.get("/access", (req, res) => {
     steamId: String(steamId),
     clearance: "ALPHA"
   });
+});
+
+
+router.get("/votes", commandAuth, async (req, res) => {
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
+
+  try {
+    const [ranking, aliases, links] = await Promise.all([
+      topServeursService.getPlayersRanking(),
+      voteAliasService.listAll(),
+      supabaseService.request(
+        "user_links?select=steam_id,discord_username&limit=5000",
+        { method: "GET" }
+      ).catch(() => [])
+    ]);
+
+    const linkBySteamId = new Map(
+      (Array.isArray(links) ? links : []).map((row) => [String(row.steam_id || ""), row])
+    );
+    const aliasesByNormalized = new Map();
+    const groups = new Map();
+
+    for (const alias of aliases) {
+      const normalized = voteAliasService.normalizeAlias(alias.alias);
+      if (normalized) aliasesByNormalized.set(normalized, alias);
+      if (!groups.has(alias.steamId)) {
+        const link = linkBySteamId.get(alias.steamId) || {};
+        groups.set(alias.steamId, {
+          steamId: alias.steamId,
+          playerName: link.discord_username || alias.alias || alias.steamId,
+          aliases: [],
+          votes: 0,
+          matchedNames: []
+        });
+      }
+      groups.get(alias.steamId).aliases.push(alias.alias);
+    }
+
+    const unidentified = [];
+    for (const entry of ranking) {
+      const alias = aliasesByNormalized.get(voteAliasService.normalizeAlias(entry.playerName));
+      if (!alias) {
+        unidentified.push(entry);
+        continue;
+      }
+      const group = groups.get(alias.steamId);
+      group.votes += Number(entry.votes || 0);
+      group.matchedNames.push(entry.playerName);
+    }
+
+    const identified = [...groups.values()]
+      .filter((group) => group.votes > 0)
+      .sort((a, b) => b.votes - a.votes)
+      .map((group, index) => ({ ...group, position: index + 1 }));
+
+    return res.json({
+      identified,
+      unidentified: unidentified.sort((a, b) => b.votes - a.votes),
+      totals: {
+        votes: ranking.reduce((sum, entry) => sum + Number(entry.votes || 0), 0),
+        voteNames: ranking.length,
+        identifiedPlayers: identified.length,
+        unidentifiedNames: unidentified.length
+      },
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("[COMMANDEMENT] Votes indisponibles :", error);
+    return res.status(502).json({ error: error.message || "Classement des votes indisponible." });
+  }
 });
 
 router.get("/players", commandAuth, async (req, res) => {

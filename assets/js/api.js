@@ -6,11 +6,16 @@
       ...options
     });
 
+    const data = await response.json().catch(() => null);
+
     if (!response.ok) {
-      throw new Error(`API ${path} indisponible (${response.status})`);
+      const error = new Error(data?.error || `API ${path} indisponible (${response.status})`);
+      error.status = response.status;
+      error.data = data;
+      throw error;
     }
 
-    return response.json();
+    return data;
   }
 
   window.SenzanyAPI = Object.freeze({
@@ -20,7 +25,14 @@
     }),
     topServeurs: Object.freeze({
       getStats: () => request('/api/topserveurs/stats'),
-      getMyVotes: () => request('/api/topserveurs/my-votes')
+      getMyVotes: () => request('/api/topserveurs/my-votes'),
+      getVoteAliases: () => request('/api/topserveurs/aliases'),
+      addVoteAlias: (alias) => request('/api/topserveurs/aliases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ alias })
+      }),
+      deleteVoteAlias: (aliasId) => request(`/api/topserveurs/aliases/${encodeURIComponent(aliasId)}`, { method: 'DELETE' })
     }),
     game: Object.freeze({
       getStats: () => request('/api/game/stats')

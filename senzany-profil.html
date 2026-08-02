@@ -137,6 +137,40 @@
           </article>
         </section>
 
+        <section class="vote-alias-panel" aria-labelledby="voteAliasesTitle">
+          <span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--tr"></span><span class="hud-corner hud-corner--bl"></span><span class="hud-corner hud-corner--br"></span>
+          <div class="vote-alias-panel__head">
+            <div>
+              <span class="section-tag">TOP-SERVEURS // IDENTITÉS DE VOTE</span>
+              <h2 id="voteAliasesTitle">Mes pseudos de vote</h2>
+              <p>Ajoute ici tous les pseudos avec lesquels tu votes. Le terminal additionnera automatiquement leurs votes dans ton total mensuel.</p>
+            </div>
+            <div class="vote-alias-total">
+              <span>TOTAL CUMULÉ</span>
+              <strong id="voteAliasesTotal">—</strong>
+              <small id="voteAliasesMatchCount">SYNCHRONISATION…</small>
+            </div>
+          </div>
+
+          <form id="voteAliasForm" class="vote-alias-form" autocomplete="off">
+            <label for="voteAliasInput">Pseudo utilisé sur Top-Serveurs</label>
+            <div>
+              <input id="voteAliasInput" name="alias" type="text" minlength="2" maxlength="50" placeholder="Exemple : Peterdlcrt" required/>
+              <button id="voteAliasAddButton" class="terminal-button terminal-button--primary" type="submit">Ajouter le pseudo</button>
+            </div>
+            <small>Chaque pseudo ne peut être enregistré que sur un seul compte Senzany.</small>
+          </form>
+
+          <div class="vote-alias-list-head">
+            <span>PSEUDOS ENREGISTRÉS</span>
+            <em id="voteAliasesCounter">0 / 20</em>
+          </div>
+          <div id="voteAliasesList" class="vote-alias-list" aria-live="polite">
+            <p class="vote-alias-empty">Chargement des pseudos…</p>
+          </div>
+          <p id="voteAliasFeedback" class="vote-alias-feedback" hidden></p>
+        </section>
+
         <div class="section-heading">
           <div><span class="section-tag">MODULES DU TERMINAL</span><h2>Progression opérationnelle</h2></div>
           <p>Les systèmes ci-dessous seront activés progressivement, uniquement lorsqu’une source fiable sera disponible.</p>
@@ -205,7 +239,7 @@
 <div data-site-footer></div>
 <script defer src="assets/js/components.js"></script>
 <script defer src="assets/js/app.js"></script>
-<script defer src="assets/js/api.js?v=20260720-votes1"></script>
-<script defer src="assets/js/pages/profil-terminal-v5.js?v=5.1.0"></script>
+<script defer src="assets/js/api.js?v=20260802-vote-aliases1"></script>
+<script defer src="assets/js/pages/profil-terminal-v5.js?v=5.2.0"></script>
 </body>
 </html>
