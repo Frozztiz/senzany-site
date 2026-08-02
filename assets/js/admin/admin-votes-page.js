@@ -4,6 +4,23 @@ let payload = null;
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
 const number = (value) => Number(value || 0);
 
+function setSyncState(state, label) {
+  const container = document.querySelector(".votes-admin-sync");
+  if (container) {
+    container.dataset.state = state;
+  }
+  byId("votesSyncState").textContent = label;
+}
+
+function setRefreshLoading(loading) {
+  const button = byId("votesRefresh");
+  if (!button) return;
+  button.disabled = loading;
+  button.classList.toggle("is-loading", loading);
+  const label = button.querySelector("span");
+  if (label) label.textContent = loading ? "Synchronisation…" : "Actualiser";
+}
+
 function setView(name) {
   byId("votesAccessLoading").hidden = name !== "loading";
   byId("votesAccessDenied").hidden = name !== "denied";
@@ -54,9 +71,11 @@ function renderLinkedCard(row) {
   const aliases = row.aliases || [];
   const matched = new Set((row.matchedNames || []).map((name) => name.toLocaleLowerCase("fr-FR")));
   const aliasRows = aliases.map((alias) => `<li><span>${escapeHtml(alias)}</span><em>${matched.has(String(alias).toLocaleLowerCase("fr-FR")) ? "RETROUVÉ" : "NON RETROUVÉ"}</em></li>`).join("");
+  const hasSteam = Boolean(row.steamId);
+  const hasDiscord = Boolean(row.playerName && row.playerName !== row.steamId);
   return `<article class="votes-member-card">
     <div class="votes-member-card__rank">#${number(row.position)}</div>
-    <div class="votes-member-card__head"><div><strong>${escapeHtml(row.playerName)}</strong><small>SteamID ${escapeHtml(row.steamId || "—")}</small></div><b>${number(row.votes)} <span>votes</span></b></div>
+    <div class="votes-member-card__head"><div><strong>${escapeHtml(row.playerName)}</strong><small>SteamID ${escapeHtml(row.steamId || "—")}</small><div class="votes-member-card__links"><span class="${hasSteam ? "is-online" : "is-offline"}"><i>S</i>Steam</span><span class="${hasDiscord ? "is-online" : "is-offline"}"><i>D</i>Discord</span></div></div><b>${number(row.votes)} <span>votes</span></b></div>
     <div class="votes-member-card__body"><span>PSEUDOS DÉCLARÉS</span><ul>${aliasRows || "<li><span>Aucun pseudo</span></li>"}</ul></div>
     <div class="votes-member-card__footer"><span>${aliases.length} pseudo${aliases.length > 1 ? "s" : ""}</span><span>${(row.matchedNames || []).length} retrouvé${(row.matchedNames || []).length > 1 ? "s" : ""}</span></div>
   </article>`;
@@ -89,25 +108,31 @@ function exportCsv() {
 async function loadVotes() {
   byId("votesFeedback").hidden = false;
   byId("votesFeedback").textContent = "Synchronisation avec Top-Serveurs…";
-  byId("votesSyncState").textContent = "SYNCHRONISATION";
-  const response = await fetch("/api/commandement/votes", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
-  payload = data;
-  byId("votesTotal").textContent = number(data.totals?.votes);
-  byId("votesLinked").textContent = number(data.totals?.identifiedPlayers);
-  byId("votesUnknown").textContent = number(data.totals?.unidentifiedNames);
-  byId("votesRate").textContent = `${associationRate()} %`;
-  byId("votesUpdated").textContent = data.updatedAt ? new Date(data.updatedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "—";
-  byId("votesSyncState").textContent = "SYNCHRONISÉ";
-  byId("votesFeedback").hidden = true;
-  render();
+  setSyncState("loading", "SYNCHRONISATION");
+  setRefreshLoading(true);
+  try {
+    const response = await fetch("/api/commandement/votes", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
+    payload = data;
+    byId("votesTotal").textContent = number(data.totals?.votes);
+    byId("votesLinked").textContent = number(data.totals?.identifiedPlayers);
+    byId("votesUnknown").textContent = number(data.totals?.unidentifiedNames);
+    byId("votesRate").textContent = `${associationRate()} %`;
+    byId("votesUpdated").textContent = data.updatedAt ? new Date(data.updatedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "—";
+    setSyncState("success", "SYNCHRONISÉ");
+    byId("votesFeedback").hidden = true;
+    render();
+  } finally {
+    setRefreshLoading(false);
+  }
 }
 
 function showLoadError(error) {
   byId("votesFeedback").hidden = false;
   byId("votesFeedback").textContent = error.message || "Classement indisponible.";
-  byId("votesSyncState").textContent = "INDISPONIBLE";
+  setSyncState("error", "INDISPONIBLE");
+  setRefreshLoading(false);
 }
 
 byId("votesRetry")?.addEventListener("click", checkAccess);

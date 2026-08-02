@@ -7,7 +7,7 @@
   <title>Commandement — Gestion des votes — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
   <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-votes.css?v=2.1.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-votes.css?v=2.2.0" />
 </head>
 <body data-page="admin-votes" data-build="commandement-votes-v4">
   <div data-site-header></div>
@@ -34,7 +34,7 @@
 
       <header class="votes-admin-header">
         <div><span>CLASSEMENT MENSUEL</span><h1>Centre de gestion des votes</h1><p>Regroupement automatique des pseudos, suivi des membres identifiés et préparation des récompenses.</p></div>
-        <div class="votes-admin-header__actions"><button id="votesRefresh" class="admin-button" type="button">Actualiser</button><button id="votesExport" class="admin-button admin-button--primary" type="button">Exporter CSV</button></div>
+        <div class="votes-admin-header__actions"><button id="votesRefresh" class="admin-button votes-refresh-button" type="button"><i aria-hidden="true"></i><span>Actualiser</span></button><button id="votesExport" class="admin-button admin-button--primary" type="button">Exporter CSV</button></div>
       </header>
 
       <section class="votes-admin-stats">
@@ -69,6 +69,6 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin-votes-page.js?v=2.0.0"></script>
+  <script type="module" src="assets/js/admin/admin-votes-page.js?v=2.1.0"></script>
 </body>
 </html>
