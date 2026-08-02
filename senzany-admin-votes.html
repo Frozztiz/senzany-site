@@ -7,9 +7,9 @@
   <title>Commandement — Gestion des votes — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
   <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-votes.css?v=2.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-votes.css?v=2.1.0" />
 </head>
-<body data-page="admin-votes" data-build="commandement-votes-v3">
+<body data-page="admin-votes" data-build="commandement-votes-v4">
   <div data-site-header></div>
   <main class="votes-admin-main">
     <section id="votesAccessLoading" class="admin-gate votes-admin-gate">
@@ -25,27 +25,9 @@
       <div><span>ERREUR DU TERMINAL</span><h2>Impossible de charger le module</h2><p id="votesAccessErrorMessage">Une erreur est survenue.</p><button id="votesRetry" class="admin-button" type="button">Réessayer</button></div>
     </section>
 
-    <div id="votesDashboard" class="commandement-shell" hidden>
-      <aside class="commandement-sidebar" aria-label="Navigation du commandement">
-        <a class="commandement-sidebar__brand" href="senzany-admin.html">
-          <span>S</span>
-          <div><strong>SENZANY</strong><small>COMMANDEMENT</small></div>
-        </a>
-        <nav class="commandement-sidebar__nav">
-          <a href="senzany-admin.html"><span>⌂</span><div><strong>Tableau de bord</strong><small>Centre de commandement</small></div></a>
-          <a href="senzany-admin.html#players"><span>◎</span><div><strong>Joueurs</strong><small>Survivants connectés</small></div></a>
-          <a href="senzany-admin.html#deliveries"><span>▣</span><div><strong>Livraisons</strong><small>Récompenses joueurs</small></div></a>
-          <a class="is-active" href="senzany-admin-votes.html" aria-current="page"><span>✓</span><div><strong>Votes</strong><small>Top-Serveurs</small></div></a>
-          <span class="commandement-sidebar__separator">MODULES À VENIR</span>
-          <button type="button" disabled><span>›_</span><div><strong>RCON</strong><small>Console distante</small></div></button>
-          <button type="button" disabled><span>★</span><div><strong>Battle Pass</strong><small>Progression saisonnière</small></div></button>
-          <button type="button" disabled><span>≡</span><div><strong>Logs</strong><small>Historique sécurisé</small></div></button>
-        </nav>
-        <div class="commandement-sidebar__footer"><i></i><span>ACCÈS ALPHA ACTIF</span></div>
-      </aside>
-      <div class="votes-admin-wrap">
+    <div id="votesDashboard" class="votes-admin-wrap" hidden>
       <section class="votes-admin-topbar">
-        <a class="admin-button admin-button--small" href="senzany-admin.html">← Retour au centre</a>
+        <a class="admin-button admin-button--small" href="senzany-admin.html">← Retour au Commandement</a>
         <div><span>MODULE 04 // TOP-SERVEURS</span><strong>GESTION DES VOTES</strong></div>
         <div class="votes-admin-sync"><i></i><span id="votesSyncState">SYNCHRONISATION</span></div>
       </section>
@@ -82,7 +64,6 @@
           <div id="votesUnknownList" class="votes-admin-list votes-admin-list--unknown"></div>
         </div>
       </section>
-      </div>
     </div>
   </main>
   <div data-site-footer></div>
