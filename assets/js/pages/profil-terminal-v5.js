@@ -18,6 +18,7 @@
   function updateTerminalTime(){const now=new Intl.DateTimeFormat("fr-FR",{dateStyle:"short",timeStyle:"short"}).format(new Date());document.getElementById("terminalUpdatedAt").textContent="MISE À JOUR — "+now}
 
   let voteAliasesLimit=20;
+  let voteAliasDetails=new Map();
 
   function showVoteAliasFeedback(message,isError=false){
     const feedback=document.getElementById("voteAliasFeedback");
@@ -43,15 +44,27 @@
       return;
     }
     safeAliases.forEach(entry=>{
+      const detail=voteAliasDetails.get(String(entry.alias||"").toLowerCase())||null;
       const row=document.createElement("div");
       row.className="vote-alias-item";
+
       const identity=document.createElement("div");
       identity.className="vote-alias-item__identity";
       const name=document.createElement("strong");
       name.textContent=entry.alias;
       const meta=document.createElement("small");
-      meta.textContent="PSEUDO TOP-SERVEURS ENREGISTRÉ";
+      meta.textContent=detail?.found&&detail.matchedName&&detail.matchedName!==entry.alias?`RETROUVÉ COMME ${detail.matchedName}`:"PSEUDO TOP-SERVEURS ENREGISTRÉ";
       identity.append(name,meta);
+
+      const stats=document.createElement("div");
+      stats.className="vote-alias-item__stats";
+      const votes=document.createElement("strong");
+      votes.textContent=detail?Number(detail.votes||0).toLocaleString("fr-FR"):"—";
+      const status=document.createElement("span");
+      status.className=`vote-alias-status ${detail?.found?"vote-alias-status--found":"vote-alias-status--missing"}`;
+      status.textContent=detail?detail.found?"Trouvé":"Aucun vote":"Vérification…";
+      stats.append(votes,status);
+
       const remove=document.createElement("button");
       remove.className="vote-alias-remove";
       remove.type="button";
@@ -70,7 +83,7 @@
           remove.textContent="Supprimer";
         }
       });
-      row.append(identity,remove);
+      row.append(identity,stats,remove);
       list.appendChild(row);
     });
   }
@@ -83,6 +96,7 @@
     if(matchCount)matchCount.textContent="LECTURE TOP-SERVEURS…";
     try{
       const result=await window.SenzanyAPI.topServeurs.getMyVotes();
+      voteAliasDetails=new Map((Array.isArray(result.aliasDetails)?result.aliasDetails:[]).map(entry=>[String(entry.alias||"").toLowerCase(),entry]));
       const votes=Number(result.votes||0);
       value.textContent=votes.toLocaleString("fr-FR");
       if(total)total.textContent=votes.toLocaleString("fr-FR");
@@ -97,9 +111,11 @@
       text.textContent=result.found?"Total cumulé de tous tes pseudos de vote ce mois-ci.":"Aucun vote trouvé ce mois-ci avec tes pseudos enregistrés.";
       foot.innerHTML=result.found?`SOURCE // TOP-SERVEURS <b>${result.position?"MEILLEURE POSITION #"+result.position:"À JOUR"}</b>`:"SOURCE // TOP-SERVEURS <b>0 VOTE TROUVÉ</b>";
       if(matchCount){
-        const count=Array.isArray(result.matchedNames)?result.matchedNames.length:0;
-        matchCount.textContent=`${count} PSEUDO${count>1?"S":""} RETROUVÉ${count>1?"S":""}`;
+        const count=Array.isArray(result.aliasDetails)?result.aliasDetails.filter(entry=>entry.found).length:Array.isArray(result.matchedNames)?result.matchedNames.length:0;
+        const configured=Array.isArray(result.aliases)?result.aliases.length:0;
+        matchCount.textContent=`${count} / ${configured} PSEUDO${configured>1?"S":""} RETROUVÉ${configured>1?"S":""}`;
       }
+      if(Array.isArray(result.aliases))renderVoteAliases(result.aliases);
       return result;
     }catch(error){
       value.textContent="—";state.textContent="INDISPONIBLE";text.textContent="Impossible de récupérer les votes pour le moment.";foot.innerHTML="SOURCE // TOP-SERVEURS <b>ERREUR API</b>";

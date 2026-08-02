@@ -115,3 +115,12 @@ main,header,footer{position:relative;z-index:2}
 
 /* SENZANY — Le module Votes occupe toute la largeur. */
 .module-grid{grid-template-columns:1fr}
+
+/* Détails par pseudo de vote */
+.vote-alias-item{grid-template-columns:minmax(0,1fr) auto auto}
+.vote-alias-item__stats{display:grid;grid-template-columns:minmax(38px,auto) minmax(92px,auto);gap:10px;align-items:center;text-align:right}
+.vote-alias-item__stats>strong{font:28px/1 'Anton';color:var(--paper)}
+.vote-alias-status{display:inline-flex;align-items:center;justify-content:center;min-height:25px;padding:0 9px;border:1px solid;font:600 8px 'IBM Plex Mono';letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.vote-alias-status--found{border-color:rgba(95,196,118,.42);background:rgba(95,196,118,.08);color:#8bdd9c}
+.vote-alias-status--missing{border-color:rgba(209,43,49,.42);background:rgba(209,43,49,.08);color:#ec9699}
+@media(max-width:680px){.vote-alias-item{grid-template-columns:1fr auto}.vote-alias-item__stats{grid-column:1/2;justify-content:start;text-align:left}.vote-alias-remove{grid-column:2;grid-row:1/3}}

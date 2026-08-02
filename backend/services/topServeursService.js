@@ -143,25 +143,51 @@ async function getDiscordNames(discordId, storedUsername) {
 async function getPlayerVotes({ aliases = [] }) {
   const ranking = await getPlayersRanking();
   const checkedNames = [...new Set(aliases.map((name) => String(name || "").trim()).filter(Boolean))];
-  const normalizedCandidates = new Set(checkedNames.map(normalizePlayerName).filter(Boolean));
 
-  const matches = ranking.filter((entry) =>
-    normalizedCandidates.has(normalizePlayerName(entry.playerName))
-  );
+  const rankingByNormalizedName = new Map();
+  ranking.forEach((entry) => {
+    const normalizedName = normalizePlayerName(entry.playerName);
+    if (!normalizedName) return;
 
-  const votes = matches.reduce((total, entry) => total + Number(entry.votes || 0), 0);
-  const bestPosition = matches.reduce((best, entry) => {
-    const position = Number(entry.position);
-    if (!Number.isFinite(position)) return best;
-    return best === null || position < best ? position : best;
+    const existing = rankingByNormalizedName.get(normalizedName);
+    if (!existing) {
+      rankingByNormalizedName.set(normalizedName, { ...entry });
+      return;
+    }
+
+    existing.votes += Number(entry.votes || 0);
+    const currentPosition = Number(existing.position);
+    const newPosition = Number(entry.position);
+    if (Number.isFinite(newPosition) && (!Number.isFinite(currentPosition) || newPosition < currentPosition)) {
+      existing.position = newPosition;
+    }
+  });
+
+  const aliasDetails = checkedNames.map((alias) => {
+    const match = rankingByNormalizedName.get(normalizePlayerName(alias));
+    return {
+      alias,
+      found: Boolean(match),
+      matchedName: match?.playerName || null,
+      votes: Number(match?.votes || 0),
+      position: Number.isFinite(Number(match?.position)) ? Number(match.position) : null,
+    };
+  });
+
+  const matchedAliases = aliasDetails.filter((entry) => entry.found);
+  const votes = matchedAliases.reduce((total, entry) => total + entry.votes, 0);
+  const bestPosition = matchedAliases.reduce((best, entry) => {
+    if (!Number.isFinite(entry.position)) return best;
+    return best === null || entry.position < best ? entry.position : best;
   }, null);
 
   return {
-    found: matches.length > 0,
+    found: matchedAliases.length > 0,
     votes,
     position: bestPosition,
-    matchedNames: matches.map((entry) => entry.playerName),
+    matchedNames: matchedAliases.map((entry) => entry.matchedName),
     checkedNames,
+    aliasDetails,
   };
 }
 
