@@ -59,14 +59,26 @@ function filteredData() {
   const query = searchValue();
   let linked = [...(payload?.identified || [])];
   let unknown = [...(payload?.unidentified || [])];
+  let ranking = [...(payload?.ranking || [])];
   if (query) {
     linked = linked.filter((row) => [row.playerName, row.steamId, ...(row.aliases || []), ...(row.matchedNames || [])].join(" ").toLocaleLowerCase("fr-FR").includes(query));
     unknown = unknown.filter((row) => String(row.playerName || "").toLocaleLowerCase("fr-FR").includes(query));
+    ranking = ranking.filter((row) => [row.playerName, row.memberName, row.steamId].join(" ").toLocaleLowerCase("fr-FR").includes(query));
   }
-  if (byId("votesOnlyLinked").checked) unknown = [];
-  if (byId("votesOnlyUnknown").checked) linked = [];
-  if (byId("votesTop10").checked) { linked = linked.slice(0, 10); unknown = unknown.slice(0, 10); }
-  return { linked, unknown };
+  if (byId("votesOnlyLinked").checked) {
+    unknown = [];
+    ranking = ranking.filter((row) => row.identified);
+  }
+  if (byId("votesOnlyUnknown").checked) {
+    linked = [];
+    ranking = ranking.filter((row) => !row.identified);
+  }
+  if (byId("votesTop10").checked) {
+    linked = linked.slice(0, 10);
+    unknown = unknown.slice(0, 10);
+    ranking = ranking.slice(0, 10);
+  }
+  return { linked, unknown, ranking };
 }
 
 function renderLinkedCard(row) {
@@ -85,6 +97,17 @@ function renderLinkedCard(row) {
 
 function renderUnknownCard(row) {
   return `<article class="votes-unknown-card"><b>#${number(row.position)}</b><div><strong>${escapeHtml(row.playerName)}</strong><small>Non rattaché à un profil Senzany</small></div><em>${number(row.votes)} <span>votes</span></em><button class="votes-associate-button" type="button" data-associate-alias="${escapeHtml(row.playerName)}" data-associate-votes="${number(row.votes)}">Associer</button></article>`;
+}
+
+function renderRankingCard(row) {
+  const linkedLabel = row.memberName ? `Relié à ${escapeHtml(row.memberName)}` : "Non identifié";
+  const stateClass = row.identified ? "is-identified" : "is-unidentified";
+  return `<article class="votes-ranking-card ${stateClass}">
+    <b>#${number(row.position)}</b>
+    <div><strong>${escapeHtml(row.playerName)}</strong><small>${linkedLabel}</small></div>
+    <em>${number(row.votes)} <span>votes</span></em>
+    <i>${row.identified ? "IDENTIFIÉ" : "À ASSOCIER"}</i>
+  </article>`;
 }
 
 function availableMembers() {
@@ -154,11 +177,13 @@ async function associateAlias(steamId) {
 
 function render() {
   if (!payload) return;
-  const { linked, unknown } = filteredData();
+  const { linked, unknown, ranking } = filteredData();
   byId("votesLinkedCount").textContent = linked.length;
   byId("votesUnknownCount").textContent = unknown.length;
+  byId("votesRankingCount").textContent = ranking.length;
   byId("votesLinkedList").innerHTML = linked.length ? linked.map(renderLinkedCard).join("") : '<div class="admin-list-message">Aucun membre correspondant.</div>';
   byId("votesUnknownList").innerHTML = unknown.length ? unknown.map(renderUnknownCard).join("") : '<div class="admin-list-message">Aucun pseudo correspondant.</div>';
+  byId("votesRankingList").innerHTML = ranking.length ? ranking.map(renderRankingCard).join("") : '<div class="admin-list-message">Aucun votant correspondant.</div>';
 }
 
 function csvCell(value) { return `"${String(value ?? "").replace(/"/g, '""')}"`; }

@@ -310,9 +310,25 @@ router.get("/votes", commandAuth, async (req, res) => {
       .sort((a, b) => b.votes - a.votes)
       .map((group, index) => ({ ...group, position: index + 1 }));
 
+    const fullRanking = ranking
+      .map((entry, index) => {
+        const alias = aliasesByNormalized.get(voteAliasService.normalizeAlias(entry.playerName));
+        const group = alias ? groups.get(alias.steamId) : null;
+        return {
+          playerName: entry.playerName,
+          votes: Number(entry.votes || 0),
+          position: Number(entry.position || index + 1),
+          identified: Boolean(alias),
+          steamId: alias?.steamId || null,
+          memberName: group?.playerName || null
+        };
+      })
+      .sort((a, b) => a.position - b.position || b.votes - a.votes);
+
     return res.json({
       identified,
       unidentified: unidentified.sort((a, b) => b.votes - a.votes),
+      ranking: fullRanking,
       totals: {
         votes: ranking.reduce((sum, entry) => sum + Number(entry.votes || 0), 0),
         voteNames: ranking.length,
