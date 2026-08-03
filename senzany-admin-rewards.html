@@ -55,8 +55,35 @@
           <button id="refreshMonthlyRewards" class="admin-button admin-button--small" type="button">Actualiser</button>
         </div>
         <div id="monthlyRewardFeedback" class="admin-feedback" hidden></div>
-        <div id="monthlyRewardPreview" class="monthly-reward-preview">
-          <div class="admin-list-message">Aucun classement mensuel préparé.</div>
+
+        <div class="monthly-view-tabs" role="tablist" aria-label="Classements mensuels">
+          <button id="monthlyCurrentTab" class="monthly-view-tab is-active" type="button" role="tab" aria-selected="true">Classement actuel</button>
+          <button id="monthlyHistoryTab" class="monthly-view-tab" type="button" role="tab" aria-selected="false">Historique</button>
+        </div>
+
+        <div id="monthlyCurrentPanel" class="monthly-view-panel">
+          <div id="monthlyRewardPreview" class="monthly-reward-preview">
+            <div class="admin-list-message">Aucun classement mensuel préparé.</div>
+          </div>
+        </div>
+
+        <div id="monthlyHistoryPanel" class="monthly-view-panel monthly-history" hidden>
+          <div class="monthly-history__toolbar">
+            <label>
+              <span>MOIS ARCHIVÉ</span>
+              <select id="monthlyHistorySelect" aria-label="Choisir un ancien classement">
+                <option value="">Aucun classement archivé</option>
+              </select>
+            </label>
+            <div class="monthly-history__summary">
+              <strong id="monthlyHistoryStatus">—</strong>
+              <small id="monthlyHistorySummary">Sélectionne un mois pour afficher son classement.</small>
+            </div>
+            <button id="monthlyHistoryExport" class="admin-button admin-button--small" type="button" disabled>Exporter CSV</button>
+          </div>
+          <div id="monthlyHistoryPreview" class="monthly-reward-preview">
+            <div class="admin-list-message">Aucun ancien classement sélectionné.</div>
+          </div>
         </div>
       </section>
 

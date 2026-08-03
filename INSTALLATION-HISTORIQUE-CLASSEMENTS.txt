@@ -1,0 +1,20 @@
+SENZANY — Historique des classements mensuels
+
+Fichiers modifiés :
+- senzany-admin-rewards.html
+- assets/js/admin/admin-rewards-page.js
+- assets/css/pages/admin-rewards.css
+
+Installation :
+1. Copier les fichiers à la racine du projet en conservant les dossiers.
+2. Commit + Push avec GitHub Desktop.
+3. Recharger la page avec Ctrl + F5.
+
+Aucun SQL supplémentaire.
+Aucun redémarrage PM2 nécessaire.
+
+Fonctionnalités :
+- Onglets Classement actuel / Historique.
+- Sélection des anciens mois déjà enregistrés dans monthly_vote_runs.
+- Consultation du classement complet et des statuts de livraison.
+- Export CSV de l'ancien classement sélectionné.

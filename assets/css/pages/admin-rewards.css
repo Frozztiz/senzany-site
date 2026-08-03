@@ -149,3 +149,18 @@ body[data-page="admin-rewards"]{margin:0;min-height:100vh;background:radial-grad
 .rewards-items--table .admin-item-suggestion span{font-size:12px!important;color:#c7c0ba!important}
 .rewards-items--table .admin-item-suggestion small{font-size:10px!important;color:#8c8580!important}
 .rewards-items--table .admin-item-suggestion:hover,.rewards-items--table .admin-item-suggestion.is-active{background:rgba(190,42,34,.2)!important}
+
+/* Historique des classements mensuels */
+.monthly-view-tabs{display:flex;gap:8px;padding:14px 18px 0;border-top:1px solid rgba(255,255,255,.08)}
+.monthly-view-tab{border:1px solid #403733;background:#0d0b0a;color:#99908a;padding:10px 16px;font-weight:800;cursor:pointer}
+.monthly-view-tab:hover{color:#fff;border-color:#6e302b}
+.monthly-view-tab.is-active{color:#fff;border-color:#a3322b;background:linear-gradient(180deg,rgba(130,30,25,.28),rgba(22,14,12,.95));box-shadow:inset 3px 0 #ef3d35}
+.monthly-view-panel{padding-top:10px}
+.monthly-history__toolbar{display:grid;grid-template-columns:minmax(240px,340px) 1fr auto;gap:14px;align-items:end;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.monthly-history__toolbar label{display:flex;flex-direction:column;gap:7px}
+.monthly-history__toolbar label>span{color:#8e8580;font:800 9px monospace;letter-spacing:1.5px}
+.monthly-history__toolbar select{width:100%;border:1px solid #3b332f;background:#0b0a09;color:#eee;padding:12px 13px}
+.monthly-history__summary{display:flex;flex-direction:column;gap:5px;min-width:0}
+.monthly-history__summary strong{color:#58dc8b;font-size:18px}
+.monthly-history__summary small{color:#8c837d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:900px){.monthly-history__toolbar{grid-template-columns:1fr}.monthly-history__summary small{white-space:normal}.monthly-view-tabs{overflow:auto}}

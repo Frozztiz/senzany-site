@@ -25,17 +25,29 @@ const monthlyEls = {
   status: byId("monthlyRewardStatus"),
   schedule: byId("monthlyRewardSchedule"),
   players: byId("monthlyRewardPlayers"),
+  identifiedNote: byId("monthlyRewardIdentifiedNote"),
   deliveries: byId("monthlyRewardDeliveries"),
   deliveryNote: byId("monthlyRewardDeliveryNote"),
-  identifiedNote: byId("monthlyRewardIdentifiedNote"),
   prepare: byId("prepareMonthlyRanking"),
   approve: byId("approveMonthlyRewards"),
   refresh: byId("refreshMonthlyRewards"),
   feedback: byId("monthlyRewardFeedback"),
   preview: byId("monthlyRewardPreview"),
+  currentTab: byId("monthlyCurrentTab"),
+  historyTab: byId("monthlyHistoryTab"),
+  currentPanel: byId("monthlyCurrentPanel"),
+  historyPanel: byId("monthlyHistoryPanel"),
+  historySelect: byId("monthlyHistorySelect"),
+  historyStatus: byId("monthlyHistoryStatus"),
+  historySummary: byId("monthlyHistorySummary"),
+  historyPreview: byId("monthlyHistoryPreview"),
+  historyExport: byId("monthlyHistoryExport"),
 };
 let monthlyRun = null;
 let monthlyRankings = [];
+let monthlyRuns = [];
+let historyRun = null;
+let historyRankings = [];
 
 function showOnly(target) {
   [els.loading, els.denied, els.error, els.workspace].forEach((node) => { if (node) node.hidden = node !== target; });
@@ -392,7 +404,6 @@ function monthlyRowState(row) {
     ready: "PRÊT",
     no_reward: "AUCUN PACK",
     no_items: "PACK SANS OBJET",
-    unidentified: "COMPTE NON IDENTIFIÉ",
     delivery_created: "LIVRAISON CRÉÉE",
     failed: "ERREUR",
     pending: "EN ATTENTE",
@@ -409,10 +420,10 @@ function renderMonthlyPreview() {
   monthlyEls.preview.innerHTML = monthlyRankings.map((row) => {
     const rewardName = row.reward_name || "Aucun pack configuré";
     const aliases = Array.isArray(row.aliases) ? row.aliases.join(", ") : "";
-    const stateClass = ["no_reward", "no_items", "unidentified"].includes(row.status) ? "is-warning" : row.status === "failed" ? "is-error" : "";
+    const stateClass = ["no_reward", "no_items"].includes(row.status) ? "is-warning" : row.status === "failed" ? "is-error" : "";
     return `<article class="monthly-ranking-row">
       <strong>#${Number(row.position || 0)}</strong>
-      <div class="monthly-ranking-row__player"><b>${escapeHtml(row.player_name || row.steam_id || "Pseudo non identifié")}</b><small>${escapeHtml(aliases || row.steam_id || "Aucun compte Senzany rattaché")}</small></div>
+      <div class="monthly-ranking-row__player"><b>${escapeHtml(row.player_name || row.steam_id)}</b><small>${escapeHtml(aliases || row.steam_id)}</small></div>
       <div class="monthly-ranking-row__votes">${formatNumber(row.votes)} votes</div>
       <div class="monthly-ranking-row__reward">${escapeHtml(rewardName)}</div>
       <div class="monthly-ranking-row__state ${stateClass}">${escapeHtml(monthlyRowState(row))}</div>
@@ -420,14 +431,114 @@ function renderMonthlyPreview() {
   }).join("");
 }
 
+
+function formatPeriodLabel(period) {
+  const match = String(period || "").match(/^(\d{4})-(\d{2})$/);
+  if (!match) return period || "Mois inconnu";
+  return new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric", timeZone: "Europe/Paris" })
+    .format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1)));
+}
+
+function switchMonthlyView(view) {
+  const history = view === "history";
+  monthlyEls.currentPanel.hidden = history;
+  monthlyEls.historyPanel.hidden = !history;
+  monthlyEls.currentTab.classList.toggle("is-active", !history);
+  monthlyEls.historyTab.classList.toggle("is-active", history);
+  monthlyEls.currentTab.setAttribute("aria-selected", String(!history));
+  monthlyEls.historyTab.setAttribute("aria-selected", String(history));
+  if (history && monthlyEls.historySelect.value && !historyRun) loadHistoryRun(monthlyEls.historySelect.value);
+}
+
+function populateHistorySelect() {
+  if (!monthlyEls.historySelect) return;
+  const previousValue = monthlyEls.historySelect.value;
+  const archived = monthlyRuns.filter((run) => run?.id && ["ready", "processing", "completed", "failed"].includes(run.status));
+  monthlyEls.historySelect.innerHTML = archived.length
+    ? archived.map((run) => `<option value="${escapeHtml(run.id)}">${escapeHtml(formatPeriodLabel(run.period))} — ${escapeHtml(monthlyStatusLabel(run.status))}</option>`).join("")
+    : '<option value="">Aucun classement archivé</option>';
+  const validPrevious = archived.some((run) => run.id === previousValue);
+  monthlyEls.historySelect.value = validPrevious ? previousValue : (archived[0]?.id || "");
+  monthlyEls.historyExport.disabled = !monthlyEls.historySelect.value;
+}
+
+function renderHistoryPreview() {
+  if (!monthlyEls.historyPreview) return;
+  if (!historyRun || !historyRankings.length) {
+    monthlyEls.historyStatus.textContent = historyRun ? monthlyStatusLabel(historyRun.status) : "—";
+    monthlyEls.historySummary.textContent = historyRun ? "Ce classement ne contient aucun votant." : "Sélectionne un mois pour afficher son classement.";
+    monthlyEls.historyPreview.innerHTML = '<div class="admin-list-message">Aucun ancien classement à afficher.</div>';
+    monthlyEls.historyExport.disabled = true;
+    return;
+  }
+  const identified = historyRankings.filter((row) => Boolean(row.steam_id)).length;
+  const delivered = historyRankings.filter((row) => row.status === "delivery_created").length;
+  monthlyEls.historyStatus.textContent = `${formatPeriodLabel(historyRun.period)} · ${monthlyStatusLabel(historyRun.status)}`;
+  monthlyEls.historySummary.textContent = `${historyRankings.length} votant(s) · ${identified} compte(s) identifié(s) · ${delivered} livraison(s) créée(s)`;
+  monthlyEls.historyExport.disabled = false;
+  monthlyEls.historyPreview.innerHTML = historyRankings.map((row) => {
+    const aliases = Array.isArray(row.aliases) ? row.aliases.join(", ") : "";
+    const rewardName = row.reward_name || "Aucun pack configuré";
+    const stateClass = ["no_reward", "no_items", "unidentified"].includes(row.status) ? "is-warning" : row.status === "failed" ? "is-error" : "";
+    return `<article class="monthly-ranking-row">
+      <strong>#${Number(row.position || 0)}</strong>
+      <div class="monthly-ranking-row__player"><b>${escapeHtml(row.player_name || "Pseudo inconnu")}</b><small>${escapeHtml(aliases || row.steam_id || "Aucun compte Senzany rattaché")}</small></div>
+      <div class="monthly-ranking-row__votes">${formatNumber(row.votes)} votes</div>
+      <div class="monthly-ranking-row__reward">${escapeHtml(rewardName)}</div>
+      <div class="monthly-ranking-row__state ${stateClass}">${escapeHtml(monthlyRowState(row))}</div>
+    </article>`;
+  }).join("");
+}
+
+async function loadHistoryRun(runId) {
+  if (!runId) {
+    historyRun = null;
+    historyRankings = [];
+    renderHistoryPreview();
+    return;
+  }
+  monthlyEls.historyPreview.innerHTML = '<div class="admin-list-message">Chargement du classement…</div>';
+  try {
+    const detail = await api(`/api/admin/monthly-votes/${encodeURIComponent(runId)}`);
+    historyRun = detail.run || null;
+    historyRankings = Array.isArray(detail.rankings) ? detail.rankings : [];
+    renderHistoryPreview();
+  } catch (error) {
+    historyRun = null;
+    historyRankings = [];
+    monthlyEls.historyPreview.innerHTML = `<div class="admin-list-message admin-list-message--error">${escapeHtml(error.message)}</div>`;
+  }
+}
+
+function exportHistoryCsv() {
+  if (!historyRun || !historyRankings.length) return;
+  const quote = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`;
+  const rows = [["Rang", "Joueur", "Pseudos", "SteamID", "Votes", "Pack", "Statut", "Livraison"]];
+  historyRankings.forEach((row) => rows.push([
+    row.position,
+    row.player_name || "",
+    Array.isArray(row.aliases) ? row.aliases.join(", ") : "",
+    row.steam_id || "",
+    row.votes || 0,
+    row.reward_name || "",
+    monthlyRowState(row),
+    row.delivery_id || "",
+  ]));
+  const csv = "\ufeff" + rows.map((row) => row.map(quote).join(";")).join("\r\n");
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `classement-votes-${historyRun.period}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 function renderMonthlyState() {
   if (!monthlyEls.status) return;
   monthlyEls.status.textContent = monthlyStatusLabel(monthlyRun?.status);
   monthlyEls.players.textContent = formatNumber(monthlyRun?.ranking_count || monthlyRankings.length || 0);
   const identifiedCount = monthlyRankings.filter((row) => Boolean(row.steam_id)).length;
-  if (monthlyEls.identifiedNote) {
-    monthlyEls.identifiedNote.textContent = `${formatNumber(identifiedCount)} compte${identifiedCount > 1 ? "s" : ""} Senzany identifié${identifiedCount > 1 ? "s" : ""}`;
-  }
+  if (monthlyEls.identifiedNote) monthlyEls.identifiedNote.textContent = `${formatNumber(identifiedCount)} compte${identifiedCount > 1 ? "s" : ""} Senzany identifié${identifiedCount > 1 ? "s" : ""}`;
   monthlyEls.deliveries.textContent = formatNumber(monthlyRun?.delivery_count || 0);
   monthlyEls.deliveryNote.textContent = monthlyRun?.status === "completed"
     ? "Distribution terminée"
@@ -457,11 +568,13 @@ async function loadMonthlyStatus() {
   setFeedback(monthlyEls.feedback, "Chargement de l’automatisation mensuelle…", "loading");
   try {
     const data = await api("/api/admin/monthly-votes/status");
+    monthlyRuns = Array.isArray(data.runs) ? data.runs : [];
+    populateHistorySelect();
     monthlyEls.schedule.textContent = `${data.nextAutomaticSnapshot} — ${data.distributionMode}`;
     if (!monthlyEls.period.value) monthlyEls.period.value = data.currentPeriod;
     const selectedPeriod = monthlyEls.period.value;
-    const run = (Array.isArray(data.runs) ? data.runs : []).find((entry) => entry.period === selectedPeriod)
-      || (Array.isArray(data.runs) ? data.runs[0] : null);
+    const run = monthlyRuns.find((entry) => entry.period === selectedPeriod)
+      || monthlyRuns[0] || null;
     if (run?.period && run.period !== selectedPeriod) monthlyEls.period.value = run.period;
     setFeedback(monthlyEls.feedback);
     await loadMonthlyRun(run?.id);
@@ -480,7 +593,7 @@ async function prepareMonthlyRanking() {
   }
   if (!confirm(`Préparer ou recalculer le classement ${period} à partir des votes actuellement disponibles ?`)) return;
   setLoading(monthlyEls.prepare, true, "Calcul en cours…");
-  setFeedback(monthlyEls.feedback, "Synchronisation de tous les votants Top-Serveurs, puis rattachement des comptes Senzany…", "loading");
+  setFeedback(monthlyEls.feedback, "Synchronisation Top-Serveurs et regroupement par SteamID…", "loading");
   try {
     const data = await api("/api/admin/monthly-votes/prepare", {
       method: "POST",
@@ -499,7 +612,7 @@ async function prepareMonthlyRanking() {
 
 async function approveMonthlyRewards() {
   if (!monthlyRun?.id) return;
-  const readyCount = monthlyRankings.filter((row) => row.status === "ready" && row.steam_id).length;
+  const readyCount = monthlyRankings.filter((row) => row.status === "ready").length;
   if (!confirm(`Créer maintenant les livraisons pour ${readyCount} joueur(s) du classement ${monthlyRun.period} ? Cette action est protégée contre les doublons.`)) return;
   setLoading(monthlyEls.approve, true, "Création des livraisons…");
   setFeedback(monthlyEls.feedback, "Création des livraisons mensuelles en cours…", "loading");
@@ -585,5 +698,9 @@ monthlyEls.prepare?.addEventListener("click", prepareMonthlyRanking);
 monthlyEls.approve?.addEventListener("click", approveMonthlyRewards);
 monthlyEls.refresh?.addEventListener("click", loadMonthlyStatus);
 monthlyEls.period?.addEventListener("change", loadMonthlyStatus);
+monthlyEls.currentTab?.addEventListener("click", () => switchMonthlyView("current"));
+monthlyEls.historyTab?.addEventListener("click", () => { switchMonthlyView("history"); if (monthlyEls.historySelect.value) loadHistoryRun(monthlyEls.historySelect.value); });
+monthlyEls.historySelect?.addEventListener("change", () => loadHistoryRun(monthlyEls.historySelect.value));
+monthlyEls.historyExport?.addEventListener("click", exportHistoryCsv);
 
 checkAccess();
