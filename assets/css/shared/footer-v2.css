@@ -54,3 +54,11 @@
   [data-site-footer] .site-footer-v2__socials{display:grid;grid-template-columns:1fr}
   [data-site-footer] .site-footer-v2__socials a{justify-content:center}
 }
+
+/* Footer V2.1 — informations disponibles avant l’ouverture officielle */
+[data-site-footer] .site-footer-v2__server-column{gap:10px}
+[data-site-footer] .site-footer-v2__server-address{color:#f1eae4;font:800 13px 'IBM Plex Mono',monospace;letter-spacing:.04em}
+[data-site-footer] .site-footer-v2__server-connect{display:inline-flex!important;align-items:center;min-height:34px;margin-top:2px;padding:8px 11px;border:1px solid #392b28;background:#100d0c;color:#c9beb6!important;font:700 9px 'IBM Plex Mono',monospace!important;letter-spacing:.06em;text-transform:uppercase;transition:border-color .2s ease,color .2s ease,transform .2s ease}
+[data-site-footer] .site-footer-v2__server-connect:hover{border-color:#9e302a;color:#fff!important;transform:translateY(-1px)!important}
+[data-site-footer] .site-footer-v2__portal-info{display:flex;flex-direction:column;gap:4px;margin-top:8px;color:#dbd2ca;font:700 11px 'IBM Plex Mono',monospace;letter-spacing:.04em}
+[data-site-footer] .site-footer-v2__portal-info small{color:#736b65;font-size:8px;letter-spacing:.16em;text-transform:uppercase}

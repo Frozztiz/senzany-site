@@ -31,7 +31,7 @@
   if (!document.querySelector('link[data-senzany-shared-footer="v2"]')) {
     const footerLink = document.createElement('link');
     footerLink.rel = 'stylesheet';
-    footerLink.href = `${sharedFooterStylesheet}?v=2.0.0`;
+    footerLink.href = `${sharedFooterStylesheet}?v=2.1.0`;
     footerLink.dataset.senzanySharedFooter = 'v2';
     document.head.appendChild(footerLink);
   }
@@ -106,7 +106,7 @@
             <div class="site-footer-v2__socials" aria-label="Liens externes Senzany">
               <a href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Discord officiel</a>
               <a href="https://top-serveurs.net/dayz/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" rel="noopener" target="_blank">Top-Serveurs</a>
-              <a href="steam://connect/208.115.196.109:2302">Connexion Steam</a>
+              <a href="steam://connect/208.115.196.109:2302">Se connecter</a>
             </div>
           </section>
 
@@ -124,18 +124,17 @@
 
             <div class="site-footer-v2__column">
               <h4>Informations</h4>
-              <a href="senzany-wiki.html">Règlement du serveur</a>
+              <span class="site-footer-v2__pending">Règlement du serveur <small>à venir</small></span>
               <span class="site-footer-v2__pending">Conditions d’utilisation <small>à venir</small></span>
               <span class="site-footer-v2__pending">Politique de confidentialité <small>à venir</small></span>
               <span class="site-footer-v2__pending">Mentions légales <small>à venir</small></span>
             </div>
 
-            <div class="site-footer-v2__column">
-              <h4>Assistance</h4>
-              <a href="senzany-support.html">Ouvrir un ticket</a>
-              <a href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Rejoindre Discord</a>
-              <a href="mailto:support@senzany.com">support@senzany.com</a>
-              <span class="site-footer-v2__server"><small>Serveur DayZ</small>208.115.196.109:2302</span>
+            <div class="site-footer-v2__column site-footer-v2__server-column">
+              <h4>Serveur DayZ</h4>
+              <span class="site-footer-v2__server-address">208.115.196.109:2302</span>
+              <a class="site-footer-v2__server-connect" href="steam://connect/208.115.196.109:2302">Se connecter au serveur</a>
+              <span class="site-footer-v2__portal-info"><small>Portail</small>Version 1.0</span>
             </div>
           </nav>
         </div>
