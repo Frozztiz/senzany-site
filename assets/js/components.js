@@ -17,14 +17,23 @@
     document.head.appendChild(ambientScript);
   }
 
-  // Feuille de style commune : uniformise le header, le menu et le footer sur toutes les pages.
+  // Feuilles de style communes : navigation et footer partagés sur toutes les pages.
   const sharedNavStylesheet = 'assets/css/shared/navigation-unified-v1.css';
+  const sharedFooterStylesheet = 'assets/css/shared/footer-v2.css';
   if (!document.querySelector(`link[data-senzany-shared-nav="v1"]`)) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = `${sharedNavStylesheet}?v=1.0.0`;
     link.dataset.senzanySharedNav = 'v1';
     document.head.appendChild(link);
+  }
+
+  if (!document.querySelector('link[data-senzany-shared-footer="v2"]')) {
+    const footerLink = document.createElement('link');
+    footerLink.rel = 'stylesheet';
+    footerLink.href = `${sharedFooterStylesheet}?v=2.0.0`;
+    footerLink.dataset.senzanySharedFooter = 'v2';
+    document.head.appendChild(footerLink);
   }
 
   const NAV = [
@@ -85,23 +94,60 @@
 
   const footer = document.querySelector('[data-site-footer]');
   if (footer) footer.innerHTML = `
-    <footer>
-      <div class="wrap">
-        <div class="footer-grid">
-          <div class="footer-brand">
-            <a class="brand" href="index.html">
+    <footer class="site-footer-v2">
+      <div class="wrap site-footer-v2__inner">
+        <div class="site-footer-v2__main">
+          <section class="site-footer-v2__brand" aria-label="Présentation Senzany">
+            <a class="brand site-footer-v2__logo-link" href="index.html" aria-label="Accueil Senzany">
               <img alt="Logo Senzany" class="badge footer-logo" src="assets/images/branding/logo.png">
               <span class="brand-name footer-brand-name">SENZANY</span>
             </a>
-            <p>Serveur PVE DayZ sur Chernarus. Communauté 100% française.</p>
-          </div>
-          <div class="footer-links">
-            <div class="footer-col"><h4>Liens utiles</h4><a href="index.html">Accueil</a><a href="senzany-communaute.html">Communauté</a><a href="senzany-staff.html">Staff</a><a href="senzany-wiki.html">Wiki</a><a href="senzany-evenements.html">Événements</a><a href="senzany-boutique.html">Boutique</a></div>
-            <div class="footer-col"><h4>Informations</h4><a href="#">Règlement</a><a href="#">Conditions d'utilisation</a><a href="#">Politique de confidentialité</a></div>
-            <div class="footer-col"><h4>Nous contacter</h4><a href="mailto:support@senzany.com">support@senzany.com</a><a href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Discord</a></div>
-          </div>
+            <p>Senzany est un serveur DayZ PVE immersif sur Chernarus, avec une progression évolutive, des événements réguliers et une communauté francophone active.</p>
+            <div class="site-footer-v2__socials" aria-label="Liens externes Senzany">
+              <a href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Discord officiel</a>
+              <a href="https://top-serveurs.net/dayz/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" rel="noopener" target="_blank">Top-Serveurs</a>
+              <a href="steam://connect/208.115.196.109:2302">Connexion Steam</a>
+            </div>
+          </section>
+
+          <nav class="site-footer-v2__links" aria-label="Navigation de pied de page">
+            <div class="site-footer-v2__column">
+              <h4>Navigation</h4>
+              <a href="index.html">Accueil</a>
+              <a href="senzany-jouer.html">Comment jouer</a>
+              <a href="senzany-communaute.html">Communauté</a>
+              <a href="senzany-evenements.html">Événements</a>
+              <a href="senzany-wiki.html">Wiki</a>
+              <a href="senzany-boutique.html">Boutique</a>
+              <a href="senzany-profil.html">Mon profil</a>
+            </div>
+
+            <div class="site-footer-v2__column">
+              <h4>Informations</h4>
+              <a href="senzany-wiki.html">Règlement du serveur</a>
+              <span class="site-footer-v2__pending">Conditions d’utilisation <small>à venir</small></span>
+              <span class="site-footer-v2__pending">Politique de confidentialité <small>à venir</small></span>
+              <span class="site-footer-v2__pending">Mentions légales <small>à venir</small></span>
+            </div>
+
+            <div class="site-footer-v2__column">
+              <h4>Assistance</h4>
+              <a href="senzany-support.html">Ouvrir un ticket</a>
+              <a href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Rejoindre Discord</a>
+              <a href="mailto:support@senzany.com">support@senzany.com</a>
+              <span class="site-footer-v2__server"><small>Serveur DayZ</small>208.115.196.109:2302</span>
+            </div>
+          </nav>
         </div>
-        <div class="footer-bottom"><span>© 2026 Senzany. Serveur communautaire non affilié à Bohemia Interactive.</span><span>IP : 208.115.196.109:2302</span></div>
+
+        <div class="site-footer-v2__bottom">
+          <div>
+            <strong>© 2026 Senzany.</strong>
+            <span>Tous droits réservés.</span>
+          </div>
+          <div class="site-footer-v2__legal-note">DayZ et ses éléments associés appartiennent à Bohemia Interactive. Senzany est un serveur communautaire indépendant et non affilié.</div>
+          <div class="site-footer-v2__version">Portail Senzany <strong>v1.0</strong></div>
+        </div>
       </div>
     </footer>`;
 
