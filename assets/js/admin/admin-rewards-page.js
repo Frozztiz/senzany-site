@@ -6,12 +6,14 @@ let saving = false;
 
 const els = {
   loading: byId("rewardsAccessLoading"), denied: byId("rewardsAccessDenied"), error: byId("rewardsAccessError"), workspace: byId("rewardsWorkspace"),
-  form: byId("rewardForm"), id: byId("rewardId"), type: byId("rewardType"), name: byId("rewardName"), rankMin: byId("rewardRankMin"), rankMax: byId("rewardRankMax"),
+  form: byId("rewardForm"), id: byId("rewardId"), type: byId("rewardType"), name: byId("rewardName"),
+  rankingFields: byId("rewardRankingFields"), thresholdFields: byId("rewardThresholdFields"),
+  rankMin: byId("rewardRankMin"), rankMax: byId("rewardRankMax"), thresholdValue: byId("rewardThresholdValue"),
   roubles: byId("rewardRoubles"), xp: byId("rewardBattlePassXp"), description: byId("rewardDescription"), active: byId("rewardActive"), priority: byId("rewardPriority"),
   items: byId("rewardItemsList"), addItem: byId("addRewardItem"), save: byId("saveRewardRule"), cancel: byId("cancelRewardEdit"), formFeedback: byId("rewardFormFeedback"),
   list: byId("rewardsList"), feedback: byId("rewardsFeedback"), search: byId("rewardsSearch"), filter: byId("rewardsTypeFilter"), refresh: byId("refreshRewards"),
-  votesCount: byId("rewardsVotes"), battlePassCount: byId("rewardsBattlePass"), eventsCount: byId("rewardsEvents"), compensationsCount: byId("rewardsCompensations"),
-  previewName: byId("rewardPreviewName"), previewType: byId("rewardPreviewType"), previewRank: byId("rewardPreviewRank"),
+  rankingsCount: byId("rewardsRankings"), thresholdsCount: byId("rewardsThresholds"), battlePassCount: byId("rewardsBattlePass"), eventsCount: byId("rewardsEvents"),
+  previewName: byId("rewardPreviewName"), previewType: byId("rewardPreviewType"), previewApplication: byId("rewardPreviewApplication"),
   previewRoubles: byId("rewardPreviewRoubles"), previewXp: byId("rewardPreviewXp"), previewItems: byId("rewardPreviewItems"),
 };
 
@@ -31,12 +33,28 @@ async function api(url, options = {}) {
 }
 
 function typeLabel(type) {
-  return ({ votes: "Votes", event: "Événement", fidelity: "Fidélité", battle_pass: "Battle Pass", compensation: "Compensation" })[type] || type;
+  return ({
+    votes_ranking: "Classement mensuel",
+    votes_threshold: "Palier de votes",
+    event: "Événement",
+    fidelity: "Fidélité",
+    battle_pass: "Battle Pass",
+    compensation: "Compensation",
+  })[type] || type;
 }
-function rankLabel(rule) {
-  const min = Number(rule.rank_min); const max = Number(rule.rank_max);
-  return min === max ? `Top ${min}` : `Top ${min} à ${max}`;
+
+function isRankingType(type) { return type === "votes_ranking"; }
+function isThresholdType(type) { return type === "votes_threshold"; }
+
+function applicationLabel(rule) {
+  if (isThresholdType(rule.reward_type)) return `Palier ${formatNumber(rule.threshold_value)} votes`;
+  if (isRankingType(rule.reward_type)) {
+    const min = Number(rule.rank_min); const max = Number(rule.rank_max);
+    return min === max ? `Top ${min}` : `Top ${min} à ${max}`;
+  }
+  return "Application manuelle";
 }
+
 function formatNumber(value) { return Number(value || 0).toLocaleString("fr-FR"); }
 function normalizeItems(items) {
   if (!Array.isArray(items)) return [];
@@ -54,6 +72,16 @@ function setLoading(button, isLoading, label) {
   else { button.disabled = false; button.textContent = button.dataset.originalText || button.textContent; delete button.dataset.originalText; }
 }
 
+function updateApplicationFields() {
+  const ranking = isRankingType(els.type.value);
+  const threshold = isThresholdType(els.type.value);
+  els.rankingFields.hidden = !ranking;
+  els.thresholdFields.hidden = !threshold;
+  els.rankMin.required = ranking;
+  els.rankMax.required = ranking;
+  els.thresholdValue.required = threshold;
+}
+
 function filteredRules() {
   const query = String(els.search.value || "").trim().toLowerCase();
   const type = els.filter.value;
@@ -61,7 +89,7 @@ function filteredRules() {
     if (type && rule.reward_type !== type) return false;
     if (!query) return true;
     const itemText = normalizeItems(rule.items).map((item) => item.className).join(" ");
-    return [rule.name, rule.description, typeLabel(rule.reward_type), rankLabel(rule), itemText].join(" ").toLowerCase().includes(query);
+    return [rule.name, rule.description, typeLabel(rule.reward_type), applicationLabel(rule), itemText].join(" ").toLowerCase().includes(query);
   });
 }
 
@@ -73,7 +101,7 @@ function renderRule(rule) {
   article.tabIndex = 0;
   article.innerHTML = `
     <div class="reward-rule__top">
-      <div><span>${escapeHtml(typeLabel(rule.reward_type))}</span><h3>${escapeHtml(rule.name)}</h3><small>${escapeHtml(rankLabel(rule))}</small></div>
+      <div><span>${escapeHtml(typeLabel(rule.reward_type))}</span><h3>${escapeHtml(rule.name)}</h3><small>${escapeHtml(applicationLabel(rule))}</small></div>
       <em>${rule.is_active ? "ACTIF" : "DÉSACTIVÉ"}</em>
     </div>
     ${rule.description ? `<p class="reward-rule__message">${escapeHtml(rule.description)}</p>` : ""}
@@ -95,25 +123,29 @@ function renderRule(rule) {
 function render() {
   const filtered = filteredRules();
   const packLabel = (count) => `${count} pack${count > 1 ? "s" : ""}`;
-  els.votesCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "votes").length);
+  els.rankingsCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "votes_ranking").length);
+  els.thresholdsCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "votes_threshold").length);
   els.battlePassCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "battle_pass").length);
   els.eventsCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "event").length);
-  els.compensationsCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "compensation").length);
   els.list.innerHTML = "";
   if (!filtered.length) {
-    els.list.innerHTML = '<div class="admin-list-message">Aucune récompense ne correspond aux filtres.</div>';
+    els.list.innerHTML = '<div class="admin-list-message">Aucun pack ne correspond aux filtres.</div>';
     return;
   }
   filtered.forEach((rule) => els.list.appendChild(renderRule(rule)));
 }
 
 function updatePreview() {
-  const rankMin = Math.max(1, Number(els.rankMin.value || 1));
-  const rankMax = Math.max(rankMin, Number(els.rankMax.value || rankMin));
   const items = getItemsFromContainer(els.items).map((item) => ({ className: item.className || item.name || "", quantity: Number(item.quantity || 1) })).filter((item) => item.className);
+  const previewRule = {
+    reward_type: els.type.value,
+    rank_min: Math.max(1, Number(els.rankMin.value || 1)),
+    rank_max: Math.max(1, Number(els.rankMax.value || els.rankMin.value || 1)),
+    threshold_value: Math.max(1, Number(els.thresholdValue.value || 1)),
+  };
   els.previewName.textContent = els.name.value.trim() || "Pack sans nom";
   els.previewType.textContent = typeLabel(els.type.value);
-  els.previewRank.textContent = rankMin === rankMax ? `Top ${rankMin}` : `Top ${rankMin} à ${rankMax}`;
+  els.previewApplication.textContent = applicationLabel(previewRule);
   els.previewRoubles.textContent = `${formatNumber(els.roubles.value)} ₽`;
   els.previewXp.textContent = formatNumber(els.xp.value);
   els.previewItems.innerHTML = items.length
@@ -123,10 +155,11 @@ function updatePreview() {
 
 function resetForm(rule = null) {
   els.id.value = rule?.id || "";
-  els.type.value = rule?.reward_type || "votes";
+  els.type.value = rule?.reward_type || "votes_ranking";
   els.name.value = rule?.name || "";
   els.rankMin.value = rule?.rank_min || 1;
   els.rankMax.value = rule?.rank_max || 1;
+  els.thresholdValue.value = rule?.threshold_value || 200;
   els.roubles.value = rule?.roubles || 0;
   els.xp.value = rule?.battle_pass_xp || 0;
   els.description.value = rule?.description || "";
@@ -140,12 +173,13 @@ function resetForm(rule = null) {
   els.save.textContent = rule ? "ENREGISTRER LES MODIFICATIONS" : "ENREGISTRER LE PACK";
   els.cancel.hidden = !rule;
   setFeedback(els.formFeedback);
+  updateApplicationFields();
   updatePreview();
 }
 
 async function loadRules() {
   setLoading(els.refresh, true, "Chargement…");
-  setFeedback(els.feedback, "Chargement des récompenses…", "loading");
+  setFeedback(els.feedback, "Chargement des packs…", "loading");
   try {
     const data = await api("/api/admin/rewards");
     rules = Array.isArray(data.rules) ? data.rules : [];
@@ -159,13 +193,20 @@ async function loadRules() {
 async function saveRule(event) {
   event.preventDefault();
   if (saving) return;
-  const rankMin = Number(els.rankMin.value); const rankMax = Number(els.rankMax.value);
+  const rewardType = els.type.value;
+  const rankMin = Number(els.rankMin.value || 1);
+  const rankMax = Number(els.rankMax.value || rankMin);
+  const thresholdValue = Number(els.thresholdValue.value || 0);
   if (!els.name.value.trim()) { setFeedback(els.formFeedback, "Le nom du pack est obligatoire.", "error"); return; }
-  if (rankMax < rankMin) { setFeedback(els.formFeedback, "Le rang maximum ne peut pas être inférieur au rang minimum.", "error"); return; }
+  if (isRankingType(rewardType) && rankMax < rankMin) { setFeedback(els.formFeedback, "Le Top maximum ne peut pas être inférieur au Top minimum.", "error"); return; }
+  if (isThresholdType(rewardType) && thresholdValue < 1) { setFeedback(els.formFeedback, "Le palier doit être supérieur à zéro.", "error"); return; }
   saving = true; setLoading(els.save, true, "Enregistrement…");
   const id = els.id.value;
   const payload = {
-    rewardType: els.type.value, name: els.name.value.trim(), rankMin, rankMax,
+    rewardType, name: els.name.value.trim(),
+    rankMin: isRankingType(rewardType) ? rankMin : 1,
+    rankMax: isRankingType(rewardType) ? rankMax : 1,
+    thresholdValue: isThresholdType(rewardType) ? thresholdValue : null,
     roubles: Number(els.roubles.value || 0), battlePassXp: Number(els.xp.value || 0),
     description: els.description.value.trim(), isActive: els.active.checked,
     priority: Number(els.priority.value || 100),
@@ -204,7 +245,8 @@ els.cancel.addEventListener("click", () => resetForm());
 els.refresh.addEventListener("click", loadRules);
 els.search.addEventListener("input", render);
 els.filter.addEventListener("change", render);
-[els.type, els.name, els.rankMin, els.rankMax, els.roubles, els.xp].forEach((node) => {
+els.type.addEventListener("change", () => { updateApplicationFields(); updatePreview(); });
+[els.name, els.rankMin, els.rankMax, els.thresholdValue, els.roubles, els.xp].forEach((node) => {
   node.addEventListener("input", updatePreview);
   node.addEventListener("change", updatePreview);
 });
@@ -212,6 +254,7 @@ els.items.addEventListener("input", updatePreview);
 els.items.addEventListener("change", updatePreview);
 els.items.addEventListener("click", () => queueMicrotask(updatePreview));
 byId("rewardsRetryAccess").addEventListener("click", checkAccess);
+
 function openRule(id) {
   const rule = rules.find((entry) => entry.id === id);
   if (!rule) return;

@@ -1,17 +1,15 @@
 const supabaseService = require("./supabaseService");
 
 const TABLE = "reward_rules";
-const ALLOWED_TYPES = new Set(["votes", "event", "fidelity", "battle_pass", "compensation"]);
+const ALLOWED_TYPES = new Set(["votes_ranking", "votes_threshold", "event", "fidelity", "battle_pass", "compensation"]);
 
 function cleanText(value, max = 160) {
   return String(value || "").trim().slice(0, max);
 }
-
 function parseInteger(value, fallback = 0) {
   const number = Number.parseInt(value, 10);
   return Number.isFinite(number) ? number : fallback;
 }
-
 function normalizeItems(value) {
   if (!Array.isArray(value)) return [];
   return value.slice(0, 100).map((item) => ({
@@ -23,13 +21,16 @@ function normalizeItems(value) {
 function validatePayload(input = {}) {
   const rewardType = cleanText(input.rewardType || input.reward_type, 40);
   if (!ALLOWED_TYPES.has(rewardType)) {
-    const error = new Error("Type de récompense invalide.");
+    const error = new Error("Type de pack invalide.");
     error.status = 400;
     throw error;
   }
 
-  const rankMin = Math.max(1, parseInteger(input.rankMin ?? input.rank_min, 1));
-  const rankMax = Math.max(rankMin, parseInteger(input.rankMax ?? input.rank_max, rankMin));
+  const isRanking = rewardType === "votes_ranking";
+  const isThreshold = rewardType === "votes_threshold";
+  const rankMin = isRanking ? Math.max(1, parseInteger(input.rankMin ?? input.rank_min, 1)) : 1;
+  const rankMax = isRanking ? Math.max(rankMin, parseInteger(input.rankMax ?? input.rank_max, rankMin)) : 1;
+  const thresholdValue = isThreshold ? Math.max(1, parseInteger(input.thresholdValue ?? input.threshold_value, 1)) : null;
   const name = cleanText(input.name, 100);
   if (name.length < 2) {
     const error = new Error("Le nom du pack doit contenir au moins 2 caractères.");
@@ -41,6 +42,7 @@ function validatePayload(input = {}) {
     reward_type: rewardType,
     rank_min: rankMin,
     rank_max: rankMax,
+    threshold_value: thresholdValue,
     name,
     description: cleanText(input.description, 500),
     roubles: Math.max(0, parseInteger(input.roubles, 0)),
@@ -54,7 +56,7 @@ function validatePayload(input = {}) {
 
 async function list() {
   const rows = await supabaseService.request(
-    `${TABLE}?select=id,reward_type,rank_min,rank_max,name,description,roubles,battle_pass_xp,items,is_active,priority,created_at,updated_at&order=reward_type.asc,rank_min.asc,priority.asc`,
+    `${TABLE}?select=id,reward_type,rank_min,rank_max,threshold_value,name,description,roubles,battle_pass_xp,items,is_active,priority,created_at,updated_at&order=reward_type.asc,rank_min.asc,threshold_value.asc,priority.asc`,
     { method: "GET" }
   );
   return Array.isArray(rows) ? rows : [];
@@ -78,7 +80,7 @@ async function update(id, input, actorSteamId) {
     body: JSON.stringify(payload),
   });
   if (!Array.isArray(rows) || rows.length === 0) {
-    const error = new Error("Règle de récompense introuvable.");
+    const error = new Error("Pack introuvable.");
     error.status = 404;
     throw error;
   }

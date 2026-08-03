@@ -7,7 +7,7 @@
   <title>Commandement — Récompenses — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
   <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=4.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=6.0.0" />
 </head>
 <body data-page="admin-rewards">
   <div data-site-header></div>
@@ -48,7 +48,8 @@
               <div class="admin-field">
                 <label for="rewardType">Type de pack</label>
                 <select id="rewardType" required>
-                  <option value="votes">Votes mensuels</option>
+                  <option value="votes_ranking">Classement mensuel</option>
+                  <option value="votes_threshold">Palier de votes</option>
                   <option value="event">Événement</option>
                   <option value="fidelity">Fidélité</option>
                   <option value="battle_pass">Battle Pass</option>
@@ -62,14 +63,22 @@
               </div>
             </div>
 
-            <div class="reward-grid reward-grid--two">
+            <div id="rewardRankingFields" class="reward-grid reward-grid--two">
               <div class="admin-field">
                 <label for="rewardRankMin">Du Top</label>
-                <input id="rewardRankMin" type="number" min="1" value="1" required />
+                <input id="rewardRankMin" type="number" min="1" value="1" />
               </div>
               <div class="admin-field">
                 <label for="rewardRankMax">Au Top</label>
-                <input id="rewardRankMax" type="number" min="1" value="1" required />
+                <input id="rewardRankMax" type="number" min="1" value="1" />
+              </div>
+            </div>
+
+            <div id="rewardThresholdFields" class="reward-grid" hidden>
+              <div class="admin-field">
+                <label for="rewardThresholdValue">Palier de votes</label>
+                <input id="rewardThresholdValue" type="number" min="1" value="200" />
+                <small>Le pack sera appliqué lorsque le total mensuel atteint ce nombre de votes.</small>
               </div>
             </div>
 
@@ -107,7 +116,7 @@
               <div class="reward-preview__body">
                 <div><span>Nom</span><strong id="rewardPreviewName">Pack sans nom</strong></div>
                 <div><span>Type</span><strong id="rewardPreviewType">Votes mensuels</strong></div>
-                <div><span>Application</span><strong id="rewardPreviewRank">Top 1</strong></div>
+                <div><span>Application</span><strong id="rewardPreviewApplication">Top 1</strong></div>
                 <div><span>Roubles</span><strong id="rewardPreviewRoubles">0 ₽</strong></div>
                 <div><span>XP Battle Pass</span><strong id="rewardPreviewXp">0</strong></div>
                 <div class="reward-preview__items"><span>Objets</span><div id="rewardPreviewItems">Aucun objet configuré</div></div>
@@ -130,17 +139,18 @@
           </div>
 
           <div class="rewards-summary-strip">
-            <div><span>Votes mensuels</span><strong id="rewardsVotes">0</strong></div>
+            <div><span>Classements</span><strong id="rewardsRankings">0</strong></div>
+            <div><span>Paliers de votes</span><strong id="rewardsThresholds">0</strong></div>
             <div><span>Battle Pass</span><strong id="rewardsBattlePass">0</strong></div>
             <div><span>Événements</span><strong id="rewardsEvents">0</strong></div>
-            <div><span>Compensations</span><strong id="rewardsCompensations">0</strong></div>
           </div>
 
           <div class="rewards-filters">
             <input id="rewardsSearch" type="search" placeholder="Rechercher un pack, un type ou un Top…" autocomplete="off" />
             <select id="rewardsTypeFilter" aria-label="Filtrer par type">
               <option value="">Tous les types</option>
-              <option value="votes">Votes</option>
+              <option value="votes_ranking">Classement mensuel</option>
+              <option value="votes_threshold">Palier de votes</option>
               <option value="event">Événement</option>
               <option value="fidelity">Fidélité</option>
               <option value="battle_pass">Battle Pass</option>
@@ -159,6 +169,6 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=4.0.0"></script>
+  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=6.0.0"></script>
 </body>
 </html>

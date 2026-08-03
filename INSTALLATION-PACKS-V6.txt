@@ -1,0 +1,21 @@
+SENZANY — PACKS V6 : CLASSEMENTS ET PALIERS DE VOTES
+
+Fichiers à remplacer :
+- senzany-admin-rewards.html
+- assets/js/admin/admin-rewards-page.js
+- assets/css/pages/admin-rewards.css
+- backend/services/rewardRuleService.js
+
+Nouveau fichier SQL :
+- supabase/012_reward_rule_modes.sql
+
+Installation :
+1. Exécuter supabase/012_reward_rule_modes.sql dans Supabase > SQL Editor.
+2. Remplacer les fichiers dans le projet puis Commit / Push.
+3. Sur le VPS : pm2 restart senzany-api
+4. Faire Ctrl + F5 sur senzany-admin-rewards.html.
+
+Le module gère désormais :
+- Classement mensuel : Du Top / Au Top.
+- Palier de votes : seuil mensuel unique, par exemple 200 votes.
+- Les autres types de packs restent disponibles pour une utilisation manuelle ou future.
