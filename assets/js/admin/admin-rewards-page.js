@@ -10,7 +10,7 @@ const els = {
   roubles: byId("rewardRoubles"), xp: byId("rewardBattlePassXp"), description: byId("rewardDescription"), active: byId("rewardActive"), priority: byId("rewardPriority"),
   items: byId("rewardItemsList"), addItem: byId("addRewardItem"), save: byId("saveRewardRule"), cancel: byId("cancelRewardEdit"), formFeedback: byId("rewardFormFeedback"),
   list: byId("rewardsList"), feedback: byId("rewardsFeedback"), search: byId("rewardsSearch"), filter: byId("rewardsTypeFilter"), refresh: byId("refreshRewards"),
-  total: byId("rewardsTotal"), activeCount: byId("rewardsActive"), votesCount: byId("rewardsVotes"), updated: byId("rewardsUpdated"),
+  votesCount: byId("rewardsVotes"), battlePassCount: byId("rewardsBattlePass"), eventsCount: byId("rewardsEvents"), compensationsCount: byId("rewardsCompensations"),
 };
 
 function showOnly(target) {
@@ -90,9 +90,10 @@ function renderRule(rule) {
 
 function render() {
   const filtered = filteredRules();
-  els.total.textContent = rules.length;
-  els.activeCount.textContent = rules.filter((rule) => rule.is_active).length;
   els.votesCount.textContent = rules.filter((rule) => rule.reward_type === "votes").length;
+  els.battlePassCount.textContent = rules.filter((rule) => rule.reward_type === "battle_pass").length;
+  els.eventsCount.textContent = rules.filter((rule) => rule.reward_type === "event").length;
+  els.compensationsCount.textContent = rules.filter((rule) => rule.reward_type === "compensation").length;
   els.list.innerHTML = "";
   if (!filtered.length) {
     els.list.innerHTML = '<div class="admin-list-message">Aucune récompense ne correspond aux filtres.</div>';
@@ -115,9 +116,9 @@ function resetForm(rule = null) {
   els.items.innerHTML = "";
   const items = normalizeItems(rule?.items);
   if (items.length) items.forEach((item) => addItemRow(els.items, item)); else clearItemRows(els.items);
-  byId("rewardFormKicker").textContent = rule ? "MODIFICATION" : "NOUVELLE RÉCOMPENSE";
+  byId("rewardFormKicker").textContent = rule ? "MODIFICATION DU PACK" : "NOUVEAU PACK";
   byId("rewardFormTitle").textContent = rule ? "Modifier le pack" : "Créer un pack";
-  els.save.textContent = rule ? "Enregistrer les modifications" : "Créer la récompense";
+  els.save.textContent = rule ? "ENREGISTRER LES MODIFICATIONS" : "ENREGISTRER LE PACK";
   els.cancel.hidden = !rule;
   setFeedback(els.formFeedback);
 }
@@ -128,7 +129,6 @@ async function loadRules() {
   try {
     const data = await api("/api/admin/rewards");
     rules = Array.isArray(data.rules) ? data.rules : [];
-    els.updated.textContent = data.updatedAt ? new Date(data.updatedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "—";
     setFeedback(els.feedback);
     render();
   } catch (error) {
@@ -154,7 +154,7 @@ async function saveRule(event) {
   try {
     await api(id ? `/api/admin/rewards/${encodeURIComponent(id)}` : "/api/admin/rewards", { method: id ? "PUT" : "POST", body: payload });
     resetForm();
-    setFeedback(els.formFeedback, id ? "La récompense a été modifiée." : "La récompense a été créée.", "success");
+    setFeedback(els.formFeedback, id ? "Le pack a été modifié." : "Le pack a été créé.", "success");
     await loadRules();
   } catch (error) { setFeedback(els.formFeedback, error.message, "error"); }
   finally { saving = false; setLoading(els.save, false); }
@@ -162,7 +162,7 @@ async function saveRule(event) {
 
 async function deleteRule(id) {
   const rule = rules.find((entry) => entry.id === id);
-  if (!rule || !confirm(`Supprimer la récompense « ${rule.name} » ?`)) return;
+  if (!rule || !confirm(`Supprimer le pack « ${rule.name} » ?`)) return;
   try { await api(`/api/admin/rewards/${encodeURIComponent(id)}`, { method: "DELETE" }); await loadRules(); }
   catch (error) { alert(error.message); }
 }
