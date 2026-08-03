@@ -3,6 +3,7 @@ import { addItemRow, clearItemRows, getItemsFromContainer, escapeHtml } from "./
 const byId = (id) => document.getElementById(id);
 let rules = [];
 let saving = false;
+let selectedRuleId = "";
 
 const els = {
   loading: byId("rewardsAccessLoading"), denied: byId("rewardsAccessDenied"), error: byId("rewardsAccessError"), workspace: byId("rewardsWorkspace"),
@@ -13,7 +14,8 @@ const els = {
   roubles: byId("rewardRoubles"), bitcoin: byId("rewardBitcoin"), xp: byId("rewardBattlePassXp"), description: byId("rewardDescription"), active: byId("rewardActive"), priority: byId("rewardPriority"),
   items: byId("rewardItemsList"), addItem: byId("addRewardItem"), save: byId("saveRewardRule"), cancel: byId("cancelRewardEdit"), formFeedback: byId("rewardFormFeedback"),
   list: byId("rewardsList"), feedback: byId("rewardsFeedback"), search: byId("rewardsSearch"), filter: byId("rewardsTypeFilter"), refresh: byId("refreshRewards"), newRule: byId("newRewardRule"),
-  rankingsCount: byId("rewardsRankings"), thresholdsCount: byId("rewardsThresholds"), battlePassCount: byId("rewardsBattlePass"), eventsCount: byId("rewardsEvents"),
+  rankingsCount: byId("rewardsRankings"), thresholdsCount: byId("rewardsThresholds"), battlePassCount: byId("rewardsBattlePass"), eventsCount: byId("rewardsEvents"), totalCount: byId("rewardsTotalCount"),
+  duplicateCurrent: byId("duplicateCurrentReward"), deleteCurrent: byId("deleteCurrentReward"), editorApplication: byId("rewardEditorApplication"),
   previewName: byId("rewardPreviewName"), previewType: byId("rewardPreviewType"), previewApplication: byId("rewardPreviewApplication"),
   previewRoubles: byId("rewardPreviewRoubles"), previewBitcoin: byId("rewardPreviewBitcoin"), previewXp: byId("rewardPreviewXp"), previewItems: byId("rewardPreviewItems"),
 };
@@ -114,6 +116,7 @@ function selectMode(mode) {
   }
   updateApplicationFields();
   updatePreview();
+  if (els.editorApplication) els.editorApplication.textContent = `${typeLabel(els.type.value)} · ${applicationLabel({ reward_type: els.type.value, rank_min: els.rankMin.value, rank_max: els.rankMax.value, threshold_value: els.thresholdValue.value })}`;
 }
 
 function updateApplicationFields() {
@@ -151,42 +154,73 @@ function compactRewardSummary(rule) {
   return parts.length ? parts.join(" • ") : "Aucune récompense configurée";
 }
 
+function categoryMeta(type) {
+  return ({
+    votes_ranking: { label: "Classement mensuel", icon: "🏆" },
+    votes_threshold: { label: "Paliers de votes", icon: "🎁" },
+    battle_pass: { label: "Battle Pass", icon: "♛" },
+    event: { label: "Événements", icon: "●" },
+    compensation: { label: "Compensations", icon: "◆" },
+    fidelity: { label: "Fidélité", icon: "★" },
+  })[type] || { label: typeLabel(type), icon: "◆" };
+}
+
+function rankingMedal(rule) {
+  if (rule.reward_type !== "votes_ranking") return "";
+  const min = Number(rule.rank_min || 0), max = Number(rule.rank_max || 0);
+  if (min === 1 && max === 1) return "🥇";
+  if (min === 2 && max === 2) return "🥈";
+  if (min === 3 && max === 3) return "🥉";
+  return "";
+}
+
 function renderRule(rule) {
-  const article = document.createElement("article");
-  article.className = `reward-rule reward-rule--compact ${rule.is_active ? "is-active" : "is-inactive"}`;
-  article.dataset.openReward = rule.id;
-  article.tabIndex = 0;
-  article.setAttribute("role", "button");
-  article.setAttribute("aria-label", `Modifier le pack ${rule.name}`);
-  article.innerHTML = `
-    <div class="reward-rule__status" aria-hidden="true"></div>
-    <div class="reward-rule__identity">
-      <span>${escapeHtml(typeLabel(rule.reward_type))}</span>
-      <strong>${escapeHtml(rule.name)}</strong>
-      <small>${escapeHtml(applicationLabel(rule))}</small>
-    </div>
-    <div class="reward-rule__summary">${escapeHtml(compactRewardSummary(rule))}</div>
-    <div class="reward-rule__state"><em>${rule.is_active ? "ACTIF" : "INACTIF"}</em></div>
-    <div class="reward-rule__menu">
-      <button type="button" class="reward-rule__icon" data-duplicate-reward="${escapeHtml(rule.id)}" title="Dupliquer">⧉</button>
-      <button type="button" class="reward-rule__icon reward-rule__icon--danger" data-delete-reward="${escapeHtml(rule.id)}" title="Supprimer">×</button>
-    </div>`;
-  return article;
+  const row = document.createElement("article");
+  row.className = `reward-tree-row ${rule.is_active ? "is-active" : "is-inactive"} ${selectedRuleId === rule.id ? "is-selected" : ""}`;
+  row.dataset.openReward = rule.id;
+  row.tabIndex = 0;
+  row.setAttribute("role", "button");
+  row.innerHTML = `
+    <span class="reward-tree-row__chevron">${selectedRuleId === rule.id ? "▶" : ""}</span>
+    <span class="reward-tree-row__medal">${rankingMedal(rule)}</span>
+    <span class="reward-tree-row__name">${escapeHtml(rule.name)}</span>
+    <span class="reward-tree-row__summary">${escapeHtml(compactRewardSummary(rule))}</span>
+    <em>${rule.is_active ? "ACTIF" : "INACTIF"}</em>`;
+  return row;
 }
 
 function render() {
   const filtered = filteredRules();
   const packLabel = (count) => `${count} pack${count > 1 ? "s" : ""}`;
-  els.rankingsCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "votes_ranking").length);
-  els.thresholdsCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "votes_threshold").length);
-  els.battlePassCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "battle_pass").length);
-  els.eventsCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "event").length);
+  const counts = {
+    votes_ranking: rules.filter((r) => r.reward_type === "votes_ranking").length,
+    votes_threshold: rules.filter((r) => r.reward_type === "votes_threshold").length,
+    battle_pass: rules.filter((r) => r.reward_type === "battle_pass").length,
+    event: rules.filter((r) => r.reward_type === "event").length,
+  };
+  els.rankingsCount.textContent = packLabel(counts.votes_ranking);
+  els.thresholdsCount.textContent = packLabel(counts.votes_threshold);
+  els.battlePassCount.textContent = packLabel(counts.battle_pass);
+  els.eventsCount.textContent = packLabel(counts.event);
+  if (els.totalCount) els.totalCount.textContent = packLabel(rules.length);
   els.list.innerHTML = "";
-  if (!filtered.length) {
-    els.list.innerHTML = '<div class="admin-list-message">Aucun pack ne correspond aux filtres.</div>';
-    return;
-  }
-  filtered.forEach((rule) => els.list.appendChild(renderRule(rule)));
+  if (!filtered.length) { els.list.innerHTML = '<div class="admin-list-message">Aucun pack ne correspond aux filtres.</div>'; return; }
+
+  const order = ["votes_ranking", "votes_threshold", "battle_pass", "event", "compensation", "fidelity"];
+  order.forEach((type) => {
+    const groupRules = filtered.filter((rule) => rule.reward_type === type);
+    if (!groupRules.length) return;
+    const meta = categoryMeta(type);
+    const details = document.createElement("details");
+    details.className = "reward-tree-group";
+    details.open = true;
+    details.innerHTML = `<summary><span>${meta.icon}</span><strong>${escapeHtml(meta.label)}</strong><b>${groupRules.length}</b></summary>`;
+    const body = document.createElement("div");
+    body.className = "reward-tree-group__body";
+    groupRules.forEach((rule) => body.appendChild(renderRule(rule)));
+    details.appendChild(body);
+    els.list.appendChild(details);
+  });
 }
 
 function updatePreview() {
@@ -203,6 +237,7 @@ function updatePreview() {
   els.previewRoubles.textContent = `${formatNumber(els.roubles.value)} ₽`;
   els.previewBitcoin.textContent = formatNumber(els.bitcoin.value);
   els.previewXp.textContent = formatNumber(els.xp.value);
+  if (els.editorApplication) els.editorApplication.textContent = `${typeLabel(els.type.value)} · ${applicationLabel(previewRule)}`;
   els.previewItems.innerHTML = items.length
     ? items.map((item) => `<small>${escapeHtml(item.className)} × ${item.quantity}</small>`).join("")
     : "Aucun objet configuré";
@@ -210,6 +245,7 @@ function updatePreview() {
 
 function resetForm(rule = null) {
   els.id.value = rule?.id || "";
+  selectedRuleId = rule?.id || "";
   els.type.value = rule?.reward_type || "votes_ranking";
   els.name.value = rule?.name || "";
   els.rankMin.value = rule?.rank_min || 1;
@@ -228,6 +264,8 @@ function resetForm(rule = null) {
   byId("rewardFormTitle").textContent = rule ? "Modifier le pack" : "Créer un pack";
   els.save.textContent = rule ? "ENREGISTRER LES MODIFICATIONS" : "ENREGISTRER LE PACK";
   els.cancel.hidden = !rule;
+  if (els.duplicateCurrent) els.duplicateCurrent.hidden = !rule;
+  if (els.deleteCurrent) els.deleteCurrent.hidden = !rule;
   setFeedback(els.formFeedback);
   updateApplicationFields();
   updatePreview();
@@ -275,6 +313,7 @@ async function saveRule(event) {
   };
   try {
     await api(id ? `/api/admin/rewards/${encodeURIComponent(id)}` : "/api/admin/rewards", { method: id ? "PUT" : "POST", body: payload });
+    selectedRuleId = "";
     resetForm();
     setFeedback(els.formFeedback, id ? "Le pack a été modifié." : "Le pack a été créé.", "success");
     await loadRules();
@@ -465,7 +504,7 @@ els.addItem.addEventListener("click", () => { addItemRow(els.items); updatePrevi
 
 els.cancel.addEventListener("click", () => resetForm());
 els.refresh.addEventListener("click", loadRules);
-els.newRule?.addEventListener("click", () => { resetForm(); document.querySelectorAll("[data-open-reward]").forEach((node) => node.classList.remove("is-selected")); document.querySelector(".rewards-editor-card")?.scrollIntoView({ behavior: "smooth", block: "start" }); els.name.focus(); });
+els.newRule?.addEventListener("click", () => { selectedRuleId = ""; resetForm(); render(); document.querySelectorAll("[data-open-reward]").forEach((node) => node.classList.remove("is-selected")); document.querySelector(".rewards-editor-card")?.scrollIntoView({ behavior: "smooth", block: "start" }); els.name.focus(); });
 els.search.addEventListener("input", render);
 els.filter.addEventListener("change", render);
 els.type.addEventListener("change", () => { updateApplicationFields(); updatePreview(); });
@@ -482,10 +521,15 @@ byId("rewardsRetryAccess").addEventListener("click", checkAccess);
 function openRule(id) {
   const rule = rules.find((entry) => entry.id === id);
   if (!rule) return;
+  selectedRuleId = id;
   resetForm(rule);
+  render();
   document.querySelectorAll("[data-open-reward]").forEach((node) => node.classList.toggle("is-selected", node.dataset.openReward === id));
   document.querySelector(".rewards-editor-card")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
+
+els.duplicateCurrent?.addEventListener("click", () => { if (selectedRuleId) duplicateRule(selectedRuleId); });
+els.deleteCurrent?.addEventListener("click", () => { if (selectedRuleId) deleteRule(selectedRuleId); });
 
 document.addEventListener("click", (event) => {
   const remove = event.target.closest("[data-delete-reward]");

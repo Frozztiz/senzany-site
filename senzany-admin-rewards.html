@@ -7,7 +7,7 @@
   <title>Commandement — Récompenses — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
   <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=10.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=11.0.0" />
 </head>
 <body data-page="admin-rewards">
   <div data-site-header></div>
@@ -60,139 +60,15 @@
         </div>
       </section>
 
-      <div class="rewards-layout">
-        <section class="admin-card rewards-editor-card">
-          <div class="admin-card__header">
-            <div><span id="rewardFormKicker">NOUVEAU PACK</span><h2 id="rewardFormTitle">Créer un pack</h2></div>
-            <b>01</b>
-          </div>
-
-          <form id="rewardForm" novalidate>
-            <input id="rewardId" type="hidden" />
-
-            <div class="reward-mode-tabs" role="tablist" aria-label="Catégorie du pack">
-              <button class="reward-mode-tab is-active" type="button" data-reward-mode="votes_ranking" role="tab" aria-selected="true">🏆 Classement mensuel</button>
-              <button class="reward-mode-tab" type="button" data-reward-mode="votes_threshold" role="tab" aria-selected="false">🎯 Palier de votes</button>
-              <button class="reward-mode-tab" type="button" data-reward-mode="other" role="tab" aria-selected="false">⚙ Autres packs</button>
-            </div>
-
-            <div class="reward-grid reward-grid--two">
-              <div id="rewardTypeField" class="admin-field" hidden>
-                <label for="rewardType">Type complémentaire</label>
-                <select id="rewardType" required>
-                  <option value="votes_ranking">Classement mensuel</option>
-                  <option value="votes_threshold">Palier de votes</option>
-                  <option value="event">Événement</option>
-                  <option value="fidelity">Fidélité</option>
-                  <option value="battle_pass">Battle Pass</option>
-                  <option value="compensation">Compensation</option>
-                </select>
-              </div>
-
-              <div class="admin-field reward-name-field">
-                <label for="rewardName">Nom</label>
-                <input id="rewardName" type="text" maxlength="100" placeholder="Exemple : Pack Or" required />
-              </div>
-            </div>
-
-            <div id="rewardRankingFields" class="reward-grid reward-grid--two">
-              <div class="admin-field">
-                <label for="rewardRankMin">Du Top</label>
-                <input id="rewardRankMin" type="number" min="1" value="1" />
-              </div>
-              <div class="admin-field">
-                <label for="rewardRankMax">Au Top</label>
-                <input id="rewardRankMax" type="number" min="1" value="1" />
-              </div>
-            </div>
-
-            <div id="rewardThresholdFields" class="reward-grid" hidden>
-              <div class="admin-field">
-                <label for="rewardThresholdValue">Palier de votes</label>
-                <input id="rewardThresholdValue" type="number" min="1" value="200" />
-                <small>Le pack sera appliqué lorsque le total mensuel atteint ce nombre de votes.</small>
-              </div>
-            </div>
-
-            <div class="reward-grid reward-grid--two">
-              <div class="admin-field">
-                <label for="rewardRoubles">Roubles</label>
-                <input id="rewardRoubles" type="number" min="0" value="0" />
-              </div>
-              <div class="admin-field">
-                <label for="rewardBitcoin">Bitcoins</label>
-                <input id="rewardBitcoin" type="number" min="0" value="0" />
-                <small>Converti automatiquement en objet <code>bitcoin</code> dans la livraison.</small>
-              </div>
-            </div>
-
-            <div class="reward-grid reward-grid--two">
-              <div class="admin-field">
-                <label for="rewardBattlePassXp">XP Battle Pass</label>
-                <input id="rewardBattlePassXp" type="number" min="0" value="0" />
-              </div>
-              <div class="reward-currency-info">
-                <span>CONVERSION AUTOMATIQUE</span>
-                <strong>50 000 ₽ = 1 lot de billets</strong>
-                <small>Le portail crée automatiquement les objets <code>MoneyRuble100</code>. Le montant doit être un multiple de 50 000 ₽.</small>
-              </div>
-            </div>
-
-            <div class="admin-field">
-              <label for="rewardDescription">Message adressé au joueur</label>
-              <textarea id="rewardDescription" rows="4" maxlength="500" placeholder="Exemple : Félicitations pour ton classement mensuel !"></textarea>
-            </div>
-
-            <div class="admin-items rewards-items">
-              <div class="admin-items__heading">
-                <div><span>CONTENU</span><h3>Objets du pack</h3><small>Ajoute uniquement les objets spéciaux : vêtements, sac, parking, armes… Les monnaies sont générées automatiquement.</small></div>
-                <button id="addRewardItem" class="admin-button admin-button--small" type="button">+ Ajouter un objet</button>
-              </div>
-              <div id="rewardItemsList"></div>
-            </div>
-
-            <div class="reward-options">
-              <label class="reward-toggle"><input id="rewardActive" type="checkbox" checked /><span>Pack actif</span></label>
-              <div class="admin-field reward-priority"><label for="rewardPriority">Priorité</label><input id="rewardPriority" type="number" min="0" value="100" /></div>
-            </div>
-
-            <aside class="reward-preview" aria-live="polite">
-              <div class="reward-preview__heading"><span>APERÇU DU PACK</span><small>Mise à jour en direct</small></div>
-              <div class="reward-preview__body">
-                <div><span>Nom</span><strong id="rewardPreviewName">Pack sans nom</strong></div>
-                <div><span>Type</span><strong id="rewardPreviewType">Votes mensuels</strong></div>
-                <div><span>Application</span><strong id="rewardPreviewApplication">Top 1</strong></div>
-                <div><span>Roubles</span><strong id="rewardPreviewRoubles">0 ₽</strong></div>
-                <div><span>Bitcoins</span><strong id="rewardPreviewBitcoin">0</strong></div>
-                <div><span>XP Battle Pass</span><strong id="rewardPreviewXp">0</strong></div>
-                <div class="reward-preview__items"><span>Objets</span><div id="rewardPreviewItems">Aucun objet configuré</div></div>
-              </div>
-            </aside>
-
-            <div id="rewardFormFeedback" class="admin-feedback" hidden></div>
-
-            <div class="reward-form-actions">
-              <button id="cancelRewardEdit" class="admin-button" type="button" hidden>Annuler la modification</button>
-              <button id="saveRewardRule" class="admin-button admin-button--primary admin-button--submit" type="submit">ENREGISTRER LE PACK</button>
-            </div>
-          </form>
-        </section>
-
-        <section class="admin-card rewards-list-card">
-          <div class="admin-card__header">
-            <div><span>GESTIONNAIRE DE PACKS</span><h2>Bibliothèque des packs</h2></div>
+      <div class="rewards-layout rewards-layout--explorer">
+        <section class="admin-card rewards-list-card rewards-explorer">
+          <div class="admin-card__header rewards-explorer__header">
+            <div><span>BIBLIOTHÈQUE DES PACKS</span><h2>Gestionnaire de packs</h2></div>
             <button id="newRewardRule" class="admin-button admin-button--primary admin-button--small" type="button">+ Nouveau pack</button>
           </div>
 
-          <div class="rewards-summary-strip">
-            <div><span>Classements</span><strong id="rewardsRankings">0</strong></div>
-            <div><span>Paliers de votes</span><strong id="rewardsThresholds">0</strong></div>
-            <div><span>Battle Pass</span><strong id="rewardsBattlePass">0</strong></div>
-            <div><span>Événements</span><strong id="rewardsEvents">0</strong></div>
-          </div>
-
-          <div class="rewards-filters">
-            <input id="rewardsSearch" type="search" placeholder="Rechercher un pack, un type ou un Top…" autocomplete="off" />
+          <div class="rewards-filters rewards-explorer__filters">
+            <input id="rewardsSearch" type="search" placeholder="Rechercher un pack…" autocomplete="off" />
             <select id="rewardsTypeFilter" aria-label="Filtrer par type">
               <option value="">Tous les types</option>
               <option value="votes_ranking">Classement mensuel</option>
@@ -202,11 +78,93 @@
               <option value="battle_pass">Battle Pass</option>
               <option value="compensation">Compensation</option>
             </select>
-            <button id="refreshRewards" class="admin-button admin-button--small" type="button">Actualiser</button>
+            <button id="refreshRewards" class="admin-button admin-button--small" type="button" title="Actualiser">↻</button>
+          </div>
+
+          <div class="rewards-summary-strip rewards-summary-strip--hidden" aria-hidden="true">
+            <div><span>Classements</span><strong id="rewardsRankings">0</strong></div>
+            <div><span>Paliers de votes</span><strong id="rewardsThresholds">0</strong></div>
+            <div><span>Battle Pass</span><strong id="rewardsBattlePass">0</strong></div>
+            <div><span>Événements</span><strong id="rewardsEvents">0</strong></div>
           </div>
 
           <div id="rewardsFeedback" class="admin-feedback" hidden></div>
-          <div id="rewardsList" class="rewards-list" aria-live="polite"></div>
+          <div id="rewardsList" class="rewards-list rewards-tree" aria-live="polite"></div>
+          <footer class="rewards-explorer__footer"><span>Total</span><strong id="rewardsTotalCount">0 pack</strong></footer>
+        </section>
+
+        <section class="admin-card rewards-editor-card">
+          <div class="admin-card__header rewards-editor-heading">
+            <div>
+              <span id="rewardFormKicker">NOUVEAU PACK</span>
+              <h2 id="rewardFormTitle">Créer un pack</h2>
+              <small id="rewardEditorApplication">Classement mensuel · Top 1</small>
+            </div>
+            <div class="rewards-editor-heading__actions">
+              <label class="reward-toggle reward-toggle--header"><input id="rewardActive" type="checkbox" checked /><span>ACTIF</span></label>
+              <button id="duplicateCurrentReward" class="admin-button admin-button--small" type="button" hidden>⧉ Dupliquer</button>
+              <button id="deleteCurrentReward" class="admin-button admin-button--small admin-button--danger" type="button" hidden>Supprimer</button>
+            </div>
+          </div>
+
+          <form id="rewardForm" novalidate>
+            <input id="rewardId" type="hidden" />
+
+            <div class="reward-grid reward-grid--two">
+              <div class="admin-field reward-name-field">
+                <label for="rewardName">Nom du pack</label>
+                <input id="rewardName" type="text" maxlength="100" placeholder="Exemple : Top 1" required />
+              </div>
+              <div id="rewardTypeField" class="admin-field">
+                <label for="rewardType">Type de pack</label>
+                <select id="rewardType" required>
+                  <option value="votes_ranking">Classement mensuel</option>
+                  <option value="votes_threshold">Palier de votes</option>
+                  <option value="event">Événement</option>
+                  <option value="fidelity">Fidélité</option>
+                  <option value="battle_pass">Battle Pass</option>
+                  <option value="compensation">Compensation</option>
+                </select>
+              </div>
+            </div>
+            <div class="reward-mode-tabs" hidden></div>
+
+            <div id="rewardRankingFields" class="reward-grid reward-grid--two">
+              <div class="admin-field"><label for="rewardRankMin">Rang minimum (Du Top)</label><input id="rewardRankMin" type="number" min="1" value="1" /></div>
+              <div class="admin-field"><label for="rewardRankMax">Rang maximum (Au Top)</label><input id="rewardRankMax" type="number" min="1" value="1" /></div>
+            </div>
+            <div id="rewardThresholdFields" class="reward-grid" hidden>
+              <div class="admin-field"><label for="rewardThresholdValue">Palier de votes</label><input id="rewardThresholdValue" type="number" min="1" value="200" /><small>Nombre de votes mensuels requis.</small></div>
+            </div>
+
+            <section class="reward-main-values">
+              <div class="reward-main-value"><span>Roubles</span><input id="rewardRoubles" type="number" min="0" value="0" /><small>Conversion automatique en lots de billets.</small></div>
+              <div class="reward-main-value"><span>Bitcoins</span><input id="rewardBitcoin" type="number" min="0" value="0" /><small>Converti automatiquement en objet bitcoin.</small></div>
+              <div class="reward-main-value"><span>XP Battle Pass</span><input id="rewardBattlePassXp" type="number" min="0" value="0" /></div>
+            </section>
+
+            <div class="admin-items rewards-items rewards-items--table">
+              <div class="admin-items__heading"><div><span>OBJETS DU PACK</span><h3>Objets spéciaux</h3><small>Ajoute uniquement les objets supplémentaires. Les monnaies sont générées automatiquement.</small></div><button id="addRewardItem" class="admin-button admin-button--small" type="button">+ Ajouter un objet</button></div>
+              <div class="reward-items-table__head"><span>Nom de l’objet</span><span>Quantité</span><span></span></div>
+              <div id="rewardItemsList"></div>
+            </div>
+
+            <div class="admin-field reward-message-field"><label for="rewardDescription">Message adressé au joueur <small>(optionnel)</small></label><textarea id="rewardDescription" rows="4" maxlength="500" placeholder="Exemple : Félicitations pour ta première place !"></textarea></div>
+
+            <div class="reward-options reward-options--compact">
+              <div class="admin-field reward-priority"><label for="rewardPriority">Priorité</label><input id="rewardPriority" type="number" min="0" value="100" /></div>
+            </div>
+
+            <aside class="reward-preview" hidden aria-hidden="true">
+              <span id="rewardPreviewName"></span><span id="rewardPreviewType"></span><span id="rewardPreviewApplication"></span><span id="rewardPreviewRoubles"></span><span id="rewardPreviewBitcoin"></span><span id="rewardPreviewXp"></span><div id="rewardPreviewItems"></div>
+            </aside>
+
+            <div id="rewardFormFeedback" class="admin-feedback" hidden></div>
+            <div class="reward-form-actions reward-form-actions--editor">
+              <button id="cancelRewardEdit" class="admin-button" type="button" hidden>Annuler</button>
+              <button id="saveRewardRule" class="admin-button admin-button--primary admin-button--submit" type="submit">ENREGISTRER LE PACK</button>
+            </div>
+          </form>
         </section>
       </div>
     </section>
@@ -215,6 +173,6 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=10.0.0"></script>
+  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=11.0.0"></script>
 </body>
 </html>
