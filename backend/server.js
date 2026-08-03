@@ -61,6 +61,11 @@ app.use(
   require("./middleware/commandAuth"),
   require("./routes/adminRewards")
 );
+app.use(
+  "/api/admin/monthly-votes",
+  require("./middleware/commandAuth"),
+  require("./routes/adminMonthlyVotes")
+);
 
 app.use((req, res) => {
   res.status(404).json({
@@ -80,4 +85,5 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "127.0.0.1", () => {
   console.log(`Senzany API démarrée sur le port ${PORT}`);
+  require("./services/monthlyVoteRewardService").startScheduler();
 });

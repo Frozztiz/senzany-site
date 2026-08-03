@@ -7,7 +7,7 @@
   <title>Commandement — Récompenses — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
   <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=7.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=8.0.0" />
 </head>
 <body data-page="admin-rewards">
   <div data-site-header></div>
@@ -33,6 +33,32 @@
         <a class="admin-button admin-button--small" href="senzany-admin.html">← Retour au Commandement</a>
         <div><span>MODULE 05</span><strong>Gestion des packs</strong><small>Configure les packs qui seront transformés en livraisons automatiques.</small></div>
       </div>
+
+      <section class="admin-card monthly-reward-automation" aria-labelledby="monthlyRewardTitle">
+        <div class="admin-card__header">
+          <div><span>AUTOMATISATION MENSUELLE</span><h2 id="monthlyRewardTitle">Classement et livraisons du 1er</h2></div>
+          <b>00</b>
+        </div>
+        <div class="monthly-reward-grid">
+          <div class="monthly-reward-state">
+            <span>PÉRIODE À TRAITER</span>
+            <input id="monthlyRewardPeriod" type="month" />
+            <small>Une capture automatique est préparée le dernier jour du mois à 23:55.</small>
+          </div>
+          <div><span>STATUT</span><strong id="monthlyRewardStatus">Aucun classement</strong><small id="monthlyRewardSchedule">Validation manuelle le 1er du mois</small></div>
+          <div><span>JOUEURS CLASSÉS</span><strong id="monthlyRewardPlayers">0</strong><small>Comptes rattachés à un SteamID</small></div>
+          <div><span>LIVRAISONS CRÉÉES</span><strong id="monthlyRewardDeliveries">0</strong><small id="monthlyRewardDeliveryNote">Aucune distribution lancée</small></div>
+        </div>
+        <div class="monthly-reward-actions">
+          <button id="prepareMonthlyRanking" class="admin-button" type="button">Préparer / recalculer</button>
+          <button id="approveMonthlyRewards" class="admin-button admin-button--primary" type="button" disabled>Valider et créer les livraisons</button>
+          <button id="refreshMonthlyRewards" class="admin-button admin-button--small" type="button">Actualiser</button>
+        </div>
+        <div id="monthlyRewardFeedback" class="admin-feedback" hidden></div>
+        <div id="monthlyRewardPreview" class="monthly-reward-preview">
+          <div class="admin-list-message">Aucun classement mensuel préparé.</div>
+        </div>
+      </section>
 
       <div class="rewards-layout">
         <section class="admin-card rewards-editor-card">
@@ -175,6 +201,6 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=7.0.0"></script>
+  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=8.0.0"></script>
 </body>
 </html>

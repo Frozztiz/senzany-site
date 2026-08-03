@@ -18,6 +18,22 @@ const els = {
   previewRoubles: byId("rewardPreviewRoubles"), previewXp: byId("rewardPreviewXp"), previewItems: byId("rewardPreviewItems"),
 };
 
+const monthlyEls = {
+  period: byId("monthlyRewardPeriod"),
+  status: byId("monthlyRewardStatus"),
+  schedule: byId("monthlyRewardSchedule"),
+  players: byId("monthlyRewardPlayers"),
+  deliveries: byId("monthlyRewardDeliveries"),
+  deliveryNote: byId("monthlyRewardDeliveryNote"),
+  prepare: byId("prepareMonthlyRanking"),
+  approve: byId("approveMonthlyRewards"),
+  refresh: byId("refreshMonthlyRewards"),
+  feedback: byId("monthlyRewardFeedback"),
+  preview: byId("monthlyRewardPreview"),
+};
+let monthlyRun = null;
+let monthlyRankings = [];
+
 function showOnly(target) {
   [els.loading, els.denied, els.error, els.workspace].forEach((node) => { if (node) node.hidden = node !== target; });
 }
@@ -278,6 +294,146 @@ async function deleteRule(id) {
   catch (error) { alert(error.message); }
 }
 
+
+function monthlyStatusLabel(status) {
+  return ({
+    draft: "Brouillon",
+    ready: "Prêt à valider",
+    processing: "Distribution en cours",
+    completed: "Livraisons créées",
+    failed: "Erreur de distribution",
+  })[status] || "Aucun classement";
+}
+
+function monthlyRowState(row) {
+  return ({
+    ready: "PRÊT",
+    no_reward: "AUCUN PACK",
+    no_items: "PACK SANS OBJET",
+    delivery_created: "LIVRAISON CRÉÉE",
+    failed: "ERREUR",
+    pending: "EN ATTENTE",
+  })[row.status] || String(row.status || "").toUpperCase();
+}
+
+function renderMonthlyPreview() {
+  if (!monthlyEls.preview) return;
+  if (!monthlyRun || !monthlyRankings.length) {
+    monthlyEls.preview.innerHTML = '<div class="admin-list-message">Aucun classement mensuel préparé.</div>';
+    return;
+  }
+
+  monthlyEls.preview.innerHTML = monthlyRankings.map((row) => {
+    const rewardName = row.reward_name || "Aucun pack configuré";
+    const aliases = Array.isArray(row.aliases) ? row.aliases.join(", ") : "";
+    const stateClass = ["no_reward", "no_items"].includes(row.status) ? "is-warning" : row.status === "failed" ? "is-error" : "";
+    return `<article class="monthly-ranking-row">
+      <strong>#${Number(row.position || 0)}</strong>
+      <div class="monthly-ranking-row__player"><b>${escapeHtml(row.player_name || row.steam_id)}</b><small>${escapeHtml(aliases || row.steam_id)}</small></div>
+      <div class="monthly-ranking-row__votes">${formatNumber(row.votes)} votes</div>
+      <div class="monthly-ranking-row__reward">${escapeHtml(rewardName)}</div>
+      <div class="monthly-ranking-row__state ${stateClass}">${escapeHtml(monthlyRowState(row))}</div>
+    </article>`;
+  }).join("");
+}
+
+function renderMonthlyState() {
+  if (!monthlyEls.status) return;
+  monthlyEls.status.textContent = monthlyStatusLabel(monthlyRun?.status);
+  monthlyEls.players.textContent = formatNumber(monthlyRun?.ranking_count || monthlyRankings.length || 0);
+  monthlyEls.deliveries.textContent = formatNumber(monthlyRun?.delivery_count || 0);
+  monthlyEls.deliveryNote.textContent = monthlyRun?.status === "completed"
+    ? "Distribution terminée"
+    : monthlyRun?.status === "failed"
+      ? (monthlyRun.error_message || "Certaines livraisons ont échoué")
+      : "Aucune distribution lancée";
+  monthlyEls.approve.disabled = !monthlyRun || !["ready", "failed"].includes(monthlyRun.status);
+  renderMonthlyPreview();
+}
+
+async function loadMonthlyRun(runId) {
+  if (!runId) {
+    monthlyRun = null;
+    monthlyRankings = [];
+    renderMonthlyState();
+    return;
+  }
+  const detail = await api(`/api/admin/monthly-votes/${encodeURIComponent(runId)}`);
+  monthlyRun = detail.run || null;
+  monthlyRankings = Array.isArray(detail.rankings) ? detail.rankings : [];
+  renderMonthlyState();
+}
+
+async function loadMonthlyStatus() {
+  if (!monthlyEls.refresh) return;
+  setLoading(monthlyEls.refresh, true, "Chargement…");
+  setFeedback(monthlyEls.feedback, "Chargement de l’automatisation mensuelle…", "loading");
+  try {
+    const data = await api("/api/admin/monthly-votes/status");
+    monthlyEls.schedule.textContent = `${data.nextAutomaticSnapshot} — ${data.distributionMode}`;
+    if (!monthlyEls.period.value) monthlyEls.period.value = data.currentPeriod;
+    const selectedPeriod = monthlyEls.period.value;
+    const run = (Array.isArray(data.runs) ? data.runs : []).find((entry) => entry.period === selectedPeriod)
+      || (Array.isArray(data.runs) ? data.runs[0] : null);
+    if (run?.period && run.period !== selectedPeriod) monthlyEls.period.value = run.period;
+    setFeedback(monthlyEls.feedback);
+    await loadMonthlyRun(run?.id);
+  } catch (error) {
+    setFeedback(monthlyEls.feedback, error.message, "error");
+  } finally {
+    setLoading(monthlyEls.refresh, false);
+  }
+}
+
+async function prepareMonthlyRanking() {
+  const period = monthlyEls.period.value;
+  if (!period) {
+    setFeedback(monthlyEls.feedback, "Choisis le mois à préparer.", "error");
+    return;
+  }
+  if (!confirm(`Préparer ou recalculer le classement ${period} à partir des votes actuellement disponibles ?`)) return;
+  setLoading(monthlyEls.prepare, true, "Calcul en cours…");
+  setFeedback(monthlyEls.feedback, "Synchronisation Top-Serveurs et regroupement par SteamID…", "loading");
+  try {
+    const data = await api("/api/admin/monthly-votes/prepare", {
+      method: "POST",
+      body: { period, force: true },
+    });
+    monthlyRun = data.run || null;
+    monthlyRankings = Array.isArray(data.rankings) ? data.rankings : [];
+    setFeedback(monthlyEls.feedback, "Le classement a été préparé. Vérifie l’aperçu avant de créer les livraisons.", "success");
+    renderMonthlyState();
+  } catch (error) {
+    setFeedback(monthlyEls.feedback, error.message, "error");
+  } finally {
+    setLoading(monthlyEls.prepare, false);
+  }
+}
+
+async function approveMonthlyRewards() {
+  if (!monthlyRun?.id) return;
+  const readyCount = monthlyRankings.filter((row) => row.status === "ready").length;
+  if (!confirm(`Créer maintenant les livraisons pour ${readyCount} joueur(s) du classement ${monthlyRun.period} ? Cette action est protégée contre les doublons.`)) return;
+  setLoading(monthlyEls.approve, true, "Création des livraisons…");
+  setFeedback(monthlyEls.feedback, "Création des livraisons mensuelles en cours…", "loading");
+  try {
+    const data = await api(`/api/admin/monthly-votes/${encodeURIComponent(monthlyRun.id)}/approve`, { method: "POST" });
+    monthlyRun = data.run || monthlyRun;
+    monthlyRankings = Array.isArray(data.rankings) ? data.rankings : monthlyRankings;
+    const summary = data.summary || {};
+    setFeedback(
+      monthlyEls.feedback,
+      `${summary.created || 0} livraison(s) créée(s), ${summary.skipped || 0} ignorée(s), ${summary.failed || 0} en échec.`,
+      summary.failed ? "error" : "success"
+    );
+    renderMonthlyState();
+  } catch (error) {
+    setFeedback(monthlyEls.feedback, error.message, "error");
+  } finally {
+    setLoading(monthlyEls.approve, false);
+  }
+}
+
 async function checkAccess() {
   showOnly(els.loading);
   try {
@@ -285,7 +441,7 @@ async function checkAccess() {
     const data = await response.json().catch(() => ({}));
     if (response.status === 401 || response.status === 403 || data.authorized !== true) { showOnly(els.denied); return; }
     if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
-    showOnly(els.workspace); resetForm(); await loadRules();
+    showOnly(els.workspace); resetForm(); await Promise.all([loadRules(), loadMonthlyStatus()]);
   } catch (error) { byId("rewardsAccessErrorMessage").textContent = error.message; showOnly(els.error); }
 }
 
@@ -330,4 +486,9 @@ document.addEventListener("keydown", (event) => {
   event.preventDefault();
   openRule(card.dataset.openReward);
 });
+monthlyEls.prepare?.addEventListener("click", prepareMonthlyRanking);
+monthlyEls.approve?.addEventListener("click", approveMonthlyRewards);
+monthlyEls.refresh?.addEventListener("click", loadMonthlyStatus);
+monthlyEls.period?.addEventListener("change", loadMonthlyStatus);
+
 checkAccess();

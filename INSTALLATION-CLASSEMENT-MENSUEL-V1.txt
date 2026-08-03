@@ -1,0 +1,32 @@
+SENZANY — Classement mensuel automatique des votes (V1 contrôlée)
+
+FICHIERS À REMPLACER
+- senzany-admin-rewards.html
+- assets/js/admin/admin-rewards-page.js
+- assets/css/pages/admin-rewards.css
+- backend/server.js
+
+NOUVEAUX FICHIERS
+- backend/routes/adminMonthlyVotes.js
+- backend/services/monthlyVoteRewardService.js
+- supabase/014_monthly_vote_rewards.sql
+
+INSTALLATION
+1. Exécuter supabase/014_monthly_vote_rewards.sql dans Supabase > SQL Editor.
+2. Copier les fichiers dans le projet puis Commit / Push avec GitHub Desktop.
+3. Sur le VPS : pm2 restart senzany-api
+4. Recharger senzany-admin-rewards.html avec Ctrl + F5.
+
+FONCTIONNEMENT
+- Le dernier jour du mois à 23:55 (heure Europe/Paris), le backend prépare automatiquement le classement.
+- Le 1er à 00:05, un calcul de secours est tenté seulement si aucune capture n'existe.
+- Aucune livraison n'est créée sans validation du staff.
+- Le staff vérifie le classement puis clique sur « Valider et créer les livraisons ».
+- Un même mois ne peut pas être distribué deux fois.
+
+IMPORTANT
+- Seuls les packs « Classement mensuel » actifs sont appliqués.
+- Une livraison automatique exige au moins un objet DayZ configuré dans le pack.
+- Les champs Roubles et XP Battle Pass sont archivés dans le pack et ajoutés au message,
+  mais leur attribution technique devra être connectée à leur système respectif.
+- Le planificateur peut être désactivé avec MONTHLY_VOTE_SCHEDULER_ENABLED=false dans .env.
