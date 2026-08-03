@@ -180,12 +180,26 @@ function renderRule(rule) {
   row.dataset.openReward = rule.id;
   row.tabIndex = 0;
   row.setAttribute("role", "button");
+  row.setAttribute("aria-label", `Modifier le pack ${rule.name}`);
   row.innerHTML = `
     <span class="reward-tree-row__chevron">${selectedRuleId === rule.id ? "▶" : ""}</span>
     <span class="reward-tree-row__medal">${rankingMedal(rule)}</span>
     <span class="reward-tree-row__name">${escapeHtml(rule.name)}</span>
     <span class="reward-tree-row__summary">${escapeHtml(compactRewardSummary(rule))}</span>
     <em>${rule.is_active ? "ACTIF" : "INACTIF"}</em>`;
+
+  // Liaison directe : évite qu'un autre composant ou une propagation interrompue
+  // empêche le chargement du pack dans l'éditeur.
+  row.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openRule(rule.id);
+  });
+  row.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    openRule(rule.id);
+  });
   return row;
 }
 
@@ -278,7 +292,18 @@ async function loadRules() {
     const data = await api("/api/admin/rewards");
     rules = Array.isArray(data.rules) ? data.rules : [];
     setFeedback(els.feedback);
-    render();
+
+    // Conserve le pack sélectionné après une actualisation. Au premier chargement,
+    // ouvre automatiquement le premier pack afin que l'éditeur ne reste pas vide.
+    const selectedRule = rules.find((rule) => rule.id === selectedRuleId);
+    if (selectedRule) {
+      resetForm(selectedRule);
+    } else if (!selectedRuleId && rules.length) {
+      selectedRuleId = rules[0].id;
+      resetForm(rules[0]);
+    } else {
+      render();
+    }
   } catch (error) {
     setFeedback(els.feedback, error.message, "error");
   } finally { setLoading(els.refresh, false); }
