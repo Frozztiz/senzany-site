@@ -70,6 +70,16 @@ async function listAll() {
   })) : [];
 }
 
+async function findByNormalizedAlias(normalizedAlias) {
+  const rows = await supabaseService.request(
+    `topserveurs_vote_aliases?normalized_alias=eq.${encodeURIComponent(normalizedAlias)}` +
+      `&select=id,steam_id,alias&limit=1`,
+    { method: "GET" }
+  );
+
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+}
+
 async function addForSteamId(steamId, value) {
   const { alias, normalizedAlias } = validateAlias(value);
   const currentAliases = await listBySteamId(steamId);
@@ -78,6 +88,20 @@ async function addForSteamId(steamId, value) {
     const error = new Error(`Tu peux enregistrer jusqu’à ${MAX_ALIASES_PER_PLAYER} pseudos.`);
     error.code = "ALIAS_LIMIT_REACHED";
     throw error;
+  }
+
+  // Contrôle applicatif : un pseudo normalisé ne peut appartenir qu’à un seul compte.
+  // Ex. Frozzz, FROZZZ et "Fro zzz" sont considérés comme le même pseudo.
+  const existingAlias = await findByNormalizedAlias(normalizedAlias);
+  if (existingAlias) {
+    const belongsToCurrentAccount = String(existingAlias.steam_id) === String(steamId);
+    const conflict = new Error(
+      belongsToCurrentAccount
+        ? "Ce pseudo est déjà présent dans ta liste."
+        : "Ce pseudo est déjà associé à un autre compte Senzany. Contacte un administrateur s’il t’appartient."
+    );
+    conflict.code = belongsToCurrentAccount ? "ALIAS_ALREADY_OWNED" : "ALIAS_ALREADY_USED";
+    throw conflict;
   }
 
   try {
@@ -94,8 +118,12 @@ async function addForSteamId(steamId, value) {
     const row = Array.isArray(rows) ? rows[0] : rows;
     return mapAlias(row);
   } catch (error) {
+    // Dernière protection contre deux ajouts simultanés : la contrainte UNIQUE
+    // Supabase reste la source de vérité, même si l’API est appelée directement.
     if (error.status === 409 || error.data?.code === "23505") {
-      const conflict = new Error("Ce pseudo est déjà enregistré sur un compte Senzany.");
+      const conflict = new Error(
+        "Ce pseudo est déjà associé à un compte Senzany. Contacte un administrateur s’il t’appartient."
+      );
       conflict.code = "ALIAS_ALREADY_USED";
       throw conflict;
     }
@@ -136,6 +164,7 @@ module.exports = {
   normalizeAlias,
   listBySteamId,
   listAll,
+  findByNormalizedAlias,
   addForSteamId,
   removeForSteamId,
 };
