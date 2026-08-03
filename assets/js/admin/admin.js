@@ -31,7 +31,7 @@ const elements = {
         '[data-admin-module="deliveries"]'
     ),
     itemsButton: document.querySelector('[data-admin-module="items"]'),
-    votesLink: document.querySelector('[data-admin-link="senzany-admin-votes.html"]'),
+    externalModuleLinks: document.querySelectorAll("[data-admin-link]"),
 
     backButton: document.getElementById("backToAdminHome")
 };
@@ -277,7 +277,14 @@ function initializeAdmin() {
     );
 
     elements.itemsButton?.addEventListener("click", showItems);
-    elements.votesLink?.addEventListener("click", () => { window.location.href = elements.votesLink.dataset.adminLink; });
+    elements.externalModuleLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+            const target = String(link.dataset.adminLink || "").trim();
+            if (target) {
+                window.location.href = target;
+            }
+        });
+    });
     initializeCatalog({ onBack: showHome });
 
     elements.retryButton?.addEventListener(
