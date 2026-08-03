@@ -455,20 +455,7 @@ async function checkAccess() {
 
 els.form.addEventListener("submit", saveRule);
 els.addItem.addEventListener("click", () => { addItemRow(els.items); updatePreview(); });
-document.querySelectorAll("[data-reward-quick]").forEach((button) => {
-  button.addEventListener("click", () => {
-    addItemRow(els.items);
-    const rows = els.items.querySelectorAll(".admin-item-row");
-    const row = rows[rows.length - 1];
-    const input = row?.querySelector('input[type="search"], input[type="text"]');
-    if (input) {
-      input.value = button.dataset.rewardQuick || "";
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-      input.focus();
-    }
-    updatePreview();
-  });
-});
+
 els.cancel.addEventListener("click", () => resetForm());
 els.refresh.addEventListener("click", loadRules);
 els.search.addEventListener("input", render);
