@@ -1,0 +1,21 @@
+SENZANY — Classement mensuel incluant tous les votants
+
+1. Exécuter dans Supabase SQL Editor :
+   supabase/018_monthly_rankings_all_voters.sql
+
+2. Remplacer les fichiers du ZIP dans le projet.
+
+3. Commit + Push avec GitHub Desktop.
+
+4. Sur le VPS :
+   pm2 restart senzany-api
+
+5. Recharger la page Gestion des packs avec Ctrl + F5.
+
+6. Cliquer sur Préparer / recalculer.
+
+Résultat attendu :
+- tous les pseudos du classement Top-Serveurs apparaissent ;
+- les pseudos associés au même SteamID sont regroupés ;
+- les pseudos non inscrits gardent leur rang réel ;
+- seules les lignes avec un SteamID peuvent créer une livraison.

@@ -27,6 +27,7 @@ const monthlyEls = {
   players: byId("monthlyRewardPlayers"),
   deliveries: byId("monthlyRewardDeliveries"),
   deliveryNote: byId("monthlyRewardDeliveryNote"),
+  identifiedNote: byId("monthlyRewardIdentifiedNote"),
   prepare: byId("prepareMonthlyRanking"),
   approve: byId("approveMonthlyRewards"),
   refresh: byId("refreshMonthlyRewards"),
@@ -391,6 +392,7 @@ function monthlyRowState(row) {
     ready: "PRÊT",
     no_reward: "AUCUN PACK",
     no_items: "PACK SANS OBJET",
+    unidentified: "COMPTE NON IDENTIFIÉ",
     delivery_created: "LIVRAISON CRÉÉE",
     failed: "ERREUR",
     pending: "EN ATTENTE",
@@ -407,10 +409,10 @@ function renderMonthlyPreview() {
   monthlyEls.preview.innerHTML = monthlyRankings.map((row) => {
     const rewardName = row.reward_name || "Aucun pack configuré";
     const aliases = Array.isArray(row.aliases) ? row.aliases.join(", ") : "";
-    const stateClass = ["no_reward", "no_items"].includes(row.status) ? "is-warning" : row.status === "failed" ? "is-error" : "";
+    const stateClass = ["no_reward", "no_items", "unidentified"].includes(row.status) ? "is-warning" : row.status === "failed" ? "is-error" : "";
     return `<article class="monthly-ranking-row">
       <strong>#${Number(row.position || 0)}</strong>
-      <div class="monthly-ranking-row__player"><b>${escapeHtml(row.player_name || row.steam_id)}</b><small>${escapeHtml(aliases || row.steam_id)}</small></div>
+      <div class="monthly-ranking-row__player"><b>${escapeHtml(row.player_name || row.steam_id || "Pseudo non identifié")}</b><small>${escapeHtml(aliases || row.steam_id || "Aucun compte Senzany rattaché")}</small></div>
       <div class="monthly-ranking-row__votes">${formatNumber(row.votes)} votes</div>
       <div class="monthly-ranking-row__reward">${escapeHtml(rewardName)}</div>
       <div class="monthly-ranking-row__state ${stateClass}">${escapeHtml(monthlyRowState(row))}</div>
@@ -422,6 +424,10 @@ function renderMonthlyState() {
   if (!monthlyEls.status) return;
   monthlyEls.status.textContent = monthlyStatusLabel(monthlyRun?.status);
   monthlyEls.players.textContent = formatNumber(monthlyRun?.ranking_count || monthlyRankings.length || 0);
+  const identifiedCount = monthlyRankings.filter((row) => Boolean(row.steam_id)).length;
+  if (monthlyEls.identifiedNote) {
+    monthlyEls.identifiedNote.textContent = `${formatNumber(identifiedCount)} compte${identifiedCount > 1 ? "s" : ""} Senzany identifié${identifiedCount > 1 ? "s" : ""}`;
+  }
   monthlyEls.deliveries.textContent = formatNumber(monthlyRun?.delivery_count || 0);
   monthlyEls.deliveryNote.textContent = monthlyRun?.status === "completed"
     ? "Distribution terminée"
@@ -474,7 +480,7 @@ async function prepareMonthlyRanking() {
   }
   if (!confirm(`Préparer ou recalculer le classement ${period} à partir des votes actuellement disponibles ?`)) return;
   setLoading(monthlyEls.prepare, true, "Calcul en cours…");
-  setFeedback(monthlyEls.feedback, "Synchronisation Top-Serveurs et regroupement par SteamID…", "loading");
+  setFeedback(monthlyEls.feedback, "Synchronisation de tous les votants Top-Serveurs, puis rattachement des comptes Senzany…", "loading");
   try {
     const data = await api("/api/admin/monthly-votes/prepare", {
       method: "POST",
@@ -493,7 +499,7 @@ async function prepareMonthlyRanking() {
 
 async function approveMonthlyRewards() {
   if (!monthlyRun?.id) return;
-  const readyCount = monthlyRankings.filter((row) => row.status === "ready").length;
+  const readyCount = monthlyRankings.filter((row) => row.status === "ready" && row.steam_id).length;
   if (!confirm(`Créer maintenant les livraisons pour ${readyCount} joueur(s) du classement ${monthlyRun.period} ? Cette action est protégée contre les doublons.`)) return;
   setLoading(monthlyEls.approve, true, "Création des livraisons…");
   setFeedback(monthlyEls.feedback, "Création des livraisons mensuelles en cours…", "loading");

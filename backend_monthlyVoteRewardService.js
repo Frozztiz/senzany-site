@@ -87,43 +87,31 @@ async function buildGroupedRanking() {
     (Array.isArray(links) ? links : []).map((row) => [String(row.steam_id || ""), row])
   );
   const aliasByNormalized = new Map();
+  const groups = new Map();
 
   for (const alias of aliases) {
     const steamId = String(alias.steamId || "");
     const normalized = voteAliasService.normalizeAlias(alias.alias);
     if (!steamId || !normalized) continue;
     aliasByNormalized.set(normalized, alias);
-  }
-
-  // Le classement officiel inclut tous les pseudos Top-Serveurs.
-  // Les pseudos déclarés par un même compte sont regroupés par SteamID,
-  // tandis que les pseudos non identifiés restent classés individuellement.
-  const groups = new Map();
-  for (const entry of Array.isArray(ranking) ? ranking : []) {
-    const playerName = String(entry?.playerName || "").trim();
-    const normalized = voteAliasService.normalizeAlias(playerName);
-    if (!normalized) continue;
-
-    const alias = aliasByNormalized.get(normalized);
-    const steamId = alias ? String(alias.steamId || "") : "";
-    const key = steamId ? `steam:${steamId}` : `alias:${normalized}`;
-
-    if (!groups.has(key)) {
-      const link = steamId ? (linkBySteamId.get(steamId) || {}) : {};
-      groups.set(key, {
-        steamId: steamId || null,
-        playerName: steamId ? (link.discord_username || alias?.alias || playerName || steamId) : playerName,
+    if (!groups.has(steamId)) {
+      const link = linkBySteamId.get(steamId) || {};
+      groups.set(steamId, {
+        steamId,
+        playerName: link.discord_username || alias.alias || steamId,
         votes: 0,
         aliases: [],
-        identified: Boolean(steamId),
       });
     }
+    groups.get(steamId).aliases.push(alias.alias);
+  }
 
-    const group = groups.get(key);
-    group.votes += Number(entry?.votes || 0);
-    if (playerName && !group.aliases.some((value) => voteAliasService.normalizeAlias(value) === normalized)) {
-      group.aliases.push(playerName);
-    }
+  for (const entry of Array.isArray(ranking) ? ranking : []) {
+    const alias = aliasByNormalized.get(voteAliasService.normalizeAlias(entry.playerName));
+    if (!alias) continue;
+    const group = groups.get(String(alias.steamId));
+    if (!group) continue;
+    group.votes += Number(entry.votes || 0);
   }
 
   return [...groups.values()]
@@ -198,14 +186,14 @@ async function prepare(periodInput, { force = false } = {}) {
     return {
       run_id: run.id,
       position: entry.position,
-      steam_id: entry.steamId || null,
+      steam_id: entry.steamId,
       player_name: entry.playerName,
       votes: entry.votes,
       aliases: entry.aliases,
       reward_rule_id: rule?.id || null,
       reward_name: rule?.name || null,
       reward_snapshot: snapshotReward(rule),
-      status: !entry.steamId ? "unidentified" : (rule ? "ready" : "no_reward"),
+      status: rule ? "ready" : "no_reward",
       delivery_id: null,
       error_message: null,
       updated_at: new Date().toISOString(),
@@ -291,19 +279,6 @@ async function approve(runId, actorSteamId) {
   let failed = 0;
 
   for (const row of rankings) {
-    if (!row.steam_id) {
-      skipped += 1;
-      await supabaseService.request(`${RANKINGS_TABLE}?id=eq.${encodeURIComponent(row.id)}`, {
-        method: "PATCH",
-        headers: { Prefer: "return=minimal" },
-        body: JSON.stringify({
-          status: "unidentified",
-          error_message: "Pseudo non rattaché à un compte Senzany.",
-          updated_at: new Date().toISOString(),
-        }),
-      });
-      continue;
-    }
     if (row.delivery_id) {
       skipped += 1;
       continue;
