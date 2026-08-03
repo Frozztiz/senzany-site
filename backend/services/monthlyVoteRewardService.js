@@ -46,6 +46,39 @@ function normalizeItems(items) {
     .filter((item) => item.className);
 }
 
+const ROUBLE_CLASSNAME = process.env.SENZANY_ROUBLE_CLASSNAME || "MoneyRuble100";
+const ROUBLE_BUNDLE_VALUE = Math.max(1, Number.parseInt(process.env.SENZANY_ROUBLE_BUNDLE_VALUE || "50000", 10));
+const BITCOIN_CLASSNAME = process.env.SENZANY_BITCOIN_CLASSNAME || "bitcoin";
+
+function mergeDeliveryItems(items) {
+  const merged = new Map();
+  for (const item of items) {
+    if (!item?.className) continue;
+    const key = item.className.toLowerCase();
+    const current = merged.get(key) || { ...item, quantity: 0 };
+    current.quantity += Math.max(1, Number.parseInt(item.quantity, 10) || 1);
+    merged.set(key, current);
+  }
+  return [...merged.values()];
+}
+
+function buildRewardDeliveryItems(reward) {
+  const items = normalizeItems(reward?.items);
+  const roubles = Math.max(0, Number.parseInt(reward?.roubles, 10) || 0);
+  const bitcoinAmount = Math.max(0, Number.parseInt(reward?.bitcoinAmount, 10) || 0);
+
+  if (roubles > 0) {
+    if (roubles % ROUBLE_BUNDLE_VALUE !== 0) {
+      throw new Error(`Le montant ${roubles} ₽ n’est pas divisible par ${ROUBLE_BUNDLE_VALUE} ₽.`);
+    }
+    items.push({ className: ROUBLE_CLASSNAME, name: "Roubles", quantity: roubles / ROUBLE_BUNDLE_VALUE });
+  }
+  if (bitcoinAmount > 0) {
+    items.push({ className: BITCOIN_CLASSNAME, name: "Bitcoin", quantity: bitcoinAmount });
+  }
+  return mergeDeliveryItems(items);
+}
+
 async function getRunByPeriod(period) {
   const rows = await supabaseService.request(
     `${RUNS_TABLE}?period=eq.${encodeURIComponent(validatePeriod(period))}` +
@@ -138,6 +171,7 @@ function snapshotReward(rule) {
     name: rule.name,
     description: rule.description || "",
     roubles: Number(rule.roubles || 0),
+    bitcoinAmount: Number(rule.bitcoin_amount || 0),
     battlePassXp: Number(rule.battle_pass_xp || 0),
     items: normalizeItems(rule.items),
     rankMin: Number(rule.rank_min || 1),
@@ -238,7 +272,8 @@ function buildDeliveryMessage(row, reward) {
     reward.description || `Récompense du classement mensuel ${row.position}.`,
     `Classement : #${row.position} — ${row.votes} vote${row.votes > 1 ? "s" : ""}.`,
   ];
-  if (reward.roubles > 0) parts.push(`Roubles prévus : ${reward.roubles}.`);
+  if (reward.roubles > 0) parts.push(`Roubles : ${reward.roubles}.`);
+  if (reward.bitcoinAmount > 0) parts.push(`Bitcoins : ${reward.bitcoinAmount}.`);
   if (reward.battlePassXp > 0) parts.push(`XP Battle Pass prévue : ${reward.battlePassXp}.`);
   return parts.join(" ").slice(0, 500);
 }
@@ -284,7 +319,22 @@ async function approve(runId, actorSteamId) {
       continue;
     }
     const reward = row.reward_snapshot;
-    const items = normalizeItems(reward?.items);
+    let items = [];
+    try {
+      items = reward ? buildRewardDeliveryItems(reward) : [];
+    } catch (conversionError) {
+      failed += 1;
+      await supabaseService.request(`${RANKINGS_TABLE}?id=eq.${encodeURIComponent(row.id)}`, {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({
+          status: "failed",
+          error_message: String(conversionError?.message || conversionError).slice(0, 500),
+          updated_at: new Date().toISOString(),
+        }),
+      });
+      continue;
+    }
     if (!reward || !items.length) {
       skipped += 1;
       await supabaseService.request(`${RANKINGS_TABLE}?id=eq.${encodeURIComponent(row.id)}`, {

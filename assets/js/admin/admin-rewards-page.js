@@ -10,12 +10,12 @@ const els = {
   modeTabs: Array.from(document.querySelectorAll("[data-reward-mode]")),
   rankingFields: byId("rewardRankingFields"), thresholdFields: byId("rewardThresholdFields"),
   rankMin: byId("rewardRankMin"), rankMax: byId("rewardRankMax"), thresholdValue: byId("rewardThresholdValue"),
-  roubles: byId("rewardRoubles"), xp: byId("rewardBattlePassXp"), description: byId("rewardDescription"), active: byId("rewardActive"), priority: byId("rewardPriority"),
+  roubles: byId("rewardRoubles"), bitcoin: byId("rewardBitcoin"), xp: byId("rewardBattlePassXp"), description: byId("rewardDescription"), active: byId("rewardActive"), priority: byId("rewardPriority"),
   items: byId("rewardItemsList"), addItem: byId("addRewardItem"), save: byId("saveRewardRule"), cancel: byId("cancelRewardEdit"), formFeedback: byId("rewardFormFeedback"),
   list: byId("rewardsList"), feedback: byId("rewardsFeedback"), search: byId("rewardsSearch"), filter: byId("rewardsTypeFilter"), refresh: byId("refreshRewards"),
   rankingsCount: byId("rewardsRankings"), thresholdsCount: byId("rewardsThresholds"), battlePassCount: byId("rewardsBattlePass"), eventsCount: byId("rewardsEvents"),
   previewName: byId("rewardPreviewName"), previewType: byId("rewardPreviewType"), previewApplication: byId("rewardPreviewApplication"),
-  previewRoubles: byId("rewardPreviewRoubles"), previewXp: byId("rewardPreviewXp"), previewItems: byId("rewardPreviewItems"),
+  previewRoubles: byId("rewardPreviewRoubles"), previewBitcoin: byId("rewardPreviewBitcoin"), previewXp: byId("rewardPreviewXp"), previewItems: byId("rewardPreviewItems"),
 };
 
 const monthlyEls = {
@@ -152,6 +152,7 @@ function renderRule(rule) {
     ${rule.description ? `<p class="reward-rule__message">${escapeHtml(rule.description)}</p>` : ""}
     <div class="reward-rule__values">
       <div><span>Roubles</span><strong>${formatNumber(rule.roubles)} ₽</strong></div>
+      <div><span>Bitcoins</span><strong>${formatNumber(rule.bitcoin_amount)}</strong></div>
       <div><span>XP Battle Pass</span><strong>${formatNumber(rule.battle_pass_xp)}</strong></div>
     </div>
     <div class="reward-rule__items">
@@ -193,6 +194,7 @@ function updatePreview() {
   els.previewType.textContent = typeLabel(els.type.value);
   els.previewApplication.textContent = applicationLabel(previewRule);
   els.previewRoubles.textContent = `${formatNumber(els.roubles.value)} ₽`;
+  els.previewBitcoin.textContent = formatNumber(els.bitcoin.value);
   els.previewXp.textContent = formatNumber(els.xp.value);
   els.previewItems.innerHTML = items.length
     ? items.map((item) => `<small>${escapeHtml(item.className)} × ${item.quantity}</small>`).join("")
@@ -207,6 +209,7 @@ function resetForm(rule = null) {
   els.rankMax.value = rule?.rank_max || 1;
   els.thresholdValue.value = rule?.threshold_value || 200;
   els.roubles.value = rule?.roubles || 0;
+  els.bitcoin.value = rule?.bitcoin_amount || 0;
   els.xp.value = rule?.battle_pass_xp || 0;
   els.description.value = rule?.description || "";
   els.active.checked = rule?.is_active ?? true;
@@ -246,6 +249,11 @@ async function saveRule(event) {
   if (!els.name.value.trim()) { setFeedback(els.formFeedback, "Le nom du pack est obligatoire.", "error"); return; }
   if (isRankingType(rewardType) && rankMax < rankMin) { setFeedback(els.formFeedback, "Le Top maximum ne peut pas être inférieur au Top minimum.", "error"); return; }
   if (isThresholdType(rewardType) && thresholdValue < 1) { setFeedback(els.formFeedback, "Le palier doit être supérieur à zéro.", "error"); return; }
+  const roubles = Number(els.roubles.value || 0);
+  if (roubles > 0 && roubles % 50000 !== 0) {
+    setFeedback(els.formFeedback, "Le montant en roubles doit être un multiple de 50 000 ₽ pour créer automatiquement les lots de billets.", "error");
+    return;
+  }
   saving = true; setLoading(els.save, true, "Enregistrement…");
   const id = els.id.value;
   const payload = {
@@ -253,7 +261,7 @@ async function saveRule(event) {
     rankMin: isRankingType(rewardType) ? rankMin : 1,
     rankMax: isRankingType(rewardType) ? rankMax : 1,
     thresholdValue: isThresholdType(rewardType) ? thresholdValue : null,
-    roubles: Number(els.roubles.value || 0), battlePassXp: Number(els.xp.value || 0),
+    roubles, bitcoinAmount: Number(els.bitcoin.value || 0), battlePassXp: Number(els.xp.value || 0),
     description: els.description.value.trim(), isActive: els.active.checked,
     priority: Number(els.priority.value || 100),
     items: getItemsFromContainer(els.items).map((item) => ({ classname: item.className || item.name, quantity: item.quantity })),
@@ -447,13 +455,27 @@ async function checkAccess() {
 
 els.form.addEventListener("submit", saveRule);
 els.addItem.addEventListener("click", () => { addItemRow(els.items); updatePreview(); });
+document.querySelectorAll("[data-reward-quick]").forEach((button) => {
+  button.addEventListener("click", () => {
+    addItemRow(els.items);
+    const rows = els.items.querySelectorAll(".admin-item-row");
+    const row = rows[rows.length - 1];
+    const input = row?.querySelector('input[type="search"], input[type="text"]');
+    if (input) {
+      input.value = button.dataset.rewardQuick || "";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.focus();
+    }
+    updatePreview();
+  });
+});
 els.cancel.addEventListener("click", () => resetForm());
 els.refresh.addEventListener("click", loadRules);
 els.search.addEventListener("input", render);
 els.filter.addEventListener("change", render);
 els.type.addEventListener("change", () => { updateApplicationFields(); updatePreview(); });
 els.modeTabs.forEach((button) => button.addEventListener("click", () => selectMode(button.dataset.rewardMode)));
-[els.name, els.rankMin, els.rankMax, els.thresholdValue, els.roubles, els.xp].forEach((node) => {
+[els.name, els.rankMin, els.rankMax, els.thresholdValue, els.roubles, els.bitcoin, els.xp].forEach((node) => {
   node.addEventListener("input", updatePreview);
   node.addEventListener("change", updatePreview);
 });

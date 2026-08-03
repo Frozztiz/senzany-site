@@ -1,0 +1,18 @@
+SENZANY — PACKS V9 : MONNAIES AUTOMATIQUES
+
+1. Exécuter dans Supabase : supabase/017_reward_business_fields.sql
+2. Remplacer les fichiers du ZIP à la racine du projet.
+3. Commit / Push avec GitHub Desktop.
+4. Sur le VPS : pm2 restart senzany-api
+5. Ctrl + F5 sur senzany-admin-rewards.html
+
+CONVERSION PAR DÉFAUT
+- 50 000 roubles = 1 objet MoneyRuble100
+- 1 bitcoin = 1 objet bitcoin
+
+Variables .env optionnelles :
+SENZANY_ROUBLE_CLASSNAME=MoneyRuble100
+SENZANY_ROUBLE_BUNDLE_VALUE=50000
+SENZANY_BITCOIN_CLASSNAME=bitcoin
+
+Le montant en roubles doit être un multiple de 50 000.

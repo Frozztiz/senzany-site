@@ -120,8 +120,21 @@
                 <input id="rewardRoubles" type="number" min="0" value="0" />
               </div>
               <div class="admin-field">
+                <label for="rewardBitcoin">Bitcoins</label>
+                <input id="rewardBitcoin" type="number" min="0" value="0" />
+                <small>Converti automatiquement en objet <code>bitcoin</code> dans la livraison.</small>
+              </div>
+            </div>
+
+            <div class="reward-grid reward-grid--two">
+              <div class="admin-field">
                 <label for="rewardBattlePassXp">XP Battle Pass</label>
                 <input id="rewardBattlePassXp" type="number" min="0" value="0" />
+              </div>
+              <div class="reward-currency-info">
+                <span>CONVERSION AUTOMATIQUE</span>
+                <strong>50 000 ₽ = 1 lot de billets</strong>
+                <small>Le portail crée automatiquement les objets <code>MoneyRuble100</code>. Le montant doit être un multiple de 50 000 ₽.</small>
               </div>
             </div>
 
@@ -132,8 +145,14 @@
 
             <div class="admin-items rewards-items">
               <div class="admin-items__heading">
-                <div><span>CONTENU</span><h3>Objets du pack</h3></div>
+                <div><span>CONTENU</span><h3>Objets du pack</h3><small>Ajoute uniquement les objets spéciaux : vêtements, sac, parking, armes… Les monnaies sont générées automatiquement.</small></div>
                 <button id="addRewardItem" class="admin-button admin-button--small" type="button">+ Ajouter un objet</button>
+              </div>
+              <div class="reward-quick-library" aria-label="Bibliothèque rapide">
+                <button type="button" data-reward-quick="Senzany">👕 Vêtement Senzany</button>
+                <button type="button" data-reward-quick="Bag">🎒 Sac à dos</button>
+                <button type="button" data-reward-quick="Parking">🚗 Parking Slot</button>
+                <button type="button" data-reward-quick="Attachment">🧩 Attachement</button>
               </div>
               <div id="rewardItemsList"></div>
             </div>
@@ -150,6 +169,7 @@
                 <div><span>Type</span><strong id="rewardPreviewType">Votes mensuels</strong></div>
                 <div><span>Application</span><strong id="rewardPreviewApplication">Top 1</strong></div>
                 <div><span>Roubles</span><strong id="rewardPreviewRoubles">0 ₽</strong></div>
+                <div><span>Bitcoins</span><strong id="rewardPreviewBitcoin">0</strong></div>
                 <div><span>XP Battle Pass</span><strong id="rewardPreviewXp">0</strong></div>
                 <div class="reward-preview__items"><span>Objets</span><div id="rewardPreviewItems">Aucun objet configuré</div></div>
               </div>
@@ -201,6 +221,6 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=8.0.0"></script>
+  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=9.0.0"></script>
 </body>
 </html>

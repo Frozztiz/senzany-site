@@ -31,6 +31,13 @@ function validatePayload(input = {}) {
   const rankMin = isRanking ? Math.max(1, parseInteger(input.rankMin ?? input.rank_min, 1)) : 1;
   const rankMax = isRanking ? Math.max(rankMin, parseInteger(input.rankMax ?? input.rank_max, rankMin)) : 1;
   const thresholdValue = isThreshold ? Math.max(1, parseInteger(input.thresholdValue ?? input.threshold_value, 1)) : null;
+  const roubles = Math.max(0, parseInteger(input.roubles, 0));
+  if (roubles > 0 && roubles % 50000 !== 0) {
+    const error = new Error("Le montant en roubles doit être un multiple de 50 000 ₽.");
+    error.status = 400;
+    throw error;
+  }
+
   const name = cleanText(input.name, 100);
   if (name.length < 2) {
     const error = new Error("Le nom du pack doit contenir au moins 2 caractères.");
@@ -45,7 +52,8 @@ function validatePayload(input = {}) {
     threshold_value: thresholdValue,
     name,
     description: cleanText(input.description, 500),
-    roubles: Math.max(0, parseInteger(input.roubles, 0)),
+    roubles,
+    bitcoin_amount: Math.max(0, parseInteger(input.bitcoinAmount ?? input.bitcoin_amount, 0)),
     battle_pass_xp: Math.max(0, parseInteger(input.battlePassXp ?? input.battle_pass_xp, 0)),
     items: normalizeItems(input.items),
     is_active: input.isActive ?? input.is_active ?? true,
@@ -56,7 +64,7 @@ function validatePayload(input = {}) {
 
 async function list() {
   const rows = await supabaseService.request(
-    `${TABLE}?select=id,reward_type,rank_min,rank_max,threshold_value,name,description,roubles,battle_pass_xp,items,is_active,priority,created_at,updated_at&order=reward_type.asc,rank_min.asc,threshold_value.asc,priority.asc`,
+    `${TABLE}?select=id,reward_type,rank_min,rank_max,threshold_value,name,description,roubles,bitcoin_amount,battle_pass_xp,items,is_active,priority,created_at,updated_at&order=reward_type.asc,rank_min.asc,threshold_value.asc,priority.asc`,
     { method: "GET" }
   );
   return Array.isArray(rows) ? rows : [];
