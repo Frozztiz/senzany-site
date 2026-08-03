@@ -10,3 +10,6 @@ body[data-page="admin-rewards"]{margin:0;min-height:100vh;background:radial-grad
 #rewardThresholdFields[hidden],#rewardRankingFields[hidden]{display:none!important}
 #rewardThresholdFields small{display:block;margin-top:7px;color:#766e68;font-size:11px;line-height:1.45}
 .reward-rule__top small{font-weight:700;color:#c3b8b0}
+
+/* V7 — navigation par catégories et duplication rapide */
+.reward-mode-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:18px;padding:6px;border:1px solid rgba(255,255,255,.1);background:#0b0908}.reward-mode-tab{min-height:48px;border:1px solid transparent;background:transparent;color:#8f8580;font:800 11px monospace;letter-spacing:.7px;cursor:pointer;transition:border-color .18s ease,background .18s ease,color .18s ease}.reward-mode-tab:hover{border-color:#50302c;color:#eee}.reward-mode-tab.is-active{border-color:#92342e;background:linear-gradient(135deg,rgba(115,31,27,.32),rgba(22,15,13,.95));color:#fff;box-shadow:inset 3px 0 #e33}.reward-name-field--wide{grid-column:1/-1}.reward-rule__actions{flex-wrap:wrap}.reward-rule__actions [data-duplicate-reward]{border-color:#705523;color:#e6c86d}.reward-rule__actions [data-duplicate-reward]:hover{border-color:#ae8131;color:#ffe398}@media(max-width:720px){.reward-mode-tabs{grid-template-columns:1fr}.reward-name-field--wide{grid-column:auto}}

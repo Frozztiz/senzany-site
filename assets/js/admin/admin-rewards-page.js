@@ -6,7 +6,8 @@ let saving = false;
 
 const els = {
   loading: byId("rewardsAccessLoading"), denied: byId("rewardsAccessDenied"), error: byId("rewardsAccessError"), workspace: byId("rewardsWorkspace"),
-  form: byId("rewardForm"), id: byId("rewardId"), type: byId("rewardType"), name: byId("rewardName"),
+  form: byId("rewardForm"), id: byId("rewardId"), type: byId("rewardType"), typeField: byId("rewardTypeField"), name: byId("rewardName"),
+  modeTabs: Array.from(document.querySelectorAll("[data-reward-mode]")),
   rankingFields: byId("rewardRankingFields"), thresholdFields: byId("rewardThresholdFields"),
   rankMin: byId("rewardRankMin"), rankMax: byId("rewardRankMax"), thresholdValue: byId("rewardThresholdValue"),
   roubles: byId("rewardRoubles"), xp: byId("rewardBattlePassXp"), description: byId("rewardDescription"), active: byId("rewardActive"), priority: byId("rewardPriority"),
@@ -72,6 +73,33 @@ function setLoading(button, isLoading, label) {
   else { button.disabled = false; button.textContent = button.dataset.originalText || button.textContent; delete button.dataset.originalText; }
 }
 
+function currentMode() {
+  if (isRankingType(els.type.value)) return "votes_ranking";
+  if (isThresholdType(els.type.value)) return "votes_threshold";
+  return "other";
+}
+
+function syncModeTabs() {
+  const mode = currentMode();
+  els.modeTabs.forEach((button) => {
+    const active = button.dataset.rewardMode === mode;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-selected", String(active));
+  });
+  els.typeField.hidden = mode !== "other";
+  document.querySelector(".reward-name-field")?.classList.toggle("reward-name-field--wide", mode !== "other");
+}
+
+function selectMode(mode) {
+  if (mode === "votes_ranking" || mode === "votes_threshold") {
+    els.type.value = mode;
+  } else if (isRankingType(els.type.value) || isThresholdType(els.type.value)) {
+    els.type.value = "event";
+  }
+  updateApplicationFields();
+  updatePreview();
+}
+
 function updateApplicationFields() {
   const ranking = isRankingType(els.type.value);
   const threshold = isThresholdType(els.type.value);
@@ -80,6 +108,7 @@ function updateApplicationFields() {
   els.rankMin.required = ranking;
   els.rankMax.required = ranking;
   els.thresholdValue.required = threshold;
+  syncModeTabs();
 }
 
 function filteredRules() {
@@ -115,6 +144,7 @@ function renderRule(rule) {
     </div>
     <div class="reward-rule__actions">
       <button type="button" class="admin-button admin-button--small" data-edit-reward="${escapeHtml(rule.id)}">Modifier</button>
+      <button type="button" class="admin-button admin-button--small" data-duplicate-reward="${escapeHtml(rule.id)}">Dupliquer</button>
       <button type="button" class="admin-button admin-button--small admin-button--danger" data-delete-reward="${escapeHtml(rule.id)}">Supprimer</button>
     </div>`;
   return article;
@@ -221,6 +251,26 @@ async function saveRule(event) {
   finally { saving = false; setLoading(els.save, false); }
 }
 
+function duplicateRule(id) {
+  const rule = rules.find((entry) => entry.id === id);
+  if (!rule) return;
+  const copy = {
+    ...rule,
+    id: "",
+    name: `Copie de ${rule.name}`.slice(0, 100),
+    is_active: false,
+  };
+  resetForm(copy);
+  byId("rewardFormKicker").textContent = "DUPLICATION DU PACK";
+  byId("rewardFormTitle").textContent = "Créer depuis une copie";
+  els.save.textContent = "ENREGISTRER LA COPIE";
+  els.cancel.hidden = false;
+  setFeedback(els.formFeedback, "Le pack a été copié dans le formulaire. Vérifie les valeurs puis enregistre-le.", "success");
+  document.querySelector(".rewards-editor-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  els.name.focus();
+  els.name.select();
+}
+
 async function deleteRule(id) {
   const rule = rules.find((entry) => entry.id === id);
   if (!rule || !confirm(`Supprimer le pack « ${rule.name} » ?`)) return;
@@ -246,6 +296,7 @@ els.refresh.addEventListener("click", loadRules);
 els.search.addEventListener("input", render);
 els.filter.addEventListener("change", render);
 els.type.addEventListener("change", () => { updateApplicationFields(); updatePreview(); });
+els.modeTabs.forEach((button) => button.addEventListener("click", () => selectMode(button.dataset.rewardMode)));
 [els.name, els.rankMin, els.rankMax, els.thresholdValue, els.roubles, els.xp].forEach((node) => {
   node.addEventListener("input", updatePreview);
   node.addEventListener("change", updatePreview);
@@ -265,6 +316,8 @@ function openRule(id) {
 document.addEventListener("click", (event) => {
   const remove = event.target.closest("[data-delete-reward]");
   if (remove) { deleteRule(remove.dataset.deleteReward); return; }
+  const duplicate = event.target.closest("[data-duplicate-reward]");
+  if (duplicate) { duplicateRule(duplicate.dataset.duplicateReward); return; }
   const edit = event.target.closest("[data-edit-reward]");
   if (edit) { openRule(edit.dataset.editReward); return; }
   const card = event.target.closest("[data-open-reward]");

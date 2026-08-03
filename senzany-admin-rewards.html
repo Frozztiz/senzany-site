@@ -7,7 +7,7 @@
   <title>Commandement — Récompenses — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
   <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=6.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=7.0.0" />
 </head>
 <body data-page="admin-rewards">
   <div data-site-header></div>
@@ -44,9 +44,15 @@
           <form id="rewardForm" novalidate>
             <input id="rewardId" type="hidden" />
 
+            <div class="reward-mode-tabs" role="tablist" aria-label="Catégorie du pack">
+              <button class="reward-mode-tab is-active" type="button" data-reward-mode="votes_ranking" role="tab" aria-selected="true">🏆 Classement mensuel</button>
+              <button class="reward-mode-tab" type="button" data-reward-mode="votes_threshold" role="tab" aria-selected="false">🎯 Palier de votes</button>
+              <button class="reward-mode-tab" type="button" data-reward-mode="other" role="tab" aria-selected="false">⚙ Autres packs</button>
+            </div>
+
             <div class="reward-grid reward-grid--two">
-              <div class="admin-field">
-                <label for="rewardType">Type de pack</label>
+              <div id="rewardTypeField" class="admin-field" hidden>
+                <label for="rewardType">Type complémentaire</label>
                 <select id="rewardType" required>
                   <option value="votes_ranking">Classement mensuel</option>
                   <option value="votes_threshold">Palier de votes</option>
@@ -57,7 +63,7 @@
                 </select>
               </div>
 
-              <div class="admin-field">
+              <div class="admin-field reward-name-field">
                 <label for="rewardName">Nom</label>
                 <input id="rewardName" type="text" maxlength="100" placeholder="Exemple : Pack Or" required />
               </div>
@@ -169,6 +175,6 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=6.0.0"></script>
+  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=7.0.0"></script>
 </body>
 </html>
