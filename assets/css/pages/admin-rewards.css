@@ -47,3 +47,38 @@ body[data-page="admin-rewards"]{margin:0;min-height:100vh;background:radial-grad
 @media(max-width:720px){
   .reward-rule__values{grid-template-columns:1fr 1fr}
 }
+
+/* V10 — Gestionnaire compact : liste à gauche, éditeur à droite */
+.rewards-layout{grid-template-columns:minmax(360px,.72fr) minmax(620px,1.28fr);gap:16px;align-items:start}
+.rewards-list-card{order:1;position:sticky;top:92px;min-width:0;max-height:calc(100vh - 112px);display:flex;flex-direction:column;overflow:hidden}
+.rewards-editor-card{order:2;position:relative;top:auto;min-width:0}
+.rewards-list-card .admin-card__header{min-height:74px;padding:16px 18px}
+.rewards-list-card .admin-card__header h2{font-size:21px}
+.rewards-list-card .rewards-summary-strip{grid-template-columns:1fr 1fr}
+.rewards-list-card .rewards-summary-strip>div{padding:10px 12px}
+.rewards-list-card .rewards-summary-strip strong{font-size:16px}
+.rewards-list-card .rewards-filters{grid-template-columns:1fr 145px;gap:8px;padding:12px}
+.rewards-list-card .rewards-filters #refreshRewards{grid-column:1/-1;padding:9px 12px}
+.rewards-list{max-height:none;flex:1;overflow:auto;padding:8px 10px 12px}
+.reward-rule--compact{display:grid;grid-template-columns:4px minmax(0,1fr) auto auto;align-items:center;gap:10px;min-height:66px;margin:0 0 7px;padding:0 10px 0 0;border:1px solid #382825;background:linear-gradient(90deg,rgba(24,17,15,.98),rgba(10,9,8,.98));cursor:pointer;transition:border-color .16s ease,background .16s ease,transform .16s ease}
+.reward-rule--compact:hover,.reward-rule--compact.is-selected{transform:translateX(2px);border-color:#9f352f;background:linear-gradient(90deg,rgba(57,20,17,.92),rgba(12,10,9,.98))}
+.reward-rule--compact.is-selected{box-shadow:inset 0 0 0 1px rgba(227,51,51,.18)}
+.reward-rule__status{align-self:stretch;background:#49d97e;box-shadow:0 0 12px rgba(73,217,126,.35)}
+.reward-rule--compact.is-inactive .reward-rule__status{background:#87302c;box-shadow:none}
+.reward-rule--compact.is-inactive{opacity:.66}
+.reward-rule__identity{min-width:0;padding:10px 0}
+.reward-rule__identity span{display:block;color:#e34b43;font:800 8px monospace;letter-spacing:1.35px;text-transform:uppercase}
+.reward-rule__identity strong{display:block;overflow:hidden;margin-top:3px;color:#f2ede7;font-size:15px;line-height:1.15;text-overflow:ellipsis;white-space:nowrap}
+.reward-rule__identity small{display:block;overflow:hidden;margin-top:3px;color:#8e8580;font-size:10px;text-overflow:ellipsis;white-space:nowrap}
+.reward-rule__summary{max-width:210px;color:#c5bbb4;font:700 10px monospace;line-height:1.45;text-align:right}
+.reward-rule__state em{display:inline-block;padding:4px 6px;border:1px solid #2d6d42;color:#59dc86;font:800 8px monospace;font-style:normal}
+.reward-rule--compact.is-inactive .reward-rule__state em{border-color:#6f2826;color:#e16d66}
+.reward-rule__menu{display:flex;gap:4px}
+.reward-rule__icon{display:grid;place-items:center;width:28px;height:28px;border:1px solid #51433e;background:#13100f;color:#d9d0ca;cursor:pointer}
+.reward-rule__icon:hover{border-color:#a33a33;color:#fff}
+.reward-rule__icon--danger{color:#e46a63}
+.rewards-editor-card form{padding:20px}
+.rewards-editor-card .admin-card__header{position:sticky;top:92px;z-index:3;background:linear-gradient(180deg,#1a1817,#11100f)}
+@media(max-width:1320px){.rewards-layout{grid-template-columns:minmax(320px,.82fr) minmax(560px,1.18fr)}.reward-rule__summary{max-width:150px}}
+@media(max-width:1050px){.rewards-layout{grid-template-columns:1fr}.rewards-list-card,.rewards-editor-card{position:relative;top:auto;max-height:none}.rewards-list-card{order:1}.rewards-editor-card{order:2}.rewards-list{max-height:420px}.reward-rule__summary{max-width:none}}
+@media(max-width:620px){.reward-rule--compact{grid-template-columns:4px minmax(0,1fr) auto}.reward-rule__summary{grid-column:2/4;max-width:none;padding-bottom:9px;text-align:left}.reward-rule__state{display:none}.rewards-list-card .rewards-filters{grid-template-columns:1fr}.rewards-list-card .rewards-filters #refreshRewards{grid-column:auto}}

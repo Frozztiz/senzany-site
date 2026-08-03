@@ -12,7 +12,7 @@ const els = {
   rankMin: byId("rewardRankMin"), rankMax: byId("rewardRankMax"), thresholdValue: byId("rewardThresholdValue"),
   roubles: byId("rewardRoubles"), bitcoin: byId("rewardBitcoin"), xp: byId("rewardBattlePassXp"), description: byId("rewardDescription"), active: byId("rewardActive"), priority: byId("rewardPriority"),
   items: byId("rewardItemsList"), addItem: byId("addRewardItem"), save: byId("saveRewardRule"), cancel: byId("cancelRewardEdit"), formFeedback: byId("rewardFormFeedback"),
-  list: byId("rewardsList"), feedback: byId("rewardsFeedback"), search: byId("rewardsSearch"), filter: byId("rewardsTypeFilter"), refresh: byId("refreshRewards"),
+  list: byId("rewardsList"), feedback: byId("rewardsFeedback"), search: byId("rewardsSearch"), filter: byId("rewardsTypeFilter"), refresh: byId("refreshRewards"), newRule: byId("newRewardRule"),
   rankingsCount: byId("rewardsRankings"), thresholdsCount: byId("rewardsThresholds"), battlePassCount: byId("rewardsBattlePass"), eventsCount: byId("rewardsEvents"),
   previewName: byId("rewardPreviewName"), previewType: byId("rewardPreviewType"), previewApplication: byId("rewardPreviewApplication"),
   previewRoubles: byId("rewardPreviewRoubles"), previewBitcoin: byId("rewardPreviewBitcoin"), previewXp: byId("rewardPreviewXp"), previewItems: byId("rewardPreviewItems"),
@@ -138,31 +138,38 @@ function filteredRules() {
   });
 }
 
+function compactRewardSummary(rule) {
+  const parts = [];
+  const roubles = Number(rule.roubles || 0);
+  const bitcoin = Number(rule.bitcoin_amount || 0);
+  const xp = Number(rule.battle_pass_xp || 0);
+  const itemCount = normalizeItems(rule.items).reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  if (roubles) parts.push(`${formatNumber(roubles)} ₽`);
+  if (bitcoin) parts.push(`${formatNumber(bitcoin)} BTC`);
+  if (xp) parts.push(`${formatNumber(xp)} XP`);
+  if (itemCount) parts.push(`${formatNumber(itemCount)} objet${itemCount > 1 ? "s" : ""}`);
+  return parts.length ? parts.join(" • ") : "Aucune récompense configurée";
+}
+
 function renderRule(rule) {
-  const items = normalizeItems(rule.items);
   const article = document.createElement("article");
-  article.className = `reward-rule ${rule.is_active ? "is-active" : "is-inactive"}`;
+  article.className = `reward-rule reward-rule--compact ${rule.is_active ? "is-active" : "is-inactive"}`;
   article.dataset.openReward = rule.id;
   article.tabIndex = 0;
+  article.setAttribute("role", "button");
+  article.setAttribute("aria-label", `Modifier le pack ${rule.name}`);
   article.innerHTML = `
-    <div class="reward-rule__top">
-      <div><span>${escapeHtml(typeLabel(rule.reward_type))}</span><h3>${escapeHtml(rule.name)}</h3><small>${escapeHtml(applicationLabel(rule))}</small></div>
-      <em>${rule.is_active ? "ACTIF" : "DÉSACTIVÉ"}</em>
+    <div class="reward-rule__status" aria-hidden="true"></div>
+    <div class="reward-rule__identity">
+      <span>${escapeHtml(typeLabel(rule.reward_type))}</span>
+      <strong>${escapeHtml(rule.name)}</strong>
+      <small>${escapeHtml(applicationLabel(rule))}</small>
     </div>
-    ${rule.description ? `<p class="reward-rule__message">${escapeHtml(rule.description)}</p>` : ""}
-    <div class="reward-rule__values">
-      <div><span>Roubles</span><strong>${formatNumber(rule.roubles)} ₽</strong></div>
-      <div><span>Bitcoins</span><strong>${formatNumber(rule.bitcoin_amount)}</strong></div>
-      <div><span>XP Battle Pass</span><strong>${formatNumber(rule.battle_pass_xp)}</strong></div>
-    </div>
-    <div class="reward-rule__items">
-      <span>OBJETS DU PACK</span>
-      <div>${items.length ? items.map((item) => `<small>${escapeHtml(item.className)} × ${item.quantity}</small>`).join("") : "<small>Aucun objet configuré</small>"}</div>
-    </div>
-    <div class="reward-rule__actions">
-      <button type="button" class="admin-button admin-button--small" data-edit-reward="${escapeHtml(rule.id)}">Modifier</button>
-      <button type="button" class="admin-button admin-button--small" data-duplicate-reward="${escapeHtml(rule.id)}">Dupliquer</button>
-      <button type="button" class="admin-button admin-button--small admin-button--danger" data-delete-reward="${escapeHtml(rule.id)}">Supprimer</button>
+    <div class="reward-rule__summary">${escapeHtml(compactRewardSummary(rule))}</div>
+    <div class="reward-rule__state"><em>${rule.is_active ? "ACTIF" : "INACTIF"}</em></div>
+    <div class="reward-rule__menu">
+      <button type="button" class="reward-rule__icon" data-duplicate-reward="${escapeHtml(rule.id)}" title="Dupliquer">⧉</button>
+      <button type="button" class="reward-rule__icon reward-rule__icon--danger" data-delete-reward="${escapeHtml(rule.id)}" title="Supprimer">×</button>
     </div>`;
   return article;
 }
@@ -458,6 +465,7 @@ els.addItem.addEventListener("click", () => { addItemRow(els.items); updatePrevi
 
 els.cancel.addEventListener("click", () => resetForm());
 els.refresh.addEventListener("click", loadRules);
+els.newRule?.addEventListener("click", () => { resetForm(); document.querySelectorAll("[data-open-reward]").forEach((node) => node.classList.remove("is-selected")); document.querySelector(".rewards-editor-card")?.scrollIntoView({ behavior: "smooth", block: "start" }); els.name.focus(); });
 els.search.addEventListener("input", render);
 els.filter.addEventListener("change", render);
 els.type.addEventListener("change", () => { updateApplicationFields(); updatePreview(); });
@@ -475,7 +483,8 @@ function openRule(id) {
   const rule = rules.find((entry) => entry.id === id);
   if (!rule) return;
   resetForm(rule);
-  document.querySelector(".rewards-editor-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.querySelectorAll("[data-open-reward]").forEach((node) => node.classList.toggle("is-selected", node.dataset.openReward === id));
+  document.querySelector(".rewards-editor-card")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 document.addEventListener("click", (event) => {
