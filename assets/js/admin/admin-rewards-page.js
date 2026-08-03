@@ -1,188 +1,194 @@
+import { addItemRow, clearItemRows, getItemsFromContainer, escapeHtml } from "./items.js";
+
 const byId = (id) => document.getElementById(id);
 let rules = [];
 let saving = false;
 
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
-}
+const els = {
+  loading: byId("rewardsAccessLoading"), denied: byId("rewardsAccessDenied"), error: byId("rewardsAccessError"), workspace: byId("rewardsWorkspace"),
+  form: byId("rewardForm"), id: byId("rewardId"), type: byId("rewardType"), name: byId("rewardName"), rankMin: byId("rewardRankMin"), rankMax: byId("rewardRankMax"),
+  roubles: byId("rewardRoubles"), xp: byId("rewardBattlePassXp"), description: byId("rewardDescription"), active: byId("rewardActive"), priority: byId("rewardPriority"),
+  items: byId("rewardItemsList"), addItem: byId("addRewardItem"), save: byId("saveRewardRule"), cancel: byId("cancelRewardEdit"), formFeedback: byId("rewardFormFeedback"),
+  list: byId("rewardsList"), feedback: byId("rewardsFeedback"), search: byId("rewardsSearch"), filter: byId("rewardsTypeFilter"), refresh: byId("refreshRewards"),
+  total: byId("rewardsTotal"), activeCount: byId("rewardsActive"), votesCount: byId("rewardsVotes"), updated: byId("rewardsUpdated"),
+};
 
-function showOnly(id) {
-  ["rewardsAccessLoading", "rewardsAccessDenied", "rewardsAccessError", "rewardsWorkspace"].forEach((key) => {
-    byId(key).hidden = key !== id;
-  });
+function showOnly(target) {
+  [els.loading, els.denied, els.error, els.workspace].forEach((node) => { if (node) node.hidden = node !== target; });
 }
 
 async function api(url, options = {}) {
   const response = await fetch(url, {
-    method: options.method || "GET",
-    credentials: "same-origin",
-    cache: "no-store",
+    method: options.method || "GET", credentials: "same-origin", cache: "no-store",
     headers: { Accept: "application/json", "Content-Type": "application/json" },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
+  if (!response.ok) throw new Error(data.error || data.message || `Erreur ${response.status}`);
   return data;
 }
 
 function typeLabel(type) {
   return ({ votes: "Votes", event: "Événement", fidelity: "Fidélité", battle_pass: "Battle Pass", compensation: "Compensation" })[type] || type;
 }
-
 function rankLabel(rule) {
-  return Number(rule.rank_min) === Number(rule.rank_max) ? `Rang ${rule.rank_min}` : `Rangs ${rule.rank_min} à ${rule.rank_max}`;
+  const min = Number(rule.rank_min); const max = Number(rule.rank_max);
+  return min === max ? `Rang ${min}` : `Rangs ${min} à ${max}`;
 }
-
-function itemsText(items) {
-  if (!Array.isArray(items) || items.length === 0) return "Aucun objet";
-  return items.map((item) => `${item.classname} ×${item.quantity}`).join(" · ");
+function formatNumber(value) { return Number(value || 0).toLocaleString("fr-FR"); }
+function normalizeItems(items) {
+  if (!Array.isArray(items)) return [];
+  return items.map((item) => ({ className: item.className || item.classname || item.name || "", quantity: Number(item.quantity || item.qty || 1) })).filter((item) => item.className);
+}
+function setFeedback(node, message = "", state = "") {
+  if (!node) return;
+  node.hidden = !message;
+  node.textContent = message;
+  if (state) node.dataset.state = state; else delete node.dataset.state;
+}
+function setLoading(button, isLoading, label) {
+  if (!button) return;
+  if (isLoading) { button.dataset.originalText = button.textContent; button.disabled = true; button.textContent = label; }
+  else { button.disabled = false; button.textContent = button.dataset.originalText || button.textContent; delete button.dataset.originalText; }
 }
 
 function filteredRules() {
-  const query = String(byId("rewardsSearch").value || "").trim().toLocaleLowerCase("fr-FR");
-  const type = byId("rewardsTypeFilter").value;
+  const query = String(els.search.value || "").trim().toLowerCase();
+  const type = els.filter.value;
   return rules.filter((rule) => {
     if (type && rule.reward_type !== type) return false;
     if (!query) return true;
-    return [rule.name, rule.description, typeLabel(rule.reward_type), rankLabel(rule), itemsText(rule.items)].join(" ").toLocaleLowerCase("fr-FR").includes(query);
+    const itemText = normalizeItems(rule.items).map((item) => item.className).join(" ");
+    return [rule.name, rule.description, typeLabel(rule.reward_type), rankLabel(rule), itemText].join(" ").toLowerCase().includes(query);
   });
+}
+
+function renderRule(rule) {
+  const items = normalizeItems(rule.items);
+  const article = document.createElement("article");
+  article.className = `reward-rule ${rule.is_active ? "is-active" : "is-inactive"}`;
+  article.innerHTML = `
+    <div class="reward-rule__top">
+      <div><span>${escapeHtml(typeLabel(rule.reward_type))}</span><h3>${escapeHtml(rule.name)}</h3><small>${escapeHtml(rankLabel(rule))}</small></div>
+      <em>${rule.is_active ? "ACTIF" : "DÉSACTIVÉ"}</em>
+    </div>
+    ${rule.description ? `<p class="reward-rule__message">${escapeHtml(rule.description)}</p>` : ""}
+    <div class="reward-rule__values">
+      <div><span>Roubles</span><strong>${formatNumber(rule.roubles)} ₽</strong></div>
+      <div><span>XP Battle Pass</span><strong>${formatNumber(rule.battle_pass_xp)}</strong></div>
+    </div>
+    <div class="reward-rule__items">
+      <span>OBJETS DU PACK</span>
+      <div>${items.length ? items.map((item) => `<small>${escapeHtml(item.className)} × ${item.quantity}</small>`).join("") : "<small>Aucun objet configuré</small>"}</div>
+    </div>
+    <div class="reward-rule__actions">
+      <button type="button" class="admin-button admin-button--small" data-edit-reward="${escapeHtml(rule.id)}">Modifier</button>
+      <button type="button" class="admin-button admin-button--small admin-button--danger" data-delete-reward="${escapeHtml(rule.id)}">Supprimer</button>
+    </div>`;
+  return article;
 }
 
 function render() {
   const filtered = filteredRules();
-  byId("rewardsTotal").textContent = rules.length;
-  byId("rewardsActive").textContent = rules.filter((rule) => rule.is_active).length;
-  byId("rewardsVotes").textContent = rules.filter((rule) => rule.reward_type === "votes").length;
-  byId("rewardsList").innerHTML = filtered.length ? filtered.map((rule) => `
-    <article class="reward-card ${rule.is_active ? "is-active" : "is-inactive"}">
-      <div class="reward-card__top"><span>${escapeHtml(typeLabel(rule.reward_type))}</span><em>${rule.is_active ? "ACTIF" : "DÉSACTIVÉ"}</em></div>
-      <div class="reward-card__title"><div><strong>${escapeHtml(rule.name)}</strong><small>${escapeHtml(rankLabel(rule))}</small></div><b>${Number(rule.roubles || 0).toLocaleString("fr-FR")} ₽</b></div>
-      <p>${escapeHtml(rule.description || "Aucune description.")}</p>
-      <dl><div><dt>XP Battle Pass</dt><dd>${Number(rule.battle_pass_xp || 0).toLocaleString("fr-FR")}</dd></div><div><dt>Priorité</dt><dd>${Number(rule.priority || 0)}</dd></div></dl>
-      <div class="reward-card__items"><span>OBJETS</span><small>${escapeHtml(itemsText(rule.items))}</small></div>
-      <div class="reward-card__actions"><button type="button" class="admin-button admin-button--small" data-edit-reward="${rule.id}">Modifier</button><button type="button" class="admin-button admin-button--small admin-button--danger" data-delete-reward="${rule.id}">Supprimer</button></div>
-    </article>`).join("") : '<div class="admin-list-message">Aucune récompense ne correspond aux filtres.</div>';
-}
-
-function parseItems(text) {
-  return String(text || "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean).map((line) => {
-    const [classname, quantity] = line.split("|").map((part) => part.trim());
-    return { classname, quantity: Math.max(1, Number.parseInt(quantity || "1", 10) || 1) };
-  }).filter((item) => item.classname);
+  els.total.textContent = rules.length;
+  els.activeCount.textContent = rules.filter((rule) => rule.is_active).length;
+  els.votesCount.textContent = rules.filter((rule) => rule.reward_type === "votes").length;
+  els.list.innerHTML = "";
+  if (!filtered.length) {
+    els.list.innerHTML = '<div class="admin-list-message">Aucune récompense ne correspond aux filtres.</div>';
+    return;
+  }
+  filtered.forEach((rule) => els.list.appendChild(renderRule(rule)));
 }
 
 function resetForm(rule = null) {
-  byId("rewardId").value = rule?.id || "";
-  byId("rewardType").value = rule?.reward_type || "votes";
-  byId("rewardName").value = rule?.name || "";
-  byId("rewardRankMin").value = rule?.rank_min || 1;
-  byId("rewardRankMax").value = rule?.rank_max || 1;
-  byId("rewardRoubles").value = rule?.roubles || 0;
-  byId("rewardBattlePassXp").value = rule?.battle_pass_xp || 0;
-  byId("rewardPriority").value = rule?.priority ?? 100;
-  byId("rewardActive").checked = rule?.is_active ?? true;
-  byId("rewardDescription").value = rule?.description || "";
-  byId("rewardItems").value = Array.isArray(rule?.items) ? rule.items.map((item) => `${item.classname} | ${item.quantity}`).join("\n") : "";
-  byId("rewardEditorEyebrow").textContent = rule ? "MODIFICATION" : "NOUVELLE RÈGLE";
-  byId("rewardEditorTitle").textContent = rule ? "Modifier la récompense" : "Créer une récompense";
-  byId("rewardEditorFeedback").hidden = true;
-}
-
-function openEditor(rule = null) {
-  resetForm(rule);
-  byId("rewardEditor").showModal();
-}
-
-function closeEditor() {
-  if (!saving) byId("rewardEditor").close();
+  els.id.value = rule?.id || "";
+  els.type.value = rule?.reward_type || "votes";
+  els.name.value = rule?.name || "";
+  els.rankMin.value = rule?.rank_min || 1;
+  els.rankMax.value = rule?.rank_max || 1;
+  els.roubles.value = rule?.roubles || 0;
+  els.xp.value = rule?.battle_pass_xp || 0;
+  els.description.value = rule?.description || "";
+  els.active.checked = rule?.is_active ?? true;
+  els.priority.value = rule?.priority ?? 100;
+  els.items.innerHTML = "";
+  const items = normalizeItems(rule?.items);
+  if (items.length) items.forEach((item) => addItemRow(els.items, item)); else clearItemRows(els.items);
+  byId("rewardFormKicker").textContent = rule ? "MODIFICATION" : "NOUVELLE RÉCOMPENSE";
+  byId("rewardFormTitle").textContent = rule ? "Modifier le pack" : "Créer un pack";
+  els.save.textContent = rule ? "Enregistrer les modifications" : "Créer la récompense";
+  els.cancel.hidden = !rule;
+  setFeedback(els.formFeedback);
 }
 
 async function loadRules() {
-  const feedback = byId("rewardsFeedback");
-  feedback.hidden = false;
-  feedback.textContent = "Chargement des récompenses…";
+  setLoading(els.refresh, true, "Chargement…");
+  setFeedback(els.feedback, "Chargement des récompenses…", "loading");
   try {
     const data = await api("/api/admin/rewards");
     rules = Array.isArray(data.rules) ? data.rules : [];
-    byId("rewardsUpdated").textContent = data.updatedAt ? new Date(data.updatedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "—";
-    feedback.hidden = true;
+    els.updated.textContent = data.updatedAt ? new Date(data.updatedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "—";
+    setFeedback(els.feedback);
     render();
   } catch (error) {
-    feedback.hidden = false;
-    feedback.dataset.state = "error";
-    feedback.textContent = error.message;
-  }
+    setFeedback(els.feedback, error.message, "error");
+  } finally { setLoading(els.refresh, false); }
 }
 
 async function saveRule(event) {
   event.preventDefault();
   if (saving) return;
-  saving = true;
-  const id = byId("rewardId").value;
-  const feedback = byId("rewardEditorFeedback");
-  feedback.hidden = false;
-  feedback.dataset.state = "loading";
-  feedback.textContent = "Enregistrement…";
+  const rankMin = Number(els.rankMin.value); const rankMax = Number(els.rankMax.value);
+  if (!els.name.value.trim()) { setFeedback(els.formFeedback, "Le nom du pack est obligatoire.", "error"); return; }
+  if (rankMax < rankMin) { setFeedback(els.formFeedback, "Le rang maximum ne peut pas être inférieur au rang minimum.", "error"); return; }
+  saving = true; setLoading(els.save, true, "Enregistrement…");
+  const id = els.id.value;
   const payload = {
-    rewardType: byId("rewardType").value,
-    name: byId("rewardName").value,
-    rankMin: Number(byId("rewardRankMin").value),
-    rankMax: Number(byId("rewardRankMax").value),
-    roubles: Number(byId("rewardRoubles").value),
-    battlePassXp: Number(byId("rewardBattlePassXp").value),
-    priority: Number(byId("rewardPriority").value),
-    isActive: byId("rewardActive").checked,
-    description: byId("rewardDescription").value,
-    items: parseItems(byId("rewardItems").value),
+    rewardType: els.type.value, name: els.name.value.trim(), rankMin, rankMax,
+    roubles: Number(els.roubles.value || 0), battlePassXp: Number(els.xp.value || 0),
+    description: els.description.value.trim(), isActive: els.active.checked,
+    priority: Number(els.priority.value || 100),
+    items: getItemsFromContainer(els.items).map((item) => ({ classname: item.className || item.name, quantity: item.quantity })),
   };
   try {
     await api(id ? `/api/admin/rewards/${encodeURIComponent(id)}` : "/api/admin/rewards", { method: id ? "PUT" : "POST", body: payload });
-    saving = false;
-    closeEditor();
+    resetForm();
+    setFeedback(els.formFeedback, id ? "La récompense a été modifiée." : "La récompense a été créée.", "success");
     await loadRules();
-  } catch (error) {
-    saving = false;
-    feedback.dataset.state = "error";
-    feedback.textContent = error.message;
-  }
+  } catch (error) { setFeedback(els.formFeedback, error.message, "error"); }
+  finally { saving = false; setLoading(els.save, false); }
 }
 
 async function deleteRule(id) {
   const rule = rules.find((entry) => entry.id === id);
-  if (!rule || !window.confirm(`Supprimer la récompense « ${rule.name} » ?`)) return;
-  try {
-    await api(`/api/admin/rewards/${encodeURIComponent(id)}`, { method: "DELETE" });
-    await loadRules();
-  } catch (error) { window.alert(error.message); }
+  if (!rule || !confirm(`Supprimer la récompense « ${rule.name} » ?`)) return;
+  try { await api(`/api/admin/rewards/${encodeURIComponent(id)}`, { method: "DELETE" }); await loadRules(); }
+  catch (error) { alert(error.message); }
 }
 
 async function checkAccess() {
-  showOnly("rewardsAccessLoading");
+  showOnly(els.loading);
   try {
     const response = await fetch("/api/commandement/access", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
     const data = await response.json().catch(() => ({}));
-    if (response.status === 401 || response.status === 403 || data.authorized !== true) { showOnly("rewardsAccessDenied"); return; }
+    if (response.status === 401 || response.status === 403 || data.authorized !== true) { showOnly(els.denied); return; }
     if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
-    showOnly("rewardsWorkspace");
-    await loadRules();
-  } catch (error) {
-    byId("rewardsAccessErrorMessage").textContent = error.message;
-    showOnly("rewardsAccessError");
-  }
+    showOnly(els.workspace); resetForm(); await loadRules();
+  } catch (error) { byId("rewardsAccessErrorMessage").textContent = error.message; showOnly(els.error); }
 }
 
+els.form.addEventListener("submit", saveRule);
+els.addItem.addEventListener("click", () => addItemRow(els.items));
+els.cancel.addEventListener("click", () => resetForm());
+els.refresh.addEventListener("click", loadRules);
+els.search.addEventListener("input", render);
+els.filter.addEventListener("change", render);
+byId("rewardsRetryAccess").addEventListener("click", checkAccess);
 document.addEventListener("click", (event) => {
   const edit = event.target.closest("[data-edit-reward]");
-  if (edit) openEditor(rules.find((rule) => rule.id === edit.dataset.editReward));
+  if (edit) { const rule = rules.find((entry) => entry.id === edit.dataset.editReward); if (rule) { resetForm(rule); scrollTo({ top: 0, behavior: "smooth" }); } }
   const remove = event.target.closest("[data-delete-reward]");
   if (remove) deleteRule(remove.dataset.deleteReward);
-  if (event.target.closest("[data-close-reward]")) closeEditor();
 });
-
-byId("createRewardRule").addEventListener("click", () => openEditor());
-byId("refreshRewards").addEventListener("click", loadRules);
-byId("rewardsRetryAccess").addEventListener("click", checkAccess);
-byId("rewardsSearch").addEventListener("input", render);
-byId("rewardsTypeFilter").addEventListener("change", render);
-byId("rewardForm").addEventListener("submit", saveRule);
 checkAccess();
