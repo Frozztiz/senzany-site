@@ -104,8 +104,10 @@ function syncModeTabs() {
     button.classList.toggle("is-active", active);
     button.setAttribute("aria-selected", String(active));
   });
-  els.typeField.hidden = mode !== "other";
-  document.querySelector(".reward-name-field")?.classList.toggle("reward-name-field--wide", mode !== "other");
+  // Le sélecteur de type reste toujours visible dans le nouvel éditeur.
+  // Les anciens onglets de mode ont été retirés de l'interface V11.
+  els.typeField.hidden = false;
+  document.querySelector(".reward-name-field")?.classList.remove("reward-name-field--wide");
 }
 
 function selectMode(mode) {
@@ -301,9 +303,9 @@ async function loadRules() {
     } else if (!selectedRuleId && rules.length) {
       selectedRuleId = rules[0].id;
       resetForm(rules[0]);
-    } else {
-      render();
     }
+    // La bibliothèque doit toujours être reconstruite après le chargement.
+    render();
   } catch (error) {
     setFeedback(els.feedback, error.message, "error");
   } finally { setLoading(els.refresh, false); }
