@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <title>Commandement — Récompenses — SENZANY</title>
+  <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=1.0.0" />
+</head>
+<body data-page="admin-rewards">
+  <div data-site-header></div>
+  <main class="rewards-admin-main">
+    <section id="rewardsAccessLoading" class="admin-gate rewards-admin-gate">
+      <div class="admin-gate__icon">S</div>
+      <div><span>VÉRIFICATION DE L’ACCÈS</span><h2>Initialisation du module Récompenses…</h2><p>Contrôle de ta session Steam et de ton niveau d’autorisation.</p></div>
+    </section>
+
+    <section id="rewardsAccessDenied" class="admin-gate admin-gate--danger rewards-admin-gate" hidden>
+      <div class="admin-gate__icon">×</div>
+      <div><span>ACCÈS REFUSÉ</span><h2>Module réservé au commandement</h2><p>Ton compte ne possède pas les autorisations nécessaires.</p><a class="admin-button" href="senzany-profil.html">Retour au profil</a></div>
+    </section>
+
+    <section id="rewardsAccessError" class="admin-gate admin-gate--danger rewards-admin-gate" hidden>
+      <div class="admin-gate__icon">!</div>
+      <div><span>ERREUR DE CONNEXION</span><h2>Impossible de vérifier l’accès</h2><p id="rewardsAccessErrorMessage">Le backend ne répond pas.</p><button id="rewardsRetryAccess" class="admin-button" type="button">Réessayer</button></div>
+    </section>
+
+    <section id="rewardsWorkspace" class="rewards-workspace" hidden>
+      <header class="rewards-topbar">
+        <a class="admin-button admin-button--small" href="senzany-admin.html">← Retour au Commandement</a>
+        <div><span>MODULE 11</span><strong>Gestion des récompenses</strong><small>Configuration centralisée des lots du portail Senzany.</small></div>
+        <button id="createRewardRule" class="admin-button admin-button--primary" type="button">+ Nouvelle récompense</button>
+      </header>
+
+      <section class="rewards-summary">
+        <article><span>RÈGLES CONFIGURÉES</span><strong id="rewardsTotal">0</strong><small>Tous systèmes confondus</small></article>
+        <article><span>RÈGLES ACTIVES</span><strong id="rewardsActive">0</strong><small>Utilisables par le portail</small></article>
+        <article><span>RÉCOMPENSES VOTES</span><strong id="rewardsVotes">0</strong><small>Classement mensuel</small></article>
+        <article><span>DERNIÈRE SYNCHRO</span><strong id="rewardsUpdated">—</strong><small>Base Supabase</small></article>
+      </section>
+
+      <section class="rewards-toolbar">
+        <label><span class="sr-only">Rechercher une récompense</span><input id="rewardsSearch" type="search" placeholder="Rechercher un pack, un type ou un rang…" autocomplete="off" /></label>
+        <select id="rewardsTypeFilter" aria-label="Filtrer par type">
+          <option value="">Tous les types</option>
+          <option value="votes">Votes</option>
+          <option value="event">Événement</option>
+          <option value="fidelity">Fidélité</option>
+          <option value="battle_pass">Battle Pass</option>
+          <option value="compensation">Compensation</option>
+        </select>
+        <button id="refreshRewards" class="admin-button admin-button--small" type="button">Actualiser</button>
+      </section>
+
+      <div id="rewardsFeedback" class="admin-feedback" hidden></div>
+      <section id="rewardsList" class="rewards-list" aria-live="polite"></section>
+    </section>
+  </main>
+
+  <dialog id="rewardEditor" class="reward-editor">
+    <form id="rewardForm" method="dialog">
+      <header><div><span id="rewardEditorEyebrow">NOUVELLE RÈGLE</span><h2 id="rewardEditorTitle">Créer une récompense</h2></div><button type="button" data-close-reward aria-label="Fermer">×</button></header>
+      <div class="reward-editor__body">
+        <input id="rewardId" type="hidden" />
+        <div class="reward-editor__grid">
+          <label>Type<select id="rewardType" required><option value="votes">Votes</option><option value="event">Événement</option><option value="fidelity">Fidélité</option><option value="battle_pass">Battle Pass</option><option value="compensation">Compensation</option></select></label>
+          <label>Nom du pack<input id="rewardName" type="text" maxlength="100" required placeholder="Pack Or" /></label>
+          <label>Rang minimum<input id="rewardRankMin" type="number" min="1" value="1" required /></label>
+          <label>Rang maximum<input id="rewardRankMax" type="number" min="1" value="1" required /></label>
+          <label>Roubles<input id="rewardRoubles" type="number" min="0" value="0" /></label>
+          <label>XP Battle Pass<input id="rewardBattlePassXp" type="number" min="0" value="0" /></label>
+          <label>Priorité<input id="rewardPriority" type="number" min="0" value="100" /></label>
+          <label class="reward-editor__active"><input id="rewardActive" type="checkbox" checked /><span>Règle active</span></label>
+          <label class="reward-editor__full">Description<textarea id="rewardDescription" maxlength="500" rows="3" placeholder="Description visible dans la livraison…"></textarea></label>
+          <label class="reward-editor__full">Objets DayZ <small>Un objet par ligne : classname | quantité</small><textarea id="rewardItems" rows="6" placeholder="MoneyRuble1000 | 100\nM4A1 | 1"></textarea></label>
+        </div>
+        <div id="rewardEditorFeedback" class="admin-feedback" hidden></div>
+      </div>
+      <footer><button type="button" class="admin-button" data-close-reward>Annuler</button><button id="saveRewardRule" type="submit" class="admin-button admin-button--primary">Enregistrer</button></footer>
+    </form>
+  </dialog>
+
+  <div data-site-footer></div>
+  <script defer src="assets/js/components.js"></script>
+  <script defer src="assets/js/app.js"></script>
+  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=1.0.0"></script>
+</body>
+</html>

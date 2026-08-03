@@ -56,6 +56,11 @@ app.use(
   require("./middleware/commandAuth"),
   require("./routes/adminItems")
 );
+app.use(
+  "/api/admin/rewards",
+  require("./middleware/commandAuth"),
+  require("./routes/adminRewards")
+);
 
 app.use((req, res) => {
   res.status(404).json({
