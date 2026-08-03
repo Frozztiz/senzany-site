@@ -11,6 +11,8 @@ const els = {
   items: byId("rewardItemsList"), addItem: byId("addRewardItem"), save: byId("saveRewardRule"), cancel: byId("cancelRewardEdit"), formFeedback: byId("rewardFormFeedback"),
   list: byId("rewardsList"), feedback: byId("rewardsFeedback"), search: byId("rewardsSearch"), filter: byId("rewardsTypeFilter"), refresh: byId("refreshRewards"),
   votesCount: byId("rewardsVotes"), battlePassCount: byId("rewardsBattlePass"), eventsCount: byId("rewardsEvents"), compensationsCount: byId("rewardsCompensations"),
+  previewName: byId("rewardPreviewName"), previewType: byId("rewardPreviewType"), previewRank: byId("rewardPreviewRank"),
+  previewRoubles: byId("rewardPreviewRoubles"), previewXp: byId("rewardPreviewXp"), previewItems: byId("rewardPreviewItems"),
 };
 
 function showOnly(target) {
@@ -33,7 +35,7 @@ function typeLabel(type) {
 }
 function rankLabel(rule) {
   const min = Number(rule.rank_min); const max = Number(rule.rank_max);
-  return min === max ? `Rang ${min}` : `Rangs ${min} à ${max}`;
+  return min === max ? `Top ${min}` : `Top ${min} à ${max}`;
 }
 function formatNumber(value) { return Number(value || 0).toLocaleString("fr-FR"); }
 function normalizeItems(items) {
@@ -67,6 +69,8 @@ function renderRule(rule) {
   const items = normalizeItems(rule.items);
   const article = document.createElement("article");
   article.className = `reward-rule ${rule.is_active ? "is-active" : "is-inactive"}`;
+  article.dataset.openReward = rule.id;
+  article.tabIndex = 0;
   article.innerHTML = `
     <div class="reward-rule__top">
       <div><span>${escapeHtml(typeLabel(rule.reward_type))}</span><h3>${escapeHtml(rule.name)}</h3><small>${escapeHtml(rankLabel(rule))}</small></div>
@@ -90,16 +94,31 @@ function renderRule(rule) {
 
 function render() {
   const filtered = filteredRules();
-  els.votesCount.textContent = rules.filter((rule) => rule.reward_type === "votes").length;
-  els.battlePassCount.textContent = rules.filter((rule) => rule.reward_type === "battle_pass").length;
-  els.eventsCount.textContent = rules.filter((rule) => rule.reward_type === "event").length;
-  els.compensationsCount.textContent = rules.filter((rule) => rule.reward_type === "compensation").length;
+  const packLabel = (count) => `${count} pack${count > 1 ? "s" : ""}`;
+  els.votesCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "votes").length);
+  els.battlePassCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "battle_pass").length);
+  els.eventsCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "event").length);
+  els.compensationsCount.textContent = packLabel(rules.filter((rule) => rule.reward_type === "compensation").length);
   els.list.innerHTML = "";
   if (!filtered.length) {
     els.list.innerHTML = '<div class="admin-list-message">Aucune récompense ne correspond aux filtres.</div>';
     return;
   }
   filtered.forEach((rule) => els.list.appendChild(renderRule(rule)));
+}
+
+function updatePreview() {
+  const rankMin = Math.max(1, Number(els.rankMin.value || 1));
+  const rankMax = Math.max(rankMin, Number(els.rankMax.value || rankMin));
+  const items = getItemsFromContainer(els.items).map((item) => ({ className: item.className || item.name || "", quantity: Number(item.quantity || 1) })).filter((item) => item.className);
+  els.previewName.textContent = els.name.value.trim() || "Pack sans nom";
+  els.previewType.textContent = typeLabel(els.type.value);
+  els.previewRank.textContent = rankMin === rankMax ? `Top ${rankMin}` : `Top ${rankMin} à ${rankMax}`;
+  els.previewRoubles.textContent = `${formatNumber(els.roubles.value)} ₽`;
+  els.previewXp.textContent = formatNumber(els.xp.value);
+  els.previewItems.innerHTML = items.length
+    ? items.map((item) => `<small>${escapeHtml(item.className)} × ${item.quantity}</small>`).join("")
+    : "Aucun objet configuré";
 }
 
 function resetForm(rule = null) {
@@ -121,6 +140,7 @@ function resetForm(rule = null) {
   els.save.textContent = rule ? "ENREGISTRER LES MODIFICATIONS" : "ENREGISTRER LE PACK";
   els.cancel.hidden = !rule;
   setFeedback(els.formFeedback);
+  updatePreview();
 }
 
 async function loadRules() {
@@ -179,16 +199,39 @@ async function checkAccess() {
 }
 
 els.form.addEventListener("submit", saveRule);
-els.addItem.addEventListener("click", () => addItemRow(els.items));
+els.addItem.addEventListener("click", () => { addItemRow(els.items); updatePreview(); });
 els.cancel.addEventListener("click", () => resetForm());
 els.refresh.addEventListener("click", loadRules);
 els.search.addEventListener("input", render);
 els.filter.addEventListener("change", render);
+[els.type, els.name, els.rankMin, els.rankMax, els.roubles, els.xp].forEach((node) => {
+  node.addEventListener("input", updatePreview);
+  node.addEventListener("change", updatePreview);
+});
+els.items.addEventListener("input", updatePreview);
+els.items.addEventListener("change", updatePreview);
+els.items.addEventListener("click", () => queueMicrotask(updatePreview));
 byId("rewardsRetryAccess").addEventListener("click", checkAccess);
+function openRule(id) {
+  const rule = rules.find((entry) => entry.id === id);
+  if (!rule) return;
+  resetForm(rule);
+  document.querySelector(".rewards-editor-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 document.addEventListener("click", (event) => {
-  const edit = event.target.closest("[data-edit-reward]");
-  if (edit) { const rule = rules.find((entry) => entry.id === edit.dataset.editReward); if (rule) { resetForm(rule); scrollTo({ top: 0, behavior: "smooth" }); } }
   const remove = event.target.closest("[data-delete-reward]");
-  if (remove) deleteRule(remove.dataset.deleteReward);
+  if (remove) { deleteRule(remove.dataset.deleteReward); return; }
+  const edit = event.target.closest("[data-edit-reward]");
+  if (edit) { openRule(edit.dataset.editReward); return; }
+  const card = event.target.closest("[data-open-reward]");
+  if (card) openRule(card.dataset.openReward);
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const card = event.target.closest("[data-open-reward]");
+  if (!card || event.target.closest("button")) return;
+  event.preventDefault();
+  openRule(card.dataset.openReward);
 });
 checkAccess();

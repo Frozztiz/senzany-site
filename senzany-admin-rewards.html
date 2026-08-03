@@ -57,18 +57,18 @@
               </div>
 
               <div class="admin-field">
-                <label for="rewardName">Nom du pack</label>
+                <label for="rewardName">Nom</label>
                 <input id="rewardName" type="text" maxlength="100" placeholder="Exemple : Pack Or" required />
               </div>
             </div>
 
             <div class="reward-grid reward-grid--two">
               <div class="admin-field">
-                <label for="rewardRankMin">Du rang</label>
+                <label for="rewardRankMin">Du Top</label>
                 <input id="rewardRankMin" type="number" min="1" value="1" required />
               </div>
               <div class="admin-field">
-                <label for="rewardRankMax">Au rang</label>
+                <label for="rewardRankMax">Au Top</label>
                 <input id="rewardRankMax" type="number" min="1" value="1" required />
               </div>
             </div>
@@ -102,6 +102,18 @@
               <div class="admin-field reward-priority"><label for="rewardPriority">Priorité</label><input id="rewardPriority" type="number" min="0" value="100" /></div>
             </div>
 
+            <aside class="reward-preview" aria-live="polite">
+              <div class="reward-preview__heading"><span>APERÇU DU PACK</span><small>Mise à jour en direct</small></div>
+              <div class="reward-preview__body">
+                <div><span>Nom</span><strong id="rewardPreviewName">Pack sans nom</strong></div>
+                <div><span>Type</span><strong id="rewardPreviewType">Votes mensuels</strong></div>
+                <div><span>Application</span><strong id="rewardPreviewRank">Top 1</strong></div>
+                <div><span>Roubles</span><strong id="rewardPreviewRoubles">0 ₽</strong></div>
+                <div><span>XP Battle Pass</span><strong id="rewardPreviewXp">0</strong></div>
+                <div class="reward-preview__items"><span>Objets</span><div id="rewardPreviewItems">Aucun objet configuré</div></div>
+              </div>
+            </aside>
+
             <div id="rewardFormFeedback" class="admin-feedback" hidden></div>
 
             <div class="reward-form-actions">
@@ -125,7 +137,7 @@
           </div>
 
           <div class="rewards-filters">
-            <input id="rewardsSearch" type="search" placeholder="Rechercher un pack, un type ou un rang…" autocomplete="off" />
+            <input id="rewardsSearch" type="search" placeholder="Rechercher un pack, un type ou un Top…" autocomplete="off" />
             <select id="rewardsTypeFilter" aria-label="Filtrer par type">
               <option value="">Tous les types</option>
               <option value="votes">Votes</option>
