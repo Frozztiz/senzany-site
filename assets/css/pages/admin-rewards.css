@@ -22,3 +22,28 @@ body[data-page="admin-rewards"]{margin:0;min-height:100vh;background:radial-grad
 .reward-currency-info span{color:#55df91;font:800 9px monospace;letter-spacing:1.5px}.reward-currency-info strong{font-size:13px}.reward-currency-info small{color:#8e8580;line-height:1.45}.reward-currency-info code{color:#c8e6d2}
 .admin-items__heading small{display:block;margin-top:5px;color:#817872;font-size:11px;font-weight:400}
 @media(max-width:720px){.reward-currency-info{min-height:70px}}
+
+/* V9.2 — cartes de packs compactes */
+@media (min-width:1350px){
+  .rewards-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:10px;max-height:calc(100vh - 310px);padding:12px}
+  .reward-rule{margin:0;min-width:0}
+}
+.reward-rule{padding:12px 14px}
+.reward-rule__top{gap:10px}
+.reward-rule__top h3{margin:3px 0 1px;font-size:17px;line-height:1.1}
+.reward-rule__top small{font-size:11px}
+.reward-rule__top em{padding:4px 7px;font-size:8px}
+.reward-rule__message{min-height:0;margin:8px 0 9px;font-size:12px;line-height:1.35}
+.reward-rule__values{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
+.reward-rule__values>div{padding:7px 9px}
+.reward-rule__values span,.reward-rule__items>span{font-size:8px}
+.reward-rule__values strong{margin-top:3px;font-size:13px}
+.reward-rule__items{margin-top:9px}
+.reward-rule__items>div{gap:5px;margin-top:5px}
+.reward-rule__items small{padding:5px 7px;font-size:10px}
+.reward-rule__actions{gap:6px;margin-top:10px}
+.reward-rule__actions .admin-button{min-height:32px;padding:7px 10px;font-size:10px}
+.reward-rule::after{margin-top:6px;font-size:7px}
+@media(max-width:720px){
+  .reward-rule__values{grid-template-columns:1fr 1fr}
+}
