@@ -170,7 +170,10 @@
     title.textContent = next.title;
     text.textContent = next.mystery && !next.revealed ? 'Le contenu de ce rendez-vous reste classifié jusqu’à sa révélation.' : (next.description || 'Plus de détails prochainement.');
     const cd = $('nextEventCountdown'); cd.hidden = false; cd.innerHTML = countdown(next.mystery && !next.revealed && next.revealAt ? next.revealAt : next.startsAt);
-    if (next.imageUrl && next.revealed) visual.style.backgroundImage = `linear-gradient(90deg,transparent,rgba(8,7,6,.8)),url("${next.imageUrl.replace(/"/g, '')}")`;
+    if (next.imageUrl && next.revealed) {
+      visual.classList.add('has-image');
+      visual.style.backgroundImage = `linear-gradient(90deg,transparent,rgba(8,7,6,.8)),url("${next.imageUrl.replace(/"/g, '')}")`;
+    }
   }
 
   function renderWeek() {
