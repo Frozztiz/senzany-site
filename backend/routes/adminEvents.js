@@ -5,6 +5,7 @@ function fail(res, error) {
   console.error('[ÉVÉNEMENTS ADMIN]', error?.data || error);
   res.status(error?.status || 500).json({ error: error?.message || "Erreur dans le module Événements." });
 }
+router.post('/upload-image', express.raw({ type: ['image/jpeg','image/png','image/webp'], limit: '5mb' }), async (req, res) => { try { const uploaded = await eventService.uploadImage(req.body, req.headers['content-type'], req.query.filename, req.commandSteamId); res.status(201).json(uploaded); } catch (e) { fail(res, e); } });
 router.get('/', async (_req, res) => { try { res.json({ events: await eventService.listAdmin() }); } catch (e) { fail(res, e); } });
 router.post('/', async (req, res) => { try { res.status(201).json({ event: await eventService.create(req.body, req.commandSteamId) }); } catch (e) { fail(res, e); } });
 router.put('/:id', async (req, res) => { try { res.json({ event: await eventService.update(req.params.id, req.body, req.commandSteamId) }); } catch (e) { fail(res, e); } });

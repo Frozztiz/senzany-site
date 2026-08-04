@@ -3,6 +3,37 @@ const supabaseService = require('./supabaseService');
 const TABLE = 'events';
 const ALLOWED_TYPES = new Set(['major', 'community', 'vote', 'seasonal']);
 const ALLOWED_STATUS = new Set(['draft', 'published', 'cancelled', 'completed']);
+const IMAGE_BUCKET = 'event-images';
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg','image/png','image/webp']);
+function storageConfig() {
+  const url = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
+  const key = process.env.SUPABASE_SECRET_KEY;
+  if (!url || !key) { const e = new Error('Configuration Supabase manquante.'); e.status = 500; throw e; }
+  return { url, key };
+}
+function safeFilename(value='image') {
+  const cleaned = String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80);
+  return cleaned || 'image';
+}
+async function uploadImage(buffer, contentType, originalName, actor) {
+  if (!Buffer.isBuffer(buffer) || !buffer.length) { const e = new Error('Aucune image reçue.'); e.status = 400; throw e; }
+  if (!ALLOWED_IMAGE_TYPES.has(contentType)) { const e = new Error('Format d’image refusé.'); e.status = 415; throw e; }
+  if (buffer.length > 5 * 1024 * 1024) { const e = new Error('L’image dépasse 5 Mo.'); e.status = 413; throw e; }
+  const { url, key } = storageConfig();
+  const ext = contentType === 'image/png' ? 'png' : contentType === 'image/webp' ? 'webp' : 'jpg';
+  const base = safeFilename(String(originalName || 'event').replace(/\.[^.]+$/, ''));
+  const folder = actor ? safeFilename(actor) : 'commandement';
+  const path = `${folder}/${Date.now()}-${base}.${ext}`;
+  const response = await fetch(`${url}/storage/v1/object/${IMAGE_BUCKET}/${encodeURI(path)}`, {
+    method: 'POST',
+    headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': contentType, 'x-upsert': 'false' },
+    body: buffer,
+  });
+  const data = await response.json().catch(()=>({}));
+  if (!response.ok) { const e = new Error(data.message || data.error || `Supabase Storage HTTP ${response.status}`); e.status = response.status; e.data = data; throw e; }
+  return { path, url: `${url}/storage/v1/object/public/${IMAGE_BUCKET}/${encodeURI(path)}` };
+}
+
 
 function cleanText(value, max = 500) {
   return String(value ?? '').trim().slice(0, max);
@@ -140,4 +171,4 @@ async function revealNow(id, actor) {
 async function remove(id) {
   await supabaseService.request(`${TABLE}?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
 }
-module.exports = { listAdmin, listPublic, create, update, revealNow, remove, validatePayload };
+module.exports = { listAdmin, listPublic, create, update, revealNow, remove, validatePayload, uploadImage };

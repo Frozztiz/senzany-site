@@ -157,11 +157,16 @@
     const title = card.querySelector('h2');
     const text = card.querySelector('p');
     const visual = card.querySelector('.next-event-card__visual');
+    const badge = $('nextEventBadge');
     visual.style.backgroundImage = '';
+    visual.className = 'next-event-card__visual';
     if (!next) {
-      card.classList.add('is-empty'); title.textContent = 'Le calendrier se prépare'; text.textContent = "Les prochains rendez-vous seront publiés ici par l'équipe Senzany."; $('nextEventCountdown').hidden = true; return;
+      card.classList.add('is-empty'); badge.textContent='ÉVÉNEMENT'; title.textContent = 'Le calendrier se prépare'; text.textContent = "Les prochains rendez-vous seront publiés ici par l'équipe Senzany."; $('nextEventCountdown').hidden = true; return;
     }
     card.classList.remove('is-empty');
+    visual.classList.add(`is-${next.eventType || 'community'}`);
+    if (next.mystery && !next.revealed) visual.classList.add('is-mystery');
+    badge.textContent = next.mystery && !next.revealed ? '🔒 ÉVÉNEMENT MYSTÈRE' : (typeLabels[next.eventType] || 'ÉVÉNEMENT').toUpperCase();
     title.textContent = next.title;
     text.textContent = next.mystery && !next.revealed ? 'Le contenu de ce rendez-vous reste classifié jusqu’à sa révélation.' : (next.description || 'Plus de détails prochainement.');
     const cd = $('nextEventCountdown'); cd.hidden = false; cd.innerHTML = countdown(next.mystery && !next.revealed && next.revealAt ? next.revealAt : next.startsAt);

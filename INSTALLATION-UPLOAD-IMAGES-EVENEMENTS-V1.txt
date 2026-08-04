@@ -1,0 +1,24 @@
+SENZANY — Upload d'images pour les événements
+
+1. Remplacer les fichiers du ZIP dans le projet.
+2. Dans Supabase > SQL Editor, exécuter :
+   supabase/022_event_images_storage.sql
+3. Commit puis Push avec GitHub Desktop.
+4. Sur le VPS :
+   pm2 restart senzany-api
+5. Recharger avec Ctrl + F5 :
+   senzany-admin-events.html
+   senzany-evenements.html
+
+Fonctionnement :
+- Choisir une image JPG, PNG ou WEBP depuis le PC.
+- Limite : 5 Mo.
+- L'image est envoyée dans le bucket public event-images.
+- Son URL est enregistrée automatiquement dans l'événement.
+- La carte publique applique un cadrage plein écran, un voile sombre,
+  un léger zoom cinématique, une bordure animée et un badge de catégorie.
+
+Sécurité :
+- La route d'upload est protégée par l'accès Commandement existant.
+- L'écriture utilise uniquement la clé secrète du backend.
+- Les visiteurs disposent seulement de la lecture publique des images.
