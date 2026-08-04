@@ -40,3 +40,7 @@ body[data-page="evenements"] [data-site-header] .mobile-menu.open{display:flex!i
 body[data-page="evenements"] .events-page{background:transparent}
 body[data-page="evenements"] .events-hero{background:radial-gradient(circle at 75% 20%,rgba(176,26,31,.34),transparent 34%),linear-gradient(120deg,rgba(5,5,5,.38),rgba(5,5,5,.92)),url('../../images/backgrounds/hero-bg.jpg');background-size:cover;background-position:center}
 @media(max-width:1100px){body[data-page="evenements"] [data-site-header] .burger{display:block!important}body[data-page="evenements"] [data-site-header] .navlinks{display:none!important}}
+
+
+/* V2.2 — compteur de votes Top-Serveurs en direct */
+.vote-progress-card__numbers{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0 0 12px}.vote-progress-card__numbers b{color:#ddd3ca;font:800 12px monospace}.vote-progress-card__numbers em{color:#80c88e;font:700 10px monospace;font-style:normal;text-align:right}.vote-progress-card__track{height:10px!important;border:1px solid #28432e;background:#142017!important;overflow:hidden}.vote-progress-card__track i{display:block;width:0;height:100%;background:linear-gradient(90deg,#3d9f59,#70d48a);box-shadow:0 0 18px rgba(95,182,117,.58);transition:width .65s ease}.vote-progress-card small{min-height:17px}.events-hero__stats strong#heroVoteProgress{color:#7ed08d}@media(max-width:600px){.vote-progress-card__numbers{align-items:flex-start;flex-direction:column}.vote-progress-card__numbers em{text-align:left}}

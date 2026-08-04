@@ -7,7 +7,7 @@
 <meta name="description" content="Consultez le calendrier des événements Senzany, les événements mystères et les rendez-vous débloqués grâce aux votes."/>
 <link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
 <link href="assets/css/shared/footer-v2.css?v=2.1.0" rel="stylesheet"/>
-<link href="assets/css/pages/evenements.css?v=2.1.0" rel="stylesheet"/>
+<link href="assets/css/pages/evenements.css?v=2.2.0" rel="stylesheet"/>
 </head>
 <body data-page="evenements">
 <div data-site-header></div>
@@ -20,7 +20,7 @@
       <div class="events-hero__stats">
         <div><span>PROCHAIN RENDEZ-VOUS</span><strong id="heroNextDate">À PROGRAMMER</strong></div>
         <div><span>ÉVÉNEMENTS PUBLIÉS</span><strong id="heroEventCount">--</strong></div>
-        <div><span>PALIER COMMUNAUTAIRE</span><strong>TOUS LES 1 000 VOTES</strong></div>
+        <div><span>PALIER COMMUNAUTAIRE</span><strong id="heroVoteProgress">CHARGEMENT…</strong></div>
       </div>
     </div>
   </section>
@@ -97,7 +97,16 @@
   <section class="vote-events-section">
     <div class="wrap vote-events-grid">
       <div><div class="eyebrow">LA COMMUNAUTÉ DÉCIDE</div><h2>Chaque tranche de 1 000 votes débloque un événement</h2><p>Lorsqu'un nouveau palier est atteint, l'équipe prépare un rendez-vous spécial puis choisit sa date de publication dans le calendrier.</p></div>
-      <div class="vote-progress-card"><span>PROCHAINE ÉTAPE</span><strong id="voteEventTarget">1 000 VOTES</strong><div><i id="voteEventProgress"></i></div><small>La connexion automatique au compteur de votes sera activée dans l'étape suivante.</small></div>
+      <div class="vote-progress-card">
+        <span>PROCHAINE ÉTAPE</span>
+        <strong id="voteEventTarget">1 000 VOTES</strong>
+        <div class="vote-progress-card__numbers">
+          <b id="voteEventCurrent">-- votes ce mois</b>
+          <em id="voteEventRemaining">Synchronisation…</em>
+        </div>
+        <div class="vote-progress-card__track"><i id="voteEventProgress"></i></div>
+        <small id="voteEventStatus">Connexion au compteur Top-Serveurs…</small>
+      </div>
     </div>
   </section>
 </main>
@@ -119,6 +128,6 @@
 <div data-site-footer></div>
 <script defer src="assets/js/components.js"></script>
 <script defer src="assets/js/app.js"></script>
-<script defer src="assets/js/pages/evenements-calendar.js?v=2.1.0"></script>
+<script defer src="assets/js/pages/evenements-calendar.js?v=2.2.0"></script>
 </body>
 </html>

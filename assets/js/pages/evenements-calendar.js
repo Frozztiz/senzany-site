@@ -7,6 +7,48 @@
   const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   const typeLabels = { major: 'Grand événement', community: 'Événement communautaire', vote: 'Événement de votes', seasonal: 'Événement saisonnier' };
 
+  const VOTE_STEP = 1000;
+
+  function formatNumber(value) {
+    return new Intl.NumberFormat('fr-FR').format(Number(value || 0));
+  }
+
+  function renderVoteProgress(monthlyVotes) {
+    const votes = Math.max(0, Number(monthlyVotes || 0));
+    const completedSteps = Math.floor(votes / VOTE_STEP);
+    const nextTarget = (completedSteps + 1) * VOTE_STEP;
+    const progressInStep = votes % VOTE_STEP;
+    const remaining = nextTarget - votes;
+    const percent = Math.min(100, Math.max(0, progressInStep / VOTE_STEP * 100));
+
+    $('heroVoteProgress').textContent = `${formatNumber(votes)} / ${formatNumber(nextTarget)} VOTES`;
+    $('voteEventTarget').textContent = `${formatNumber(nextTarget)} VOTES`;
+    $('voteEventCurrent').textContent = `${formatNumber(votes)} votes ce mois`;
+    $('voteEventRemaining').textContent = `${formatNumber(remaining)} vote${remaining > 1 ? 's' : ''} avant le prochain événement`;
+    $('voteEventProgress').style.width = `${percent}%`;
+    $('voteEventStatus').textContent = completedSteps
+      ? `${completedSteps} palier${completedSteps > 1 ? 's' : ''} de 1 000 votes atteint${completedSteps > 1 ? 's' : ''} ce mois.`
+      : 'Le prochain palier débloquera un événement communautaire.';
+  }
+
+  async function loadVoteProgress() {
+    try {
+      const response = await fetch('/api/topserveurs/stats', {
+        cache: 'no-store',
+        headers: { Accept: 'application/json' },
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+      renderVoteProgress(data.monthlyVotes);
+    } catch (error) {
+      $('heroVoteProgress').textContent = 'COMPTEUR INDISPONIBLE';
+      $('voteEventCurrent').textContent = '-- votes ce mois';
+      $('voteEventRemaining').textContent = 'Prochain palier : 1 000 votes';
+      $('voteEventProgress').style.width = '0%';
+      $('voteEventStatus').textContent = `Compteur temporairement indisponible : ${error.message}`;
+    }
+  }
+
   function rangeForMonth(date) {
     const from = new Date(date.getFullYear(), date.getMonth() - 2, 1);
     const to = new Date(date.getFullYear(), date.getMonth() + 3, 1);
@@ -179,5 +221,7 @@
   $('eventDialog').addEventListener('click', (e) => { if (e.target === $('eventDialog')) $('eventDialogClose').click(); });
 
   load();
+  loadVoteProgress();
   setInterval(updateLiveCountdowns, 1000);
+  setInterval(loadVoteProgress, 300000);
 })();
