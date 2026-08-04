@@ -7,7 +7,7 @@
 <meta name="description" content="Consultez le calendrier des événements Senzany, les événements mystères et les rendez-vous débloqués grâce aux votes."/>
 <link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
 <link href="assets/css/shared/footer-v2.css?v=2.1.0" rel="stylesheet"/>
-<link href="assets/css/pages/evenements.css?v=1.0.2" rel="stylesheet"/>
+<link href="assets/css/pages/evenements.css?v=2.0.0" rel="stylesheet"/>
 </head>
 <body data-page="evenements">
 <div data-site-header></div>
@@ -39,6 +39,25 @@
     </div>
   </section>
 
+
+  <section class="week-section">
+    <div class="wrap week-layout">
+      <article class="week-panel">
+        <div class="week-panel__head">
+          <div><div class="eyebrow">CETTE SEMAINE</div><h2>Les rendez-vous à ne pas manquer</h2></div>
+          <span id="weekRangeLabel">--</span>
+        </div>
+        <div id="weekEventsList" class="week-events-list"><div class="event-empty">Aucun événement annoncé cette semaine.</div></div>
+      </article>
+      <aside class="mystery-panel">
+        <div class="eyebrow">PROCHAINE RÉVÉLATION</div>
+        <h3 id="mysteryRevealTitle">Aucun événement mystère</h3>
+        <p id="mysteryRevealText">Les futurs événements secrets apparaîtront ici.</p>
+        <div id="mysteryRevealCountdown" class="event-countdown" hidden></div>
+      </aside>
+    </div>
+  </section>
+
   <section class="calendar-section">
     <div class="wrap">
       <header class="calendar-heading">
@@ -61,6 +80,17 @@
         <span><i class="legend-vote"></i> Débloqué par les votes</span>
         <span><i class="legend-mystery"></i> Mystère</span>
       </div>
+    </div>
+  </section>
+
+
+  <section class="event-archives-section">
+    <div class="wrap">
+      <header class="archives-heading">
+        <div><span class="section-index">02</span><div><span class="section-tag">Mémoire du serveur</span><h2>Derniers événements</h2></div></div>
+        <p>Retrouvez les derniers rendez-vous publiés par l’équipe Senzany.</p>
+      </header>
+      <div id="recentEventsGrid" class="recent-events-grid"><div class="event-empty">Aucun événement passé pour le moment.</div></div>
     </div>
   </section>
 
@@ -89,6 +119,6 @@
 <div data-site-footer></div>
 <script defer src="assets/js/components.js"></script>
 <script defer src="assets/js/app.js"></script>
-<script defer src="assets/js/pages/evenements-calendar.js"></script>
+<script defer src="assets/js/pages/evenements-calendar.js?v=2.0.0"></script>
 </body>
 </html>

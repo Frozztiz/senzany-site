@@ -1,0 +1,21 @@
+SENZANY — CALENDRIER ÉVÉNEMENTS V2
+
+Cette version ajoute à la page publique :
+- le panneau « Cette semaine » ;
+- le prochain événement mystère et son compte à rebours ;
+- le calendrier mensuel interactif ;
+- le prochain événement avec compte à rebours en temps réel ;
+- les derniers événements publiés ;
+- les fenêtres détaillées au clic ;
+- la conservation du fond commun et de la navigation du portail.
+
+INSTALLATION
+1. Extraire le ZIP à la racine du projet et remplacer les fichiers.
+2. Faire Commit puis Push dans GitHub Desktop.
+3. Aucun nouveau SQL n'est nécessaire si 021_events_calendar.sql a déjà été exécuté.
+4. Aucun redémarrage PM2 n'est nécessaire pour cette mise à jour uniquement front-end.
+5. Recharger senzany-evenements.html avec Ctrl + F5.
+
+REMARQUE
+Les blocs restent vides tant qu'aucun événement publié n'existe dans la table public.events.
+Les événements en brouillon n'apparaissent pas sur la page publique.
