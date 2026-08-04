@@ -2,94 +2,91 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Événements — SENZANY</title>
-<meta name="description" content="Découvrez les pistes actuellement étudiées pour les futurs événements communautaires de Senzany."/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Calendrier des événements — SENZANY</title>
+<meta name="description" content="Consultez le calendrier des événements Senzany, les événements mystères et les rendez-vous débloqués grâce aux votes."/>
 <link href="assets/css/pages/evenements.css" rel="stylesheet"/>
 </head>
 <body data-page="evenements">
-<div data-site-header=""></div>
-<main>
+<div data-site-header></div>
+<main class="events-page">
   <section class="events-hero">
-    <div class="events-hero__overlay"></div>
     <div class="wrap events-hero__content">
-      <div class="eyebrow">SENZANY // LABORATOIRE ÉVÉNEMENTIEL</div>
-      <h1>Les événements<br/>de demain</h1>
-      <p>Nous préparons la prochaine étape de l’expérience communautaire Senzany. Rien de ce qui apparaît sur cette page n’est encore une annonce officielle.</p>
-      <div class="construction-chip"><span></span> Page en cours de conception</div>
+      <div class="eyebrow">SENZANY // CALENDRIER COMMUNAUTAIRE</div>
+      <h1>Chaque mois.<br/>Une nouvelle histoire.</h1>
+      <p>Deux grands rendez-vous, des surprises communautaires et des événements débloqués au rythme de vos votes.</p>
+      <div class="events-hero__stats">
+        <div><span>PROCHAIN RENDEZ-VOUS</span><strong id="heroNextDate">À PROGRAMMER</strong></div>
+        <div><span>ÉVÉNEMENTS PUBLIÉS</span><strong id="heroEventCount">--</strong></div>
+        <div><span>PALIER COMMUNAUTAIRE</span><strong>TOUS LES 1 000 VOTES</strong></div>
+      </div>
     </div>
   </section>
 
-  <section class="status-section">
+  <section class="next-event-section">
     <div class="wrap">
-      <article class="status-panel">
-        <div class="status-panel__index">00</div>
-        <div>
-          <div class="eyebrow">Information importante</div>
-          <h2>Une vision en construction</h2>
-        </div>
-        <div class="status-panel__copy">
-          <p>Les idées présentées ci-dessous sont uniquement des <strong>pistes de travail</strong>. Elles peuvent être modifiées, remplacées ou abandonnées selon les choix de l’équipe et l’évolution du serveur.</p>
-          <p>Aucune date, récompense ou mécanique n’est confirmée à ce stade.</p>
+      <article id="nextEventCard" class="next-event-card is-empty">
+        <div class="next-event-card__visual"><span class="next-event-card__lock">◈</span></div>
+        <div class="next-event-card__content">
+          <div class="eyebrow">PROCHAIN ÉVÉNEMENT</div>
+          <h2>Le calendrier se prépare</h2>
+          <p>Les prochains rendez-vous seront publiés ici par l'équipe Senzany.</p>
+          <div class="event-countdown" id="nextEventCountdown" hidden></div>
         </div>
       </article>
     </div>
   </section>
 
-  <section class="concepts-section">
+  <section class="calendar-section">
     <div class="wrap">
-      <header class="section-heading">
-        <div><span class="section-index">01</span><span class="section-tag">Pistes étudiées</span></div>
-        <h2>Concepts envisagés</h2>
-        <p>Une sélection d’ambiances et d’activités susceptibles d’inspirer les futurs rendez-vous communautaires.</p>
+      <header class="calendar-heading">
+        <div><span class="section-index">01</span><div><span class="section-tag">Planning officiel</span><h2>Calendrier des événements</h2></div></div>
+        <div class="calendar-navigation">
+          <button id="calendarPrev" type="button" aria-label="Mois précédent">←</button>
+          <strong id="calendarMonthLabel">--</strong>
+          <button id="calendarNext" type="button" aria-label="Mois suivant">→</button>
+          <button id="calendarToday" type="button">Aujourd'hui</button>
+        </div>
       </header>
-
-      <div class="concept-grid">
-        <article class="concept-card concept-card--race">
-          <div class="concept-visual"><span class="concept-icon">🚗</span><span class="concept-status">Concept</span></div>
-          <div class="concept-body"><div class="concept-code">EVT // 01</div><h3>Courses automobiles</h3><p>Des compétitions de pilotage organisées autour de parcours spécialement préparés.</p><span class="concept-note">À l’étude — non confirmé</span></div>
-        </article>
-        <article class="concept-card concept-card--petanque">
-          <div class="concept-visual"><span class="concept-icon">🎯</span><span class="concept-status">Concept</span></div>
-          <div class="concept-body"><div class="concept-code">EVT // 02</div><h3>Tournois de pétanque</h3><p>Des rencontres communautaires accessibles, conviviales et centrées sur la précision.</p><span class="concept-note">À l’étude — non confirmé</span></div>
-        </article>
-        <article class="concept-card concept-card--toxic">
-          <div class="concept-visual"><span class="concept-icon">☣️</span><span class="concept-status">Concept</span></div>
-          <div class="concept-body"><div class="concept-code">EVT // 03</div><h3>Zones contaminées</h3><p>Des opérations temporaires dans des secteurs dangereux demandant préparation et coordination.</p><span class="concept-note">À l’étude — non confirmé</span></div>
-        </article>
-        <article class="concept-card concept-card--loot">
-          <div class="concept-visual"><span class="concept-icon">🎁</span><span class="concept-status">Concept</span></div>
-          <div class="concept-body"><div class="concept-code">EVT // 04</div><h3>Loot Events</h3><p>Des rendez-vous ponctuels autour de zones, convois ou objectifs contenant du butin spécial.</p><span class="concept-note">À l’étude — non confirmé</span></div>
-        </article>
-        <article class="concept-card concept-card--season">
-          <div class="concept-visual"><span class="concept-icon">🎄</span><span class="concept-status">Concept</span></div>
-          <div class="concept-body"><div class="concept-code">EVT // 05</div><h3>Événements saisonniers</h3><p>Des contenus temporaires pensés pour accompagner certaines périodes importantes de l’année.</p><span class="concept-note">À l’étude — non confirmé</span></div>
-        </article>
-        <article class="concept-card concept-card--halloween">
-          <div class="concept-visual"><span class="concept-icon">🎃</span><span class="concept-status">Concept</span></div>
-          <div class="concept-body"><div class="concept-code">EVT // 06</div><h3>Halloween</h3><p>Une ambiance plus sombre, inquiétante et atypique pour transformer temporairement Chernarus.</p><span class="concept-note">À l’étude — non confirmé</span></div>
-        </article>
-        <article class="concept-card concept-card--summer">
-          <div class="concept-visual"><span class="concept-icon">🎆</span><span class="concept-status">Concept</span></div>
-          <div class="concept-body"><div class="concept-code">EVT // 07</div><h3>Été</h3><p>Des activités légères et festives imaginées pour animer la communauté pendant la saison estivale.</p><span class="concept-note">À l’étude — non confirmé</span></div>
-        </article>
-        <article class="concept-card concept-card--christmas">
-          <div class="concept-visual"><span class="concept-icon">🎅</span><span class="concept-status">Concept</span></div>
-          <div class="concept-body"><div class="concept-code">EVT // 08</div><h3>Noël</h3><p>Une période spéciale susceptible d’accueillir décorations, rendez-vous et surprises communautaires.</p><span class="concept-note">À l’étude — non confirmé</span></div>
-        </article>
+      <div id="eventsStatus" class="events-status">Chargement du calendrier…</div>
+      <div class="calendar-shell">
+        <div class="calendar-weekdays" aria-hidden="true"><span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span></div>
+        <div id="eventsCalendar" class="events-calendar"></div>
+      </div>
+      <div class="calendar-legend">
+        <span><i class="legend-major"></i> Grand événement</span>
+        <span><i class="legend-community"></i> Communautaire</span>
+        <span><i class="legend-vote"></i> Débloqué par les votes</span>
+        <span><i class="legend-mystery"></i> Mystère</span>
       </div>
     </div>
   </section>
 
-  <section class="events-closing">
-    <div class="wrap events-closing__inner">
-      <div><div class="eyebrow">Notre engagement</div><h2>Annoncer seulement ce qui est prêt</h2></div>
-      <p>Cette page évoluera lorsque le fonctionnement des événements sera défini. Les informations confirmées seront alors clairement distinguées des simples concepts.</p>
+  <section class="vote-events-section">
+    <div class="wrap vote-events-grid">
+      <div><div class="eyebrow">LA COMMUNAUTÉ DÉCIDE</div><h2>Chaque tranche de 1 000 votes débloque un événement</h2><p>Lorsqu'un nouveau palier est atteint, l'équipe prépare un rendez-vous spécial puis choisit sa date de publication dans le calendrier.</p></div>
+      <div class="vote-progress-card"><span>PROCHAINE ÉTAPE</span><strong id="voteEventTarget">1 000 VOTES</strong><div><i id="voteEventProgress"></i></div><small>La connexion automatique au compteur de votes sera activée dans l'étape suivante.</small></div>
     </div>
   </section>
 </main>
-<div data-site-footer=""></div>
+
+<dialog id="eventDialog" class="event-dialog">
+  <article>
+    <button id="eventDialogClose" class="event-dialog__close" type="button" aria-label="Fermer">×</button>
+    <div id="eventDialogVisual" class="event-dialog__visual"></div>
+    <div class="event-dialog__body">
+      <span id="eventDialogType" class="event-dialog__type"></span>
+      <h2 id="eventDialogTitle"></h2>
+      <div id="eventDialogDate" class="event-dialog__date"></div>
+      <div id="eventDialogCountdown" class="event-countdown"></div>
+      <p id="eventDialogDescription"></p>
+      <dl id="eventDialogDetails"></dl>
+    </div>
+  </article>
+</dialog>
+<div data-site-footer></div>
 <script defer src="assets/js/components.js"></script>
 <script defer src="assets/js/app.js"></script>
+<script defer src="assets/js/pages/evenements-calendar.js"></script>
 </body>
 </html>

@@ -1,0 +1,23 @@
+SENZANY — CALENDRIER DES ÉVÉNEMENTS V1
+
+1. Extraire le ZIP à la racine du projet et remplacer les fichiers.
+2. Dans Supabase > SQL Editor, créer une requête nommée :
+   021_events_calendar.sql
+3. Coller le contenu du fichier supabase/021_events_calendar.sql puis cliquer sur Run.
+4. Commit + Push avec GitHub Desktop.
+5. Sur le VPS : pm2 restart senzany-api
+6. Recharger avec Ctrl + F5 :
+   - /senzany-evenements.html
+   - /senzany-admin-events.html
+
+V1 incluse :
+- calendrier public mensuel ;
+- événements normaux et mystères ;
+- compte à rebours ;
+- révélation automatique ;
+- création, modification, suppression ;
+- brouillon / publication ;
+- bouton Révéler maintenant ;
+- préparation des événements de paliers de votes.
+
+La création automatique d'un brouillon à chaque tranche de 1 000 votes sera raccordée après validation de cette V1.
