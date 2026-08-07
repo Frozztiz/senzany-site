@@ -36,7 +36,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/topserveurs", require("./routes/topserveurs"));
-app.use("/api/events", require("./routes/events"));
+app.use("/api/vote-wallet", require("./routes/voteWallet"));
 app.use("/api/discord", require("./routes/discord"));
 app.use("/api/game", require("./routes/game"));
 app.use("/api/steam", require("./routes/steam"));
@@ -66,11 +66,6 @@ app.use(
   "/api/admin/monthly-votes",
   require("./middleware/commandAuth"),
   require("./routes/adminMonthlyVotes")
-);
-app.use(
-  "/api/admin/events",
-  require("./middleware/commandAuth"),
-  require("./routes/adminEvents")
 );
 
 app.use((req, res) => {

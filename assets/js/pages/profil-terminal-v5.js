@@ -151,6 +151,22 @@
     });
   }
 
+
+  function formatMoney(value){return new Intl.NumberFormat("fr-FR").format(Math.max(0,Number(value)||0))+" $"}
+  function renderVoteWallet(wallet){
+    if(!wallet)return;
+    const balance=document.getElementById("voteWalletBalance"),rate=document.getElementById("voteWalletRate"),next=document.getElementById("voteWalletNext"),bar=document.getElementById("voteWalletProgressBar"),text=document.getElementById("voteWalletProgressText"),milestones=document.getElementById("voteMilestones"),claim=document.getElementById("voteWalletClaim");
+    if(balance)balance.textContent=formatMoney(wallet.balance);
+    if(rate)rate.textContent=formatMoney(wallet.amountPerVote);
+    const votes=Math.max(0,Number(wallet.monthlyVotes)||0),nextValue=Math.max(1,Number(wallet.nextMilestone)||50);
+    const previous=Math.max(0,nextValue-50),range=Math.max(1,nextValue-previous),progress=Math.max(0,Math.min(100,((votes-previous)/range)*100));
+    if(next)next.textContent=`${nextValue} votes`; if(bar)bar.style.width=progress+"%"; if(text)text.textContent=`${votes} votes ce mois // ${Math.max(0,Number(wallet.votesToNext)||0)} avant le prochain palier`;
+    if(milestones){milestones.innerHTML="";(Array.isArray(wallet.milestones)?wallet.milestones:[]).forEach(tier=>{const el=document.createElement("div");el.className=`vote-milestone ${tier.unlocked?"vote-milestone--unlocked":""}`;el.innerHTML=`<strong>${tier.value}</strong><small>${tier.unlocked?"DÉBLOQUÉ":"PALIER"}</small>`;milestones.appendChild(el)})}
+    if(claim){claim.disabled=(Number(wallet.balance)||0)<=0||!wallet.claimConfigured;claim.title=!wallet.claimConfigured?"Conversion de la monnaie DayZ à configurer sur le serveur":"";claim.textContent=(Number(wallet.balance)||0)>0?`CLAIM ${formatMoney(wallet.balance)}`:"CAGNOTTE VIDE"}
+  }
+  function showWalletFeedback(message,isError=false){const el=document.getElementById("voteWalletFeedback");if(!el)return;el.hidden=false;el.textContent=message;el.classList.toggle("vote-wallet-feedback--error",isError)}
+  async function loadVoteWallet(){try{const wallet=await window.SenzanyAPI.voteWallet.get();renderVoteWallet(wallet);return wallet}catch(error){showWalletFeedback(error.message||"Cagnotte indisponible.",true);return null}}
+
   async function loadPersonalVotes(){
     const value=document.getElementById("personalVotesValue"),state=document.getElementById("votesModuleState"),text=document.getElementById("personalVotesText"),foot=document.getElementById("personalVotesFoot"),total=document.getElementById("voteAliasesTotal"),matchCount=document.getElementById("voteAliasesMatchCount");
     if(!value||!state||!text||!foot)return;
@@ -173,6 +189,7 @@
         }
       }
       previousVoteTotal=votes;
+      if(result.wallet)renderVoteWallet(result.wallet);
       setVoteLastSync(new Date());
       if(!result.configured){
         state.textContent="PSEUDOS REQUIS";
@@ -219,7 +236,7 @@
   }
 
   async function refreshVoteAliasesAndTotal(){
-    await Promise.all([loadVoteAliases(),loadPersonalVotes()]);
+    await Promise.all([loadVoteAliases(),loadPersonalVotes(),loadVoteWallet()]);
   }
 
   const voteAliasForm=document.getElementById("voteAliasForm");
@@ -259,6 +276,16 @@
       voteAliasesRefreshButton.disabled=false;
       voteAliasesRefreshButton.textContent="Actualiser les votes";
     }
+  });
+
+
+  const voteWalletClaim=document.getElementById("voteWalletClaim");
+  if(voteWalletClaim)voteWalletClaim.addEventListener("click",async()=>{
+    if(voteWalletClaim.disabled)return;
+    if(!confirm("Créer maintenant une livraison en jeu avec toute ta cagnotte disponible ?"))return;
+    voteWalletClaim.disabled=true;voteWalletClaim.textContent="CRÉATION DE LA LIVRAISON…";
+    try{const result=await window.SenzanyAPI.voteWallet.claim();renderVoteWallet(result.summary);showWalletFeedback(`${formatMoney(result.amount)} ont été transformés en livraison. Tu peux maintenant la récupérer en jeu.`);appendLog(`Cagnotte réclamée : ${formatMoney(result.amount)}`,0)}
+    catch(error){showWalletFeedback(error.message||"Impossible de créer la livraison.",true);await loadVoteWallet()}
   });
 
 

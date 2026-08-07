@@ -137,6 +137,26 @@
           </article>
         </section>
 
+        <section class="vote-wallet-panel" aria-labelledby="voteWalletTitle">
+          <span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--tr"></span><span class="hud-corner hud-corner--bl"></span><span class="hud-corner hud-corner--br"></span>
+          <div class="vote-wallet-panel__main">
+            <div>
+              <span class="section-tag">RÉCOMPENSES DE VOTES // CAGNOTTE</span>
+              <h2 id="voteWalletTitle">Ma cagnotte de votes</h2>
+              <p>Chaque vote validé ajoute automatiquement <strong id="voteWalletRate">1 000 $</strong>. Tu peux conserver ta cagnotte et la récupérer en jeu quand tu le souhaites.</p>
+              <div class="vote-wallet-balance"><span>SOLDE DISPONIBLE</span><strong id="voteWalletBalance">—</strong><small>DOLLARS À RÉCUPÉRER</small></div>
+              <button id="voteWalletClaim" class="terminal-button terminal-button--primary vote-wallet-claim" type="button">CLAIM MA CAGNOTTE</button>
+              <p id="voteWalletFeedback" class="vote-wallet-feedback" hidden></p>
+            </div>
+            <div class="vote-wallet-progress">
+              <div class="vote-wallet-progress__head"><span>PROCHAIN PALIER</span><strong id="voteWalletNext">50 votes</strong></div>
+              <div class="vote-wallet-track"><i id="voteWalletProgressBar"></i></div>
+              <small id="voteWalletProgressText">—</small>
+              <div id="voteMilestones" class="vote-milestones"></div>
+            </div>
+          </div>
+        </section>
+
         <section class="vote-alias-panel" aria-labelledby="voteAliasesTitle">
           <span class="hud-corner hud-corner--tl"></span><span class="hud-corner hud-corner--tr"></span><span class="hud-corner hud-corner--bl"></span><span class="hud-corner hud-corner--br"></span>
           <div class="vote-alias-panel__head">
@@ -228,7 +248,7 @@
 <div data-site-footer></div>
 <script defer src="assets/js/components.js"></script>
 <script defer src="assets/js/app.js"></script>
-<script defer src="assets/js/api.js?v=20260802-vote-aliases2"></script>
-<script defer src="assets/js/pages/profil-terminal-v5.js?v=5.3.0"></script>
+<script defer src="assets/js/api.js?v=20260807-vote-wallet"></script>
+<script defer src="assets/js/pages/profil-terminal-v5.js?v=5.4.0"></script>
 </body>
 </html>

@@ -1,0 +1,27 @@
+SENZANY — CAGNOTTE DE VOTES V1
+
+Fonctionnement :
+- 1 vote = 1 000 $ dans la cagnotte du compte Senzany.
+- La cagnotte reste disponible jusqu'au CLAIM du joueur.
+- Le CLAIM crée une livraison DayZ via le système SenzanyDelivery existant.
+- Les votes mensuels ne sont jamais remis à zéro par un CLAIM.
+- Paliers affichés par défaut : 50 / 100 / 150 / 200 / ... / 500 votes.
+- Les récompenses de palier seront branchées dans une étape suivante ; cette V1 affiche déjà verrouillé/débloqué.
+- Lorsqu'un pseudo est retiré puis attribué à un autre compte, les anciens votes ne sont pas recrédités : un baseline est enregistré au moment du nouveau rattachement.
+
+INSTALLATION :
+1. Exécuter supabase/023_vote_wallet.sql dans Supabase SQL Editor.
+2. Remplacer les fichiers du ZIP à la racine du projet.
+3. Commit + Push.
+4. Sur le VPS : cd /var/www/senzany/server && pm2 restart senzany-api
+5. Ctrl + F5 sur senzany-profil.html.
+
+CONFIGURATION MONNAIE DAYZ (OBLIGATOIRE POUR ACTIVER LE BOUTON CLAIM) :
+Dans /var/www/senzany/server/.env, ajouter VOTE_WALLET_DENOMINATIONS_JSON avec les vrais classnames de vos billets/monnaies.
+Le backend refuse volontairement de créer une livraison avec un classname inventé ou une mauvaise valeur.
+
+Exemple de structure :
+VOTE_WALLET_DENOMINATIONS_JSON=[{"value":1000,"className":"VOTRE_CLASSNAME_1000","name":"Billet 1 000 $"}]
+
+Si plusieurs coupures existent, elles peuvent être déclarées :
+VOTE_WALLET_DENOMINATIONS_JSON=[{"value":50000,"className":"..."},{"value":10000,"className":"..."},{"value":1000,"className":"..."}]

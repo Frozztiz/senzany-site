@@ -35,6 +35,10 @@
       }),
       deleteVoteAlias: (aliasId) => request(`/api/topserveurs/aliases/${encodeURIComponent(aliasId)}`, { method: 'DELETE' })
     }),
+    voteWallet: Object.freeze({
+      get: () => request('/api/vote-wallet'),
+      claim: () => request('/api/vote-wallet/claim', { method: 'POST' })
+    }),
     game: Object.freeze({
       getStats: () => request('/api/game/stats')
     }),
