@@ -25,3 +25,9 @@ VOTE_WALLET_DENOMINATIONS_JSON=[{"value":1000,"className":"VOTRE_CLASSNAME_1000"
 
 Si plusieurs coupures existent, elles peuvent être déclarées :
 VOTE_WALLET_DENOMINATIONS_JSON=[{"value":50000,"className":"..."},{"value":10000,"className":"..."},{"value":1000,"className":"..."}]
+
+
+V1.1 - CONVERSION MONNAIE PAR DEFAUT
+Le code contient maintenant directement les coupures DayZ suivantes :
+MoneyRuble100=100, MoneyRuble50=50, MoneyRuble25=25, MoneyRuble10=10, MoneyRuble5=5, MoneyRuble1=1.
+Aucune variable .env n'est obligatoire pour activer le CLAIM. VOTE_WALLET_DENOMINATIONS_JSON reste optionnelle pour surcharger cette configuration plus tard.

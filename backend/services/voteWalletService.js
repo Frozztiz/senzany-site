@@ -86,17 +86,29 @@ async function syncForPlayer({ steamId, aliases, aliasDetails }) {
   return { creditedVotes, creditedAmount, wallet: await getWalletRow(steamId) };
 }
 
+const DEFAULT_DENOMINATIONS = [
+  { value: 100, className: 'MoneyRuble100', name: 'Billet 100 $' },
+  { value: 50, className: 'MoneyRuble50', name: 'Billet 50 $' },
+  { value: 25, className: 'MoneyRuble25', name: 'Billet 25 $' },
+  { value: 10, className: 'MoneyRuble10', name: 'Billet 10 $' },
+  { value: 5, className: 'MoneyRuble5', name: 'Billet 5 $' },
+  { value: 1, className: 'MoneyRuble1', name: 'Billet 1 $' }
+];
+
 function parseDenominations() {
   const raw = String(process.env.VOTE_WALLET_DENOMINATIONS_JSON || '').trim();
-  if (!raw) return [];
+  if (!raw) return DEFAULT_DENOMINATIONS;
   try {
     const parsed = JSON.parse(raw);
-    return (Array.isArray(parsed)?parsed:[]).map(x=>({
+    const configured = (Array.isArray(parsed)?parsed:[]).map(x=>({
       value:Math.max(1,Number.parseInt(x.value,10)||0),
       className:String(x.className||x.classname||'').trim(),
       name:String(x.name||x.displayName||x.className||'').trim()
     })).filter(x=>x.value>0&&x.className).sort((a,b)=>b.value-a.value);
-  } catch { return []; }
+    return configured.length ? configured : DEFAULT_DENOMINATIONS;
+  } catch {
+    return DEFAULT_DENOMINATIONS;
+  }
 }
 
 function buildCurrencyItems(amount) {
