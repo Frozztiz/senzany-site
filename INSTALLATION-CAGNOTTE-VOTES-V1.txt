@@ -31,3 +31,16 @@ V1.1 - CONVERSION MONNAIE PAR DEFAUT
 Le code contient maintenant directement les coupures DayZ suivantes :
 MoneyRuble100=100, MoneyRuble50=50, MoneyRuble25=25, MoneyRuble10=10, MoneyRuble5=5, MoneyRuble1=1.
 Aucune variable .env n'est obligatoire pour activer le CLAIM. VOTE_WALLET_DENOMINATIONS_JSON reste optionnelle pour surcharger cette configuration plus tard.
+
+
+=== V1.2 - MONNAIE TEST / PRODUCTION ===
+Le backend choisit maintenant automatiquement la monnaie selon l'environnement :
+- test : ExpansionBanknoteHryvnia, réellement spawnable sur le serveur test.
+- production : MoneyRuble100 / 50 / 25 / 10 / 5 / 1.
+
+Le serveur test utilise volontairement un mapping temporaire de 100 $ par billet Expansion, uniquement pour tester la chaîne complète Claim -> Livraison -> jeu.
+Sur l'officiel, les MoneyRuble sont conservés.
+
+Variable optionnelle : DAYZ_DELIVERY_ENVIRONMENT=test|production
+Si elle n'existe pas, DAYZ_RCON_ENVIRONMENT est utilisée.
+VOTE_WALLET_DENOMINATIONS_JSON reste prioritaire sur ces valeurs automatiques.

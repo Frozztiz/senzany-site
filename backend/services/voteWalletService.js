@@ -86,7 +86,7 @@ async function syncForPlayer({ steamId, aliases, aliasDetails }) {
   return { creditedVotes, creditedAmount, wallet: await getWalletRow(steamId) };
 }
 
-const DEFAULT_DENOMINATIONS = [
+const PRODUCTION_DENOMINATIONS = [
   { value: 100, className: 'MoneyRuble100', name: 'Billet 100 $' },
   { value: 50, className: 'MoneyRuble50', name: 'Billet 50 $' },
   { value: 25, className: 'MoneyRuble25', name: 'Billet 25 $' },
@@ -95,9 +95,29 @@ const DEFAULT_DENOMINATIONS = [
   { value: 1, className: 'MoneyRuble1', name: 'Billet 1 $' }
 ];
 
+// Serveur de test : MoneyRuble n'est pas chargé. On utilise donc une monnaie
+// Expansion réellement spawnable afin de valider toute la chaîne Delivery.
+// Mapping TEMPORAIRE de test : 1 billet Expansion = 100 $ de cagnotte.
+const TEST_DENOMINATIONS = [
+  { value: 100, className: 'ExpansionBanknoteHryvnia', name: 'Billet test 100 $' }
+];
+
+function getDayzEnvironment() {
+  return String(
+    process.env.DAYZ_DELIVERY_ENVIRONMENT ||
+    process.env.DAYZ_RCON_ENVIRONMENT ||
+    'production'
+  ).trim().toLowerCase();
+}
+
+function defaultDenominationsForEnvironment() {
+  return getDayzEnvironment() === 'test' ? TEST_DENOMINATIONS : PRODUCTION_DENOMINATIONS;
+}
+
 function parseDenominations() {
+  const defaults = defaultDenominationsForEnvironment();
   const raw = String(process.env.VOTE_WALLET_DENOMINATIONS_JSON || '').trim();
-  if (!raw) return DEFAULT_DENOMINATIONS;
+  if (!raw) return defaults;
   try {
     const parsed = JSON.parse(raw);
     const configured = (Array.isArray(parsed)?parsed:[]).map(x=>({
@@ -105,9 +125,9 @@ function parseDenominations() {
       className:String(x.className||x.classname||'').trim(),
       name:String(x.name||x.displayName||x.className||'').trim()
     })).filter(x=>x.value>0&&x.className).sort((a,b)=>b.value-a.value);
-    return configured.length ? configured : DEFAULT_DENOMINATIONS;
+    return configured.length ? configured : defaults;
   } catch {
-    return DEFAULT_DENOMINATIONS;
+    return defaults;
   }
 }
 
