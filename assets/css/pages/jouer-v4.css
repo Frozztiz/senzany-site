@@ -1,0 +1,328 @@
+
+/* ==========================================================
+   SENZANY — JOUER V4
+   Surcouche du CSS original : header/footer et reset conservés.
+   ========================================================== */
+
+.play4{background:#080807;color:var(--paper)}
+.play4 .wrap{width:min(1320px,calc(100% - 64px))}
+
+/* HERO */
+.play4-hero{
+  position:relative;
+  min-height:720px;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  isolation:isolate;
+  border-bottom:1px solid var(--line);
+}
+.play4-hero__image,
+.play4-hero__overlay{position:absolute;inset:0}
+.play4-hero__image{
+  z-index:-2;
+  background:url('../../images/backgrounds/hero-bg.jpg') 70% 42%/cover no-repeat;
+  animation:play4-drift 20s ease-in-out infinite alternate;
+}
+@keyframes play4-drift{from{transform:scale(1.02)}to{transform:scale(1.055) translateX(.5%)}}
+.play4-hero__overlay{
+  z-index:-1;
+  background:
+    linear-gradient(90deg,rgba(6,5,5,.94) 0%,rgba(6,5,5,.78) 35%,rgba(6,5,5,.19) 68%,rgba(6,5,5,.43) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.09) 64%,rgba(7,6,6,.84) 100%);
+}
+.play4-hero__inner{
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) 390px;
+  gap:72px;
+  align-items:center;
+  padding:90px 0 100px;
+}
+.play4-hero__copy{max-width:720px}
+.play4-hero h1{
+  font-size:clamp(62px,6vw,96px);
+  line-height:.9;
+  margin:0;
+}
+.play4-hero h1 span{
+  color:#c2b9af;
+  -webkit-text-stroke:0;
+}
+.play4-hero__lead{
+  max-width:650px;
+  margin:24px 0 0;
+  color:#cbc2b9;
+  font-size:19px;
+  line-height:1.55;
+}
+.play4-hero__actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.play4-tags{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:30px;
+}
+.play4-tags span{
+  padding:7px 10px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(5,5,5,.42);
+  color:#958c84;
+  font:600 9px 'IBM Plex Mono',monospace;
+  letter-spacing:.1em;
+}
+.play4-live{width:100%;align-self:center}
+
+/* SECTION HEAD */
+.play4-section-head{
+  display:grid;
+  grid-template-columns:1.15fr .75fr;
+  gap:70px;
+  align-items:end;
+  margin-bottom:34px;
+}
+.play4-section-head h2{
+  margin:0;
+  font-size:clamp(46px,4.2vw,70px);
+  line-height:.94;
+}
+.play4-section-head h2 span{
+  color:#9e948a;
+  -webkit-text-stroke:0;
+}
+.play4-section-head>p{
+  max-width:520px;
+  color:var(--muted);
+  font-size:16px;
+  line-height:1.65;
+}
+.play4-section-head--simple{grid-template-columns:1fr}
+
+/* GUIDE */
+.play4-guide{
+  padding:84px 0 96px;
+  background:
+    radial-gradient(circle at 12% 8%,rgba(153,34,39,.08),transparent 26%),
+    #0a0908;
+}
+.play4-route{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+.play4-route-card{
+  position:relative;
+  min-height:430px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background:#100e0d;
+  transition:.3s ease;
+}
+.play4-route-card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(217,43,51,.55);
+  box-shadow:0 24px 54px rgba(0,0,0,.25);
+}
+.play4-route-card__image{
+  height:175px;
+  flex:none;
+  background-size:cover;
+  background-position:center;
+  filter:saturate(.8) contrast(1.05);
+  transition:.4s ease;
+}
+.play4-route-card:hover .play4-route-card__image{transform:scale(1.025);filter:saturate(1)}
+.play4-route-card--steam .play4-route-card__image{
+  background-image:linear-gradient(rgba(6,7,8,.15),rgba(6,7,8,.38)),url('../../images/accueil/progression-unique.webp');
+}
+.play4-route-card--search .play4-route-card__image{
+  background-image:linear-gradient(rgba(6,7,8,.12),rgba(6,7,8,.4)),url('../../images/accueil/monde-transforme.webp');
+}
+.play4-route-card--mods .play4-route-card__image{
+  background-image:linear-gradient(rgba(6,7,8,.12),rgba(6,7,8,.42)),url('../../images/accueil/exploration-new.webp');
+}
+.play4-route-card--arrival .play4-route-card__image{
+  background-image:linear-gradient(rgba(6,7,8,.08),rgba(6,7,8,.36)),url('../../images/accueil/communaute-new.webp');
+}
+.play4-route-card__body{
+  position:relative;
+  flex:1;
+  padding:25px 22px 24px;
+}
+.play4-route-card__num{
+  position:absolute;
+  right:17px;top:13px;
+  color:rgba(255,255,255,.07);
+  font:42px 'Anton',sans-serif;
+}
+.play4-route-card__body small{
+  color:var(--red);
+  font:600 9px 'IBM Plex Mono',monospace;
+  letter-spacing:.13em;
+}
+.play4-route-card h3{
+  margin:9px 0 12px;
+  font-size:28px;
+}
+.play4-route-card p{
+  color:#998f87;
+  font-size:14px;
+  line-height:1.55;
+}
+.play4-route-card a,
+.play4-route-card button{
+  position:absolute;
+  left:22px;bottom:22px;
+  border:0;
+  padding:0;
+  background:none;
+  color:#dba34f;
+  font:600 10px 'IBM Plex Mono',monospace;
+  cursor:pointer;
+}
+.play4-auto{
+  position:absolute;
+  left:22px;bottom:20px;
+  color:#59d77b;
+  font:600 9px 'IBM Plex Mono',monospace;
+  border:1px solid rgba(89,215,123,.3);
+  padding:6px 8px;
+}
+
+/* BREAK */
+.play4-break{
+  position:relative;
+  min-height:500px;
+  display:flex;
+  align-items:center;
+  isolation:isolate;
+  overflow:hidden;
+}
+.play4-break__image,.play4-break__overlay{position:absolute;inset:0}
+.play4-break__image{
+  z-index:-2;
+  background:url('../../images/accueil/monde-transforme.webp') center 44%/cover no-repeat;
+}
+.play4-break__overlay{
+  z-index:-1;
+  background:linear-gradient(90deg,rgba(5,5,5,.95) 0%,rgba(5,5,5,.69) 42%,rgba(5,5,5,.14) 76%);
+}
+.play4-break__content{max-width:750px}
+.play4-break h2{
+  margin:0;
+  font-size:clamp(52px,5vw,82px);
+}
+.play4-break h2 span{
+  color:#9c9287;
+  -webkit-text-stroke:0;
+}
+.play4-break__content>p:last-child{
+  max-width:650px;
+  margin-top:22px;
+  color:#b8aea5;
+  font-size:17px;
+  line-height:1.6;
+}
+
+/* DISCOVER */
+.play4-discover{
+  padding:86px 0 100px;
+  background:#0a0a09;
+}
+.play4-discover-grid{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  grid-template-rows:285px 285px;
+  gap:14px;
+}
+.play4-discover-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.11);
+  color:#fff;
+}
+.play4-discover-card--events{grid-row:1 / span 2}
+.play4-discover-card img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  transition:transform .5s ease;
+}
+.play4-discover-card:hover img{transform:scale(1.035)}
+.play4-discover-card__shade{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.05) 30%,rgba(5,5,5,.93) 94%);
+}
+.play4-discover-card__copy{
+  position:absolute;
+  left:25px;right:25px;bottom:23px;
+}
+.play4-discover-card small{
+  color:#e0a350;
+  font:600 9px 'IBM Plex Mono',monospace;
+  letter-spacing:.11em;
+}
+.play4-discover-card h3{
+  margin:7px 0 6px;
+  font-size:32px;
+}
+.play4-discover-card--events h3{font-size:45px}
+.play4-discover-card p{color:#c0b7ae;font-size:14px}
+
+/* FINAL */
+.play4-final{
+  position:relative;
+  min-height:560px;
+  display:flex;
+  align-items:center;
+  isolation:isolate;
+  overflow:hidden;
+}
+.play4-final__image,.play4-final__overlay{position:absolute;inset:0}
+.play4-final__image{
+  z-index:-2;
+  background:url('../../images/backgrounds/hero-bg.jpg') 72% 42%/cover no-repeat;
+}
+.play4-final__overlay{
+  z-index:-1;
+  background:
+    linear-gradient(90deg,rgba(6,5,5,.95),rgba(6,5,5,.66) 42%,rgba(6,5,5,.2) 75%),
+    linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.45));
+}
+.play4-final__content{max-width:720px}
+.play4-final h2{
+  margin:0;
+  font-size:clamp(58px,5.5vw,90px);
+}
+.play4-final h2 span{
+  color:#a79d92;
+  -webkit-text-stroke:0;
+}
+.play4-final__content>p:not(.eyebrow){
+  margin-top:20px;
+  color:#bdb4ab;
+  font-size:17px;
+}
+
+/* Responsive */
+@media(max-width:1080px){
+  .play4-hero__inner{grid-template-columns:1fr;gap:38px}
+  .play4-live{max-width:520px}
+  .play4-route{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:760px){
+  .play4 .wrap{width:min(100% - 30px,1320px)}
+  .play4-hero{min-height:auto}
+  .play4-hero__inner{padding:75px 0 70px}
+  .play4-hero h1{font-size:58px}
+  .play4-section-head{grid-template-columns:1fr;gap:18px}
+  .play4-route{grid-template-columns:1fr}
+  .play4-route-card{min-height:395px}
+  .play4-discover-grid{grid-template-columns:1fr;grid-template-rows:360px 270px 270px}
+  .play4-discover-card--events{grid-row:auto}
+  .play4-break,.play4-final{min-height:500px}
+}
+@media(prefers-reduced-motion:reduce){
+  .play4-hero__image{animation:none}
+}
