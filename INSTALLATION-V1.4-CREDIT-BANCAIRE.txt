@@ -1,0 +1,36 @@
+SENZANY - V1.4 - CLAIM DIRECT VERS LBMASTER ENHANCED BANKING
+
+OBJECTIF
+Le claim de cagnotte ne genere plus aucun billet physique.
+Un claim de 2 000 $ cree une livraison virtuelle SenzanyBankCredit x2000.
+Le mod DayZ ajoute ensuite 2 000 au champ currentMoney du compte LBmaster du joueur.
+
+1) GITHUB / SITE
+Remplacer : backend/services/voteWalletService.js
+Commit + Push.
+Sur le VPS :
+  pm2 restart senzany-api --update-env
+
+2) MOD DAYZ
+Remplacer le SenzanyDeliveryManager.c du mod par :
+  dayz-mod/SenzanyDeliveryManager.c
+Repack puis redemarrer le serveur DayZ.
+
+3) VERIFICATION AVANT CLAIM
+Dans le script log, au demarrage tu dois voir :
+  [SenzanyDelivery] Manager construit - version 0.8.0-bank-credit
+
+4) TEST
+Note le solde ATM avant le claim.
+Fais un petit claim de test.
+Dans le script log, tu dois voir :
+  [SenzanyDelivery] LB BANK - <steamid> : <avant> -> <apres> (+<montant>)
+  [SenzanyDelivery] BANQUE CREDitee : <montant> $
+
+AUCUN ExpansionBanknoteHryvnia ne doit etre cree par ce claim.
+
+SECURITE
+- Refuse un compte LBmaster absent ou incoherent.
+- Refuse de depasser le plafond actuel de 20 000 000 $ + maxMoneyBonus.
+- Relit le fichier apres ecriture et ne valide la livraison que si le nouveau solde est exact.
+- Les livraisons normales d'objets restent inchangees.

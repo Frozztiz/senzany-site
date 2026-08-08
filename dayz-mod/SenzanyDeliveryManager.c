@@ -1,3 +1,14 @@
+class SZD_LBBankingPlayerData
+{
+    int version = 0;
+    string steamid = "";
+    string playername = "";
+    int currentMoney = 0;
+    int maxMoneyBonus = 0;
+    int paycheckBonus = 0;
+    int ignoreTransferFee = 0;
+};
+
 class SZD_DeliveryManager
 {
     protected static const string SETTINGS_DIRECTORY = "$profile:SenzanyDelivery";
@@ -10,7 +21,7 @@ class SZD_DeliveryManager
 
     void SZD_DeliveryManager()
     {
-        Print("[SenzanyDelivery] Manager construit - version 0.7.0-money-stack");
+        Print("[SenzanyDelivery] Manager construit - version 0.8.0-bank-credit");
     }
 
     void Start()
@@ -199,40 +210,24 @@ class SZD_DeliveryManager
                 quantity = 1;
             }
 
-            // Cas special : la nouvelle monnaie Expansion.
-            // quantity represente ici la valeur monetaire du stack.
-            if (deliveryItem.className == "ExpansionBanknoteHryvnia")
+            // Livraison virtuelle : credit direct du compte LBmaster Enhanced Banking.
+            // Aucun billet physique n'est cree.
+            if (deliveryItem.className == "SenzanyBankCredit")
             {
                 totalRequested += quantity;
 
-                int moneyCreated = CreateMoneyStackForPlayer(player, quantity);
+                string bankError;
+                bool bankSuccess = CreditLBmasterBank(player, quantity, bankError);
 
-                if (moneyCreated == quantity)
+                if (bankSuccess)
                 {
                     totalCreated += quantity;
-                    Print("[SenzanyDelivery] MONNAIE CREEE : " + quantity.ToString() + " dans un seul stack");
+                    Print("[SenzanyDelivery] BANQUE CREDitee : " + quantity.ToString() + " $ pour " + player.GetIdentity().GetPlainId());
                 }
                 else
                 {
-                    if (moneyCreated > 0)
-                    {
-                        totalCreated += moneyCreated;
-                    }
-
-                    failures.Insert(
-                        deliveryItem.className
-                        + " montant demande="
-                        + quantity.ToString()
-                        + " montant reel="
-                        + moneyCreated.ToString()
-                    );
-
-                    Print(
-                        "[SenzanyDelivery] MONNAIE ECHEC/PARTIEL : demande="
-                        + quantity.ToString()
-                        + " reel="
-                        + moneyCreated.ToString()
-                    );
+                    failures.Insert("SenzanyBankCredit: " + bankError);
+                    Print("[SenzanyDelivery] BANQUE ECHEC : " + bankError);
                 }
 
                 continue;
@@ -274,58 +269,101 @@ class SZD_DeliveryManager
         return true;
     }
 
-    protected int CreateMoneyStackForPlayer(PlayerBase player, int amount)
+    protected bool CreditLBmasterBank(PlayerBase player, int amount, out string errorMessage)
     {
-        if (!player || amount < 1)
+        if (!player || !player.GetIdentity())
         {
-            return 0;
+            errorMessage = "joueur ou identite invalide";
+            return false;
         }
 
-        const string MONEY_CLASSNAME = "ExpansionBanknoteHryvnia";
-
-        EntityAI moneyEntity = player.GetInventory().CreateInInventory(MONEY_CLASSNAME);
-
-        if (!moneyEntity)
+        if (amount < 1)
         {
-            vector position = player.GetPosition();
-            vector direction = player.GetDirection();
-
-            direction.Normalize();
-
-            position = position + (direction * m_Settings.groundDropDistance);
-            position[1] = GetGame().SurfaceY(position[0], position[2]) + 0.15;
-
-            Object spawnedObject = GetGame().CreateObject(MONEY_CLASSNAME, position, false, true);
-            moneyEntity = EntityAI.Cast(spawnedObject);
+            errorMessage = "montant invalide";
+            return false;
         }
 
-        if (!moneyEntity)
+        string steamId = player.GetIdentity().GetPlainId();
+        string playerName = player.GetIdentity().GetName();
+
+        if (steamId.Length() != 17)
         {
-            Print("[SenzanyDelivery] MONNAIE ECHEC - impossible de creer " + MONEY_CLASSNAME);
-            return 0;
+            errorMessage = "SteamID invalide";
+            return false;
         }
 
-        ItemBase moneyItem = ItemBase.Cast(moneyEntity);
+        string bankingFile = "$profile:LBmaster/Data/LBBanking/Players/" + steamId + ".json";
 
-        if (!moneyItem)
+        if (!FileExist(bankingFile))
         {
-            Print("[SenzanyDelivery] MONNAIE ECHEC - objet non convertible en ItemBase");
-            GetGame().ObjectDelete(moneyEntity);
-            return 0;
+            errorMessage = "compte LBmaster introuvable : " + bankingFile;
+            return false;
         }
 
-        moneyItem.SetQuantity(amount);
+        SZD_LBBankingPlayerData bankData = new SZD_LBBankingPlayerData();
+        JsonFileLoader<SZD_LBBankingPlayerData>.JsonLoadFile(bankingFile, bankData);
 
-        int actualAmount = Math.Round(moneyItem.GetQuantity());
+        if (!bankData || bankData.steamid == "")
+        {
+            errorMessage = "fichier bancaire invalide ou illisible";
+            return false;
+        }
+
+        if (bankData.steamid != steamId)
+        {
+            errorMessage = "SteamID du compte bancaire incoherent";
+            return false;
+        }
+
+        int beforeMoney = bankData.currentMoney;
+        int maxMoney = 20000000 + bankData.maxMoneyBonus;
+
+        if (beforeMoney < 0)
+        {
+            beforeMoney = 0;
+        }
+
+        if (beforeMoney > maxMoney)
+        {
+            errorMessage = "solde bancaire actuel superieur au plafond";
+            return false;
+        }
+
+        if (amount > (maxMoney - beforeMoney))
+        {
+            errorMessage = "credit impossible : plafond bancaire depasse";
+            return false;
+        }
+
+        bankData.currentMoney = beforeMoney + amount;
+        bankData.playername = playerName;
+
+        JsonFileLoader<SZD_LBBankingPlayerData>.JsonSaveFile(bankingFile, bankData);
+
+        // Verification immediate apres ecriture.
+        SZD_LBBankingPlayerData verifyData = new SZD_LBBankingPlayerData();
+        JsonFileLoader<SZD_LBBankingPlayerData>.JsonLoadFile(bankingFile, verifyData);
+
+        if (!verifyData || verifyData.currentMoney != (beforeMoney + amount))
+        {
+            errorMessage = "verification du nouveau solde impossible";
+            return false;
+        }
 
         Print(
-            "[SenzanyDelivery] MONNAIE STACK - demande="
+            "[SenzanyDelivery] LB BANK - "
+            + steamId
+            + " : "
+            + beforeMoney.ToString()
+            + " -> "
+            + verifyData.currentMoney.ToString()
+            + " (+"
             + amount.ToString()
-            + " reel="
-            + actualAmount.ToString()
+            + ")"
         );
 
-        return actualAmount;
+        errorMessage = "";
+        return true;
     }
 
     protected EntityAI CreateForPlayer(PlayerBase player, string className, int index)

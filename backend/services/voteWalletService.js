@@ -86,74 +86,27 @@ async function syncForPlayer({ steamId, aliases, aliasDetails }) {
   return { creditedVotes, creditedAmount, wallet: await getWalletRow(steamId) };
 }
 
-const PRODUCTION_DENOMINATIONS = [
-  { value: 100, className: 'MoneyRuble100', name: 'Billet 100 $' },
-  { value: 50, className: 'MoneyRuble50', name: 'Billet 50 $' },
-  { value: 25, className: 'MoneyRuble25', name: 'Billet 25 $' },
-  { value: 10, className: 'MoneyRuble10', name: 'Billet 10 $' },
-  { value: 5, className: 'MoneyRuble5', name: 'Billet 5 $' },
-  { value: 1, className: 'MoneyRuble1', name: 'Billet 1 $' }
-];
-
-// Serveur de test : MoneyRuble n'est pas chargé. On utilise donc une monnaie
-// Expansion réellement spawnable afin de valider toute la chaîne Delivery.
-// Nouvelle monnaie Expansion : sa valeur unitaire est 1 $.
-// Le Delivery server-side regroupe ensuite la somme dans UN SEUL stack
-// via SetQuantity(amount), au lieu de creer N objets physiques.
-const TEST_DENOMINATIONS = [
-  { value: 1, className: 'ExpansionBanknoteHryvnia', name: 'Monnaie Expansion' }
-];
-
-function getDayzEnvironment() {
-  return String(
-    process.env.DAYZ_DELIVERY_ENVIRONMENT ||
-    process.env.DAYZ_RCON_ENVIRONMENT ||
-    'production'
-  ).trim().toLowerCase();
-}
-
-function defaultDenominationsForEnvironment() {
-  return getDayzEnvironment() === 'test' ? TEST_DENOMINATIONS : PRODUCTION_DENOMINATIONS;
-}
-
-function parseDenominations() {
-  const defaults = defaultDenominationsForEnvironment();
-  const raw = String(process.env.VOTE_WALLET_DENOMINATIONS_JSON || '').trim();
-  if (!raw) return defaults;
-  try {
-    const parsed = JSON.parse(raw);
-    const configured = (Array.isArray(parsed)?parsed:[]).map(x=>({
-      value:Math.max(1,Number.parseInt(x.value,10)||0),
-      className:String(x.className||x.classname||'').trim(),
-      name:String(x.name||x.displayName||x.className||'').trim()
-    })).filter(x=>x.value>0&&x.className).sort((a,b)=>b.value-a.value);
-    return configured.length ? configured : defaults;
-  } catch {
-    return defaults;
-  }
-}
+// Les claims de cagnotte ne sont plus convertis en billets physiques.
+// Le serveur DayZ reçoit une livraison virtuelle "SenzanyBankCredit" et
+// crédite directement le compte LBmaster Enhanced Banking du joueur.
+const BANK_CREDIT_CLASSNAME = 'SenzanyBankCredit';
 
 function buildCurrencyItems(amount) {
-  const denoms = parseDenominations();
-  if (!denoms.length) {
-    const error = new Error('La conversion de la cagnotte vers la monnaie DayZ n’est pas encore configurée.');
-    error.code = 'CURRENCY_NOT_CONFIGURED'; error.status = 503; throw error;
+  const safeAmount = Math.max(0, Number.parseInt(amount, 10) || 0);
+  if (safeAmount <= 0) {
+    const error = new Error('Le montant bancaire à créditer est invalide.');
+    error.code = 'INVALID_BANK_AMOUNT';
+    error.status = 422;
+    throw error;
   }
-  let remaining = amount;
-  const items=[];
-  for (const denom of denoms) {
-    const quantity = Math.floor(remaining / denom.value);
-    if (quantity > 0) {
-      items.push({ className:denom.className, name:denom.name || `${denom.value} $`, quantity });
-      remaining -= quantity * denom.value;
-    }
-  }
-  if (remaining !== 0) {
-    const error = new Error(`Le montant ${amount} $ ne peut pas être converti exactement avec les coupures configurées.`);
-    error.code='UNREPRESENTABLE_AMOUNT'; error.status=422; throw error;
-  }
-  return items;
+
+  return [{
+    className: BANK_CREDIT_CLASSNAME,
+    name: 'Crédit bancaire',
+    quantity: safeAmount
+  }];
 }
+
 
 async function getSummary(steamId, monthlyVotes = 0) {
   const wallet = await getWalletRow(steamId);
@@ -169,7 +122,7 @@ async function getSummary(steamId, monthlyVotes = 0) {
     milestones:tiers.map(value=>({ value, unlocked:votes>=value })),
     nextMilestone:next,
     votesToNext:Math.max(0,next-votes),
-    claimConfigured:parseDenominations().length>0
+    claimConfigured:true
   };
 }
 
