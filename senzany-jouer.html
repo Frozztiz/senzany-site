@@ -5,105 +5,27 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <meta name="description" content="Rejoignez Senzany, serveur DayZ PVE français : connexion, installation des mods et découverte de l'expérience."/>
   <title>Jouer — SENZANY</title>
-  <link href="assets/css/pages/jouer.css?v=2.3" rel="stylesheet"/>
+  <link href="assets/css/pages/jouer-v3.css?v=3.0" rel="stylesheet"/>
   <link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
 </head>
 <body data-page="jouer">
   <div data-site-header></div>
 
-  <main>
-    <section class="play-hero" aria-labelledby="play-title">
-      <div class="play-hero__veil"></div>
-      <div class="play-hero__embers" aria-hidden="true"></div>
-      <div class="wrap play-hero__grid">
-        <div class="play-hero__content reveal">
-          <p class="eyebrow">PROTOCOLE D'ENTRÉE // SENZANY</p>
-          <h1 id="play-title">VOTRE SURVIE<br><span>COMMENCE ICI.</span></h1>
-          <p class="play-hero__lead">Entrez dans un monde PVE français pensé pour durer : progression, exploration, économie, événements et communauté.</p>
-          <div class="play-hero__actions">
-            <a class="btn btn-primary" href="steam://connect/208.115.196.109:2302">REJOINDRE LE SERVEUR <span>↗</span></a>
-            <a class="btn btn-ghost" href="#chapitre-acces">PRÉPARER MON ARRIVÉE <span>↓</span></a>
-          </div>
-          <div class="play-hero__proofs">
-            <div><strong>100%</strong><span>PVE français</span></div>
-            <div><strong>24/7</strong><span>Serveur actif</span></div>
-            <div><strong>+18</strong><span>Staff à l'écoute</span></div>
-          </div>
-        </div>
-
-        <aside class="live-card reveal" aria-label="État du serveur">
-          <div class="live-card__head">
-            <span><i class="status-dot" id="serverStatusDot"></i> SERVEUR SENZANY</span>
-            <b id="serverStatusLabel">CONNEXION</b>
-          </div>
-          <div class="live-card__players">
-            <span>JOUEURS EN LIGNE</span>
-            <strong id="slotsInfo">-- / 50</strong>
-          </div>
-          <div class="capacity"><span id="capacityFill"></span></div>
-          <dl class="server-data">
-            <div><dt>Adresse</dt><dd class="mono">208.115.196.109:2302</dd></div>
-            <div><dt>Carte</dt><dd id="serverMap">Chernarus+</dd></div>
-            <div><dt>Mode</dt><dd>PVE</dd></div>
-            <div><dt>Prochain wipe</dt><dd>21/07</dd></div>
-          </dl>
-          <div class="live-card__actions">
-            <button id="copyIpBtn" type="button">COPIER L'ADRESSE</button>
-            <a href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">DISCORD ↗</a>
-          </div>
-        </aside>
-      </div>
-      <a class="scroll-cue" href="#chapitre-acces"><span>DÉCOUVRIR</span><i></i></a>
-    </section>
-
-    <section class="chapter chapter-access" id="chapitre-acces">
-      <div class="wrap">
-        <header class="chapter-heading chapter-heading--guide reveal">
-          <div><p class="eyebrow">CHAPITRE I // REJOINDRE LE SERVEUR</p><h2>4 ÉTAPES.<br><span>UNE SEULE DESTINATION.</span></h2></div>
-          <p>Pas de configuration compliquée : le launcher officiel DayZ s'occupe des mods. Suivez le parcours et entrez dans Senzany.</p>
-        </header>
-        <div class="join-timeline">
-          <article class="join-card reveal"><span class="join-card__number">01</span><div class="join-card__visual steam-visual"><div class="fake-window"><div class="fake-window__bar"><i></i><i></i><i></i><span>STEAM</span></div><div class="steam-game"><b>DAYZ</b><button>JOUER</button></div></div></div><div class="join-card__copy"><p>PRÉPARATION</p><h3>INSTALLEZ DAYZ</h3><span>Installez DayZ depuis Steam, lancez-le une première fois, puis refermez-le.</span><a href="https://store.steampowered.com/app/221100/DayZ/" target="_blank" rel="noopener">OUVRIR STEAM ↗</a></div></article>
-          <article class="join-card reveal"><span class="join-card__number">02</span><div class="join-card__visual launcher-visual"><div class="fake-window"><div class="fake-window__bar"><i></i><i></i><i></i><span>DAYZ LAUNCHER</span></div><div class="launcher-search"><small>SERVEURS COMMUNAUTAIRES</small><strong>⌕&nbsp; SENZANY</strong><div><b>SENZANY PVE FR</b><em>208.115.196.109:2302</em></div></div></div></div><div class="join-card__copy"><p>RECHERCHE</p><h3>TROUVEZ SENZANY</h3><span>Dans le launcher DayZ, ouvrez les serveurs communautaires et recherchez « Senzany ».</span><button class="text-action" id="copyIpSecondary" type="button">COPIER L'ADRESSE</button></div></article>
-          <article class="join-card reveal"><span class="join-card__number">03</span><div class="join-card__visual mods-visual"><div class="mods-stack"><div><span>✓</span><b>Collection Senzany</b><small>Configuration détectée</small></div><div><span>↓</span><b>Mods Workshop</b><small>Téléchargement automatique</small></div><div class="progress-line"><i></i></div></div></div><div class="join-card__copy"><p>INSTALLATION</p><h3>ACCEPTEZ LES MODS</h3><span>Cliquez sur « Configurer les DLC et mods puis rejoindre ». Steam télécharge tout automatiquement.</span><strong class="join-badge">AUTOMATIQUE</strong></div></article>
-          <article class="join-card reveal"><span class="join-card__number">04</span><div class="join-card__visual spawn-visual"><div class="spawn-scene"><span>CONNEXION ÉTABLIE</span><b>BIENVENUE<br>SUR SENZANY</b><small>Votre récit commence maintenant.</small></div></div><div class="join-card__copy"><p>ARRIVÉE</p><h3>COMMENCEZ VOTRE HISTOIRE</h3><span>Créez votre survivant, ajoutez le serveur aux favoris et rejoignez la communauté.</span><a href="steam://connect/208.115.196.109:2302">REJOINDRE LE SERVEUR ↗</a></div></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="story-break story-break--progression"><div class="story-break__overlay"></div><div class="wrap story-break__content reveal"><p class="eyebrow">CHAPITRE II // L'EXPÉRIENCE</p><h2>PLUS QU'UN SERVEUR.<br><span>UN MONDE À CONSTRUIRE.</span></h2><p>Chaque système, chaque événement et chaque rencontre nourrit une aventure pensée pour durer.</p></div></section>
-
-    <section class="systems-showcase">
-      <div class="wrap systems-showcase__grid">
-        <div class="systems-showcase__copy reveal"><p class="eyebrow">POURQUOI SENZANY ?</p><h2>UNE EXPÉRIENCE<br><span>QUI ÉVOLUE AVEC VOUS.</span></h2><p>Survolez les expériences pour découvrir l'univers Senzany.</p>
-          <div class="feature-switcher">
-            <button class="feature-switch is-active" data-image="assets/images/accueil/progression-unique.webp" data-kicker="PROGRESSION" data-title="UNE ÉCONOMIE VIVANTE"><span>01</span><div><b>PROGRESSION & ÉCONOMIE</b><small>Développez votre activité et bâtissez votre place.</small></div></button>
-            <button class="feature-switch" data-image="assets/images/accueil/evenements-new.webp" data-kicker="ÉVÉNEMENTS" data-title="DES RENDEZ-VOUS MÉMORABLES"><span>02</span><div><b>ÉVÉNEMENTS RÉGULIERS</b><small>Courses, boss, défis et saisons communautaires.</small></div></button>
-            <button class="feature-switch" data-image="assets/images/accueil/monde-transforme.webp" data-kicker="EXPLORATION" data-title="CHERNARUS RÉINVENTÉ"><span>03</span><div><b>MONDE TRANSFORMÉ</b><small>Zones retravaillées, secrets et lieux uniques.</small></div></button>
-            <button class="feature-switch" data-image="assets/images/accueil/communaute-new.webp" data-kicker="COMMUNAUTÉ" data-title="L'AVENTURE SE VIT ENSEMBLE"><span>04</span><div><b>COMMUNAUTÉ FRANCOPHONE</b><small>Une équipe présente et des joueurs impliqués.</small></div></button>
-            <button class="feature-switch" data-image="assets/images/accueil/exploration-new.webp" data-kicker="FUTUR" data-title="TOUJOURS PLUS LOIN"><span>05</span><div><b>IA, QUÊTES & SAISONS</b><small>De nouveaux systèmes pour renouveler l'expérience.</small></div></button>
-          </div>
-        </div>
-        <div class="systems-showcase__media reveal"><img id="featurePreview" src="assets/images/accueil/progression-unique.webp" alt="Expérience Senzany"><div class="systems-showcase__caption"><span id="featureKicker">PROGRESSION</span><strong id="featureTitle">UNE ÉCONOMIE VIVANTE</strong></div><div class="systems-showcase__counter"><b id="featureCurrent">01</b><span>/ 05</span></div></div>
-      </div>
-    </section>
-
-    <section class="film-section">
-      <div class="wrap film-grid">
-        <button class="film-poster reveal" id="openFilm" type="button" aria-label="Lire le film Senzany">
-          <span class="film-poster__badge">FILM COMMUNAUTAIRE</span>
-          <span class="film-poster__play" aria-hidden="true">▶</span>
-          <span class="film-poster__info"><strong>UN AN DE SURVIE</strong><small>SENZANY · 4 MIN</small></span>
-          <span class="film-poster__label">APPUYER POUR LIRE LE FILM</span>
-        </button>
-        <div class="film-copy reveal"><p class="eyebrow">LE FILM DE SENZANY</p><h2>UN AN DE<br><span>SURVIE PARTAGÉE.</span></h2><p>Des événements, des rencontres et des souvenirs qui racontent mieux que des mots ce qu'est Senzany.</p><div class="film-stats"><div><strong>+5000</strong><span>VOTES / MOIS</span></div><div><strong>24/7</strong><span>SERVEUR ACTIF</span></div><div><strong>+18</strong><span>MEMBRES STAFF</span></div></div></div>
-      </div>
-    </section>
-
-    <section class="final-cinematic"><div class="final-cinematic__overlay"></div><div class="wrap final-cinematic__content reveal"><p class="eyebrow">CHAPITRE FINAL // À VOUS DE JOUER</p><h2>VOICI LE RÉCIT<br><span>DE VOTRE MORT.</span></h2><a class="btn btn-primary" href="steam://connect/208.115.196.109:2302">REJOINDRE SENZANY ↗</a></div></section>
-
-    <div class="film-modal" id="filmModal" aria-hidden="true"><button class="film-modal__close" id="closeFilm" type="button" aria-label="Fermer">×</button><div class="film-modal__backdrop" data-close-film></div><div class="film-modal__dialog" role="dialog" aria-modal="true" aria-label="Film Senzany"><div class="film-modal__frame" id="filmFrame"></div></div></div>
-  </main>
+  <main class="play3">
+<section class="play3-hero" aria-labelledby="play-title"><div class="play3-bg"></div><div class="play3-veil"></div><div class="wrap play3-grid">
+<div class="play3-copy"><p class="play3-kicker">PROTOCOLE D'ENTRÉE // SENZANY</p><h1 id="play-title">ENTREZ.<br><span>LE RESTE S'ÉCRIRA SUR CHERNARUS.</span></h1><p class="play3-lead">Pas de whitelist compliquée. Installez DayZ, trouvez Senzany, acceptez les mods et entrez dans un monde PVE pensé pour durer.</p><div class="play3-actions"><a class="play3-btn primary" href="steam://connect/208.115.196.109:2302">REJOINDRE SENZANY ↗</a><a class="play3-btn ghost" href="#acces">COMMENT ENTRER ↓</a></div><div class="play3-meta"><div><small>MODE</small><strong>PVE FR</strong></div><div><small>CARTE</small><strong>CHERNARUS+</strong></div><div><small>ACCÈS</small><strong>24/7</strong></div></div></div>
+<aside class="play3-live" aria-label="État du serveur"><div class="play3-live-head"><span><i class="status-dot" id="serverStatusDot"></i> RÉSEAU SENZANY</span><b id="serverStatusLabel">CONNEXION</b></div><div class="play3-live-players"><span>JOUEURS CONNECTÉS</span><strong id="slotsInfo">-- / 50</strong></div><div class="capacity"><span id="capacityFill"></span></div><div class="play3-live-grid"><div><span>ADRESSE</span><strong class="mono">208.115.196.109:2302</strong></div><div><span>CARTE</span><strong id="serverMap">Chernarus+</strong></div><div><span>MODE</span><strong>PVE</strong></div><div><span>WIPE</span><strong>29/07</strong></div></div><div class="play3-live-actions"><button id="copyIpBtn" type="button">COPIER L'IP</button><a href="https://discord.gg/aJ2eGmqAQv" target="_blank" rel="noopener">DISCORD ↗</a></div></aside>
+</div></section>
+<section class="play3-access" id="acces"><div class="wrap"><header class="play3-heading"><div><p class="play3-kicker">ACCÈS AU SERVEUR // 4 ÉTAPES</p><h2>DE STEAM À SENZANY.<br><span>EN QUELQUES MINUTES.</span></h2></div><p>Le launcher officiel DayZ s'occupe de la configuration des mods. Suivez simplement ces quatre étapes.</p></header><div class="play3-steps">
+<article><b>01</b><span>PRÉPARATION</span><h3>INSTALLEZ DAYZ</h3><p>Installez DayZ depuis Steam et lancez-le une première fois.</p><a href="https://store.steampowered.com/app/221100/DayZ/" target="_blank" rel="noopener">OUVRIR STEAM ↗</a></article>
+<article><b>02</b><span>RECHERCHE</span><h3>TROUVEZ SENZANY</h3><p>Dans le launcher DayZ, ouvrez les serveurs communautaires et recherchez « Senzany ».</p><button id="copyIpSecondary" type="button">COPIER L'ADRESSE</button></article>
+<article><b>03</b><span>INSTALLATION</span><h3>ACCEPTEZ LES MODS</h3><p>Cliquez sur « Configurer les DLC et mods puis rejoindre ». Steam télécharge tout automatiquement.</p><em>AUTOMATIQUE</em></article>
+<article><b>04</b><span>ARRIVÉE</span><h3>ENTREZ DANS LE MONDE</h3><p>Ajoutez le serveur aux favoris et rejoignez la communauté.</p><a href="steam://connect/208.115.196.109:2302">REJOINDRE LE SERVEUR ↗</a></article>
+</div></div></section>
+<section class="play3-world"><div class="play3-world-bg"></div><div class="play3-world-veil"></div><div class="wrap play3-world-copy"><p class="play3-kicker">UNE FOIS À L'INTÉRIEUR</p><h2>VOUS N'ENTREZ PAS<br><span>DANS UN SIMPLE SERVEUR.</span></h2><p>Exploration, économie, événements, progression et communauté se croisent en permanence.</p></div></section>
+<section class="play3-features"><div class="wrap"><header class="play3-heading compact"><div><p class="play3-kicker">L'EXPÉRIENCE SENZANY</p><h2>CE QUI VOUS ATTEND.</h2></div></header><div class="play3-cards"><a class="big" href="senzany-evenements.html"><img src="assets/images/accueil/evenements-new.webp" alt=""><div><span>01 // ÉVÉNEMENTS</span><strong>UN MONDE QUI BOUGE.</strong><p>Courses, boss, défis, opérations et rendez-vous communautaires.</p></div></a><a href="senzany-wiki.html"><img src="assets/images/accueil/monde-transforme.webp" alt=""><div><span>02 // EXPLORATION</span><strong>CHERNARUS RÉINVENTÉ.</strong><p>Zones retravaillées, secrets et lieux uniques.</p></div></a><a href="senzany-profil.html"><img src="assets/images/accueil/progression-unique.webp" alt=""><div><span>03 // PROGRESSION</span><strong>VOTRE SURVIE A UNE MÉMOIRE.</strong><p>Économie, votes, récompenses et progression.</p></div></a></div></div></section>
+<section class="play3-final"><div class="play3-final-bg"></div><div class="play3-final-veil"></div><div class="wrap"><p class="play3-kicker">DERNIÈRE ÉTAPE</p><h2>IL NE RESTE PLUS<br><span>QU'À ENTRER.</span></h2><p>Le serveur vous attend. Votre histoire, elle, n'a pas encore commencé.</p><div class="play3-actions"><a class="play3-btn primary" href="steam://connect/208.115.196.109:2302">REJOINDRE SENZANY ↗</a><a class="play3-btn ghost" href="https://discord.gg/aJ2eGmqAQv" target="_blank" rel="noopener">DISCORD ↗</a></div></div></section>
+</main>
 
   <div data-site-footer></div>
   <script defer src="assets/js/components.js"></script>
