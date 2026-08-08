@@ -10,7 +10,7 @@ class SZD_DeliveryManager
 
     void SZD_DeliveryManager()
     {
-        Print("[SenzanyDelivery] Manager construit - version 0.6.0");
+        Print("[SenzanyDelivery] Manager construit - version 0.7.0-money-stack");
     }
 
     void Start()
@@ -199,6 +199,45 @@ class SZD_DeliveryManager
                 quantity = 1;
             }
 
+            // Cas special : la nouvelle monnaie Expansion.
+            // quantity represente ici la valeur monetaire du stack.
+            if (deliveryItem.className == "ExpansionBanknoteHryvnia")
+            {
+                totalRequested += quantity;
+
+                int moneyCreated = CreateMoneyStackForPlayer(player, quantity);
+
+                if (moneyCreated == quantity)
+                {
+                    totalCreated += quantity;
+                    Print("[SenzanyDelivery] MONNAIE CREEE : " + quantity.ToString() + " dans un seul stack");
+                }
+                else
+                {
+                    if (moneyCreated > 0)
+                    {
+                        totalCreated += moneyCreated;
+                    }
+
+                    failures.Insert(
+                        deliveryItem.className
+                        + " montant demande="
+                        + quantity.ToString()
+                        + " montant reel="
+                        + moneyCreated.ToString()
+                    );
+
+                    Print(
+                        "[SenzanyDelivery] MONNAIE ECHEC/PARTIEL : demande="
+                        + quantity.ToString()
+                        + " reel="
+                        + moneyCreated.ToString()
+                    );
+                }
+
+                continue;
+            }
+
             if (quantity > m_Settings.maxQuantityPerItem)
             {
                 quantity = m_Settings.maxQuantityPerItem;
@@ -233,6 +272,60 @@ class SZD_DeliveryManager
 
         errorMessage = "";
         return true;
+    }
+
+    protected int CreateMoneyStackForPlayer(PlayerBase player, int amount)
+    {
+        if (!player || amount < 1)
+        {
+            return 0;
+        }
+
+        const string MONEY_CLASSNAME = "ExpansionBanknoteHryvnia";
+
+        EntityAI moneyEntity = player.GetInventory().CreateInInventory(MONEY_CLASSNAME);
+
+        if (!moneyEntity)
+        {
+            vector position = player.GetPosition();
+            vector direction = player.GetDirection();
+
+            direction.Normalize();
+
+            position = position + (direction * m_Settings.groundDropDistance);
+            position[1] = GetGame().SurfaceY(position[0], position[2]) + 0.15;
+
+            Object spawnedObject = GetGame().CreateObject(MONEY_CLASSNAME, position, false, true);
+            moneyEntity = EntityAI.Cast(spawnedObject);
+        }
+
+        if (!moneyEntity)
+        {
+            Print("[SenzanyDelivery] MONNAIE ECHEC - impossible de creer " + MONEY_CLASSNAME);
+            return 0;
+        }
+
+        ItemBase moneyItem = ItemBase.Cast(moneyEntity);
+
+        if (!moneyItem)
+        {
+            Print("[SenzanyDelivery] MONNAIE ECHEC - objet non convertible en ItemBase");
+            GetGame().ObjectDelete(moneyEntity);
+            return 0;
+        }
+
+        moneyItem.SetQuantity(amount);
+
+        int actualAmount = Math.Round(moneyItem.GetQuantity());
+
+        Print(
+            "[SenzanyDelivery] MONNAIE STACK - demande="
+            + amount.ToString()
+            + " reel="
+            + actualAmount.ToString()
+        );
+
+        return actualAmount;
     }
 
     protected EntityAI CreateForPlayer(PlayerBase player, string className, int index)
