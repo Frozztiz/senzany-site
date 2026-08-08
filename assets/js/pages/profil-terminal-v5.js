@@ -11,11 +11,26 @@
   function reveal(view){loading.hidden=true;loggedOut.hidden=view!=="out";loggedIn.hidden=view!=="in"}
   function formatLastActivity(ts){if(!ts)return"Non communiquée";return new Intl.DateTimeFormat("fr-FR",{dateStyle:"medium",timeStyle:"short"}).format(new Date(ts*1000))}
   function formatHours(v){return new Intl.NumberFormat("fr-FR",{maximumFractionDigits:1}).format(v)}
-  function renderDayz(dayz){const hours=document.getElementById("dayzHours"),summary=document.getElementById("dayzHoursSummary"),explanation=document.getElementById("dayzExplanation"),state=document.getElementById("dayzState"),bar=document.getElementById("dayzMetricBar");state.classList.remove("panel-state--online","panel-state--pending");if(dayz&&dayz.available){const formatted=formatHours(dayz.hours);animateNumber(hours,dayz.hours);summary.textContent=formatted+" h";document.getElementById("quickHours").textContent=formatted+" H";explanation.textContent="Temps de jeu total enregistré par Steam pour DayZ.";state.textContent="Donnée publique";state.classList.add("panel-state--online");requestAnimationFrame(()=>{bar.style.width=Math.min(100,Math.max(12,(Number(dayz.hours)||0)/20))+"%"});return}hours.textContent="Privé";summary.textContent="Indisponible";state.textContent="Indisponible";state.classList.add("panel-state--pending");explanation.textContent=dayz&&dayz.reason==="not_found"?"DayZ n’apparaît pas dans les jeux visibles de ce compte.":"Cette donnée Steam est privée ou indisponible."}
-  function updateDiscordService(linked){const row=document.getElementById("discordServiceRow"),dot=row.querySelector(".system-dot"),text=document.getElementById("discordServiceText"),state=document.getElementById("discordServiceState"),header=document.getElementById("discordHeaderState");if(linked){dot.classList.add("system-dot--online");text.textContent="Compte et rôles synchronisés";state.textContent="ONLINE";header.textContent="DISCORD ASSOCIÉ";header.classList.add("chip--ok");document.getElementById("quickDiscord").textContent="ONLINE"}else{dot.classList.remove("system-dot--online");text.textContent="Association en attente";state.textContent="EN ATTENTE";header.textContent="DISCORD EN ATTENTE";header.classList.remove("chip--ok");document.getElementById("quickDiscord").textContent="EN ATTENTE"}}
+  function renderDayz(dayz){const hours=document.getElementById("dayzHours"),summary=document.getElementById("dayzHoursSummary"),explanation=document.getElementById("dayzExplanation"),state=document.getElementById("dayzState"),bar=document.getElementById("dayzMetricBar");state.classList.remove("panel-state--online","panel-state--pending");if(dayz&&dayz.available){const formatted=formatHours(dayz.hours);animateNumber(hours,dayz.hours);summary.textContent=formatted+" h";const quickHours=document.getElementById("quickHours");if(quickHours)quickHours.textContent=formatted+" H";explanation.textContent="Temps de jeu total enregistré par Steam pour DayZ.";state.textContent="Donnée publique";state.classList.add("panel-state--online");requestAnimationFrame(()=>{bar.style.width=Math.min(100,Math.max(12,(Number(dayz.hours)||0)/20))+"%"});return}hours.textContent="Privé";summary.textContent="Indisponible";state.textContent="Indisponible";state.classList.add("panel-state--pending");explanation.textContent=dayz&&dayz.reason==="not_found"?"DayZ n’apparaît pas dans les jeux visibles de ce compte.":"Cette donnée Steam est privée ou indisponible."}
+  function updateDiscordService(linked){
+    const row=document.getElementById("discordServiceRow"),dot=row?.querySelector(".system-dot"),text=document.getElementById("discordServiceText"),state=document.getElementById("discordServiceState"),header=document.getElementById("discordHeaderState"),quick=document.getElementById("quickDiscord");
+    if(linked){
+      dot?.classList.add("system-dot--online");
+      if(text)text.textContent="Compte et rôles synchronisés";
+      if(state)state.textContent="ONLINE";
+      if(header){header.textContent="● DISCORD ASSOCIÉ";header.classList.add("chip--ok")}
+      if(quick)quick.textContent="ONLINE";
+    }else{
+      dot?.classList.remove("system-dot--online");
+      if(text)text.textContent="Association en attente";
+      if(state)state.textContent="EN ATTENTE";
+      if(header){header.textContent="● DISCORD EN ATTENTE";header.classList.remove("chip--ok")}
+      if(quick)quick.textContent="EN ATTENTE";
+    }
+  }
   function renderDiscord(discord){const state=document.getElementById("discordState"),unlinked=document.getElementById("discordUnlinked"),linked=document.getElementById("discordLinked"),linkButton=document.getElementById("discordLinkButton"),unlinkButtons=document.querySelectorAll(".js-discord-unlink"),rolesBox=document.getElementById("discordRoles");state.classList.remove("panel-state--online","panel-state--pending");if(discord&&discord.linked){state.textContent="Associé";state.classList.add("panel-state--online");unlinked.hidden=true;linked.hidden=false;linkButton.hidden=true;unlinkButtons.forEach(button=>button.hidden=false);document.getElementById("discordUsername").textContent=discord.username||"Compte Discord";document.getElementById("discordId").textContent=discord.id||"—";const avatar=document.getElementById("discordAvatar");if(discord.avatar){avatar.src=discord.avatar;avatar.hidden=false}else avatar.hidden=true;const list=document.getElementById("discordRolesList"),empty=document.getElementById("discordRolesEmpty");list.innerHTML="";if(discord.rolesAvailable){rolesBox.hidden=false;const roles=Array.isArray(discord.roles)?discord.roles:[];empty.hidden=roles.length>0;roles.slice(0,6).forEach(role=>{const badge=document.createElement("span");badge.className="discord-role-badge";badge.textContent=role.name;list.appendChild(badge)});if(roles.length>6){const more=document.createElement("span");more.className="discord-role-badge";more.textContent="+ "+(roles.length-6);list.appendChild(more)}}else rolesBox.hidden=true;updateDiscordService(true);return}state.textContent="Non associé";state.classList.add("panel-state--pending");unlinked.hidden=false;linked.hidden=true;rolesBox.hidden=true;linkButton.hidden=false;unlinkButtons.forEach(button=>button.hidden=true);updateDiscordService(false)}
   function showDiscordFeedback(){const code=new URLSearchParams(location.search).get("discord");if(!code)return;const messages={linked:"Compte Discord associé avec succès.",cancelled:"Association Discord annulée.",already_linked:"Ce compte Discord est déjà lié à un autre compte Steam.",steam_required:"Reconnecte-toi à Steam avant d’associer Discord.",invalid_state:"La demande a expiré. Recommence.",invalid_callback:"Réponse Discord invalide.",token_error:"Discord n’a pas finalisé l’autorisation.",user_error:"Impossible de lire le profil Discord.",server_error:"Impossible d’enregistrer l’association."};const feedback=document.getElementById("discordFeedback");feedback.textContent=messages[code]||"État Discord mis à jour.";feedback.hidden=false;feedback.classList.toggle("discord-feedback--error",code!=="linked");history.replaceState({},document.title,location.pathname)}
-  function updateTerminalTime(){const now=new Intl.DateTimeFormat("fr-FR",{dateStyle:"short",timeStyle:"short"}).format(new Date());document.getElementById("terminalUpdatedAt").textContent="MISE À JOUR — "+now}
+  function updateTerminalTime(){const target=document.getElementById("terminalUpdatedAt");if(!target)return;const now=new Intl.DateTimeFormat("fr-FR",{dateStyle:"short",timeStyle:"short"}).format(new Date());target.textContent="MISE À JOUR — "+now}
 
   let voteAliasesLimit=20;
   let voteAliasDetails=new Map();
@@ -157,6 +172,7 @@
     if(!wallet)return;
     const balance=document.getElementById("voteWalletBalance"),rate=document.getElementById("voteWalletRate"),next=document.getElementById("voteWalletNext"),bar=document.getElementById("voteWalletProgressBar"),text=document.getElementById("voteWalletProgressText"),milestones=document.getElementById("voteMilestones"),claim=document.getElementById("voteWalletClaim");
     if(balance)balance.textContent=formatMoney(wallet.balance);
+    const heroWallet=document.getElementById("heroWalletValue");if(heroWallet)heroWallet.textContent=formatMoney(wallet.balance);
     if(rate)rate.textContent=formatMoney(wallet.amountPerVote);
     const votes=Math.max(0,Number(wallet.monthlyVotes)||0),nextValue=Math.max(1,Number(wallet.nextMilestone)||50);
     const previous=Math.max(0,nextValue-50),range=Math.max(1,nextValue-previous),progress=Math.max(0,Math.min(100,((votes-previous)/range)*100));
@@ -179,6 +195,7 @@
       voteAliasDetails=new Map((Array.isArray(result.aliasDetails)?result.aliasDetails:[]).map(entry=>[String(entry.alias||"").toLowerCase(),entry]));
       const votes=Number(result.votes||0);
       value.textContent=votes.toLocaleString("fr-FR");
+      const heroVotes=document.getElementById("heroVotesValue");if(heroVotes)heroVotes.textContent=votes.toLocaleString("fr-FR");
       if(total){
         total.textContent=votes.toLocaleString("fr-FR");
         if(previousVoteTotal!==null&&votes>previousVoteTotal){
@@ -212,7 +229,7 @@
       if(Array.isArray(result.aliases))renderVoteAliases(result.aliases);
       return result;
     }catch(error){
-      value.textContent="—";state.textContent="INDISPONIBLE";text.textContent="Impossible de récupérer les votes pour le moment.";foot.innerHTML="SOURCE // TOP-SERVEURS <b>ERREUR API</b>";
+      value.textContent="—";const heroVotes=document.getElementById("heroVotesValue");if(heroVotes)heroVotes.textContent="—";state.textContent="INDISPONIBLE";text.textContent="Impossible de récupérer les votes pour le moment.";foot.innerHTML="SOURCE // TOP-SERVEURS <b>ERREUR API</b>";
       if(total)total.textContent="—";
       if(matchCount)matchCount.textContent="API INDISPONIBLE";
       setVoteSyncState("error","API indisponible");
