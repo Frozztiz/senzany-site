@@ -4,6 +4,7 @@ const { verifySteamId } = require('../utils/steamSession');
 const voteAliasService = require('../services/voteAliasService');
 const topServeursService = require('../services/topServeursService');
 const voteWalletService = require('../services/voteWalletService');
+const supabaseService = require('../services/supabaseService');
 
 function steamIdFrom(req,res){
   const secret=process.env.SESSION_SECRET;
@@ -33,8 +34,35 @@ router.post('/claim', async(req,res)=>{
   res.set('Cache-Control','no-store');
   const steamId=steamIdFrom(req,res); if(!steamId)return;
   try{
-    const {result}=await sync(steamId);
-    const claim=await voteWalletService.claimAll({steamId,playerName:null});
+    const {aliases,result}=await sync(steamId);
+
+    // Nom affiché dans le Centre de commandement.
+    // Priorité au pseudo Discord lié au compte Senzany, puis au pseudo
+    // réellement retrouvé sur Top-Serveurs, puis au dernier alias enregistré.
+    let playerName=null;
+
+    try{
+      const link=await supabaseService.getLinkBySteamId(steamId);
+      if(link?.discord_username){
+        playerName=String(link.discord_username).trim()||null;
+      }
+    }catch(identityError){
+      console.warn('[VOTE WALLET] Impossible de récupérer le nom du compte lié :',identityError?.message||identityError);
+    }
+
+    if(!playerName && result?.matchedName){
+      playerName=String(result.matchedName).trim()||null;
+    }
+
+    if(!playerName && Array.isArray(result?.matchedNames) && result.matchedNames.length){
+      playerName=String(result.matchedNames[result.matchedNames.length-1]||'').trim()||null;
+    }
+
+    if(!playerName && Array.isArray(aliases) && aliases.length){
+      playerName=String(aliases[aliases.length-1]?.alias||'').trim()||null;
+    }
+
+    const claim=await voteWalletService.claimAll({steamId,playerName});
     res.status(201).json({...claim,summary:await voteWalletService.getSummary(steamId,result.votes)});
   }catch(error){console.error('[VOTE WALLET] claim',error);res.status(error.status||500).json({error:error.message||'Impossible de réclamer la cagnotte.',code:error.code||null});}
 });

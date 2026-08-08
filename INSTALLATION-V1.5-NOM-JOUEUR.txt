@@ -1,0 +1,32 @@
+SENZANY CAGNOTTE V1.5 - NOM DU JOUEUR DANS LES LIVRAISONS
+
+Problème corrigé :
+Les claims de cagnotte créaient la livraison avec playerName:null.
+Le Centre de commandement affichait donc "Joueur inconnu".
+
+Correction :
+Le backend résout maintenant automatiquement le nom avant de créer la livraison.
+Ordre de priorité :
+1. pseudo Discord lié au compte Senzany (user_links.discord_username)
+2. pseudo retrouvé sur Top-Serveurs (matchedName)
+3. dernier pseudo retrouvé parmi matchedNames
+4. dernier alias enregistré
+
+FICHIER À REMPLACER :
+backend/routes/voteWallet.js
+
+SUR LE VPS :
+cd /var/www/senzany
+git pull
+cd server
+pm2 restart senzany-api
+pm2 save
+
+TEST :
+- Faire un nouveau claim de cagnotte.
+- Dans Commandement > Livraisons, la nouvelle ligne doit afficher le pseudo
+  à la place de "Joueur inconnu".
+
+IMPORTANT :
+Les anciennes livraisons déjà enregistrées avec player_name = NULL
+resteront "Joueur inconnu". La correction s'applique aux nouveaux claims.
