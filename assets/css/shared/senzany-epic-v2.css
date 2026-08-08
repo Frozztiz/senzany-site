@@ -1,0 +1,172 @@
+
+/* SENZANY EPIC V2 — radical cinematic art direction.
+   Entry terminal and intro cinematic are intentionally excluded. */
+:root{
+ --sx-black:#030405;--sx-ink:#08090a;--sx-paper:#eee9e1;--sx-dim:#817d78;
+ --sx-red:#e22a30;--sx-red2:#861319;--sx-gold:#d39a36;--sx-line:rgba(238,233,225,.13);
+}
+body:not(.senzany-entry-terminal){
+ background:#030405!important;
+}
+body:has(#senzany-maintenance) main{filter:saturate(.72)}
+body:not([data-page="accueil"]) main{overflow:hidden}
+
+/* Cinematic global frame */
+body:not([data-page="accueil"]) main::after{
+ content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+ background:
+ radial-gradient(circle at 82% 14%,rgba(226,42,48,.075),transparent 25%),
+ radial-gradient(circle at 18% 70%,rgba(211,154,54,.035),transparent 26%),
+ linear-gradient(115deg,transparent 0 72%,rgba(255,255,255,.018) 72.1% 72.2%,transparent 72.3%);
+}
+.wrap{max-width:1540px!important}
+
+/* Header is a thin tactical command rail */
+.site-header,.main-header,[data-site-header] header{
+ min-height:72px!important;
+ background:rgba(3,4,5,.82)!important;
+ border-bottom:1px solid rgba(255,255,255,.08)!important;
+ box-shadow:0 20px 70px rgba(0,0,0,.25)!important;
+}
+.site-header nav,.main-header nav,[data-site-header] nav{gap:clamp(12px,1.6vw,28px)!important}
+.site-header nav a,.main-header nav a,[data-site-header] nav a{
+ font:600 10px/1 'IBM Plex Mono',monospace!important;letter-spacing:.12em!important;
+ color:#8d8984!important;text-transform:uppercase;
+}
+.site-header nav a:hover,.site-header nav a.active,
+.main-header nav a:hover,.main-header nav a.active,
+[data-site-header] nav a:hover,[data-site-header] nav a.active{color:#fff!important}
+
+/* HOME — editorial blockbuster */
+body[data-page="accueil"] .home-hero{min-height:calc(100svh - 1px)!important}
+body[data-page="accueil"] .home-hero__inner{
+ width:min(1540px,calc(100% - 72px))!important;
+ min-height:78svh!important;
+ grid-template-columns:minmax(0,1.55fr) minmax(300px,.42fr)!important;
+ align-items:end!important;padding-bottom:9vh!important;
+}
+body[data-page="accueil"] .home-hero__content{align-self:end!important}
+body[data-page="accueil"] .home-hero__title{
+ font-size:clamp(92px,10.6vw,184px)!important;line-height:.74!important;
+ max-width:1100px!important;margin:22px 0 36px!important;
+}
+body[data-page="accueil"] .home-hero__lead{
+ border-left:2px solid var(--sx-red);padding-left:22px!important;
+ max-width:650px!important;color:#aaa59f!important;
+}
+body[data-page="accueil"] .home-live-card{
+ align-self:end!important;margin-bottom:5px!important;
+ border-top:2px solid var(--sx-red)!important;
+}
+body[data-page="accueil"] .home-pillars{padding-top:170px!important}
+body[data-page="accueil"] .home-pillars__head{
+ display:grid!important;grid-template-columns:1.2fr .8fr!important;align-items:end!important;
+ border-bottom:1px solid var(--sx-line);padding-bottom:34px!important;
+}
+body[data-page="accueil"] .home-pillars__head h2{font-size:clamp(68px,6.4vw,108px)!important;max-width:850px}
+body[data-page="accueil"] .home-pillars__grid{margin-top:30px!important}
+body[data-page="accueil"] .home-pillar{
+ min-height:650px!important;
+ transition:transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .5s ease!important;
+}
+body[data-page="accueil"] .home-pillar:hover{transform:translateY(-8px);box-shadow:0 50px 120px rgba(0,0,0,.48)!important}
+body[data-page="accueil"] .home-pillar__body{padding:44px!important}
+body[data-page="accueil"] .home-pillar h3{font-size:clamp(48px,4vw,76px)!important}
+body[data-page="accueil"] .home-news{padding-block:170px!important}
+body[data-page="accueil"] .home-news__grid{grid-template-columns:1.3fr .7fr!important}
+body[data-page="accueil"] .home-news-card:first-child{min-height:680px!important}
+body[data-page="accueil"] .home-news-card:first-child .home-news-card__media{height:440px!important}
+
+/* Internal pages: create a huge visual "chapter" rhythm */
+body:not([data-page="accueil"]) main > section:first-of-type{
+ min-height:42vh;display:flex;align-items:flex-end;
+ padding-bottom:70px!important;
+}
+body:not([data-page="accueil"]) main > section:first-of-type h1{
+ font-size:clamp(82px,9vw,158px)!important;line-height:.75!important;
+ text-shadow:0 25px 90px rgba(0,0,0,.6);
+}
+body:not([data-page="accueil"]) main > section:first-of-type p{
+ max-width:760px;font-size:18px;color:#aaa59f;
+}
+
+/* Give repeated grids asymmetry instead of dashboard sameness */
+body:not([data-page="accueil"]) main [class*="grid"]{
+ gap:18px!important;
+}
+body:not([data-page="accueil"]) main [class*="card"]:not(.entry-terminal__card):not(.ambient-player){
+ position:relative;overflow:hidden;
+ background:linear-gradient(145deg,rgba(15,16,17,.93),rgba(6,7,8,.96))!important;
+ border:1px solid rgba(255,255,255,.095)!important;
+}
+body:not([data-page="accueil"]) main [class*="card"]:not(.entry-terminal__card):not(.ambient-player)::before{
+ content:"";position:absolute;left:0;top:0;width:46px;height:2px;background:var(--sx-red);
+}
+
+/* Profile: stop looking like an admin dashboard */
+body[data-page="profil"] .terminal-shell{width:min(1540px,calc(100% - 64px))!important}
+body[data-page="profil"] .survivor-pass--command{
+ min-height:520px!important;
+ display:grid!important;grid-template-columns:260px minmax(0,1fr) 340px!important;
+ align-items:center!important;gap:46px!important;padding:54px!important;
+}
+body[data-page="profil"] .survivor-pass__portrait{width:260px!important;height:350px!important}
+body[data-page="profil"] .survivor-pass__identity h2{
+ font-size:clamp(90px,8vw,145px)!important;letter-spacing:-.035em!important;
+}
+body[data-page="profil"] .survivor-pass__identity p{font-size:17px!important}
+body[data-page="profil"] .operator-card{padding:42px!important}
+body[data-page="profil"] .profile-dossier-grid{
+ display:grid!important;grid-template-columns:.8fr 1.2fr 1fr!important;gap:18px!important;
+}
+body[data-page="profil"] .vote-wallet-panel{
+ margin-top:28px!important;min-height:430px!important;padding:58px!important;
+ background:
+ radial-gradient(circle at 85% 25%,rgba(211,154,54,.13),transparent 25%),
+ linear-gradient(125deg,#171109,#08090a 72%)!important;
+}
+body[data-page="profil"] .vote-wallet-balance strong{font-size:clamp(74px,7vw,120px)!important}
+body[data-page="profil"] .battlepass-command{margin-top:28px!important;min-height:380px!important}
+
+/* Staff/community/events/shop: large page-specific content cards */
+body[data-page="staff"] main [class*="card"],
+body[data-page="communaute"] main [class*="card"],
+body[data-page="evenements"] main [class*="card"],
+body[data-page="boutique"] main [class*="card"]{min-height:220px}
+
+/* Epic separators / chapter numbers */
+.rz-epic-chapter{position:relative}
+.rz-epic-chapter::after{
+ content:attr(data-rz-chapter);position:absolute;right:3vw;top:-.25em;z-index:-1;
+ font:clamp(120px,18vw,320px)/1 'Anton',sans-serif;color:rgba(255,255,255,.018);
+ letter-spacing:-.06em;pointer-events:none;
+}
+
+/* hover light follows cursor */
+.rz-spotlight{--mx:50%;--my:50%}
+.rz-spotlight::after{
+ content:"";position:absolute!important;inset:0!important;pointer-events:none!important;
+ background:radial-gradient(450px circle at var(--mx) var(--my),rgba(255,255,255,.055),transparent 42%)!important;
+}
+
+/* Never restyle the entry identity */
+.entry-terminal,.senzany-entry-terminal,.intro-cinematic,.cinematic-overlay,
+.entry-terminal *, .senzany-entry-terminal *, .intro-cinematic *, .cinematic-overlay *{
+ --sx-terminal-preserved:1;
+}
+
+@media(max-width:1050px){
+ body[data-page="accueil"] .home-hero__inner{width:calc(100% - 38px)!important;grid-template-columns:1fr!important}
+ body[data-page="accueil"] .home-pillars__head{grid-template-columns:1fr!important}
+ body[data-page="accueil"] .home-news__grid{grid-template-columns:1fr!important}
+ body[data-page="profil"] .survivor-pass--command{grid-template-columns:180px 1fr!important}
+ body[data-page="profil"] .survivor-pass__portrait{width:180px!important;height:250px!important}
+ body[data-page="profil"] .profile-dossier-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:680px){
+ body[data-page="accueil"] .home-hero__inner{width:calc(100% - 26px)!important}
+ body[data-page="accueil"] .home-hero__title{font-size:clamp(68px,22vw,105px)!important}
+ body[data-page="profil"] .terminal-shell{width:calc(100% - 24px)!important}
+ body[data-page="profil"] .survivor-pass--command{grid-template-columns:1fr!important;padding:26px!important}
+ body[data-page="profil"] .survivor-pass__portrait{width:100%!important;height:330px!important}
+}
