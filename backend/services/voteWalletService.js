@@ -97,9 +97,11 @@ const PRODUCTION_DENOMINATIONS = [
 
 // Serveur de test : MoneyRuble n'est pas chargé. On utilise donc une monnaie
 // Expansion réellement spawnable afin de valider toute la chaîne Delivery.
-// Mapping TEMPORAIRE de test : 1 billet Expansion = 100 $ de cagnotte.
+// Nouvelle monnaie Expansion : sa valeur unitaire est 1 $.
+// Le Delivery server-side regroupe ensuite la somme dans UN SEUL stack
+// via SetQuantity(amount), au lieu de creer N objets physiques.
 const TEST_DENOMINATIONS = [
-  { value: 100, className: 'ExpansionBanknoteHryvnia', name: 'Billet test 100 $' }
+  { value: 1, className: 'ExpansionBanknoteHryvnia', name: 'Monnaie Expansion' }
 ];
 
 function getDayzEnvironment() {

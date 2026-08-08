@@ -1,0 +1,25 @@
+SENZANY - CAGNOTTE VOTES V1.3 - MONNAIE EXPANSION EN STACK
+
+1) SITE / GITHUB
+Remplacer : backend/services/voteWalletService.js
+Commit + Push, puis sur le VPS :
+  pm2 restart senzany-api --update-env
+
+Le serveur test doit garder :
+  DAYZ_DELIVERY_ENVIRONMENT=test
+
+Avec cette version, un claim de 1 000 $ cree une ligne de livraison :
+  ExpansionBanknoteHryvnia x1000
+
+2) MOD DAYZ
+Remplacer le SenzanyDeliveryManager.c utilise par le mod serveur par :
+  dayz-mod/SenzanyDeliveryManager.c
+Puis repack / redemarrer le serveur DayZ comme d'habitude.
+
+Le mod ne cree PAS 1000 billets physiques. Pour ExpansionBanknoteHryvnia, il cree un seul objet puis applique SetQuantity(1000).
+Il controle ensuite GetQuantity() et marque la livraison en erreur/partielle si le moteur refuse la valeur demandee.
+
+3) TEST
+Faire un claim de 1 000 $. Dans le log DayZ, chercher :
+  [SenzanyDelivery] MONNAIE STACK - demande=1000 reel=...
+Si reel=1000, le fonctionnement est valide.
