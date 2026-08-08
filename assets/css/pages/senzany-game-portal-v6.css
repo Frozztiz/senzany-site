@@ -28,9 +28,9 @@ body[data-page="accueil"]>[data-site-footer]{display:none!important}
 .gp-slide{opacity:0;visibility:hidden;transition:opacity .55s ease,visibility .55s}.gp-slide.is-active{opacity:1;visibility:visible}
 .gp-slide__bg{background-size:cover;background-position:center;transform:scale(1.01);transition:transform 6s ease}
 .gp-slide.is-active .gp-slide__bg{transform:scale(1.045)}
-.gp-slide__bg--world{background-image:url('../images/accueil/monde-transforme.webp')}
-.gp-slide__bg--events{background-image:url('../images/accueil/evenements-new.webp')}
-.gp-slide__bg--season{background-image:url('../images/accueil/saison-new.webp')}
+.gp-slide__bg--world{background-image:url('../../images/accueil/monde-transforme.webp')}
+.gp-slide__bg--events{background-image:url('../../images/accueil/evenements-new.webp')}
+.gp-slide__bg--season{background-image:url('../../images/accueil/saison-new.webp')}
 .gp-slide__shade{background:linear-gradient(90deg,rgba(11,14,16,.91) 0%,rgba(11,14,16,.66) 36%,rgba(11,14,16,.17) 68%,rgba(11,14,16,.14)),linear-gradient(180deg,rgba(8,11,13,.04),rgba(8,11,13,.12) 60%,rgba(8,11,13,.72) 100%)}
 .gp-slide__content{position:absolute;left:max(5vw,50px);top:50%;transform:translateY(-50%);width:min(700px,55vw);z-index:3}
 .gp-kicker{display:block;margin-bottom:12px;color:#f2b765;font-size:13px;font-weight:800;letter-spacing:.12em}
@@ -57,7 +57,7 @@ body[data-page="accueil"]>[data-site-footer]{display:none!important}
 
 .gp-news{background:#121619}.gp-news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.gp-news-card{overflow:hidden;border-radius:5px;background:#20262a;color:#fff;text-decoration:none}.gp-news-card img{display:block;width:100%;height:225px;object-fit:cover;transition:transform .45s ease}.gp-news-card:hover img{transform:scale(1.04)}.gp-news-card>div{padding:20px}.gp-news-card small{display:block;color:#e5a85c;font-size:11px;font-weight:800;letter-spacing:.1em}.gp-news-card strong{display:block;font-size:30px;margin:6px 0}.gp-news-card span{font-size:15px;color:#aeb7bc}
 
-.gp-profile-promo{position:relative;min-height:580px;display:flex;align-items:center;padding:70px max(5vw,55px);overflow:hidden}.gp-profile-promo__image{position:absolute;inset:0;background:url('../images/accueil/profil.png') center/cover no-repeat}.gp-profile-promo__shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,13,15,.94),rgba(9,13,15,.58) 52%,rgba(9,13,15,.18))}.gp-profile-promo__content{position:relative;z-index:2;max-width:720px}.gp-profile-promo__content>span{color:#8fb6c6;font-weight:800;letter-spacing:.1em;font-size:13px}.gp-profile-promo h2{font-size:clamp(54px,5vw,90px);line-height:.9;margin:12px 0 18px}.gp-profile-promo p{font-size:18px;line-height:1.5;color:#d5dade;max-width:620px}.gp-profile-promo .gp-btn{margin-top:22px}
+.gp-profile-promo{position:relative;min-height:580px;display:flex;align-items:center;padding:70px max(5vw,55px);overflow:hidden}.gp-profile-promo__image{position:absolute;inset:0;background:url('../../images/accueil/profil.png') center/cover no-repeat}.gp-profile-promo__shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,13,15,.94),rgba(9,13,15,.58) 52%,rgba(9,13,15,.18))}.gp-profile-promo__content{position:relative;z-index:2;max-width:720px}.gp-profile-promo__content>span{color:#8fb6c6;font-weight:800;letter-spacing:.1em;font-size:13px}.gp-profile-promo h2{font-size:clamp(54px,5vw,90px);line-height:.9;margin:12px 0 18px}.gp-profile-promo p{font-size:18px;line-height:1.5;color:#d5dade;max-width:620px}.gp-profile-promo .gp-btn{margin-top:22px}
 
 .gp-footer{min-height:190px;padding:44px max(4vw,46px);display:grid;grid-template-columns:1fr auto auto;gap:50px;align-items:center;background:#0e1214;border-top:1px solid rgba(255,255,255,.08)}.gp-footer__brand{display:flex;align-items:center;gap:13px}.gp-footer__brand img{width:48px;height:48px;object-fit:cover;border-radius:4px}.gp-footer__brand div{display:grid}.gp-footer__brand strong{font-size:25px}.gp-footer__brand small{font-size:11px;color:#7f8c93}.gp-footer nav{display:flex;gap:26px}.gp-footer nav a{color:#c8cfd3;text-decoration:none;font-size:13px}.gp-footer>span{font-size:11px;color:#69767d}
 
@@ -358,7 +358,7 @@ body[data-page="accueil"]>[data-site-footer]{display:none!important}
 
 /* Le volcan redevient le visuel identitaire du premier écran. */
 .gp-slide__bg--world{
-  background-image:url('../images/accueil/monde-transforme.webp');
+  background-image:url('../../images/accueil/monde-transforme.webp');
   background-position:58% 44%;
 }
 .gp-slide__shade{
@@ -462,7 +462,7 @@ body[data-page="accueil"]{
   position:relative;
   background-image:
     linear-gradient(rgba(7,9,10,.72),rgba(7,9,10,.78)),
-    url('../images/backgrounds/hero-bg.jpg')!important;
+    url('../../images/backgrounds/hero-bg.jpg')!important;
   background-size:cover!important;
   background-position:68% 38%!important;
   background-attachment:fixed!important;
@@ -496,8 +496,8 @@ body[data-page="accueil"]::before{
    Le second visuel sert de secours si hero-bg.jpg n'est pas disponible. */
 .gp-slide__bg--world{
   background-image:
-    url('../images/backgrounds/hero-bg.jpg'),
-    url('../images/accueil/monde-transforme.webp')!important;
+    url('../../images/backgrounds/hero-bg.jpg'),
+    url('../../images/accueil/monde-transforme.webp')!important;
   background-size:cover!important;
   background-position:70% 38%,58% 44%!important;
   background-repeat:no-repeat!important;
@@ -573,8 +573,8 @@ body[data-page="accueil"]::before{
   inset:0;
   z-index:0;
   background-image:
-    url('../images/backgrounds/hero-bg.jpg'),
-    url('../images/accueil/monde-transforme.webp');
+    url('../../images/backgrounds/hero-bg.jpg'),
+    url('../../images/accueil/monde-transforme.webp');
   background-size:cover;
   background-position:70% 42%,58% 45%;
   background-repeat:no-repeat;
@@ -637,7 +637,7 @@ body[data-page="accueil"]{
   background-color:#090b0c!important;
   background-image:
     linear-gradient(rgba(7,9,10,.67),rgba(7,9,10,.76)),
-    url('../images/backgrounds/hero-bg.jpg')!important;
+    url('../../images/backgrounds/hero-bg.jpg')!important;
   background-size:cover!important;
   background-position:70% 38%!important;
   background-attachment:fixed!important;
@@ -652,7 +652,7 @@ body[data-page="accueil"]::after{
   z-index:-2;
   pointer-events:none;
   background:
-    url('../images/backgrounds/hero-bg.jpg') 72% 38% / cover no-repeat;
+    url('../../images/backgrounds/hero-bg.jpg') 72% 38% / cover no-repeat;
   opacity:.22;
   filter:saturate(1.04) contrast(1.02);
   transform:scale(1.035);
@@ -676,7 +676,7 @@ body[data-page="accueil"]::after{
 
 /* Le hero garde le volcan et le personnage à droite */
 .gp-slide__bg--world{
-  background-image:url('../images/backgrounds/hero-bg.jpg')!important;
+  background-image:url('../../images/backgrounds/hero-bg.jpg')!important;
   background-size:cover!important;
   background-position:73% 39%!important;
   animation:gpHeroVolcanoMove 18s ease-in-out infinite alternate!important;
@@ -695,7 +695,7 @@ body[data-page="accueil"]::after{
 
 /* Le volcan reste visible dans la section Saison aussi */
 .gp-season-band::before{
-  background-image:url('../images/backgrounds/hero-bg.jpg')!important;
+  background-image:url('../../images/backgrounds/hero-bg.jpg')!important;
   background-size:cover!important;
   background-position:72% 42%!important;
   animation:gpSeasonVolcanoMove 22s ease-in-out infinite alternate;
@@ -756,5 +756,58 @@ body[data-page="accueil"]::after{
   .gp-slide__bg--world,
   .gp-season-band::before{
     animation:none!important;
+  }
+}
+
+
+/* =========================================================
+   V6.5 — CORRECTION CHEMINS IMAGES + VOLCAN VISIBLE
+   ========================================================= */
+
+.gp-slide__bg--world{
+  background-image:url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-size:cover!important;
+  background-position:68% 42%!important;
+  opacity:1!important;
+}
+
+body[data-page="accueil"]{
+  background-image:
+    linear-gradient(rgba(7,9,10,.55),rgba(7,9,10,.68)),
+    url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-position:68% 40%!important;
+}
+
+body[data-page="accueil"]::after{
+  background-image:url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-position:70% 40%!important;
+}
+
+.gp-season-band::before{
+  background-image:url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-position:69% 43%!important;
+}
+
+/* On éclaircit un peu le premier hero pour que le volcan ressorte. */
+.gp-slide:first-child .gp-slide__shade{
+  background:
+    linear-gradient(90deg,
+      rgba(7,9,10,.80) 0%,
+      rgba(7,9,10,.52) 33%,
+      rgba(7,9,10,.14) 58%,
+      rgba(7,9,10,.02) 82%,
+      rgba(7,9,10,.08) 100%),
+    linear-gradient(180deg,
+      rgba(5,7,8,.02),
+      rgba(5,7,8,.05) 62%,
+      rgba(5,7,8,.48) 100%)!important;
+}
+
+@media(min-width:1900px){
+  .gp-slide__bg--world{
+    background-position:72% 41%!important;
+  }
+  body[data-page="accueil"]{
+    background-position:72% 39%!important;
   }
 }
