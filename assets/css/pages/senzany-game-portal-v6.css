@@ -445,3 +445,184 @@ body[data-page="accueil"]>[data-site-footer]{display:none!important}
   .gp-footer__top{grid-template-columns:1fr;padding:42px 20px 34px}
   .gp-footer__bottom{grid-template-columns:1fr;padding:18px 20px}.gp-footer__bottom span:last-child{grid-column:auto}
 }
+
+
+/* =========================================================
+   GAME PORTAL V6.3 — RETOUR DU FOND CINÉMATIQUE SENZANY
+   Principe de l'ancien site :
+   un décor apocalyptique fixe visible derrière toute la page.
+   ========================================================= */
+
+/* Fond général : on retrouve le paysage Senzany au lieu du bleu/noir plat. */
+html,
+body[data-page="accueil"]{
+  background-color:#090b0c!important;
+}
+body[data-page="accueil"]{
+  position:relative;
+  background-image:
+    linear-gradient(rgba(7,9,10,.72),rgba(7,9,10,.78)),
+    url('../images/backgrounds/hero-bg.jpg')!important;
+  background-size:cover!important;
+  background-position:68% 38%!important;
+  background-attachment:fixed!important;
+  background-repeat:no-repeat!important;
+}
+body[data-page="accueil"]::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 76% 34%,rgba(205,92,37,.10),transparent 28%),
+    linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.36));
+}
+
+/* La page ne masque plus totalement le décor global. */
+.gp-home{
+  background:transparent!important;
+}
+
+/* Header légèrement transparent : on garde la profondeur du paysage. */
+.gp-nav{
+  background:rgba(11,14,16,.91)!important;
+  backdrop-filter:blur(15px);
+  box-shadow:0 10px 34px rgba(0,0,0,.22);
+}
+
+/* HERO :
+   priorité au visuel historique avec volcan/personnage.
+   Le second visuel sert de secours si hero-bg.jpg n'est pas disponible. */
+.gp-slide__bg--world{
+  background-image:
+    url('../images/backgrounds/hero-bg.jpg'),
+    url('../images/accueil/monde-transforme.webp')!important;
+  background-size:cover!important;
+  background-position:70% 38%,58% 44%!important;
+  background-repeat:no-repeat!important;
+}
+.gp-slide__shade{
+  background:
+    linear-gradient(90deg,
+      rgba(7,9,10,.86) 0%,
+      rgba(7,9,10,.59) 31%,
+      rgba(7,9,10,.22) 55%,
+      rgba(7,9,10,.04) 78%,
+      rgba(7,9,10,.12) 100%),
+    linear-gradient(180deg,
+      rgba(5,7,8,.03),
+      rgba(5,7,8,.08) 62%,
+      rgba(5,7,8,.62) 100%)!important;
+}
+
+/* Sur écran large on décale encore légèrement le paysage afin de conserver
+   le survivant/volcan à droite et le texte à gauche. */
+@media(min-width:1500px){
+  .gp-slide__bg--world{
+    background-position:74% 40%,60% 44%!important;
+  }
+}
+
+/* Les grandes zones ne sont plus des aplats opaques.
+   On revoit le décor global entre et derrière les sections. */
+.gp-discover{
+  background:linear-gradient(
+    180deg,
+    rgba(19,25,29,.91),
+    rgba(15,20,23,.87)
+  )!important;
+  border-top:1px solid rgba(255,255,255,.05);
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.gp-news{
+  background:linear-gradient(
+    180deg,
+    rgba(11,15,17,.88),
+    rgba(14,18,20,.92)
+  )!important;
+}
+
+/* On crée de vraies respirations où le paysage apparaît. */
+.gp-section{
+  position:relative;
+}
+.gp-discover::before,
+.gp-news::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(115deg,rgba(181,91,38,.025),transparent 36%),
+    radial-gradient(circle at 85% 15%,rgba(210,116,54,.045),transparent 22%);
+}
+
+/* Bande Saison :
+   elle garde son contenu, mais n'est plus un bloc tropical qui coupe le site.
+   On réutilise le paysage volcanique comme fond principal. */
+.gp-season-band{
+  background:#111416!important;
+}
+.gp-season-band>img{
+  opacity:0!important;
+}
+.gp-season-band::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  background-image:
+    url('../images/backgrounds/hero-bg.jpg'),
+    url('../images/accueil/monde-transforme.webp');
+  background-size:cover;
+  background-position:70% 42%,58% 45%;
+  background-repeat:no-repeat;
+}
+.gp-season-band__shade{
+  z-index:1!important;
+  background:
+    linear-gradient(90deg,
+      rgba(10,12,13,.91) 0%,
+      rgba(10,12,13,.68) 38%,
+      rgba(10,12,13,.25) 66%,
+      rgba(10,12,13,.13) 100%),
+    linear-gradient(180deg,rgba(5,7,8,.08),rgba(5,7,8,.55))!important;
+}
+.gp-season-band__content,
+.gp-season-band__date{
+  z-index:2!important;
+}
+
+/* Portail joueur :
+   on enlève le grand noir vide et on laisse revenir le décor du site. */
+.gp-profile-promo{
+  background:rgba(7,10,11,.72)!important;
+  border-top:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.gp-profile-promo__image{
+  opacity:.42;
+  mix-blend-mode:luminosity;
+}
+.gp-profile-promo__shade{
+  background:
+    linear-gradient(90deg,
+      rgba(7,10,11,.95),
+      rgba(7,10,11,.69) 42%,
+      rgba(7,10,11,.38) 70%,
+      rgba(7,10,11,.20))!important;
+}
+
+/* Footer : noir profond, mais légèrement raccordé au décor au-dessus. */
+.gp-footer{
+  background:linear-gradient(180deg,rgba(8,11,12,.97),#060809)!important;
+}
+
+/* Le fond fixe est coûteux / parfois saccadé sur mobile. */
+@media(max-width:900px){
+  body[data-page="accueil"]{
+    background-attachment:scroll!important;
+    background-position:center top!important;
+  }
+}
