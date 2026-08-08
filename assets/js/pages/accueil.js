@@ -817,10 +817,13 @@
     let current = 0;
     let timer = null;
 
+    const stories = Array.from(document.querySelectorAll("[data-hero-story]"));
+
     const show = (index) => {
       current = (index + slides.length) % slides.length;
       slides.forEach((slide, i) => slide.classList.toggle("is-active", i === current));
       dots.forEach((dot, i) => dot.classList.toggle("is-active", i === current));
+      stories.forEach((story, i) => story.classList.toggle("is-active", i === current));
     };
 
     const restart = () => {

@@ -678,3 +678,61 @@ linear-gradient(180deg,#090807 0%,#070606 100%);border-top:1px solid rgba(255,25
 @media(prefers-reduced-motion:reduce){
   .home-hero-slide{transition:opacity .25s ease;transform:none!important}
 }
+
+
+/* === ACCUEIL V2.9 — CARROUSEL COMPLET COMME LE TEST PRÉCÉDENT ===
+   Chaque image possède maintenant son propre titre, texte et boutons. */
+.home-hero-story{
+  display:none;
+  opacity:0;
+  transform:translateY(12px);
+}
+.home-hero-story.is-active{
+  display:block;
+  animation:homeHeroStoryIn .62s cubic-bezier(.2,.72,.2,1) both;
+}
+@keyframes homeHeroStoryIn{
+  from{opacity:0;transform:translateY(18px)}
+  to{opacity:1;transform:none}
+}
+
+/* On conserve la composition originale mais les titres des slides 2/3
+   restent un peu plus compacts pour ne pas manger l'image. */
+.home-hero__title--event,
+.home-hero__title--season{
+  max-width:760px;
+}
+.home-hero__title--event span,
+.home-hero__title--season span{
+  font-size:.91em;
+}
+
+/* L'image EVENEMENT contient déjà son titre :
+   voile moins sombre à droite, mais on protège toujours le texte à gauche. */
+.home-hero:has(.home-hero-slide--event.is-active) .home-hero-slider::after{
+  background:
+    linear-gradient(90deg,
+      rgba(5,4,4,.91) 0%,
+      rgba(5,4,4,.73) 34%,
+      rgba(5,4,4,.18) 60%,
+      rgba(5,4,4,.10) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.10) 62%,rgba(8,7,6,.70) 100%);
+}
+
+/* Slide saison : léger voile chaud, toujours dans l'identité du site original. */
+.home-hero:has(.home-hero-slide--season.is-active) .home-hero-slider::after{
+  background:
+    linear-gradient(90deg,
+      rgba(5,4,4,.91) 0%,
+      rgba(5,4,4,.69) 36%,
+      rgba(5,4,4,.23) 68%,
+      rgba(5,4,4,.18) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.12) 60%,rgba(8,7,6,.74) 100%);
+}
+
+@media(max-width:780px){
+  .home-hero__title--event span,
+  .home-hero__title--season span{
+    font-size:1em;
+  }
+}
