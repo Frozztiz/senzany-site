@@ -63,3 +63,261 @@ body[data-page="accueil"]>[data-site-footer]{display:none!important}
 
 @media(max-width:1100px){.gp-nav__links{display:none}.gp-slide__content{width:72vw}.gp-server-card{display:none!important}.gp-feature-grid{grid-template-columns:repeat(2,1fr)}.gp-feature--large{grid-column:span 2}.gp-news-grid{grid-template-columns:1fr 1fr}.gp-footer{grid-template-columns:1fr}.gp-footer nav{flex-wrap:wrap}}
 @media(max-width:720px){.gp-nav{height:68px;padding-inline:16px}.gp-brand small{display:none}.gp-brand strong{font-size:20px}.gp-brand img{width:38px;height:38px}.gp-nav__join{padding:11px 14px;font-size:11px}.gp-hero{height:640px;min-height:640px}.gp-slide__content{left:22px;right:22px;width:auto;top:54%}.gp-slide h1,.gp-slide h2{font-size:56px}.gp-slide p{font-size:16px}.gp-actions{flex-direction:column}.gp-btn{width:100%}.gp-arrow{display:none}.gp-slider__dots{bottom:14px}.gp-section{padding:52px 20px}.gp-section__head{grid-template-columns:1fr;gap:18px}.gp-feature-grid{grid-template-columns:1fr;grid-auto-rows:280px}.gp-feature--large{grid-column:auto;grid-row:auto}.gp-news-grid{grid-template-columns:1fr}.gp-season-band{min-height:580px;padding:52px 20px}.gp-season-band__date{display:none}.gp-profile-promo{min-height:560px;padding:50px 20px}.gp-footer{padding:38px 20px}}
+
+
+/* =========================================================
+   GAME PORTAL V6.1 — CADRAGE / NETTETÉ / COMPTEUR
+   ========================================================= */
+
+/* Le hero respire mieux et laisse une vraie zone au compteur. */
+.gp-hero{
+  height:min(760px,calc(100svh - 76px));
+  min-height:620px;
+}
+.gp-slide__content{
+  left:max(5vw,64px);
+  width:min(680px,49vw);
+}
+.gp-slide h1,.gp-slide h2{
+  font-size:clamp(62px,5.6vw,104px);
+  max-width:720px;
+}
+.gp-slide p{
+  max-width:610px;
+}
+
+/* Cadrage individuel des 3 slides. */
+.gp-slide__bg--world{
+  background-position:center 42%;
+}
+.gp-slide__bg--events{
+  background-position:center 38%;
+}
+.gp-slide__bg--season{
+  background-position:center 48%;
+}
+
+/* Compteur serveur : composant autonome, aligné et lisible. */
+.gp-server-card{
+  position:absolute;
+  z-index:8;
+  right:max(4.4vw,56px);
+  bottom:58px;
+  width:340px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:5px;
+  background:rgba(14,18,21,.92);
+  box-shadow:0 24px 70px rgba(0,0,0,.38);
+  backdrop-filter:blur(16px);
+}
+.gp-server-card__head{
+  min-height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:0 18px;
+  border-bottom:1px solid var(--gp-line);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+.gp-server-card__head small{
+  color:#75dc96;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+.gp-server-dot{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  margin-right:8px;
+  border-radius:50%;
+  background:#63d887;
+  box-shadow:0 0 14px rgba(99,216,135,.75);
+}
+.gp-server-card__main{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:end;
+  gap:16px;
+  min-height:122px;
+  padding:22px 18px 18px;
+}
+.gp-server-card__main span{
+  display:block;
+  max-width:88px;
+  color:#89949a;
+  font-size:11px;
+  line-height:1.25;
+}
+.gp-server-card__main strong{
+  display:block;
+  color:#63df83;
+  font-size:58px;
+  line-height:.9;
+  white-space:nowrap;
+  text-align:right;
+}
+.gp-server-card__grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  border-top:1px solid var(--gp-line);
+}
+.gp-server-card__grid div{
+  min-height:72px;
+  padding:14px 18px;
+}
+.gp-server-card__grid div+div{
+  border-left:1px solid var(--gp-line);
+}
+.gp-server-card__grid span{
+  display:block;
+  color:#7f8b91;
+  font-size:9px;
+  letter-spacing:.06em;
+}
+.gp-server-card__grid strong{
+  display:block;
+  margin-top:5px;
+  font-size:18px;
+  line-height:1.1;
+  color:#f3f1ec;
+}
+.gp-server-card>a{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:56px;
+  padding:0 18px;
+  background:linear-gradient(90deg,rgba(225,147,63,.19),rgba(225,147,63,.06));
+  border-top:1px solid rgba(225,147,63,.24);
+  color:#f0ae5e;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.03em;
+}
+.gp-server-card>a:hover{
+  background:rgba(225,147,63,.24);
+  color:#fff;
+}
+
+/* Cartes : mêmes proportions, mais cadrage image contrôlé. */
+.gp-feature-grid{
+  grid-auto-rows:280px;
+}
+.gp-feature img{
+  image-rendering:auto;
+}
+.gp-feature--large img{
+  object-position:center 46%;
+}
+.gp-feature:nth-child(2) img{
+  object-position:center 42%;
+}
+.gp-feature:nth-child(3) img{
+  object-position:center 50%;
+}
+.gp-feature:nth-child(4) img{
+  object-position:center 48%;
+}
+.gp-feature:nth-child(5) img{
+  object-position:center 50%;
+}
+
+/* L'exploration utilise maintenant l'image 1920x1080 du projet,
+   et les événements la version 2048x1151, donc beaucoup plus propres. */
+.gp-feature--large{
+  min-height:574px;
+}
+
+/* Saison : moins de zoom, meilleur cadrage et voile moins agressif. */
+.gp-season-band{
+  min-height:520px;
+}
+.gp-season-band>img{
+  object-position:center 48%;
+  transform:scale(1.005);
+}
+.gp-season-band__shade{
+  background:
+    linear-gradient(90deg,rgba(15,18,20,.91),rgba(15,18,20,.48) 47%,rgba(15,18,20,.08) 78%),
+    linear-gradient(180deg,rgba(15,18,20,.06),rgba(15,18,20,.18));
+}
+
+/* Actualités : visuels moins écrasés. */
+.gp-news-card img{
+  height:250px;
+  object-fit:cover;
+}
+.gp-news-card:nth-child(1) img{
+  object-position:center 48%;
+}
+.gp-news-card:nth-child(2) img{
+  object-position:center 42%;
+}
+.gp-news-card:nth-child(3) img{
+  object-position:center 45%;
+}
+
+/* Le portail joueur doit utiliser une vraie composition image + texte,
+   pas un grand bloc vide. */
+.gp-profile-promo{
+  min-height:520px;
+}
+.gp-profile-promo__image{
+  background-position:center 42%;
+  background-size:cover;
+}
+.gp-profile-promo__content{
+  width:min(680px,54vw);
+}
+.gp-profile-promo h2{
+  font-size:clamp(50px,4.6vw,82px);
+}
+
+/* Desktop large : le compteur ne chevauche jamais les flèches ou les dots. */
+@media(min-width:1101px){
+  .gp-slider__dots{
+    bottom:24px;
+  }
+  .gp-arrow--next{
+    right:22px;
+  }
+}
+
+/* Tablette / mobile */
+@media(max-width:1100px){
+  .gp-slide__content{
+    width:70vw;
+  }
+  .gp-server-card{
+    display:none;
+  }
+}
+@media(max-width:720px){
+  .gp-hero{
+    height:650px;
+    min-height:650px;
+  }
+  .gp-slide__content{
+    width:auto;
+    left:22px;
+    right:22px;
+  }
+  .gp-feature-grid{
+    grid-auto-rows:300px;
+  }
+  .gp-feature--large{
+    min-height:300px;
+  }
+  .gp-news-card img{
+    height:220px;
+  }
+  .gp-profile-promo__content{
+    width:100%;
+  }
+}
