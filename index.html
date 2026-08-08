@@ -23,7 +23,7 @@
 <link href="assets/css/shared/senzany-reborn-v1.css?v=1.0.0" rel="stylesheet"/>
 <link rel="stylesheet" href="assets/css/shared/senzany-maintenance.css?v=1.0.0">
 <script src="assets/js/shared/senzany-maintenance.js?v=1.0.0"></script>
-<link rel="stylesheet" href="assets/css/pages/senzany-game-portal-v6.css?v=6.1.0">
+<link rel="stylesheet" href="assets/css/pages/senzany-game-portal-v6.css?v=6.2.0">
 </head>
 <body data-page="accueil" data-design="senzany-reborn-v1">
 <div data-site-header=""></div>
@@ -106,16 +106,16 @@
       <button type="button" data-dot="2" aria-label="Slide 3"></button>
     </div>
 
-    <aside class="gp-server-card" aria-label="État du serveur">
-      <div class="gp-server-card__head">
-        <span><i class="gp-server-dot"></i> SERVEUR SENZANY</span>
+    <aside class="gp-server-card home-live-card" aria-label="État du serveur">
+      <div class="gp-server-card__head home-live-card__head">
+        <span><i class="gp-server-dot home-live-dot"></i> SERVEUR SENZANY</span>
         <small>VÉRIFICATION...</small>
       </div>
-      <div class="gp-server-card__main">
+      <div class="gp-server-card__main home-live-card__main">
         <span>JOUEURS EN LIGNE</span>
         <strong id="statPlayers">Connexion…</strong>
       </div>
-      <div class="gp-server-card__grid">
+      <div class="gp-server-card__grid home-live-card__grid">
         <div><span>CARTE</span><strong>CHERNARUS</strong></div>
         <div><span>VOTES DU MOIS</span><strong id="statVotes">—</strong></div>
       </div>
@@ -133,14 +133,14 @@
     </div>
 
     <div class="gp-feature-grid">
-      <a class="gp-feature gp-feature--large" href="senzany-jouer.html">
-        <img src="assets/images/accueil/exploration.png" alt="">
+      <a class="gp-feature gp-feature--large" href="senzany-wiki.html">
+        <img src="assets/images/accueil/monde-transforme.webp" alt="">
         <div class="gp-feature__overlay"></div>
         <div class="gp-feature__content"><small>MONDE</small><strong>EXPLORATION</strong><span>Mapping, zones uniques et découvertes.</span></div>
       </a>
 
       <a class="gp-feature" href="senzany-evenements.html">
-        <img src="assets/images/accueil/evenements.png" alt="">
+        <img src="assets/images/accueil/evenements-new.webp" alt="">
         <div class="gp-feature__overlay"></div>
         <div class="gp-feature__content"><small>LIVE</small><strong>ÉVÉNEMENTS</strong><span>Courses, boss, opérations et défis.</span></div>
       </a>
@@ -210,17 +210,42 @@
   </section>
 
   <footer class="gp-footer">
-    <div class="gp-footer__brand">
-      <img src="assets/images/branding/logo.png" alt="Senzany">
-      <div><strong>SENZANY</strong><small>VOICI LE RÉCIT DE VOTRE MORT.</small></div>
+    <div class="gp-footer__top">
+      <div class="gp-footer__brand">
+        <img src="assets/images/branding/logo.png" alt="Senzany">
+        <div><strong>SENZANY</strong><small>VOICI LE RÉCIT DE VOTRE MORT.</small></div>
+        <p>Serveur DayZ PVE français sur Chernarus. Un monde persistant, communautaire et en constante évolution.</p>
+      </div>
+
+      <div class="gp-footer__column">
+        <strong>LE SERVEUR</strong>
+        <a href="senzany-jouer.html">Rejoindre Senzany</a>
+        <a href="senzany-wiki.html">Découvrir l'univers</a>
+        <a href="senzany-evenements.html">Événements</a>
+        <a href="senzany-communaute.html">Communauté</a>
+      </div>
+
+      <div class="gp-footer__column">
+        <strong>ESPACE JOUEUR</strong>
+        <a href="senzany-profil.html">Mon profil</a>
+        <a href="senzany-boutique.html">Boutique</a>
+        <a href="senzany-support.html">Support</a>
+        <a href="senzany-staff.html">L'équipe</a>
+      </div>
+
+      <div class="gp-footer__column gp-footer__column--status">
+        <strong>RÉSEAU SENZANY</strong>
+        <span><i></i> Portail en ligne</span>
+        <small>DAYZ PVE // CHERNARUS+</small>
+        <a class="gp-footer__cta" href="senzany-jouer.html">ENTRER DANS SENZANY ↗</a>
+      </div>
     </div>
-    <nav>
-      <a href="senzany-jouer.html">Jouer</a>
-      <a href="senzany-evenements.html">Événements</a>
-      <a href="senzany-communaute.html">Communauté</a>
-      <a href="senzany-support.html">Support</a>
-    </nav>
-    <span>PORTAIL SENZANY // 2026</span>
+
+    <div class="gp-footer__bottom">
+      <span>© 2026 SENZANY — TOUS DROITS RÉSERVÉS</span>
+      <span>PORTAIL OFFICIEL // VERSION 6.2</span>
+      <span>DAYZ est une marque de Bohemia Interactive. Senzany est un serveur communautaire indépendant.</span>
+    </div>
   </footer>
 
 </main>

@@ -321,3 +321,127 @@ body[data-page="accueil"]>[data-site-footer]{display:none!important}
     width:100%;
   }
 }
+
+/* =========================================================
+   GAME PORTAL V6.2 — IDENTITÉ / TYPO / FOOTER / LIVE CARD
+   ========================================================= */
+:root{
+  --gp-text:#ddd9cf;
+  --gp-heading:#d8d2c6;
+  --gp-heading-soft:#c8c2b6;
+}
+
+/* Titres moins massifs et moins blancs. */
+.gp-slide h1,.gp-slide h2{
+  font-size:clamp(54px,4.7vw,86px);
+  line-height:.92;
+  color:var(--gp-heading);
+  text-shadow:0 7px 28px rgba(0,0,0,.42);
+}
+.gp-section__head h2{
+  font-size:clamp(38px,3.45vw,60px);
+  line-height:.96;
+  color:var(--gp-heading-soft);
+  letter-spacing:-.018em;
+}
+.gp-season-band h2{
+  font-size:clamp(46px,4.15vw,72px);
+  color:#ded5c5;
+}
+.gp-profile-promo h2{
+  font-size:clamp(46px,4vw,70px);
+  color:#cfd3cf;
+}
+.gp-feature__content strong{font-size:28px;color:#e3dfd6}
+.gp-feature--large .gp-feature__content strong{font-size:44px}
+.gp-news-card strong{font-size:27px;color:#ddd8ce}
+
+/* Le volcan redevient le visuel identitaire du premier écran. */
+.gp-slide__bg--world{
+  background-image:url('../images/accueil/monde-transforme.webp');
+  background-position:58% 44%;
+}
+.gp-slide__shade{
+  background:linear-gradient(90deg,rgba(10,14,16,.92) 0%,rgba(10,14,16,.66) 34%,rgba(10,14,16,.17) 63%,rgba(10,14,16,.08) 100%),linear-gradient(180deg,rgba(8,11,13,.02),rgba(8,11,13,.12) 64%,rgba(8,11,13,.72) 100%);
+}
+
+/* Compteur : cadré dans le hero et compatible avec le JS live historique. */
+.gp-server-card{
+  right:clamp(54px,4.5vw,92px)!important;
+  bottom:54px!important;
+  width:352px!important;
+  border-radius:6px!important;
+}
+.gp-server-card__main{
+  grid-template-columns:110px 1fr!important;
+  align-items:center!important;
+  min-height:116px!important;
+}
+.gp-server-card__main strong{
+  font-size:48px!important;
+  line-height:1!important;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.home-live-card__occupancy{
+  height:5px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+}
+.home-live-card__occupancy>span{
+  display:block;height:100%;width:0;
+  background:linear-gradient(90deg,#4cc978,#8ccf9e);
+  transition:width .5s ease;
+}
+.gp-server-card.is-offline .gp-server-dot{background:#9b6b61;box-shadow:none}
+.gp-server-card.is-offline .gp-server-card__head small{color:#b98b82!important}
+
+/* Images : on privilégie le rendu naturel, sans zoom agressif. */
+.gp-feature img,.gp-news-card img,.gp-season-band>img{transform:none!important;filter:none}
+.gp-feature:hover img,.gp-news-card:hover img{transform:scale(1.025)!important}
+.gp-feature--large img{object-position:58% 45%}
+
+/* Footer complet — vraie fin de portail. */
+.gp-footer{
+  min-height:0;
+  display:block;
+  padding:0;
+  background:#090d0f;
+  border-top:1px solid rgba(225,147,63,.22);
+}
+.gp-footer__top{
+  display:grid;
+  grid-template-columns:minmax(280px,1.5fr) repeat(3,minmax(150px,.75fr));
+  gap:clamp(34px,4vw,76px);
+  padding:58px max(4vw,54px) 48px;
+}
+.gp-footer__brand{display:grid;grid-template-columns:54px 1fr;align-items:center;gap:0 14px}
+.gp-footer__brand img{width:54px;height:54px;grid-row:1 / span 2}
+.gp-footer__brand strong{font-size:28px;color:#ddd8ce}
+.gp-footer__brand small{font-size:10px;letter-spacing:.12em;color:#8b969b}
+.gp-footer__brand p{grid-column:1 / -1;max-width:410px;margin:22px 0 0;color:#77838a;font-size:14px;line-height:1.55}
+.gp-footer__column{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.gp-footer__column>strong{font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;letter-spacing:.13em;color:#d99b55;margin-bottom:6px}
+.gp-footer__column a{font-family:'Barlow Condensed',Arial,sans-serif;color:#aab2b6;text-decoration:none;font-size:14px;transition:.2s}
+.gp-footer__column a:hover{color:#f0ece4;transform:translateX(2px)}
+.gp-footer__column--status span{font-size:13px;color:#b9c0c3}.gp-footer__column--status span i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#5fd486;margin-right:8px;box-shadow:0 0 10px rgba(95,212,134,.5)}
+.gp-footer__column--status small{color:#657177;font-size:10px;letter-spacing:.08em}
+.gp-footer__cta{margin-top:10px!important;padding:10px 12px;border:1px solid rgba(225,147,63,.3);color:#dda45e!important}
+.gp-footer__bottom{
+  display:grid;grid-template-columns:auto auto 1fr;gap:28px;align-items:center;
+  padding:18px max(4vw,54px);border-top:1px solid rgba(255,255,255,.07);background:#070a0c;
+}
+.gp-footer__bottom span{font-family:'Barlow Condensed',Arial,sans-serif;font-size:10px;letter-spacing:.055em;color:#566269}
+.gp-footer__bottom span:last-child{text-align:right}
+
+@media(max-width:1100px){
+  .gp-footer__top{grid-template-columns:1fr 1fr}
+  .gp-footer__bottom{grid-template-columns:1fr 1fr}.gp-footer__bottom span:last-child{grid-column:1/-1;text-align:left}
+}
+@media(max-width:720px){
+  .gp-slide h1,.gp-slide h2{font-size:48px}
+  .gp-section__head h2{font-size:38px}
+  .gp-feature--large .gp-feature__content strong{font-size:34px}
+  .gp-footer__top{grid-template-columns:1fr;padding:42px 20px 34px}
+  .gp-footer__bottom{grid-template-columns:1fr;padding:18px 20px}.gp-footer__bottom span:last-child{grid-column:auto}
+}
