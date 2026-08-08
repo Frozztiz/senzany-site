@@ -1,0 +1,45 @@
+SENZANY REBORN V1
+=================
+
+Ceci est une COPIE complète du site fournie pour tester une refonte artistique radicale.
+
+IMPORTANT
+- Le terminal d'arrivée n'a pas été supprimé.
+- La cinématique d'introduction n'a pas été supprimée.
+- entry-terminal.css / entry-terminal.js n'ont pas été réécrits.
+- Les API et fonctions existantes restent dans les fichiers d'origine.
+- La refonte est ajoutée comme une couche globale indépendante.
+
+NOUVEAUX FICHIERS
+assets/css/shared/senzany-reborn-v1.css
+assets/js/shared/senzany-reborn-v1.js
+
+PAGES PUBLIQUES BRANCHÉES SUR REBORN
+- index.html
+- senzany-profil.html
+- senzany-evenements.html
+- senzany-jouer.html
+- senzany-communaute.html
+- senzany-staff.html
+- senzany-boutique.html
+- senzany-support.html
+- senzany-wiki.html
+
+PHILOSOPHIE
+- beaucoup plus cinématique ;
+- typographie monumentale ;
+- plus d'espace ;
+- cartes plus immersives ;
+- rouge Senzany utilisé comme accent ;
+- verre noir, profondeur, grain, lumière ;
+- animations d'apparition et léger parallaxe sur l'accueil ;
+- responsive inclus.
+
+TEST CONSEILLÉ
+Ne remplace pas ta version stable si tu veux la conserver telle quelle.
+Déploie ce ZIP sur une branche / copie de test, puis Ctrl+F5.
+
+Pour revenir à l'ancien design dans cette copie, retirer simplement les références :
+assets/css/shared/senzany-reborn-v1.css
+assets/js/shared/senzany-reborn-v1.js
+des pages HTML.
