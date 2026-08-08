@@ -1,0 +1,22 @@
+SENZANY REFONTE RADICALE V3
+============================
+
+Cette version n'est PAS une simple surcouche de taille/couleurs.
+
+La page d'accueil a été reconstruite avec un nouveau DOM :
+- hero totalement différent ;
+- manifeste de marque ;
+- chapitres plein écran ;
+- section opérations / systèmes ;
+- section saison ;
+- navigation par grandes portes ;
+- finale cinématique.
+
+Terminal d'arrivée et cinématique : conservés.
+Maintenance : conservée.
+Accès preview : conservé.
+Dossier .git : absent.
+
+Pour le moment, la rupture la plus forte est volontairement concentrée sur l'ACCUEIL
+afin de valider la nouvelle direction artistique avant de reconstruire toutes les
+autres pages sur le même niveau.

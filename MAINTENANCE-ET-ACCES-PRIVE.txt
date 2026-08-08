@@ -1,0 +1,34 @@
+SENZANY — MODE MAINTENANCE
+===========================
+
+Le site public affiche maintenant une page de maintenance globale.
+Les pages admin n'ont pas été bloquées par cette couche.
+
+VOIR LE SITE EN DEVELOPPEMENT
+-----------------------------
+Ajoute simplement ceci UNE FOIS à l'adresse du site :
+
+?senzany-preview=1
+
+Exemple :
+https://ton-domaine.fr/?senzany-preview=1
+
+L'accès privé reste actif pour l'onglet/session du navigateur.
+Tu peux ensuite naviguer normalement entre les pages.
+
+REVENIR A LA PAGE MAINTENANCE
+-----------------------------
+Ajoute :
+?senzany-preview=off
+
+IMPORTANT
+---------
+Ceci est un verrou VISUEL de chantier côté navigateur, pratique pour cacher
+le site au public pendant la refonte. Ce n'est PAS une protection de sécurité
+pour des données sensibles : les contrôles d'accès serveur existants restent
+nécessaires pour les zones privées/Commandement.
+
+RETOUR ARRIERE
+--------------
+Ta sauvegarde "senzany-siteNEPASTOUCHER.zip" reste la référence de l'ancien site.
+Ne la modifie pas.

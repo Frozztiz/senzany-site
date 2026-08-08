@@ -1,0 +1,20 @@
+SENZANY EPIC V2
+================
+Refonte visuelle plus radicale construite au-dessus du site fonctionnel.
+
+INTOUCHABLE / CONSERVÉ :
+- Terminal d'arrivée
+- Cinématique
+- APIs et logique métier existantes
+- Maintenance publique
+- Accès preview
+
+NOUVEAUX FICHIERS :
+assets/css/shared/senzany-epic-v2.css
+assets/js/shared/senzany-epic-v2.js
+
+Cette V2 vise une vraie direction artistique : compositions asymétriques,
+titres monumentaux, rythme de chapitres, cartes éditoriales, profondeur,
+éclairage interactif et profil moins "dashboard".
+
+Le dossier .git est volontairement absent du ZIP.

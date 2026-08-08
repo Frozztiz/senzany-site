@@ -1,0 +1,813 @@
+
+/* SENZANY GAME PORTAL V6 — dense game-site direction inspired by modern publisher portals */
+:root{
+ --gp-bg:#121619;--gp-panel:#1b2024;--gp-panel2:#242a2f;--gp-text:#f4f1ec;
+ --gp-muted:#aab0b4;--gp-accent:#e1933f;--gp-accent2:#5f8795;--gp-line:rgba(255,255,255,.12);
+}
+body[data-page="accueil"]{background:var(--gp-bg)!important;color:var(--gp-text)!important}
+body[data-page="accueil"]>[data-site-header],
+body[data-page="accueil"]>[data-site-footer]{display:none!important}
+.gp-home{background:var(--gp-bg);color:var(--gp-text);min-height:100vh}
+.gp-home *{box-sizing:border-box}
+.gp-home h1,.gp-home h2,.gp-home strong{font-family:'Anton','Arial Narrow',sans-serif}
+.gp-home p,.gp-home a,.gp-home span,.gp-home small{font-family:'Barlow Condensed',Arial,sans-serif}
+
+/* Header */
+.gp-nav{
+ position:sticky;top:0;z-index:300;height:76px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:34px;
+ padding:0 max(3vw,28px);background:rgba(18,22,25,.97);border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px)
+}
+.gp-brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}.gp-brand img{width:44px;height:44px;object-fit:cover;border-radius:5px}.gp-brand div{display:grid}.gp-brand strong{font-size:24px;letter-spacing:.025em}.gp-brand small{font-size:10px;letter-spacing:.11em;color:#81909a}
+.gp-nav__links{display:flex;align-items:center;justify-content:center;gap:clamp(16px,1.8vw,32px)}
+.gp-nav__links a{position:relative;color:#d8dde0;text-decoration:none;font-size:14px;font-weight:700}.gp-nav__links a:after{content:"";position:absolute;left:0;right:100%;bottom:-12px;height:3px;background:var(--gp-accent);transition:right .2s}.gp-nav__links a:hover,.gp-nav__links a.active{color:#fff}.gp-nav__links a:hover:after,.gp-nav__links a.active:after{right:0}
+.gp-nav__join{padding:13px 22px;background:var(--gp-accent);color:#15191c;text-decoration:none;font-weight:800;font-size:13px;border-radius:3px}.gp-nav__join:hover{filter:brightness(1.08)}
+
+/* Hero slider */
+.gp-hero{position:relative;height:min(700px,calc(100svh - 76px));min-height:560px;background:#0b0f11;overflow:hidden}
+.gp-slides,.gp-slide,.gp-slide__bg,.gp-slide__shade{position:absolute;inset:0}
+.gp-slide{opacity:0;visibility:hidden;transition:opacity .55s ease,visibility .55s}.gp-slide.is-active{opacity:1;visibility:visible}
+.gp-slide__bg{background-size:cover;background-position:center;transform:scale(1.01);transition:transform 6s ease}
+.gp-slide.is-active .gp-slide__bg{transform:scale(1.045)}
+.gp-slide__bg--world{background-image:url('../../images/accueil/monde-transforme.webp')}
+.gp-slide__bg--events{background-image:url('../../images/accueil/evenements-new.webp')}
+.gp-slide__bg--season{background-image:url('../../images/accueil/saison-new.webp')}
+.gp-slide__shade{background:linear-gradient(90deg,rgba(11,14,16,.91) 0%,rgba(11,14,16,.66) 36%,rgba(11,14,16,.17) 68%,rgba(11,14,16,.14)),linear-gradient(180deg,rgba(8,11,13,.04),rgba(8,11,13,.12) 60%,rgba(8,11,13,.72) 100%)}
+.gp-slide__content{position:absolute;left:max(5vw,50px);top:50%;transform:translateY(-50%);width:min(700px,55vw);z-index:3}
+.gp-kicker{display:block;margin-bottom:12px;color:#f2b765;font-size:13px;font-weight:800;letter-spacing:.12em}
+.gp-slide h1,.gp-slide h2{font-size:clamp(64px,6.1vw,112px);line-height:.88;letter-spacing:-.025em;margin:0 0 20px;text-shadow:0 8px 34px rgba(0,0,0,.3)}
+.gp-slide p{max-width:650px;font-size:19px;line-height:1.45;color:#e0e3e4}
+.gp-actions{display:flex;gap:12px;margin-top:27px}.gp-btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 24px;text-decoration:none;font-weight:800;font-size:15px;border-radius:3px}.gp-btn--primary{background:var(--gp-accent);color:#161a1d}.gp-btn--secondary{background:rgba(18,22,25,.68);border:1px solid rgba(255,255,255,.36);color:#fff}.gp-btn--light{background:#f0ede6;color:#171b1e}
+.gp-arrow{position:absolute;z-index:5;top:50%;transform:translateY(-50%);width:46px;height:60px;border:0;border-radius:4px;background:rgba(18,22,25,.7);color:#fff;font-size:42px;cursor:pointer}.gp-arrow:hover{background:rgba(18,22,25,.95)}.gp-arrow--prev{left:20px}.gp-arrow--next{right:20px}
+.gp-slider__dots{position:absolute;left:50%;bottom:24px;z-index:6;transform:translateX(-50%);display:flex;gap:8px}.gp-slider__dots button{width:28px;height:5px;border:0;border-radius:999px;background:rgba(255,255,255,.35);cursor:pointer}.gp-slider__dots button.is-active{background:#fff;width:48px}
+
+.gp-server-card{position:absolute!important;z-index:7!important;right:max(4vw,45px)!important;bottom:42px!important;width:315px!important;background:rgba(19,24,27,.9)!important;border:1px solid rgba(255,255,255,.17)!important;box-shadow:0 20px 60px rgba(0,0,0,.32)!important;backdrop-filter:blur(14px)}
+.gp-server-card__head{padding:13px 16px!important;display:flex!important;justify-content:space-between!important;align-items:center!important;border-bottom:1px solid var(--gp-line)!important;font-size:11px!important}.gp-server-card__head small{color:#8fcda5!important}.home-live-dot{display:inline-block!important;width:7px!important;height:7px!important;border-radius:50%!important;background:#63d887!important;margin-right:6px!important;box-shadow:0 0 12px rgba(99,216,135,.7)!important}
+.gp-server-card__main{padding:18px 16px!important}.gp-server-card__main span{display:block!important;color:#88939a!important;font-size:11px!important}.gp-server-card__main strong{display:block!important;font-size:36px!important;margin-top:4px!important}
+.gp-server-card__grid{display:grid!important;grid-template-columns:1fr 1fr!important}.gp-server-card__grid div{padding:14px 16px!important;border-top:1px solid var(--gp-line)!important;border-right:1px solid var(--gp-line)!important}.gp-server-card__grid span{display:block!important;font-size:9px!important;color:#7f8c93!important}.gp-server-card__grid strong{display:block!important;font-size:16px!important;margin-top:4px!important}.gp-server-card>a{display:flex!important;justify-content:space-between!important;padding:14px 16px!important;color:#fff!important;text-decoration:none!important;background:rgba(225,147,63,.12)!important;font-size:12px!important;font-weight:700!important}
+
+/* Content sections */
+.gp-section{padding:72px max(4vw,46px)}
+.gp-section__head{display:grid;grid-template-columns:1fr .65fr;gap:60px;align-items:end;margin-bottom:32px}.gp-section__head>div>span{display:block;color:#9ea8ad;font-size:13px;font-weight:700;letter-spacing:.1em;margin-bottom:8px}.gp-section__head h2{font-size:clamp(44px,4.1vw,72px);line-height:.92;margin:0}.gp-section__head>p{max-width:620px;color:#9da7ac;font-size:17px;line-height:1.5}.gp-section__head--simple{grid-template-columns:1fr}
+
+.gp-discover{background:#171c20}
+.gp-feature-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:260px;gap:14px}
+.gp-feature{position:relative;overflow:hidden;border-radius:5px;color:#fff;text-decoration:none;background:#222}.gp-feature--large{grid-column:span 2;grid-row:span 2}.gp-feature img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .55s ease}.gp-feature:hover img{transform:scale(1.055)}.gp-feature__overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 24%,rgba(10,14,16,.88) 90%)}.gp-feature__content{position:absolute;left:20px;right:20px;bottom:18px}.gp-feature__content small{display:block;color:#efb364;font-size:11px;font-weight:800;letter-spacing:.1em}.gp-feature__content strong{display:block;font-size:32px;margin:3px 0 4px}.gp-feature--large .gp-feature__content strong{font-size:52px}.gp-feature__content span{font-size:14px;color:#d6dcdf}
+
+.gp-season-band{position:relative;min-height:500px;display:flex;align-items:center;padding:70px max(5vw,55px);overflow:hidden}.gp-season-band>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.gp-season-band__shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,18,20,.94),rgba(15,18,20,.52) 50%,rgba(15,18,20,.1) 76%)}.gp-season-band__content{position:relative;z-index:2;max-width:720px}.gp-season-band__content>span{color:#f0b25d;font-size:13px;font-weight:800;letter-spacing:.12em}.gp-season-band h2{font-size:clamp(52px,5vw,88px);line-height:.9;margin:10px 0 15px}.gp-season-band p{font-size:18px;line-height:1.45;color:#d8dcde;max-width:640px}.gp-season-band .gp-btn{margin-top:23px}.gp-season-band__date{position:absolute;z-index:2;right:max(5vw,55px);bottom:56px;text-align:right}.gp-season-band__date small{display:block;font-size:12px;color:#e2e5e6}.gp-season-band__date strong{display:block;font-size:92px;color:#f0b25d}
+
+.gp-news{background:#121619}.gp-news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.gp-news-card{overflow:hidden;border-radius:5px;background:#20262a;color:#fff;text-decoration:none}.gp-news-card img{display:block;width:100%;height:225px;object-fit:cover;transition:transform .45s ease}.gp-news-card:hover img{transform:scale(1.04)}.gp-news-card>div{padding:20px}.gp-news-card small{display:block;color:#e5a85c;font-size:11px;font-weight:800;letter-spacing:.1em}.gp-news-card strong{display:block;font-size:30px;margin:6px 0}.gp-news-card span{font-size:15px;color:#aeb7bc}
+
+.gp-profile-promo{position:relative;min-height:580px;display:flex;align-items:center;padding:70px max(5vw,55px);overflow:hidden}.gp-profile-promo__image{position:absolute;inset:0;background:url('../../images/accueil/profil.png') center/cover no-repeat}.gp-profile-promo__shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,13,15,.94),rgba(9,13,15,.58) 52%,rgba(9,13,15,.18))}.gp-profile-promo__content{position:relative;z-index:2;max-width:720px}.gp-profile-promo__content>span{color:#8fb6c6;font-weight:800;letter-spacing:.1em;font-size:13px}.gp-profile-promo h2{font-size:clamp(54px,5vw,90px);line-height:.9;margin:12px 0 18px}.gp-profile-promo p{font-size:18px;line-height:1.5;color:#d5dade;max-width:620px}.gp-profile-promo .gp-btn{margin-top:22px}
+
+.gp-footer{min-height:190px;padding:44px max(4vw,46px);display:grid;grid-template-columns:1fr auto auto;gap:50px;align-items:center;background:#0e1214;border-top:1px solid rgba(255,255,255,.08)}.gp-footer__brand{display:flex;align-items:center;gap:13px}.gp-footer__brand img{width:48px;height:48px;object-fit:cover;border-radius:4px}.gp-footer__brand div{display:grid}.gp-footer__brand strong{font-size:25px}.gp-footer__brand small{font-size:11px;color:#7f8c93}.gp-footer nav{display:flex;gap:26px}.gp-footer nav a{color:#c8cfd3;text-decoration:none;font-size:13px}.gp-footer>span{font-size:11px;color:#69767d}
+
+@media(max-width:1100px){.gp-nav__links{display:none}.gp-slide__content{width:72vw}.gp-server-card{display:none!important}.gp-feature-grid{grid-template-columns:repeat(2,1fr)}.gp-feature--large{grid-column:span 2}.gp-news-grid{grid-template-columns:1fr 1fr}.gp-footer{grid-template-columns:1fr}.gp-footer nav{flex-wrap:wrap}}
+@media(max-width:720px){.gp-nav{height:68px;padding-inline:16px}.gp-brand small{display:none}.gp-brand strong{font-size:20px}.gp-brand img{width:38px;height:38px}.gp-nav__join{padding:11px 14px;font-size:11px}.gp-hero{height:640px;min-height:640px}.gp-slide__content{left:22px;right:22px;width:auto;top:54%}.gp-slide h1,.gp-slide h2{font-size:56px}.gp-slide p{font-size:16px}.gp-actions{flex-direction:column}.gp-btn{width:100%}.gp-arrow{display:none}.gp-slider__dots{bottom:14px}.gp-section{padding:52px 20px}.gp-section__head{grid-template-columns:1fr;gap:18px}.gp-feature-grid{grid-template-columns:1fr;grid-auto-rows:280px}.gp-feature--large{grid-column:auto;grid-row:auto}.gp-news-grid{grid-template-columns:1fr}.gp-season-band{min-height:580px;padding:52px 20px}.gp-season-band__date{display:none}.gp-profile-promo{min-height:560px;padding:50px 20px}.gp-footer{padding:38px 20px}}
+
+
+/* =========================================================
+   GAME PORTAL V6.1 — CADRAGE / NETTETÉ / COMPTEUR
+   ========================================================= */
+
+/* Le hero respire mieux et laisse une vraie zone au compteur. */
+.gp-hero{
+  height:min(760px,calc(100svh - 76px));
+  min-height:620px;
+}
+.gp-slide__content{
+  left:max(5vw,64px);
+  width:min(680px,49vw);
+}
+.gp-slide h1,.gp-slide h2{
+  font-size:clamp(62px,5.6vw,104px);
+  max-width:720px;
+}
+.gp-slide p{
+  max-width:610px;
+}
+
+/* Cadrage individuel des 3 slides. */
+.gp-slide__bg--world{
+  background-position:center 42%;
+}
+.gp-slide__bg--events{
+  background-position:center 38%;
+}
+.gp-slide__bg--season{
+  background-position:center 48%;
+}
+
+/* Compteur serveur : composant autonome, aligné et lisible. */
+.gp-server-card{
+  position:absolute;
+  z-index:8;
+  right:max(4.4vw,56px);
+  bottom:58px;
+  width:340px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:5px;
+  background:rgba(14,18,21,.92);
+  box-shadow:0 24px 70px rgba(0,0,0,.38);
+  backdrop-filter:blur(16px);
+}
+.gp-server-card__head{
+  min-height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:0 18px;
+  border-bottom:1px solid var(--gp-line);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+.gp-server-card__head small{
+  color:#75dc96;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+.gp-server-dot{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  margin-right:8px;
+  border-radius:50%;
+  background:#63d887;
+  box-shadow:0 0 14px rgba(99,216,135,.75);
+}
+.gp-server-card__main{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:end;
+  gap:16px;
+  min-height:122px;
+  padding:22px 18px 18px;
+}
+.gp-server-card__main span{
+  display:block;
+  max-width:88px;
+  color:#89949a;
+  font-size:11px;
+  line-height:1.25;
+}
+.gp-server-card__main strong{
+  display:block;
+  color:#63df83;
+  font-size:58px;
+  line-height:.9;
+  white-space:nowrap;
+  text-align:right;
+}
+.gp-server-card__grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  border-top:1px solid var(--gp-line);
+}
+.gp-server-card__grid div{
+  min-height:72px;
+  padding:14px 18px;
+}
+.gp-server-card__grid div+div{
+  border-left:1px solid var(--gp-line);
+}
+.gp-server-card__grid span{
+  display:block;
+  color:#7f8b91;
+  font-size:9px;
+  letter-spacing:.06em;
+}
+.gp-server-card__grid strong{
+  display:block;
+  margin-top:5px;
+  font-size:18px;
+  line-height:1.1;
+  color:#f3f1ec;
+}
+.gp-server-card>a{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:56px;
+  padding:0 18px;
+  background:linear-gradient(90deg,rgba(225,147,63,.19),rgba(225,147,63,.06));
+  border-top:1px solid rgba(225,147,63,.24);
+  color:#f0ae5e;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.03em;
+}
+.gp-server-card>a:hover{
+  background:rgba(225,147,63,.24);
+  color:#fff;
+}
+
+/* Cartes : mêmes proportions, mais cadrage image contrôlé. */
+.gp-feature-grid{
+  grid-auto-rows:280px;
+}
+.gp-feature img{
+  image-rendering:auto;
+}
+.gp-feature--large img{
+  object-position:center 46%;
+}
+.gp-feature:nth-child(2) img{
+  object-position:center 42%;
+}
+.gp-feature:nth-child(3) img{
+  object-position:center 50%;
+}
+.gp-feature:nth-child(4) img{
+  object-position:center 48%;
+}
+.gp-feature:nth-child(5) img{
+  object-position:center 50%;
+}
+
+/* L'exploration utilise maintenant l'image 1920x1080 du projet,
+   et les événements la version 2048x1151, donc beaucoup plus propres. */
+.gp-feature--large{
+  min-height:574px;
+}
+
+/* Saison : moins de zoom, meilleur cadrage et voile moins agressif. */
+.gp-season-band{
+  min-height:520px;
+}
+.gp-season-band>img{
+  object-position:center 48%;
+  transform:scale(1.005);
+}
+.gp-season-band__shade{
+  background:
+    linear-gradient(90deg,rgba(15,18,20,.91),rgba(15,18,20,.48) 47%,rgba(15,18,20,.08) 78%),
+    linear-gradient(180deg,rgba(15,18,20,.06),rgba(15,18,20,.18));
+}
+
+/* Actualités : visuels moins écrasés. */
+.gp-news-card img{
+  height:250px;
+  object-fit:cover;
+}
+.gp-news-card:nth-child(1) img{
+  object-position:center 48%;
+}
+.gp-news-card:nth-child(2) img{
+  object-position:center 42%;
+}
+.gp-news-card:nth-child(3) img{
+  object-position:center 45%;
+}
+
+/* Le portail joueur doit utiliser une vraie composition image + texte,
+   pas un grand bloc vide. */
+.gp-profile-promo{
+  min-height:520px;
+}
+.gp-profile-promo__image{
+  background-position:center 42%;
+  background-size:cover;
+}
+.gp-profile-promo__content{
+  width:min(680px,54vw);
+}
+.gp-profile-promo h2{
+  font-size:clamp(50px,4.6vw,82px);
+}
+
+/* Desktop large : le compteur ne chevauche jamais les flèches ou les dots. */
+@media(min-width:1101px){
+  .gp-slider__dots{
+    bottom:24px;
+  }
+  .gp-arrow--next{
+    right:22px;
+  }
+}
+
+/* Tablette / mobile */
+@media(max-width:1100px){
+  .gp-slide__content{
+    width:70vw;
+  }
+  .gp-server-card{
+    display:none;
+  }
+}
+@media(max-width:720px){
+  .gp-hero{
+    height:650px;
+    min-height:650px;
+  }
+  .gp-slide__content{
+    width:auto;
+    left:22px;
+    right:22px;
+  }
+  .gp-feature-grid{
+    grid-auto-rows:300px;
+  }
+  .gp-feature--large{
+    min-height:300px;
+  }
+  .gp-news-card img{
+    height:220px;
+  }
+  .gp-profile-promo__content{
+    width:100%;
+  }
+}
+
+/* =========================================================
+   GAME PORTAL V6.2 — IDENTITÉ / TYPO / FOOTER / LIVE CARD
+   ========================================================= */
+:root{
+  --gp-text:#ddd9cf;
+  --gp-heading:#d8d2c6;
+  --gp-heading-soft:#c8c2b6;
+}
+
+/* Titres moins massifs et moins blancs. */
+.gp-slide h1,.gp-slide h2{
+  font-size:clamp(54px,4.7vw,86px);
+  line-height:.92;
+  color:var(--gp-heading);
+  text-shadow:0 7px 28px rgba(0,0,0,.42);
+}
+.gp-section__head h2{
+  font-size:clamp(38px,3.45vw,60px);
+  line-height:.96;
+  color:var(--gp-heading-soft);
+  letter-spacing:-.018em;
+}
+.gp-season-band h2{
+  font-size:clamp(46px,4.15vw,72px);
+  color:#ded5c5;
+}
+.gp-profile-promo h2{
+  font-size:clamp(46px,4vw,70px);
+  color:#cfd3cf;
+}
+.gp-feature__content strong{font-size:28px;color:#e3dfd6}
+.gp-feature--large .gp-feature__content strong{font-size:44px}
+.gp-news-card strong{font-size:27px;color:#ddd8ce}
+
+/* Le volcan redevient le visuel identitaire du premier écran. */
+.gp-slide__bg--world{
+  background-image:url('../../images/accueil/monde-transforme.webp');
+  background-position:58% 44%;
+}
+.gp-slide__shade{
+  background:linear-gradient(90deg,rgba(10,14,16,.92) 0%,rgba(10,14,16,.66) 34%,rgba(10,14,16,.17) 63%,rgba(10,14,16,.08) 100%),linear-gradient(180deg,rgba(8,11,13,.02),rgba(8,11,13,.12) 64%,rgba(8,11,13,.72) 100%);
+}
+
+/* Compteur : cadré dans le hero et compatible avec le JS live historique. */
+.gp-server-card{
+  right:clamp(54px,4.5vw,92px)!important;
+  bottom:54px!important;
+  width:352px!important;
+  border-radius:6px!important;
+}
+.gp-server-card__main{
+  grid-template-columns:110px 1fr!important;
+  align-items:center!important;
+  min-height:116px!important;
+}
+.gp-server-card__main strong{
+  font-size:48px!important;
+  line-height:1!important;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.home-live-card__occupancy{
+  height:5px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+}
+.home-live-card__occupancy>span{
+  display:block;height:100%;width:0;
+  background:linear-gradient(90deg,#4cc978,#8ccf9e);
+  transition:width .5s ease;
+}
+.gp-server-card.is-offline .gp-server-dot{background:#9b6b61;box-shadow:none}
+.gp-server-card.is-offline .gp-server-card__head small{color:#b98b82!important}
+
+/* Images : on privilégie le rendu naturel, sans zoom agressif. */
+.gp-feature img,.gp-news-card img,.gp-season-band>img{transform:none!important;filter:none}
+.gp-feature:hover img,.gp-news-card:hover img{transform:scale(1.025)!important}
+.gp-feature--large img{object-position:58% 45%}
+
+/* Footer complet — vraie fin de portail. */
+.gp-footer{
+  min-height:0;
+  display:block;
+  padding:0;
+  background:#090d0f;
+  border-top:1px solid rgba(225,147,63,.22);
+}
+.gp-footer__top{
+  display:grid;
+  grid-template-columns:minmax(280px,1.5fr) repeat(3,minmax(150px,.75fr));
+  gap:clamp(34px,4vw,76px);
+  padding:58px max(4vw,54px) 48px;
+}
+.gp-footer__brand{display:grid;grid-template-columns:54px 1fr;align-items:center;gap:0 14px}
+.gp-footer__brand img{width:54px;height:54px;grid-row:1 / span 2}
+.gp-footer__brand strong{font-size:28px;color:#ddd8ce}
+.gp-footer__brand small{font-size:10px;letter-spacing:.12em;color:#8b969b}
+.gp-footer__brand p{grid-column:1 / -1;max-width:410px;margin:22px 0 0;color:#77838a;font-size:14px;line-height:1.55}
+.gp-footer__column{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.gp-footer__column>strong{font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;letter-spacing:.13em;color:#d99b55;margin-bottom:6px}
+.gp-footer__column a{font-family:'Barlow Condensed',Arial,sans-serif;color:#aab2b6;text-decoration:none;font-size:14px;transition:.2s}
+.gp-footer__column a:hover{color:#f0ece4;transform:translateX(2px)}
+.gp-footer__column--status span{font-size:13px;color:#b9c0c3}.gp-footer__column--status span i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#5fd486;margin-right:8px;box-shadow:0 0 10px rgba(95,212,134,.5)}
+.gp-footer__column--status small{color:#657177;font-size:10px;letter-spacing:.08em}
+.gp-footer__cta{margin-top:10px!important;padding:10px 12px;border:1px solid rgba(225,147,63,.3);color:#dda45e!important}
+.gp-footer__bottom{
+  display:grid;grid-template-columns:auto auto 1fr;gap:28px;align-items:center;
+  padding:18px max(4vw,54px);border-top:1px solid rgba(255,255,255,.07);background:#070a0c;
+}
+.gp-footer__bottom span{font-family:'Barlow Condensed',Arial,sans-serif;font-size:10px;letter-spacing:.055em;color:#566269}
+.gp-footer__bottom span:last-child{text-align:right}
+
+@media(max-width:1100px){
+  .gp-footer__top{grid-template-columns:1fr 1fr}
+  .gp-footer__bottom{grid-template-columns:1fr 1fr}.gp-footer__bottom span:last-child{grid-column:1/-1;text-align:left}
+}
+@media(max-width:720px){
+  .gp-slide h1,.gp-slide h2{font-size:48px}
+  .gp-section__head h2{font-size:38px}
+  .gp-feature--large .gp-feature__content strong{font-size:34px}
+  .gp-footer__top{grid-template-columns:1fr;padding:42px 20px 34px}
+  .gp-footer__bottom{grid-template-columns:1fr;padding:18px 20px}.gp-footer__bottom span:last-child{grid-column:auto}
+}
+
+
+/* =========================================================
+   GAME PORTAL V6.3 — RETOUR DU FOND CINÉMATIQUE SENZANY
+   Principe de l'ancien site :
+   un décor apocalyptique fixe visible derrière toute la page.
+   ========================================================= */
+
+/* Fond général : on retrouve le paysage Senzany au lieu du bleu/noir plat. */
+html,
+body[data-page="accueil"]{
+  background-color:#090b0c!important;
+}
+body[data-page="accueil"]{
+  position:relative;
+  background-image:
+    linear-gradient(rgba(7,9,10,.72),rgba(7,9,10,.78)),
+    url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-size:cover!important;
+  background-position:68% 38%!important;
+  background-attachment:fixed!important;
+  background-repeat:no-repeat!important;
+}
+body[data-page="accueil"]::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 76% 34%,rgba(205,92,37,.10),transparent 28%),
+    linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.36));
+}
+
+/* La page ne masque plus totalement le décor global. */
+.gp-home{
+  background:transparent!important;
+}
+
+/* Header légèrement transparent : on garde la profondeur du paysage. */
+.gp-nav{
+  background:rgba(11,14,16,.91)!important;
+  backdrop-filter:blur(15px);
+  box-shadow:0 10px 34px rgba(0,0,0,.22);
+}
+
+/* HERO :
+   priorité au visuel historique avec volcan/personnage.
+   Le second visuel sert de secours si hero-bg.jpg n'est pas disponible. */
+.gp-slide__bg--world{
+  background-image:
+    url('../../images/backgrounds/hero-bg.jpg'),
+    url('../../images/accueil/monde-transforme.webp')!important;
+  background-size:cover!important;
+  background-position:70% 38%,58% 44%!important;
+  background-repeat:no-repeat!important;
+}
+.gp-slide__shade{
+  background:
+    linear-gradient(90deg,
+      rgba(7,9,10,.86) 0%,
+      rgba(7,9,10,.59) 31%,
+      rgba(7,9,10,.22) 55%,
+      rgba(7,9,10,.04) 78%,
+      rgba(7,9,10,.12) 100%),
+    linear-gradient(180deg,
+      rgba(5,7,8,.03),
+      rgba(5,7,8,.08) 62%,
+      rgba(5,7,8,.62) 100%)!important;
+}
+
+/* Sur écran large on décale encore légèrement le paysage afin de conserver
+   le survivant/volcan à droite et le texte à gauche. */
+@media(min-width:1500px){
+  .gp-slide__bg--world{
+    background-position:74% 40%,60% 44%!important;
+  }
+}
+
+/* Les grandes zones ne sont plus des aplats opaques.
+   On revoit le décor global entre et derrière les sections. */
+.gp-discover{
+  background:linear-gradient(
+    180deg,
+    rgba(19,25,29,.91),
+    rgba(15,20,23,.87)
+  )!important;
+  border-top:1px solid rgba(255,255,255,.05);
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.gp-news{
+  background:linear-gradient(
+    180deg,
+    rgba(11,15,17,.88),
+    rgba(14,18,20,.92)
+  )!important;
+}
+
+/* On crée de vraies respirations où le paysage apparaît. */
+.gp-section{
+  position:relative;
+}
+.gp-discover::before,
+.gp-news::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(115deg,rgba(181,91,38,.025),transparent 36%),
+    radial-gradient(circle at 85% 15%,rgba(210,116,54,.045),transparent 22%);
+}
+
+/* Bande Saison :
+   elle garde son contenu, mais n'est plus un bloc tropical qui coupe le site.
+   On réutilise le paysage volcanique comme fond principal. */
+.gp-season-band{
+  background:#111416!important;
+}
+.gp-season-band>img{
+  opacity:0!important;
+}
+.gp-season-band::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  background-image:
+    url('../../images/backgrounds/hero-bg.jpg'),
+    url('../../images/accueil/monde-transforme.webp');
+  background-size:cover;
+  background-position:70% 42%,58% 45%;
+  background-repeat:no-repeat;
+}
+.gp-season-band__shade{
+  z-index:1!important;
+  background:
+    linear-gradient(90deg,
+      rgba(10,12,13,.91) 0%,
+      rgba(10,12,13,.68) 38%,
+      rgba(10,12,13,.25) 66%,
+      rgba(10,12,13,.13) 100%),
+    linear-gradient(180deg,rgba(5,7,8,.08),rgba(5,7,8,.55))!important;
+}
+.gp-season-band__content,
+.gp-season-band__date{
+  z-index:2!important;
+}
+
+/* Portail joueur :
+   on enlève le grand noir vide et on laisse revenir le décor du site. */
+.gp-profile-promo{
+  background:rgba(7,10,11,.72)!important;
+  border-top:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.gp-profile-promo__image{
+  opacity:.42;
+  mix-blend-mode:luminosity;
+}
+.gp-profile-promo__shade{
+  background:
+    linear-gradient(90deg,
+      rgba(7,10,11,.95),
+      rgba(7,10,11,.69) 42%,
+      rgba(7,10,11,.38) 70%,
+      rgba(7,10,11,.20))!important;
+}
+
+/* Footer : noir profond, mais légèrement raccordé au décor au-dessus. */
+.gp-footer{
+  background:linear-gradient(180deg,rgba(8,11,12,.97),#060809)!important;
+}
+
+/* Le fond fixe est coûteux / parfois saccadé sur mobile. */
+@media(max-width:900px){
+  body[data-page="accueil"]{
+    background-attachment:scroll!important;
+    background-position:center top!important;
+  }
+}
+
+
+/* =========================================================
+   GAME PORTAL V6.4 — FOND VOLCAN ANIMÉ TYPE ANCIEN SENZANY
+   ========================================================= */
+
+/* Fond général permanent avec le volcan */
+body[data-page="accueil"]{
+  background-color:#090b0c!important;
+  background-image:
+    linear-gradient(rgba(7,9,10,.67),rgba(7,9,10,.76)),
+    url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-size:cover!important;
+  background-position:70% 38%!important;
+  background-attachment:fixed!important;
+  background-repeat:no-repeat!important;
+}
+
+/* Couche animée lente au-dessus du fond fixe : effet vivant comme avant */
+body[data-page="accueil"]::after{
+  content:"";
+  position:fixed;
+  inset:-4%;
+  z-index:-2;
+  pointer-events:none;
+  background:
+    url('../../images/backgrounds/hero-bg.jpg') 72% 38% / cover no-repeat;
+  opacity:.22;
+  filter:saturate(1.04) contrast(1.02);
+  transform:scale(1.035);
+  animation:gpVolcanoDrift 24s ease-in-out infinite alternate;
+}
+
+@keyframes gpVolcanoDrift{
+  0%{
+    transform:scale(1.035) translate3d(-.8%,0,0);
+    background-position:70% 38%;
+  }
+  50%{
+    transform:scale(1.055) translate3d(.25%,-.35%,0);
+    background-position:72% 40%;
+  }
+  100%{
+    transform:scale(1.045) translate3d(.9%,.2%,0);
+    background-position:74% 39%;
+  }
+}
+
+/* Le hero garde le volcan et le personnage à droite */
+.gp-slide__bg--world{
+  background-image:url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-size:cover!important;
+  background-position:73% 39%!important;
+  animation:gpHeroVolcanoMove 18s ease-in-out infinite alternate!important;
+}
+
+@keyframes gpHeroVolcanoMove{
+  from{
+    transform:scale(1.025) translate3d(-.4%,0,0);
+    background-position:72% 39%;
+  }
+  to{
+    transform:scale(1.065) translate3d(.65%,-.25%,0);
+    background-position:75% 40%;
+  }
+}
+
+/* Le volcan reste visible dans la section Saison aussi */
+.gp-season-band::before{
+  background-image:url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-size:cover!important;
+  background-position:72% 42%!important;
+  animation:gpSeasonVolcanoMove 22s ease-in-out infinite alternate;
+}
+
+@keyframes gpSeasonVolcanoMove{
+  from{
+    transform:scale(1.02) translate3d(-.35%,0,0);
+  }
+  to{
+    transform:scale(1.06) translate3d(.7%,-.3%,0);
+  }
+}
+
+/* On laisse davantage apparaître le décor derrière les sections */
+.gp-discover{
+  background:linear-gradient(
+    180deg,
+    rgba(17,22,25,.84),
+    rgba(12,16,18,.80)
+  )!important;
+}
+.gp-news{
+  background:linear-gradient(
+    180deg,
+    rgba(10,13,15,.80),
+    rgba(12,16,18,.86)
+  )!important;
+}
+.gp-profile-promo{
+  background:rgba(7,10,11,.56)!important;
+}
+
+/* Sur très grand écran, priorité au cadrage volcan + personnage à droite */
+@media(min-width:1900px){
+  body[data-page="accueil"]{
+    background-position:73% 36%!important;
+  }
+  .gp-slide__bg--world{
+    background-position:76% 39%!important;
+  }
+}
+
+/* Mobile : mouvement coupé pour éviter les saccades */
+@media(max-width:900px){
+  body[data-page="accueil"]{
+    background-attachment:scroll!important;
+    background-position:68% top!important;
+  }
+  body[data-page="accueil"]::after{
+    display:none;
+  }
+}
+
+/* Accessibilité */
+@media(prefers-reduced-motion:reduce){
+  body[data-page="accueil"]::after,
+  .gp-slide__bg--world,
+  .gp-season-band::before{
+    animation:none!important;
+  }
+}
+
+
+/* =========================================================
+   V6.5 — CORRECTION CHEMINS IMAGES + VOLCAN VISIBLE
+   ========================================================= */
+
+.gp-slide__bg--world{
+  background-image:url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-size:cover!important;
+  background-position:68% 42%!important;
+  opacity:1!important;
+}
+
+body[data-page="accueil"]{
+  background-image:
+    linear-gradient(rgba(7,9,10,.55),rgba(7,9,10,.68)),
+    url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-position:68% 40%!important;
+}
+
+body[data-page="accueil"]::after{
+  background-image:url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-position:70% 40%!important;
+}
+
+.gp-season-band::before{
+  background-image:url('../../images/backgrounds/hero-bg.jpg')!important;
+  background-position:69% 43%!important;
+}
+
+/* On éclaircit un peu le premier hero pour que le volcan ressorte. */
+.gp-slide:first-child .gp-slide__shade{
+  background:
+    linear-gradient(90deg,
+      rgba(7,9,10,.80) 0%,
+      rgba(7,9,10,.52) 33%,
+      rgba(7,9,10,.14) 58%,
+      rgba(7,9,10,.02) 82%,
+      rgba(7,9,10,.08) 100%),
+    linear-gradient(180deg,
+      rgba(5,7,8,.02),
+      rgba(5,7,8,.05) 62%,
+      rgba(5,7,8,.48) 100%)!important;
+}
+
+@media(min-width:1900px){
+  .gp-slide__bg--world{
+    background-position:72% 41%!important;
+  }
+  body[data-page="accueil"]{
+    background-position:72% 39%!important;
+  }
+}
