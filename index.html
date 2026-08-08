@@ -7,7 +7,7 @@
 <meta content="Senzany, serveur DayZ PVE français sur Chernarus. Découvrez un univers communautaire immersif, évolutif et riche en contenus." name="description"/>
 <title>SENZANY — Portail officiel DayZ PVE</title>
 <link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
-<link href="assets/css/pages/accueil.css?v=2.7" rel="stylesheet"/>
+<link href="assets/css/pages/accueil.css?v=2.8-slider" rel="stylesheet"/>
 <link href="assets/css/shared/entry-terminal.css?v=4.0.1" rel="stylesheet"/>
 <script>
 (() => {
@@ -25,6 +25,20 @@
 <div data-site-header=""></div>
 <main class="home-main">
 <section class="home-hero" id="accueil">
+<div class="home-hero-slider" aria-hidden="true">
+  <div class="home-hero-slide home-hero-slide--volcan is-active"></div>
+  <div class="home-hero-slide home-hero-slide--event"></div>
+  <div class="home-hero-slide home-hero-slide--season"></div>
+</div>
+<div class="home-hero-slider__nav" aria-label="Changer l'image d'en-tête">
+  <button type="button" class="home-hero-slider__arrow home-hero-slider__arrow--prev" aria-label="Image précédente">‹</button>
+  <div class="home-hero-slider__dots">
+    <button type="button" class="is-active" data-hero-slide="0" aria-label="Volcan"></button>
+    <button type="button" data-hero-slide="1" aria-label="Événements"></button>
+    <button type="button" data-hero-slide="2" aria-label="Saison"></button>
+  </div>
+  <button type="button" class="home-hero-slider__arrow home-hero-slider__arrow--next" aria-label="Image suivante">›</button>
+</div>
 <div aria-hidden="true" class="home-hero__light"></div>
 <div aria-hidden="true" class="home-hero__grain"></div>
 <div aria-hidden="true" class="home-hero__ash" id="heroAsh"></div>
@@ -194,7 +208,7 @@
 <script defer="" src="assets/js/components.js"></script>
 <script defer="" src="assets/js/app.js"></script>
 <script defer="" src="assets/js/api.js"></script>
-<script defer="" src="assets/js/pages/accueil.js?v=2.7"></script>
+<script defer="" src="assets/js/pages/accueil.js?v=2.8-slider"></script>
 <script defer="" src="assets/js/shared/entry-terminal.js?v=4.0.1"></script>
 </body>
 </html>
