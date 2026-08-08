@@ -23,147 +23,208 @@
 <link href="assets/css/shared/senzany-reborn-v1.css?v=1.0.0" rel="stylesheet"/>
 <link rel="stylesheet" href="assets/css/shared/senzany-maintenance.css?v=1.0.0">
 <script src="assets/js/shared/senzany-maintenance.js?v=1.0.0"></script>
-<link rel="stylesheet" href="assets/css/pages/senzany-aurora-v5.css?v=5.1.0">
+<link rel="stylesheet" href="assets/css/pages/senzany-game-portal-v6.css?v=6.0.0">
 </head>
 <body data-page="accueil" data-design="senzany-reborn-v1">
 <div data-site-header=""></div>
 
 
 
-<main class="aurora-home" id="mainContent">
 
-  <header class="aurora-nav">
-    <a class="aurora-brand" href="index.html">
-      <span class="aurora-brand__mark">S</span>
-      <span class="aurora-brand__text"><b>SENZANY</b><small>CHERNARUS / FRANCE</small></span>
+<main class="gp-home" id="mainContent">
+
+  <header class="gp-nav">
+    <a class="gp-brand" href="index.html">
+      <img src="assets/images/branding/logo.png" alt="Senzany">
+      <div><strong>SENZANY</strong><small>DAYZ PVE // CHERNARUS</small></div>
     </a>
-    <nav>
+
+    <nav class="gp-nav__links" aria-label="Navigation principale">
+      <a class="active" href="index.html">Accueil</a>
       <a href="senzany-jouer.html">Jouer</a>
-      <a href="senzany-evenements.html">Opérations</a>
+      <a href="senzany-evenements.html">Événements</a>
       <a href="senzany-communaute.html">Communauté</a>
+      <a href="senzany-wiki.html">Wiki</a>
       <a href="senzany-boutique.html">Boutique</a>
       <a href="senzany-profil.html">Mon profil</a>
     </nav>
-    <a class="aurora-nav__cta" href="senzany-jouer.html">ENTRER</a>
+
+    <a class="gp-nav__join" href="senzany-jouer.html">REJOINDRE</a>
   </header>
 
-  <section class="aurora-hero">
-    <div class="aurora-hero__image"></div>
-    <div class="aurora-hero__veil"></div>
+  <section class="gp-hero" aria-label="À la une">
+    <div class="gp-slides" data-gp-slider>
 
-    <div class="aurora-hero__copy">
-      <span class="aurora-label">EXPÉRIENCE PVE // CHERNARUS</span>
-      <h1>SURVIVRE<br><em>AUTREMENT.</em></h1>
-      <p>Senzany transforme DayZ en une aventure persistante, communautaire et évolutive.</p>
-      <div class="aurora-hero__actions">
-        <a href="senzany-jouer.html">REJOINDRE SENZANY <b>↗</b></a>
-        <a href="#vision">DÉCOUVRIR LE MONDE <b>↓</b></a>
-      </div>
+      <article class="gp-slide is-active" data-slide="0">
+        <div class="gp-slide__bg gp-slide__bg--world"></div>
+        <div class="gp-slide__shade"></div>
+        <div class="gp-slide__content">
+          <span class="gp-kicker">SENZANY // CHERNARUS</span>
+          <h1>VOICI LE RÉCIT<br>DE VOTRE MORT.</h1>
+          <p>Un serveur DayZ PVE français pensé comme un monde vivant : progression, événements, économie, IA et contenus saisonniers.</p>
+          <div class="gp-actions">
+            <a class="gp-btn gp-btn--primary" href="senzany-jouer.html">REJOINDRE SENZANY</a>
+            <a class="gp-btn gp-btn--secondary" href="#discover">DÉCOUVRIR LE SERVEUR</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="gp-slide" data-slide="1">
+        <div class="gp-slide__bg gp-slide__bg--events"></div>
+        <div class="gp-slide__shade"></div>
+        <div class="gp-slide__content">
+          <span class="gp-kicker">ÉVÉNEMENTS SENZANY</span>
+          <h2>LE MONDE<br>SE RÉVEILLE.</h2>
+          <p>Courses, boss, convois, expéditions, chasses au trésor et événements communautaires viennent rythmer votre survie.</p>
+          <div class="gp-actions">
+            <a class="gp-btn gp-btn--primary" href="senzany-evenements.html">VOIR LES ÉVÉNEMENTS</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="gp-slide" data-slide="2">
+        <div class="gp-slide__bg gp-slide__bg--season"></div>
+        <div class="gp-slide__shade"></div>
+        <div class="gp-slide__content">
+          <span class="gp-kicker">SAISON 01 // BIENTÔT</span>
+          <h2>LE PROCHAIN<br>CHAPITRE ARRIVE.</h2>
+          <p>Une nouvelle progression saisonnière, des récompenses et une raison de toujours revenir écrire la suite.</p>
+          <div class="gp-actions">
+            <a class="gp-btn gp-btn--primary" href="senzany-profil.html">VOIR MON PROFIL</a>
+          </div>
+        </div>
+      </article>
+
     </div>
 
-    <aside class="aurora-hero__note">
-      <span>JOURNAL // 001</span>
-      <strong>« Chaque survivant laisse une empreinte. »</strong>
-      <small>SAISON IV</small>
+    <button class="gp-arrow gp-arrow--prev" type="button" aria-label="Slide précédente">‹</button>
+    <button class="gp-arrow gp-arrow--next" type="button" aria-label="Slide suivante">›</button>
+
+    <div class="gp-slider__dots" aria-label="Navigation du carrousel">
+      <button class="is-active" type="button" data-dot="0" aria-label="Slide 1"></button>
+      <button type="button" data-dot="1" aria-label="Slide 2"></button>
+      <button type="button" data-dot="2" aria-label="Slide 3"></button>
+    </div>
+
+    <aside class="home-live-card gp-server-card" aria-label="État du serveur">
+      <div class="home-live-card__head gp-server-card__head">
+        <span><i class="home-live-dot"></i> SERVEUR SENZANY</span>
+        <small>VÉRIFICATION...</small>
+      </div>
+      <div class="home-live-card__main gp-server-card__main">
+        <span>JOUEURS EN LIGNE</span>
+        <strong id="statPlayers">Connexion…</strong>
+      </div>
+      <div class="home-live-card__grid gp-server-card__grid">
+        <div><span>CARTE</span><strong>CHERNARUS</strong></div>
+        <div><span>VOTES DU MOIS</span><strong id="statVotes">—</strong></div>
+      </div>
+      <a href="senzany-jouer.html">SE CONNECTER AU SERVEUR <b>↗</b></a>
     </aside>
   </section>
 
-  <section class="aurora-vision" id="vision">
-    <div class="aurora-vision__eyebrow">01 / NOTRE VISION</div>
-    <div class="aurora-vision__statement">
-      <h2>UN MONDE<br>QUI NE VOUS<br>ATTEND PAS.</h2>
-      <p>Pas de décor figé. Pas de routine. Chaque saison transforme le terrain, les enjeux et les histoires qui s'y écrivent.</p>
-    </div>
-    <div class="aurora-vision__facts">
-      <div><span>01</span><strong>PROGRESSION</strong><small>Votre parcours continue.</small></div>
-      <div><span>02</span><strong>ÉVÉNEMENTS</strong><small>Le monde bouge avec vous.</small></div>
-      <div><span>03</span><strong>ÉCONOMIE</strong><small>Construite pour durer.</small></div>
-      <div><span>04</span><strong>COMMUNAUTÉ</strong><small>L'expérience se vit ensemble.</small></div>
-    </div>
-  </section>
-
-  <section class="aurora-story aurora-story--explore">
-    <div class="aurora-story__image"></div>
-    <div class="aurora-story__card">
-      <span>02 / EXPLORER</span>
-      <h2>REDÉCOUVREZ<br>CHERNARUS.</h2>
-      <p>De nouveaux lieux, des zones retravaillées et une carte pensée pour surprendre même les vétérans.</p>
-      <a href="senzany-jouer.html">PRÉPARER MON ARRIVÉE ↗</a>
-    </div>
-  </section>
-
-  <section class="aurora-duo">
-    <article class="aurora-duo__panel aurora-duo__panel--events">
-      <div class="aurora-duo__image"></div>
-      <div class="aurora-duo__copy">
-        <span>03 / OPÉRATIONS</span>
-        <h2>QUAND<br>LE CALME<br>SE BRISE.</h2>
-        <p>Boss, courses, expéditions, convois et événements communautaires.</p>
-        <a href="senzany-evenements.html">VOIR LES OPÉRATIONS ↗</a>
-      </div>
-    </article>
-
-    <article class="aurora-duo__panel aurora-duo__panel--profile">
-      <div class="aurora-duo__image"></div>
-      <div class="aurora-duo__copy">
-        <span>04 / VOTRE HISTOIRE</span>
-        <h2>VOTRE<br>PARCOURS<br>COMPTE.</h2>
-        <p>Votes, cagnotte, rôles, récompenses et identité : votre profil devient votre dossier de survivant.</p>
-        <a href="senzany-profil.html">OUVRIR MON DOSSIER ↗</a>
-      </div>
-    </article>
-  </section>
-
-  <section class="aurora-season">
-    <div class="aurora-season__image"></div>
-    <div class="aurora-season__ribbon">05 / SAISON 01</div>
-    <div class="aurora-season__content">
+  <section class="gp-section gp-discover" id="discover">
+    <div class="gp-section__head">
       <div>
-        <h2>LE PROCHAIN<br>CHAPITRE<br>ARRIVE.</h2>
-        <p>Une progression saisonnière et des récompenses qui donnent du poids à chaque aventure.</p>
+        <span>EXPLORER SENZANY</span>
+        <h2>UN SERVEUR.<br>PLUSIEURS FAÇONS DE LE VIVRE.</h2>
       </div>
-      <div class="aurora-season__date">
-        <small>OUVERTURE</small>
-        <strong>21.07</strong>
-        <span>SAISON À VENIR</span>
-      </div>
+      <p>Découvrez les grands systèmes qui donnent à Senzany son identité et sa profondeur.</p>
+    </div>
+
+    <div class="gp-feature-grid">
+      <a class="gp-feature gp-feature--large" href="senzany-jouer.html">
+        <img src="assets/images/accueil/exploration-new.webp" alt="">
+        <div class="gp-feature__overlay"></div>
+        <div class="gp-feature__content"><small>MONDE</small><strong>EXPLORATION</strong><span>Mapping, zones uniques et découvertes.</span></div>
+      </a>
+
+      <a class="gp-feature" href="senzany-evenements.html">
+        <img src="assets/images/accueil/evenements-new.webp" alt="">
+        <div class="gp-feature__overlay"></div>
+        <div class="gp-feature__content"><small>LIVE</small><strong>ÉVÉNEMENTS</strong><span>Courses, boss, opérations et défis.</span></div>
+      </a>
+
+      <a class="gp-feature" href="senzany-profil.html">
+        <img src="assets/images/accueil/progression-unique.webp" alt="">
+        <div class="gp-feature__overlay"></div>
+        <div class="gp-feature__content"><small>PROGRESSION</small><strong>VOTRE PARCOURS</strong><span>Votes, cagnotte, récompenses et profil.</span></div>
+      </a>
+
+      <a class="gp-feature" href="senzany-communaute.html">
+        <img src="assets/images/accueil/communaute-new.webp" alt="">
+        <div class="gp-feature__overlay"></div>
+        <div class="gp-feature__content"><small>ENSEMBLE</small><strong>COMMUNAUTÉ</strong><span>Une aventure pensée pour être partagée.</span></div>
+      </a>
+
+      <a class="gp-feature" href="senzany-boutique.html">
+        <img src="assets/images/boutique/skins-armes.webp" alt="">
+        <div class="gp-feature__overlay"></div>
+        <div class="gp-feature__content"><small>PERSONNALISATION</small><strong>BOUTIQUE</strong><span>Contenus exclusifs et soutien au serveur.</span></div>
+      </a>
     </div>
   </section>
 
-  <section class="aurora-community">
-    <div class="aurora-community__image"></div>
-    <div class="aurora-community__overlay"></div>
-    <div class="aurora-community__copy">
-      <span>06 / COMMUNAUTÉ</span>
-      <h2>ICI, PERSONNE<br>NE SURVIT SEUL.</h2>
-      <p>Une communauté française active, un staff présent et une aventure construite pour durer.</p>
-      <a href="senzany-communaute.html">RENCONTRER LA COMMUNAUTÉ ↗</a>
+  <section class="gp-season-band">
+    <img src="assets/images/accueil/saison-new.webp" alt="">
+    <div class="gp-season-band__shade"></div>
+    <div class="gp-season-band__content">
+      <span>SAISON 01</span>
+      <h2>LE PROCHAIN CHAPITRE<br>COMMENCE ICI.</h2>
+      <p>Progression saisonnière, missions et récompenses : bientôt une nouvelle manière de vivre Senzany.</p>
+      <a class="gp-btn gp-btn--light" href="senzany-profil.html">DÉCOUVRIR MON DOSSIER</a>
+    </div>
+    <div class="gp-season-band__date"><small>OUVERTURE</small><strong>21.07</strong></div>
+  </section>
+
+  <section class="gp-section gp-news">
+    <div class="gp-section__head gp-section__head--simple">
+      <div><span>ACTUALITÉS & OPÉRATIONS</span><h2>À NE PAS MANQUER.</h2></div>
+    </div>
+
+    <div class="gp-news-grid">
+      <a class="gp-news-card" href="senzany-evenements.html">
+        <img src="assets/images/news/senzany-summer-vibes-2026.png" alt="">
+        <div><small>ÉVÉNEMENT</small><strong>SUMMER VIBES 2026</strong><span>Découvrir l'événement et les activités.</span></div>
+      </a>
+      <a class="gp-news-card" href="senzany-evenements.html">
+        <img src="assets/images/news/classement-votes-juillet-2026.png" alt="">
+        <div><small>COMMUNAUTÉ</small><strong>CLASSEMENT DES VOTES</strong><span>Les survivants qui font vivre Senzany.</span></div>
+      </a>
+      <a class="gp-news-card" href="senzany-wiki.html">
+        <img src="assets/images/news/dayz-update-129.jpg" alt="">
+        <div><small>DAYZ</small><strong>ACTUALITÉS DU MONDE</strong><span>Infos et mises à jour utiles aux survivants.</span></div>
+      </a>
     </div>
   </section>
 
-  <section class="aurora-destinations">
-    <div class="aurora-destinations__head">
-      <span>07 / DESTINATIONS</span>
-      <h2>CHOISISSEZ<br>VOTRE ROUTE.</h2>
-    </div>
-    <div class="aurora-destinations__list">
-      <a href="senzany-jouer.html"><span>01</span><strong>JOUER</strong><small>Entrer sur Senzany</small><b>↗</b></a>
-      <a href="senzany-profil.html"><span>02</span><strong>MON PROFIL</strong><small>Votre dossier personnel</small><b>↗</b></a>
-      <a href="senzany-evenements.html"><span>03</span><strong>ÉVÉNEMENTS</strong><small>Les opérations du moment</small><b>↗</b></a>
-      <a href="senzany-boutique.html"><span>04</span><strong>BOUTIQUE</strong><small>Soutenir Senzany</small><b>↗</b></a>
+  <section class="gp-profile-promo">
+    <div class="gp-profile-promo__image"></div>
+    <div class="gp-profile-promo__shade"></div>
+    <div class="gp-profile-promo__content">
+      <span>PORTAIL JOUEUR</span>
+      <h2>VOTRE SURVIE<br>CONTINUE HORS DU JEU.</h2>
+      <p>Connectez Steam et Discord, suivez vos votes, récupérez votre cagnotte et accédez à vos récompenses.</p>
+      <a class="gp-btn gp-btn--primary" href="senzany-profil.html">ACCÉDER À MON PROFIL</a>
     </div>
   </section>
 
-  <footer class="aurora-footer">
-    <div class="aurora-footer__brand">
-      <span class="aurora-brand__mark">S</span>
-      <div><b>SENZANY</b><small>VOICI LE RÉCIT DE VOTRE MORT.</small></div>
+  <footer class="gp-footer">
+    <div class="gp-footer__brand">
+      <img src="assets/images/branding/logo.png" alt="Senzany">
+      <div><strong>SENZANY</strong><small>VOICI LE RÉCIT DE VOTRE MORT.</small></div>
     </div>
-    <p>PORTAIL SENZANY // CHERNARUS PVE FR</p>
-    <a href="senzany-jouer.html">COMMENCER L'AVENTURE ↗</a>
+    <nav>
+      <a href="senzany-jouer.html">Jouer</a>
+      <a href="senzany-evenements.html">Événements</a>
+      <a href="senzany-communaute.html">Communauté</a>
+      <a href="senzany-support.html">Support</a>
+    </nav>
+    <span>PORTAIL SENZANY // 2026</span>
   </footer>
 
 </main>
+
 
 
 
@@ -174,6 +235,6 @@
 <script defer="" src="assets/js/pages/accueil.js?v=2.7"></script>
 <script defer="" src="assets/js/shared/entry-terminal.js?v=4.0.1"></script>
 <script defer src="assets/js/shared/senzany-reborn-v1.js?v=1.0.0"></script>
-<script defer src="assets/js/pages/senzany-aurora-v5.js?v=5.1.0"></script>
+<script defer src="assets/js/pages/senzany-game-portal-v6.js?v=6.0.0"></script>
 </body>
 </html>
