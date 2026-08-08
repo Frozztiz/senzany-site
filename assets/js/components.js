@@ -38,7 +38,7 @@
 
   const NAV = [
     ['accueil','index.html','Accueil'],
-    ['jouer','senzany-jouer.html','Jouer'],
+    ['map','senzany-map.html','Carte'],
     ['communaute','senzany-communaute.html','Communauté'],
     ['wiki','senzany-wiki.html','Wiki'],
     ['evenements','senzany-evenements.html','Événements'],
@@ -114,7 +114,7 @@
             <div class="site-footer-v2__column">
               <h4>Navigation</h4>
               <a href="index.html">Accueil</a>
-              <a href="senzany-jouer.html">Comment jouer</a>
+              <a href="senzany-map.html">Carte</a>
               <a href="senzany-communaute.html">Communauté</a>
               <a href="senzany-evenements.html">Événements</a>
               <a href="senzany-wiki.html">Wiki</a>

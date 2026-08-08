@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Commandement — MAP SENZANY</title>
+  <link rel="stylesheet" href="assets/css/pages/map.css?v=1.0"/>
+</head>
+<body data-page="commandement" class="map-admin-body">
+  <div data-site-header></div>
+  <main class="map-page map-admin-page">
+    <section class="map-hero map-hero--admin">
+      <div class="wrap map-hero__inner">
+        <div>
+          <p class="map-kicker">COMMANDEMENT // MAP</p>
+          <h1>GESTION DES<br><span>IMPLANTATIONS.</span></h1>
+          <p>Vue staff destinée aux demandes, bases validées et futurs mâts de drapeau synchronisés depuis le serveur.</p>
+        </div>
+        <a class="map-back-command" href="senzany-admin.html">← RETOUR AU COMMANDEMENT</a>
+      </div>
+    </section>
+
+    <section class="map-workspace">
+      <div class="wrap map-workspace__grid">
+        <aside class="map-panel">
+          <div class="map-panel__section">
+            <span class="map-panel__eyebrow">SUPERVISION</span>
+            <h2>Implantations</h2>
+            <div class="map-admin-stats">
+              <div><small>VALIDÉES</small><strong id="approvedCount">0</strong></div>
+              <div><small>EN ATTENTE</small><strong id="pendingCount">0</strong></div>
+              <div><small>NON DÉCLARÉES</small><strong id="orphanCount">0</strong></div>
+            </div>
+          </div>
+          <div class="map-panel__section">
+            <span class="map-panel__eyebrow">V1 // ÉTAT</span>
+            <p>La carte et les coordonnées sont prêtes. La prochaine étape sera de connecter Supabase puis la détection automatique des mâts de drapeau DayZ.</p>
+          </div>
+        </aside>
+
+        <div class="map-stage-card">
+          <div class="map-stage-toolbar">
+            <div><span>CARTE STAFF</span><small>Zones publiques + demandes + détection jeu</small></div>
+            <div class="map-zoom-controls"><button id="zoomOut" type="button">−</button><button id="zoomReset" type="button">100%</button><button id="zoomIn" type="button">+</button></div>
+          </div>
+          <div class="map-stage" id="mapStage">
+            <div class="map-canvas" id="mapCanvas">
+              <img src="assets/images/map/chernarus-grid.svg" alt="Fond cartographique Chernarus provisoire" draggable="false"/>
+              <div class="map-marker-layer" id="markerLayer"></div>
+            </div>
+            <div class="map-stage__hint">MAP Commandement · V1 interface</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div data-site-footer></div>
+  <script defer src="assets/js/components.js?v=map-v1"></script>
+  <script defer src="assets/js/app.js"></script>
+  <script defer src="assets/js/pages/map.js?v=1.0"></script>
+</body>
+</html>

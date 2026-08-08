@@ -1,0 +1,17 @@
+SENZANY MAP V1
+==============
+Ce patch remplace "Jouer" par "Carte" dans la navigation publique.
+
+Fichiers :
+- assets/js/components.js
+- senzany-map.html
+- assets/css/pages/map.css
+- assets/js/pages/map.js
+- assets/images/map/chernarus-grid.svg (fond provisoire)
+- senzany-admin.html (ajout de la carte MAP)
+- senzany-admin-map.html
+- supabase/024_map_bases.sql (préparation de la base, NE PAS exécuter encore si on veut tester seulement l'interface)
+
+V1 = interface et mécanique de coordonnées.
+Le fond réel Chernarus n'est volontairement pas intégré dans ce patch :
+on validera d'abord la page, puis on branchera un fond cartographique fiable et ensuite Supabase.
