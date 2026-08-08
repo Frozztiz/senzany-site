@@ -626,3 +626,135 @@ body[data-page="accueil"]::before{
     background-position:center top!important;
   }
 }
+
+
+/* =========================================================
+   GAME PORTAL V6.4 — FOND VOLCAN ANIMÉ TYPE ANCIEN SENZANY
+   ========================================================= */
+
+/* Fond général permanent avec le volcan */
+body[data-page="accueil"]{
+  background-color:#090b0c!important;
+  background-image:
+    linear-gradient(rgba(7,9,10,.67),rgba(7,9,10,.76)),
+    url('../images/backgrounds/hero-bg.jpg')!important;
+  background-size:cover!important;
+  background-position:70% 38%!important;
+  background-attachment:fixed!important;
+  background-repeat:no-repeat!important;
+}
+
+/* Couche animée lente au-dessus du fond fixe : effet vivant comme avant */
+body[data-page="accueil"]::after{
+  content:"";
+  position:fixed;
+  inset:-4%;
+  z-index:-2;
+  pointer-events:none;
+  background:
+    url('../images/backgrounds/hero-bg.jpg') 72% 38% / cover no-repeat;
+  opacity:.22;
+  filter:saturate(1.04) contrast(1.02);
+  transform:scale(1.035);
+  animation:gpVolcanoDrift 24s ease-in-out infinite alternate;
+}
+
+@keyframes gpVolcanoDrift{
+  0%{
+    transform:scale(1.035) translate3d(-.8%,0,0);
+    background-position:70% 38%;
+  }
+  50%{
+    transform:scale(1.055) translate3d(.25%,-.35%,0);
+    background-position:72% 40%;
+  }
+  100%{
+    transform:scale(1.045) translate3d(.9%,.2%,0);
+    background-position:74% 39%;
+  }
+}
+
+/* Le hero garde le volcan et le personnage à droite */
+.gp-slide__bg--world{
+  background-image:url('../images/backgrounds/hero-bg.jpg')!important;
+  background-size:cover!important;
+  background-position:73% 39%!important;
+  animation:gpHeroVolcanoMove 18s ease-in-out infinite alternate!important;
+}
+
+@keyframes gpHeroVolcanoMove{
+  from{
+    transform:scale(1.025) translate3d(-.4%,0,0);
+    background-position:72% 39%;
+  }
+  to{
+    transform:scale(1.065) translate3d(.65%,-.25%,0);
+    background-position:75% 40%;
+  }
+}
+
+/* Le volcan reste visible dans la section Saison aussi */
+.gp-season-band::before{
+  background-image:url('../images/backgrounds/hero-bg.jpg')!important;
+  background-size:cover!important;
+  background-position:72% 42%!important;
+  animation:gpSeasonVolcanoMove 22s ease-in-out infinite alternate;
+}
+
+@keyframes gpSeasonVolcanoMove{
+  from{
+    transform:scale(1.02) translate3d(-.35%,0,0);
+  }
+  to{
+    transform:scale(1.06) translate3d(.7%,-.3%,0);
+  }
+}
+
+/* On laisse davantage apparaître le décor derrière les sections */
+.gp-discover{
+  background:linear-gradient(
+    180deg,
+    rgba(17,22,25,.84),
+    rgba(12,16,18,.80)
+  )!important;
+}
+.gp-news{
+  background:linear-gradient(
+    180deg,
+    rgba(10,13,15,.80),
+    rgba(12,16,18,.86)
+  )!important;
+}
+.gp-profile-promo{
+  background:rgba(7,10,11,.56)!important;
+}
+
+/* Sur très grand écran, priorité au cadrage volcan + personnage à droite */
+@media(min-width:1900px){
+  body[data-page="accueil"]{
+    background-position:73% 36%!important;
+  }
+  .gp-slide__bg--world{
+    background-position:76% 39%!important;
+  }
+}
+
+/* Mobile : mouvement coupé pour éviter les saccades */
+@media(max-width:900px){
+  body[data-page="accueil"]{
+    background-attachment:scroll!important;
+    background-position:68% top!important;
+  }
+  body[data-page="accueil"]::after{
+    display:none;
+  }
+}
+
+/* Accessibilité */
+@media(prefers-reduced-motion:reduce){
+  body[data-page="accueil"]::after,
+  .gp-slide__bg--world,
+  .gp-season-band::before{
+    animation:none!important;
+  }
+}
