@@ -1,22 +1,11 @@
-CORRECTIF TROUVÉ DANS LE ZIP ACTUEL
+SENZANY — COMPTE À REBOURS 21 AOÛT 2026
 
-Le vrai problème était ici :
-senzany-admin-map.html chargeait encore :
-  map/index_carte_senzany_v10_6.html?embed=1&mode=admin
+Remplacer dans GitHub :
+1. index.html
+2. assets/js/pages/accueil.js
 
-Cette V10.6 affiche bien les demandes mais ne possède pas les boutons de validation.
+Le compte à rebours vise :
+21 août 2026 à 00h00
 
-Le fichier corrigé charge maintenant :
-  map/index_carte_senzany_v10_33_demandes_validation.html?embed=1&mode=admin
-
-La V10.33 présente déjà dans ton dépôt contient :
-  ✓ VALIDER
-  ✕ REFUSER
-
-A FAIRE :
-1. Remplacer uniquement senzany-admin-map.html
-2. Commit
-3. Push origin
-4. Ctrl+F5 sur Commandement > Implantations
-
-Aucun changement VPS / Supabase / backend nécessaire pour ce correctif.
+Après :
+Commit -> Push origin -> attendre le déploiement -> Ctrl+F5 sur l'accueil.
