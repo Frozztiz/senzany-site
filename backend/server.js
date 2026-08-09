@@ -41,71 +41,46 @@ app.use("/api/discord", require("./routes/discord"));
 app.use("/api/game", require("./routes/game"));
 app.use("/api/steam", require("./routes/steam"));
 app.use("/api/commandement", require("./routes/commandement"));
-
 app.use(
   "/api/rcon",
   require("./middleware/commandAuth"),
   require("./routes/rcon")
 );
-
 app.use("/api/delivery-agent", require("./routes/deliveryAgent"));
-
 app.use(
   "/api/admin/deliveries",
   require("./middleware/commandAuth"),
   require("./routes/adminDeliveries")
 );
-
 app.use(
   "/api/admin/items",
   require("./middleware/commandAuth"),
   require("./routes/adminItems")
 );
-
 app.use(
   "/api/admin/rewards",
   require("./middleware/commandAuth"),
   require("./routes/adminRewards")
 );
-
 app.use(
   "/api/admin/monthly-votes",
   require("./middleware/commandAuth"),
   require("./routes/adminMonthlyVotes")
 );
 
-// ============================================================
-// CARTE SENZANY
-// ============================================================
-
-// Route publique.
-// Ne retourne aucune donnée privée :
-// pas de SteamID, coordonnées admin, propriétaire,
-// membres ou commentaires staff.
 app.use("/api/map", require("./routes/mapPublic"));
 
-// Route privée Commandement.
-// Protection par le middleware Steam/Commandement existant.
 app.use(
   "/api/admin/map",
   require("./middleware/commandAuth"),
   require("./routes/adminMap")
 );
 
-// ============================================================
-// 404
-// Toujours conserver ce bloc APRÈS toutes les routes API.
-// ============================================================
-
 app.use((req, res) => {
   res.status(404).json({
     error: "Route API introuvable."
   });
 });
-
-// ============================================================
-// GESTION DES ERREURS
-// ============================================================
 
 app.use((error, req, res, next) => {
   console.error("Erreur API Senzany :", error);
