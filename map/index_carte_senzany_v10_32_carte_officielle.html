@@ -245,6 +245,45 @@ body.embed-admin.tools-open #map{right:0!important}
 #v30Box{display:none!important}
 .senzany-cal-label,.senzany-aff-label,.senzany-valid-label,.senzany-pivot-label{display:none!important}
 </style>
+
+<style>
+.pending-public-label{
+  background:#1b1408!important;
+  color:#ffd07a!important;
+  border:1px solid #a86e17!important;
+  box-shadow:none!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  padding:3px 6px!important
+}
+.pending-public-label:before{display:none!important}
+.request-actions{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+  margin-top:10px!important;
+}
+.request-actions .btn{
+  display:block!important;
+  width:100%!important;
+  min-height:34px!important;
+  font-weight:900!important;
+  font-size:11px!important;
+}
+.approveRequestBtn{
+  background:#178447!important;
+  border:1px solid #32d37a!important;
+  color:#fff!important
+}
+.rejectRequestBtn{
+  background:#8c2525!important;
+  border:1px solid #e44b4b!important;
+  color:#fff!important
+}
+.approveRequestBtn:hover{background:#20a65b!important}
+.rejectRequestBtn:hover{background:#aa3030!important}
+.approveRequestBtn[disabled],.rejectRequestBtn[disabled]{opacity:.55;cursor:wait}
+</style>
 </head>
 <body>
 
@@ -346,14 +385,14 @@ let publicPickMode=false;
 let publicSelectionLayer=null;
 
 function dayzToLatLng(x,z){
-  const px=PAD_PX+x;
-  const py=PAD_PX+(WORLD-z);
-  return L.latLng(-py/SCALE_AT_MAX,px/SCALE_AT_MAX);
+  // Conversion validée sur 4 points réels XAM / Chernarus.
+  return L.latLng((Number(z)/60)-256, Number(x)/60);
 }
 function latLngToDayz(latlng){
-  const px=latlng.lng*SCALE_AT_MAX;
-  const py=-latlng.lat*SCALE_AT_MAX;
-  return {x:px-PAD_PX,z:WORLD-(py-PAD_PX)};
+  return {
+    x:Number(latlng.lng)*60,
+    z:(Number(latlng.lat)+256)*60
+  };
 }
 function esc(s){
   return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
@@ -515,13 +554,42 @@ function render(){
 
   zones.forEach(z=>{
     if(mode==='public'){
+      // La vue joueur reçoit uniquement les coordonnées nécessaires pour dessiner
+      // les zones, jamais les données privées du propriétaire.
+      const x=Number(z.center_x);
+      const zz=Number(z.center_z);
+      const radius=Math.min(MAX_RADIUS,Math.max(1,Number(z.radius_m)||60));
+
+      if(Number.isFinite(x)&&Number.isFinite(zz)&&z.public_status!=='hidden'){
+        const c=z.zone_type==='base' ? '#d33a32' : '#3b9bd3';
+        const center=dayzToLatLng(x,zz);
+
+        L.circle(center,{
+          radius:radius/60,
+          color:c,
+          fillColor:c,
+          weight:2,
+          fillOpacity:.13
+        }).addTo(zonesLayer);
+
+        L.circleMarker(center,{
+          radius:5,
+          color:c,
+          fillColor:c,
+          fillOpacity:1,
+          weight:2
+        }).bindPopup(
+          '<b>'+esc(z.public_name||'Zone occupée')+'</b><br>'+
+          'Statut : '+statusLabel(z.public_status)
+        ).addTo(zonesLayer);
+      }
+
       const card=document.createElement('div');
       card.className='card';
       card.innerHTML=
         '<div class="card-name">'+esc(z.public_name)+' <span class="badge public">PUBLIC</span></div>'+
         '<div class="meta">Type : '+typeLabel(z.zone_type)+'<br>Statut : '+statusLabel(z.public_status)+
-        (z.public_description?'<br>'+esc(z.public_description):'')+'</div>'+
-        '<div class="publicOnly">La vue joueur ne reçoit ni coordonnées exactes, ni SteamID, ni propriétaire, ni membres, ni commentaire staff.</div>';
+        (z.public_description?'<br>'+esc(z.public_description):'')+'</div>';
       list.appendChild(card);
       return;
     }
@@ -535,7 +603,7 @@ function render(){
       const c=z.zone_type==='base' ? '#d33a32' : '#3b9bd3';
 
       L.circle(dayzToLatLng(x,zz),{
-        radius:radius/SCALE_AT_MAX,color:c,fillColor:c,weight:2,fillOpacity:.14
+        radius:radius/60,color:c,fillColor:c,weight:2,fillOpacity:.14
       }).addTo(zonesLayer);
 
       const marker=L.circleMarker(dayzToLatLng(x,zz),{
@@ -584,6 +652,111 @@ function render(){
 }
 
 
+function renderPublicRequests(){
+  if(mode!=='public' || !Array.isArray(requests) || !requests.length) return;
+
+  requests
+    .filter(r=>String(r.status||'pending')==='pending')
+    .forEach(r=>{
+      const x=Number(r.center_x);
+      const z=Number(r.center_z);
+      const radius=Math.min(MAX_RADIUS,Math.max(1,Number(r.radius_m)||60));
+      if(!Number.isFinite(x)||!Number.isFinite(z)) return;
+
+      const center=dayzToLatLng(x,z);
+
+      L.circle(center,{
+        radius:radius/60,
+        color:'#d19a38',
+        fillColor:'#d19a38',
+        weight:2,
+        fillOpacity:.16
+      }).addTo(zonesLayer);
+
+      L.circleMarker(center,{
+        radius:5,
+        color:'#d19a38',
+        fillColor:'#d19a38',
+        fillOpacity:1,
+        weight:2
+      })
+      .bindTooltip('DEMANDE EN ATTENTE',{
+        permanent:false,
+        direction:'top',
+        className:'pending-public-label'
+      })
+      .bindPopup('<b>DEMANDE EN ATTENTE</b><br>Zone réservée temporairement pendant la validation.')
+      .addTo(zonesLayer);
+    });
+}
+
+async function approveRequest(request, button){
+  if(!adminAuthorized || !request?.id) return;
+
+  const previous=button?.textContent || 'VALIDER';
+  if(button){
+    button.disabled=true;
+    button.textContent='VALIDATION…';
+  }
+
+  try{
+    const response=await fetch(
+      '/api/admin/map/requests/'+encodeURIComponent(request.id)+'/approve',
+      {
+        method:'PATCH',
+        credentials:'include',
+        cache:'no-store',
+        headers:{Accept:'application/json','Content-Type':'application/json'}
+      }
+    );
+    const data=await response.json().catch(()=>({}));
+
+    if(!response.ok){
+      throw new Error(data.error||('HTTP '+response.status));
+    }
+
+    status('Demande validée en un clic.',true);
+    await loadAdmin();
+  }catch(error){
+    status('Validation impossible : '+error.message,false);
+    if(button){
+      button.disabled=false;
+      button.textContent=previous;
+    }
+  }
+}
+
+
+async function rejectRequest(request, button){
+  if(!adminAuthorized || !request?.id) return;
+  if(!window.confirm('Refuser cette demande ?')) return;
+
+  const old=button.textContent;
+  button.disabled=true;
+  button.textContent='REFUS…';
+
+  try{
+    const response=await fetch(
+      '/api/admin/map/requests/'+encodeURIComponent(request.id)+'/reject',
+      {
+        method:'PATCH',
+        credentials:'include',
+        cache:'no-store',
+        headers:{Accept:'application/json','Content-Type':'application/json'}
+      }
+    );
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok) throw new Error(data.error||('HTTP '+response.status));
+    status('Demande refusée.',true);
+    await loadAdmin();
+  }catch(error){
+    status('Refus impossible : '+error.message,false);
+    button.disabled=false;
+    button.textContent=old;
+  }
+}
+
+
 function renderAdminRequests(){
   if(mode!=='admin' || !Array.isArray(requests) || !requests.length) return;
 
@@ -597,7 +770,7 @@ function renderAdminRequests(){
 
     if(Number.isFinite(x)&&Number.isFinite(z)&&isPending){
       L.circle(dayzToLatLng(x,z),{
-        radius:radius/SCALE_AT_MAX,
+        radius:radius/60,
         color:'#d19a38',
         fillColor:'#d19a38',
         weight:2,
@@ -634,7 +807,20 @@ function renderAdminRequests(){
         ' / Z '+(Number.isFinite(z)?z.toFixed(1):'—')+'<br>'+
         'Rayon : '+radius+' m<br>'+
         'Commentaire : '+esc(r.comment||'—')+
-      '</div>';
+      '</div>'+
+      (isPending
+        ? '<div class="request-actions">'+
+            '<button class="btn approveRequestBtn">✓ VALIDER</button>'+
+            '<button class="btn rejectRequestBtn">✕ REFUSER</button>'+
+          '</div>'
+        : '');
+
+    if(isPending){
+      const approveBtn=card.querySelector('.approveRequestBtn');
+      const rejectBtn=card.querySelector('.rejectRequestBtn');
+      if(approveBtn) approveBtn.onclick=()=>approveRequest(r,approveBtn);
+      if(rejectBtn) rejectBtn.onclick=()=>rejectRequest(r,rejectBtn);
+    }
 
     if(Number.isFinite(x)&&Number.isFinite(z)){
       card.querySelector('.card-name').style.cursor='pointer';
@@ -665,9 +851,11 @@ async function loadPublic(){
     if(!response.ok) throw new Error(data.error||('HTTP '+response.status));
 
     zones=Array.isArray(data.zones)?data.zones:[];
-    requests=[];
-    status('API publique connectée — '+zones.length+' zone(s).',true);
+    requests=Array.isArray(data.requests)?data.requests:[];
+    const pendingCount=requests.filter(r=>String(r.status||'pending')==='pending').length;
+    status('Carte connectée — '+zones.length+' zone(s), '+pendingCount+' demande(s) en attente.',true);
     render();
+    renderPublicRequests();
   }catch(error){
     zones=[];
     render();
@@ -895,7 +1083,7 @@ map.on('click',e=>{
     const center=dayzToLatLng(p.x,p.z);
     const group=L.layerGroup();
     L.circle(center,{
-      radius:MAX_RADIUS/SCALE_AT_MAX,
+      radius:MAX_RADIUS/60,
       color:'#5bace5',
       fillColor:'#5bace5',
       weight:2,

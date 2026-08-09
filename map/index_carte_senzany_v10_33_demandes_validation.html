@@ -258,31 +258,31 @@ body.embed-admin.tools-open #map{right:0!important}
 }
 .pending-public-label:before{display:none!important}
 .request-actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-  margin-top:9px
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+  margin-top:10px!important;
+}
+.request-actions .btn{
+  display:block!important;
+  width:100%!important;
+  min-height:34px!important;
+  font-weight:900!important;
+  font-size:11px!important;
 }
 .approveRequestBtn{
-  background:#1e7c45!important;
-  border-color:#2dbb6b!important;
+  background:#178447!important;
+  border:1px solid #32d37a!important;
   color:#fff!important
 }
-.approveRequestBtn:hover{background:#269856!important}
 .rejectRequestBtn{
-  background:#742626!important;
-  border-color:#b83c3c!important;
+  background:#8c2525!important;
+  border:1px solid #e44b4b!important;
   color:#fff!important
 }
-.rejectRequestBtn:hover{background:#903030!important}
-.approveRequestBtn[disabled],
-.rejectRequestBtn[disabled]{opacity:.55;cursor:wait}
-.requestDecisionMessage{
-  margin-top:7px;
-  font-size:10px;
-  line-height:1.35;
-  color:#c8cdcf
-}
+.approveRequestBtn:hover{background:#20a65b!important}
+.rejectRequestBtn:hover{background:#aa3030!important}
+.approveRequestBtn[disabled],.rejectRequestBtn[disabled]{opacity:.55;cursor:wait}
 </style>
 </head>
 <body>
@@ -726,17 +726,14 @@ async function approveRequest(request, button){
   }
 }
 
+
 async function rejectRequest(request, button){
   if(!adminAuthorized || !request?.id) return;
+  if(!window.confirm('Refuser cette demande ?')) return;
 
-  const label=String(request.request_name||'cette demande');
-  if(!window.confirm('Refuser définitivement la demande « '+label+' » ?')) return;
-
-  const previous=button?.textContent || 'REFUSER';
-  if(button){
-    button.disabled=true;
-    button.textContent='REFUS…';
-  }
+  const old=button.textContent;
+  button.disabled=true;
+  button.textContent='REFUS…';
 
   try{
     const response=await fetch(
@@ -749,19 +746,13 @@ async function rejectRequest(request, button){
       }
     );
     const data=await response.json().catch(()=>({}));
-
-    if(!response.ok){
-      throw new Error(data.error||('HTTP '+response.status));
-    }
-
+    if(!response.ok) throw new Error(data.error||('HTTP '+response.status));
     status('Demande refusée.',true);
     await loadAdmin();
   }catch(error){
     status('Refus impossible : '+error.message,false);
-    if(button){
-      button.disabled=false;
-      button.textContent=previous;
-    }
+    button.disabled=false;
+    button.textContent=old;
   }
 }
 
@@ -821,8 +812,7 @@ function renderAdminRequests(){
         ? '<div class="request-actions">'+
             '<button class="btn approveRequestBtn">✓ VALIDER</button>'+
             '<button class="btn rejectRequestBtn">✕ REFUSER</button>'+
-          '</div>'+
-          '<div class="requestDecisionMessage">Validation : la demande devient immédiatement une zone occupée. Refus : la demande disparaît des demandes en attente.</div>'
+          '</div>'
         : '');
 
     if(isPending){
