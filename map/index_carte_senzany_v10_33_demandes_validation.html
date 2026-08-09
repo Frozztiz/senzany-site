@@ -259,9 +259,9 @@ body.embed-admin.tools-open #map{right:0!important}
 .pending-public-label:before{display:none!important}
 .request-actions{
   display:grid;
-  grid-template-columns:1fr;
-  gap:6px;
-  margin-top:8px
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:9px
 }
 .approveRequestBtn{
   background:#1e7c45!important;
@@ -269,7 +269,20 @@ body.embed-admin.tools-open #map{right:0!important}
   color:#fff!important
 }
 .approveRequestBtn:hover{background:#269856!important}
-.approveRequestBtn[disabled]{opacity:.55;cursor:wait}
+.rejectRequestBtn{
+  background:#742626!important;
+  border-color:#b83c3c!important;
+  color:#fff!important
+}
+.rejectRequestBtn:hover{background:#903030!important}
+.approveRequestBtn[disabled],
+.rejectRequestBtn[disabled]{opacity:.55;cursor:wait}
+.requestDecisionMessage{
+  margin-top:7px;
+  font-size:10px;
+  line-height:1.35;
+  color:#c8cdcf
+}
 </style>
 </head>
 <body>
@@ -713,6 +726,45 @@ async function approveRequest(request, button){
   }
 }
 
+async function rejectRequest(request, button){
+  if(!adminAuthorized || !request?.id) return;
+
+  const label=String(request.request_name||'cette demande');
+  if(!window.confirm('Refuser définitivement la demande « '+label+' » ?')) return;
+
+  const previous=button?.textContent || 'REFUSER';
+  if(button){
+    button.disabled=true;
+    button.textContent='REFUS…';
+  }
+
+  try{
+    const response=await fetch(
+      '/api/admin/map/requests/'+encodeURIComponent(request.id)+'/reject',
+      {
+        method:'PATCH',
+        credentials:'include',
+        cache:'no-store',
+        headers:{Accept:'application/json','Content-Type':'application/json'}
+      }
+    );
+    const data=await response.json().catch(()=>({}));
+
+    if(!response.ok){
+      throw new Error(data.error||('HTTP '+response.status));
+    }
+
+    status('Demande refusée.',true);
+    await loadAdmin();
+  }catch(error){
+    status('Refus impossible : '+error.message,false);
+    if(button){
+      button.disabled=false;
+      button.textContent=previous;
+    }
+  }
+}
+
 
 function renderAdminRequests(){
   if(mode!=='admin' || !Array.isArray(requests) || !requests.length) return;
@@ -766,12 +818,18 @@ function renderAdminRequests(){
         'Commentaire : '+esc(r.comment||'—')+
       '</div>'+
       (isPending
-        ? '<div class="request-actions"><button class="btn approveRequestBtn">✓ VALIDER LA DEMANDE</button></div>'
+        ? '<div class="request-actions">'+
+            '<button class="btn approveRequestBtn">✓ VALIDER</button>'+
+            '<button class="btn rejectRequestBtn">✕ REFUSER</button>'+
+          '</div>'+
+          '<div class="requestDecisionMessage">Validation : la demande devient immédiatement une zone occupée. Refus : la demande disparaît des demandes en attente.</div>'
         : '');
 
     if(isPending){
       const approveBtn=card.querySelector('.approveRequestBtn');
+      const rejectBtn=card.querySelector('.rejectRequestBtn');
       if(approveBtn) approveBtn.onclick=()=>approveRequest(r,approveBtn);
+      if(rejectBtn) rejectBtn.onclick=()=>rejectRequest(r,rejectBtn);
     }
 
     if(Number.isFinite(x)&&Number.isFinite(z)){

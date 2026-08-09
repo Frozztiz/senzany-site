@@ -62,6 +62,24 @@ async function rpc(functionName, payload = {}) {
   return data;
 }
 
+async function syncPublicGeometry(zoneId, centerX, centerZ, radiusM) {
+  if (!zoneId) return;
+
+  await supabaseRequest(
+    `map_zones_public?id=eq.${encodeURIComponent(String(zoneId))}`,
+    {
+      method: "PATCH",
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify({
+        center_x: Number(centerX),
+        center_z: Number(centerZ),
+        radius_m: Math.min(60, Math.max(1, Number(radiusM) || 60)),
+        updated_at: new Date().toISOString(),
+      }),
+    }
+  );
+}
+
 function normalizeMembers(value) {
   if (Array.isArray(value)) return value;
   if (typeof value === "string") {
@@ -149,6 +167,8 @@ router.post("/", async (req, res, next) => {
       p_actor: req.commandSteamId,
     });
 
+    await syncPublicGeometry(zoneId, centerX, centerZ, radiusM);
+
     return res.status(201).json({ ok: true, id: zoneId });
   } catch (error) {
     next(error);
@@ -181,6 +201,7 @@ router.patch("/:id", async (req, res, next) => {
     });
 
     if (!updated) return res.status(404).json({ error: "Zone introuvable." });
+    await syncPublicGeometry(zoneId, centerX, centerZ, radiusM);
     return res.json({ ok: true });
   } catch (error) {
     next(error);
@@ -240,6 +261,13 @@ router.patch("/requests/:id/approve", async (req, res, next) => {
       p_staff_comment: String(request.comment || "").trim() || null,
       p_actor: req.commandSteamId,
     });
+
+    await syncPublicGeometry(
+      zoneId,
+      Number(request.center_x),
+      Number(request.center_z),
+      Math.min(60, Math.max(1, Number(request.radius_m) || 60))
+    );
 
     await supabaseRequest(
       `map_requests?id=eq.${encodeURIComponent(requestId)}`,

@@ -1,16 +1,51 @@
-CORRECTION CARTE JOUEUR - DEMANDES EN ATTENTE
+SENZANY — FINAL MAP / VALIDATION DEMANDES
 
-Fichiers à remplacer/ajouter dans le dépôt :
-- senzany-map.html
-- assets/js/pages/map-pending-v2.js
+CE PACK REGROUPE TOUTES LES MODIFICATIONS ACTUELLES.
 
-La correction :
-- conserve ton interface actuelle ;
-- conserve le bouton de demande existant ;
-- récupère /api/map toutes les 5 secondes ;
-- affiche les demandes pending en orange ;
-- affiche les zones validated en rouge si leurs coordonnées existent ;
-- ne montre aucune donnée privée.
+1. CARTE JOUEUR
+Fichier :
+  senzany-map.html
 
-Aucune modification VPS manuelle n'est nécessaire si ton déploiement GitHub fonctionne.
-Après déploiement : Ctrl+F5 sur /senzany-map.html.
+Fonctions :
+- vraie carte Chernarus ;
+- demandes EN ATTENTE visibles en orange ;
+- zones VALIDÉES visibles en rouge ;
+- création de demande directement sur la carte ;
+- aucun SteamID / propriétaire / commentaire privé affiché publiquement.
+
+2. COMMANDEMENT
+Fichier :
+  map/index_carte_senzany_v10_33_demandes_validation.html
+
+Chaque demande EN ATTENTE possède désormais :
+  ✓ VALIDER
+  ✕ REFUSER
+
+VALIDER :
+- crée automatiquement la zone validée ;
+- reprend SteamID, coordonnées, rayon et commentaire ;
+- synchronise les coordonnées dans map_zones_public ;
+- passe la demande en approved ;
+- recharge immédiatement la carte/liste.
+
+REFUSER :
+- demande une confirmation ;
+- passe la demande en rejected ;
+- retire immédiatement la demande de la liste d'attente.
+
+3. BACKEND
+Remplacer :
+  backend/routes/adminMap.js
+  backend/routes/mapPublic.js
+
+4. SUPABASE
+Le fichier supabase_map_final_patch.sql est idempotent.
+Les colonnes ont déjà été ajoutées dans ton Supabase, mais il garantit aussi UPDATE pour service_role.
+
+DEPLOIEMENT :
+- Copier/remplacer tous les fichiers dans GitHub.
+- Commit + Push origin.
+- Le workflow doit redéployer et redémarrer senzany-api.
+- Ensuite Ctrl+F5 sur la carte joueur et Commandement.
+
+AUCUN CHANGEMENT DE server.js N'EST NECESSAIRE.

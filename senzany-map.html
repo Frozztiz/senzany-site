@@ -7,6 +7,28 @@
   <title>Carte — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/map.css?v=1.0"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <style>
+    #mapStage{
+      position:relative !important;
+      overflow:hidden !important;
+      background:#081012 !important;
+    }
+    #senzanyLeafletMap{
+      position:absolute !important;
+      inset:0 !important;
+      width:100% !important;
+      height:100% !important;
+      min-height:0 !important;
+      background:#081012 !important;
+    }
+    #senzanyLeafletMap .leaflet-container,
+    #senzanyLeafletMap .leaflet-pane,
+    #senzanyLeafletMap .leaflet-map-pane{
+      background:#081012 !important;
+    }
+  </style>
+
 </head>
 <body data-page="map">
   <div data-site-header></div>
@@ -50,7 +72,7 @@
 
           <div class="map-panel__section">
             <span class="map-panel__eyebrow">RÈGLE SENZANY</span>
-            <p>Une base validée apparaîtra publiquement comme <strong>zone occupée</strong>. Aucun pseudo ni propriétaire ne sera affiché sur la carte publique.</p>
+            <p>Une demande validée apparaîtra publiquement comme <strong>zone occupée</strong>. Aucun pseudo ni propriétaire ne sera affiché sur la carte publique.</p>
           </div>
         </aside>
 
@@ -60,7 +82,7 @@
             <div class="map-zoom-controls"><button id="zoomOut" type="button">−</button><button id="zoomReset" type="button">100%</button><button id="zoomIn" type="button">+</button></div>
           </div>
           <div class="map-stage" id="mapStage" aria-label="Carte interactive Chernarus">
-            <div id="senzanyLeafletMap" style="width:100%;height:100%;min-height:680px;"></div>
+            <div id="senzanyLeafletMap" style="width:100%;height:100%;min-height:680px;background:#081012;"></div>
           </div>
         </div>
       </div>
@@ -119,7 +141,8 @@
       zoomSnap: 1,
       zoomDelta: 1,
       attributionControl: false,
-      maxBoundsViscosity: 1
+      maxBoundsViscosity: 1,
+      zoomControl: false
     });
 
     const canvasBounds = L.latLngBounds(L.latLng(-256, 0), L.latLng(0, 256));
@@ -152,7 +175,7 @@
     }).addTo(map);
 
     map.setMaxBounds(canvasBounds.pad(.03));
-    map.fitBounds(worldBounds);
+    map.fitBounds(canvasBounds, { padding: [0, 0] });
 
     const zonesLayer = L.layerGroup().addTo(map);
     const selectionLayer = L.layerGroup().addTo(map);
@@ -165,7 +188,7 @@
       z = Number(z);
       radius = Math.min(MAX_RADIUS, Math.max(1, Number(radius) || 60));
       if (!Number.isFinite(x) || !Number.isFinite(z)) return;
-      if (x < 0 || x > WORLD || z < 0 || z > WORLD) return;
+      if (x <= 0 || x > WORLD || z <= 0 || z > WORLD) return;
 
       const center = dayzToLatLng(x, z);
       const leafletRadius = radius / SCALE_AT_MAX;
@@ -342,19 +365,22 @@
     document.getElementById('zoomIn').addEventListener('click', () => map.zoomIn());
     document.getElementById('zoomOut').addEventListener('click', () => map.zoomOut());
     document.getElementById('zoomReset').addEventListener('click', () => {
-      map.fitBounds(worldBounds);
+      map.fitBounds(canvasBounds, { padding: [0, 0] });
       document.getElementById('zoomReset').textContent = '100%';
     });
 
     map.on('zoomend', () => {
       const z = map.getZoom();
-      const pct = Math.round(Math.pow(2, z - map.getBoundsZoom(worldBounds)) * 100);
+      const pct = Math.round(Math.pow(2, z - map.getBoundsZoom(canvasBounds)) * 100);
       document.getElementById('zoomReset').textContent = Math.max(25, pct) + '%';
     });
 
     refreshZones();
     setInterval(refreshZones, 5000);
-    setTimeout(() => map.invalidateSize(), 250);
+    setTimeout(() => {
+      map.invalidateSize(true);
+      map.fitBounds(canvasBounds, { padding: [0, 0] });
+    }, 250);
   })();
   </script>
 
