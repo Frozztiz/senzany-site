@@ -9,7 +9,6 @@
   <style>
     .real-map-frame{width:100%;height:820px;border:0;display:block;background:#0b0f10}
     .map-stage--real{overflow:hidden;padding:0}
-    .map-live-note{margin-top:12px;padding:10px 12px;border:1px solid rgba(91,172,229,.28);background:rgba(91,172,229,.06);font-size:12px;line-height:1.55}
   </style>
 </head>
 <body data-page="map">
@@ -35,36 +34,26 @@
       <div class="wrap map-workspace__grid">
         <aside class="map-panel">
           <div class="map-panel__section">
-            <span class="map-panel__eyebrow">NOUVELLE IMPLANTATION</span>
-            <h2>Choisissez votre zone</h2>
-            <p>Cliquez sur « Demander un emplacement », puis sélectionnez précisément votre position sur la carte.</p>
-            <button id="startPlacementBtn" class="map-primary" type="button" disabled title="Connexion au système de demandes en cours">+ DEMANDER UN EMPLACEMENT</button><div class="map-live-note">La vraie carte Chernarus est maintenant intégrée. Le dépôt d’une demande joueur sera reconnecté à Supabase à l’étape suivante.</div>
-          </div>
-
-          <div class="map-panel__section map-selection" id="selectionPanel" hidden>
-            <span class="map-panel__eyebrow">EMPLACEMENT SÉLECTIONNÉ</span>
-                        <label>Nom de la demande<input id="requestName" type="text" maxlength="80" placeholder="Ex. Base de notre groupe"></label>
-            <label>Commentaire<textarea id="requestComment" rows="4" maxlength="500" placeholder="Précisez votre projet si nécessaire…"></textarea></label>
-            <div class="map-radius-note">Zone indicative : <strong>60 m autour du drapeau</strong></div>
-            <button id="submitPlacementBtn" class="map-primary" type="button">ENVOYER LA DEMANDE</button>
-            <button id="cancelPlacementBtn" class="map-secondary" type="button">ANNULER</button>
+            <span class="map-panel__eyebrow">CARTE PUBLIQUE</span>
+            <h2>Zones d’implantation</h2>
+            <p>Consultez les secteurs déjà occupés afin de préparer votre future implantation sur Chernarus.</p>
           </div>
 
           <div class="map-panel__section">
             <span class="map-panel__eyebrow">RÈGLE SENZANY</span>
-            <p>Une base validée apparaîtra publiquement comme <strong>zone occupée</strong>. Aucun pseudo, propriétaire, SteamID ni coordonnée exacte ne sera affiché aux joueurs.</p>
+            <p>Une base validée apparaîtra comme <strong>zone occupée</strong>. Aucun pseudo, propriétaire, SteamID ni coordonnée exacte ne sera affiché aux joueurs.</p>
           </div>
         </aside>
 
         <div class="map-stage-card">
           <div class="map-stage-toolbar">
             <div><span>CHERNARUS+</span><small>Carte publique des zones d’implantation</small></div>
-            <div class="map-zoom-controls"><button id="zoomOut" type="button">−</button><button id="zoomReset" type="button">100%</button><button id="zoomIn" type="button">+</button></div>
+            
           </div>
           <div class="map-stage map-stage--real" id="mapStage" aria-label="Carte interactive Chernarus">
             <iframe
               class="real-map-frame"
-              src="map/index_carte_senzany_v10_3.html?embed=1&mode=public"
+              src="map/index_carte_senzany_v10_4.html?embed=1&mode=public"
               title="Carte publique Chernarus Senzany"
               loading="eager">
             </iframe>
