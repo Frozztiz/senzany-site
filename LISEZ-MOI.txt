@@ -1,22 +1,16 @@
-SENZANY MAP V10.6 — DEMANDES COMMANDEMENT
+CORRECTION CARTE JOUEUR - DEMANDES EN ATTENTE
 
-Correction :
-- /api/admin/map renvoie maintenant aussi public.map_requests.
-- Les demandes joueur en attente apparaissent en ORANGE sur la carte Commandement.
-- Le panneau OUTILS ADMIN affiche aussi les demandes en attente.
-- Le compteur EN ATTENTE de la page Commandement est synchronisé avec Supabase.
+Fichiers à remplacer/ajouter dans le dépôt :
+- senzany-map.html
+- assets/js/pages/map-pending-v2.js
 
-Fichiers à remplacer/ajouter :
-1) backend/routes/adminMap.js
-2) map/index_carte_senzany_v10_6.html
-3) senzany-admin-map.html
+La correction :
+- conserve ton interface actuelle ;
+- conserve le bouton de demande existant ;
+- récupère /api/map toutes les 5 secondes ;
+- affiche les demandes pending en orange ;
+- affiche les zones validated en rouge si leurs coordonnées existent ;
+- ne montre aucune donnée privée.
 
-Puis :
-Commit + Push GitHub
-Sur VPS :
-cd /var/www/senzany
-git pull
-cd backend
-pm2 restart senzany-api --update-env
-
-Aucun nouveau SQL n'est nécessaire pour cette correction.
+Aucune modification VPS manuelle n'est nécessaire si ton déploiement GitHub fonctionne.
+Après déploiement : Ctrl+F5 sur /senzany-map.html.

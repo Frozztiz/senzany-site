@@ -6,10 +6,6 @@
   <meta name="description" content="Carte interactive Senzany : consulter les zones occupées et demander un emplacement de base."/>
   <title>Carte — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/map.css?v=1.0"/>
-  <style>
-    .real-map-frame{width:100%;height:820px;border:0;display:block;background:#0b0f10}
-    .map-stage--real{overflow:hidden;padding:0}
-  </style>
 </head>
 <body data-page="map">
   <div data-site-header></div>
@@ -36,39 +32,37 @@
           <div class="map-panel__section">
             <span class="map-panel__eyebrow">NOUVELLE IMPLANTATION</span>
             <h2>Choisissez votre zone</h2>
-            <p>Cliquez sur « Demander un emplacement », puis sélectionnez votre position directement sur la carte.</p>
+            <p>Cliquez sur « Demander un emplacement », puis sélectionnez précisément votre position sur la carte.</p>
             <button id="startPlacementBtn" class="map-primary" type="button">+ DEMANDER UN EMPLACEMENT</button>
           </div>
 
           <div class="map-panel__section map-selection" id="selectionPanel" hidden>
-            <span class="map-panel__eyebrow">EMPLACEMENT SÉLECTIONNÉ</span>
-            <p>Votre sélection est prête. Les coordonnées exactes restent privées et seront transmises uniquement au staff.</p>
+            <span class="map-panel__eyebrow">POSITION SÉLECTIONNÉE</span>
+            <div class="map-coords"><div><small>X</small><strong id="selectedX">—</strong></div><div><small>Z</small><strong id="selectedZ">—</strong></div></div>
             <label>Nom de la demande<input id="requestName" type="text" maxlength="80" placeholder="Ex. Base de notre groupe"></label>
             <label>Commentaire<textarea id="requestComment" rows="4" maxlength="500" placeholder="Précisez votre projet si nécessaire…"></textarea></label>
-            <div class="map-radius-note">Zone demandée : <strong>60 m autour du drapeau</strong></div>
+            <div class="map-radius-note">Zone indicative : <strong>60 m autour du drapeau</strong></div>
             <button id="submitPlacementBtn" class="map-primary" type="button">ENVOYER LA DEMANDE</button>
             <button id="cancelPlacementBtn" class="map-secondary" type="button">ANNULER</button>
-            <div id="requestStatus" style="margin-top:10px;font-size:12px;line-height:1.45"></div>
           </div>
 
           <div class="map-panel__section">
             <span class="map-panel__eyebrow">RÈGLE SENZANY</span>
-            <p>Une base validée apparaîtra comme <strong>zone occupée</strong>. Aucun pseudo, propriétaire, SteamID ni coordonnée exacte ne sera affiché aux joueurs.</p>
+            <p>Une base validée apparaîtra publiquement comme <strong>zone occupée</strong>. Aucun pseudo ni propriétaire ne sera affiché sur la carte publique.</p>
           </div>
         </aside>
 
         <div class="map-stage-card">
           <div class="map-stage-toolbar">
-            <div><span>CHERNARUS+</span><small>Carte publique des zones d’implantation</small></div>
-            
+            <div><span>CHERNARUS+</span><small>Coordonnées DayZ 0 → 15360</small></div>
+            <div class="map-zoom-controls"><button id="zoomOut" type="button">−</button><button id="zoomReset" type="button">100%</button><button id="zoomIn" type="button">+</button></div>
           </div>
-          <div class="map-stage map-stage--real" id="mapStage" aria-label="Carte interactive Chernarus">
-            <iframe
-              class="real-map-frame"
-              src="map/index_carte_senzany_v10_5.html?embed=1&mode=public"
-              title="Carte publique Chernarus Senzany"
-              loading="eager">
-            </iframe>
+          <div class="map-stage" id="mapStage" aria-label="Carte interactive Chernarus">
+            <div class="map-canvas" id="mapCanvas">
+              <img src="assets/images/map/chernarus-grid.svg" alt="Fond cartographique Chernarus provisoire" draggable="false"/>
+              <div class="map-marker-layer" id="markerLayer"></div>
+            </div>
+            <div class="map-stage__hint" id="mapHint">Maintenez et glissez pour déplacer la carte · molette pour zoomer</div>
           </div>
         </div>
       </div>
@@ -78,114 +72,7 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js?v=map-v1"></script>
   <script defer src="assets/js/app.js"></script>
-
-<script>
-(() => {
-  const frame = document.querySelector('.real-map-frame');
-  const startBtn = document.getElementById('startPlacementBtn');
-  const panel = document.getElementById('selectionPanel');
-  const submitBtn = document.getElementById('submitPlacementBtn');
-  const cancelBtn = document.getElementById('cancelPlacementBtn');
-  const nameInput = document.getElementById('requestName');
-  const commentInput = document.getElementById('requestComment');
-  const statusEl = document.getElementById('requestStatus');
-
-  let selected = null;
-
-  function setStatus(message, ok = true){
-    statusEl.textContent = message;
-    statusEl.style.color = ok ? '#7de398' : '#ff8f8f';
-  }
-
-  startBtn.addEventListener('click', () => {
-    selected = null;
-    panel.hidden = true;
-    setStatus('');
-    frame.contentWindow.postMessage({type:'senzany-start-placement'}, location.origin);
-    startBtn.textContent = 'CLIQUEZ SUR LA CARTE…';
-  });
-
-  cancelBtn.addEventListener('click', () => {
-    selected = null;
-    panel.hidden = true;
-    nameInput.value = '';
-    commentInput.value = '';
-    setStatus('');
-    startBtn.textContent = '+ DEMANDER UN EMPLACEMENT';
-    frame.contentWindow.postMessage({type:'senzany-cancel-placement'}, location.origin);
-  });
-
-  window.addEventListener('message', (event) => {
-    if(event.origin !== location.origin) return;
-    if(!event.data || event.data.type !== 'senzany-map-selection') return;
-
-    selected = {
-      x: Number(event.data.x),
-      z: Number(event.data.z),
-      radius: 60
-    };
-
-    panel.hidden = false;
-    startBtn.textContent = 'MODIFIER MON EMPLACEMENT';
-    setStatus('Emplacement sélectionné. Complétez votre demande.');
-  });
-
-  submitBtn.addEventListener('click', async () => {
-    if(!selected){
-      setStatus('Sélectionnez d’abord un emplacement sur la carte.', false);
-      return;
-    }
-
-    const name = nameInput.value.trim();
-    const comment = commentInput.value.trim();
-
-    if(!name){
-      setStatus('Donnez un nom à votre demande.', false);
-      return;
-    }
-
-    submitBtn.disabled = true;
-    setStatus('Envoi de la demande…');
-
-    try{
-      const response = await fetch('/api/map/requests', {
-        method:'POST',
-        credentials:'include',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          request_name:name,
-          comment,
-          center_x:selected.x,
-          center_z:selected.z,
-          radius_m:60
-        })
-      });
-
-      const data = await response.json().catch(()=>({}));
-
-      if(response.status === 401){
-        setStatus('Connectez-vous avec Steam avant d’envoyer votre demande.', false);
-        return;
-      }
-
-      if(!response.ok){
-        throw new Error(data.error || ('HTTP '+response.status));
-      }
-
-      setStatus('Demande envoyée au Commandement. ✅');
-      selected = null;
-      nameInput.value = '';
-      commentInput.value = '';
-      startBtn.textContent = '+ DEMANDER UN EMPLACEMENT';
-      frame.contentWindow.postMessage({type:'senzany-cancel-placement'}, location.origin);
-    }catch(error){
-      setStatus('Impossible d’envoyer la demande : '+error.message, false);
-    }finally{
-      submitBtn.disabled = false;
-    }
-  });
-})();
-</script>
-
+  <script defer src="assets/js/pages/map.js?v=1.0"></script>
+  <script defer src="assets/js/pages/map-pending-v2.js?v=2.0"></script>
 </body>
 </html>
