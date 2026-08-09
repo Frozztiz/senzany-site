@@ -1,63 +1,62 @@
-/* Senzany buildings overlay — prototype V1
-   Source: exports mapgrouppos fournis par l'utilisateur.
-   IMPORTANT: empreintes rectangulaires approximatives; positions/orientations viennent des exports DayZ.
+/* SENZANY — couche bâtiments prototype V1.1
+   Positions et orientations: exports DayZ mapgrouppos.
+   Empreintes: approximatives pour validation visuelle.
 */
 (function(){
-  const WORLD=15360;
-  const DATA_URL='overlay/buildings.json';
-  let layer=null;
+  const DATA_URL='buildings.json';
+  let buildingsLayer=null;
 
   function rotate(dx,dz,deg){
-    const a=deg*Math.PI/180, c=Math.cos(a), s=Math.sin(a);
+    const a=deg*Math.PI/180;
+    const c=Math.cos(a), s=Math.sin(a);
     return [dx*c-dz*s, dx*s+dz*c];
   }
 
   function footprint(b){
-    const hw=b.w/2, hh=b.h/2;
+    const hw=(Number(b.w)||12)/2;
+    const hh=(Number(b.h)||9)/2;
     const pts=[[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh]];
+
     return pts.map(([dx,dz])=>{
-      const [rx,rz]=rotate(dx,dz,b.a||0);
-      return dayzToLatLng(b.x+rx,b.z+rz);
+      const [rx,rz]=rotate(dx,dz,Number(b.a)||0);
+      return dayzToLatLng(Number(b.x)+rx,Number(b.z)+rz);
     });
   }
 
   async function initSenzanyBuildings(){
-    const res=await fetch(DATA_URL,{cache:'force-cache'});
+    const res=await fetch(DATA_URL,{cache:'no-store'});
     if(!res.ok) throw new Error('buildings.json HTTP '+res.status);
-    const data=await res.json();
 
-    layer=L.layerGroup();
+    const data=await res.json();
+    buildingsLayer=L.layerGroup();
+
     const renderer=L.canvas({padding:.5});
 
-    for(const b of data.structures||[]){
-      const poly=L.polygon(footprint(b),{
+    for(const b of (data.structures||[])){
+      L.polygon(footprint(b),{
         renderer,
-        color:'#e8e0ce',
+        color:'#f1dfb7',
         weight:1,
-        opacity:.9,
-        fillColor:'#d6cdb9',
-        fillOpacity:.55,
+        opacity:.95,
+        fillColor:'#d8c79f',
+        fillOpacity:.58,
         interactive:false
-      });
-      poly.addTo(layer);
+      }).addTo(buildingsLayer);
     }
 
-    layer.addTo(map);
-
-    // Ne dessiner les bâtiments qu'à un zoom utile.
-    function visibility(){
-      const z=map.getZoom();
-      if(z>=5){
-        if(!map.hasLayer(layer)) layer.addTo(map);
-      }else if(map.hasLayer(layer)){
-        map.removeLayer(layer);
+    function refreshVisibility(){
+      if(map.getZoom()>=5){
+        if(!map.hasLayer(buildingsLayer)) buildingsLayer.addTo(map);
+      }else if(map.hasLayer(buildingsLayer)){
+        map.removeLayer(buildingsLayer);
       }
     }
-    map.on('zoomend',visibility);
-    visibility();
 
-    console.log('[SENZANY] Couche bâtiments:', data.count);
-    return layer;
+    map.on('zoomend',refreshVisibility);
+    refreshVisibility();
+
+    console.log('[SENZANY] bâtiments chargés :',data.count);
+    return {layer:buildingsLayer,count:data.count||0};
   }
 
   window.initSenzanyBuildings=initSenzanyBuildings;

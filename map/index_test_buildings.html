@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Senzany — TEST bâtiments Chernarus</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+html,body,#map{height:100%;margin:0}
+body{background:#0b0f10;font-family:Arial,sans-serif}
+#map{background:#0b0f10}
+.test-panel{
+  position:absolute;z-index:1200;top:14px;right:14px;width:310px;
+  background:rgba(8,10,11,.95);border:1px solid rgba(255,255,255,.18);
+  color:#f3f3f3;padding:14px;box-shadow:0 16px 40px rgba(0,0,0,.35)
+}
+.test-panel b{display:block;font-size:15px;margin-bottom:7px}
+.test-panel p{font-size:11px;line-height:1.5;color:#aeb5b8;margin:5px 0}
+.status{margin-top:10px;padding:8px;border:1px solid #6e5728;color:#f2c46f;font-size:11px}
+.legend{margin-top:10px;font-size:11px}
+.swatch{display:inline-block;width:15px;height:10px;background:#d8c79f;border:1px solid #f1dfb7;margin-right:6px;vertical-align:-1px}
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<div class="test-panel">
+  <b>SENZANY — TEST BÂTIMENTS</b>
+  <p>Page isolée. Elle ne modifie ni la carte joueur ni la carte Commandement.</p>
+  <p>Les bâtiments apparaissent à partir du zoom 5.</p>
+  <div class="legend"><span class="swatch"></span>Empreinte bâtiment prototype</div>
+  <div id="status" class="status">Chargement des bâtiments…</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const WORLD=15360, SCALE_AT_MAX=64, PAD_PX=512;
+
+function dayzToLatLng(x,z){
+  const px=PAD_PX+x;
+  const py=PAD_PX+(WORLD-z);
+  return L.latLng(-py/SCALE_AT_MAX,px/SCALE_AT_MAX);
+}
+
+const map=L.map('map',{
+  crs:L.CRS.Simple,
+  minZoom:0,
+  maxZoom:8,
+  zoomSnap:1,
+  zoomDelta:1,
+  attributionControl:false,
+  maxBoundsViscosity:1
+});
+
+const canvasBounds=L.latLngBounds(L.latLng(-256,0),L.latLng(0,256));
+const worldBounds=L.latLngBounds(dayzToLatLng(0,0),dayzToLatLng(WORLD,WORLD));
+
+L.tileLayer('tiles/{z}/{x}/{y}.png',{
+  tileSize:256,
+  minZoom:0,
+  maxNativeZoom:6,
+  maxZoom:8,
+  noWrap:true,
+  bounds:canvasBounds,
+  keepBuffer:4
+}).addTo(map);
+
+map.createPane('roadsPane');
+map.getPane('roadsPane').style.zIndex=450;
+
+L.tileLayer('overlay/usermap_v5/{z}/{x}/{y}.png',{
+  pane:'roadsPane',
+  tileSize:256,
+  minZoom:0,
+  maxNativeZoom:6,
+  maxZoom:8,
+  noWrap:true,
+  bounds:canvasBounds,
+  opacity:.78,
+  keepBuffer:4
+}).addTo(map);
+
+map.setMaxBounds(canvasBounds.pad(.03));
+map.fitBounds(worldBounds);
+
+// On démarre volontairement à un zoom où la couche bâtiments est visible.
+map.setView(dayzToLatLng(6566,2985),6);
+</script>
+<script src="buildings-overlay.js"></script>
+<script>
+(async()=>{
+  const status=document.getElementById('status');
+  try{
+    const result=await initSenzanyBuildings();
+    status.textContent='Couche chargée : '+result.count+' structures. Zoome et compare avec le satellite.';
+  }catch(e){
+    console.error(e);
+    status.textContent='ERREUR : '+e.message;
+    status.style.color='#ff8f8f';
+  }
+})();
+</script>
+</body>
+</html>
