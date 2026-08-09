@@ -29,6 +29,13 @@
     }
   </style>
 
+
+<style>
+.leaflet-tile-pane img.leaflet-tile{
+  filter: brightness(.62) contrast(1.12) saturate(.82);
+}
+</style>
+
 </head>
 <body data-page="map">
   <div data-site-header></div>
@@ -145,9 +152,9 @@
     const canvasBounds = L.latLngBounds(L.latLng(-256, 0), L.latLng(0, 256));
     const worldBounds = L.latLngBounds(dayzToLatLng(0, 0), dayzToLatLng(WORLD, WORLD));
 
-    // Même fond XAM topographique que dans Commandement.
+    // Même fond XAM satellite sombre que dans Commandement.
     const xamTopo = L.tileLayer(
-      'https://static.xam.nu/dayz/maps/chernarusplus/1.27/topographic/{z}/{x}/{y}.webp',
+      'https://static.xam.nu/dayz/maps/chernarusplus/1.27/satellite/{z}/{x}/{y}.webp',
       {
         tileSize: 256,
         minZoom: 0,

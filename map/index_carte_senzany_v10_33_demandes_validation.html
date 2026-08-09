@@ -258,32 +258,26 @@ body.embed-admin.tools-open #map{right:0!important}
 }
 .pending-public-label:before{display:none!important}
 .request-actions{
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  gap:8px!important;
-  margin-top:10px!important;
-}
-.request-actions .btn{
-  display:block!important;
-  width:100%!important;
-  min-height:34px!important;
-  font-weight:900!important;
-  font-size:11px!important;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:6px;
+  margin-top:8px
 }
 .approveRequestBtn{
-  background:#178447!important;
-  border:1px solid #32d37a!important;
+  background:#1e7c45!important;
+  border-color:#2dbb6b!important;
   color:#fff!important
 }
-.rejectRequestBtn{
-  background:#8c2525!important;
-  border:1px solid #e44b4b!important;
-  color:#fff!important
-}
-.approveRequestBtn:hover{background:#20a65b!important}
-.rejectRequestBtn:hover{background:#aa3030!important}
-.approveRequestBtn[disabled],.rejectRequestBtn[disabled]{opacity:.55;cursor:wait}
+.approveRequestBtn:hover{background:#269856!important}
+.approveRequestBtn[disabled]{opacity:.55;cursor:wait}
 </style>
+
+<style>
+.leaflet-tile-pane img.leaflet-tile{
+  filter: brightness(.62) contrast(1.12) saturate(.82);
+}
+</style>
+
 </head>
 <body>
 
@@ -727,36 +721,6 @@ async function approveRequest(request, button){
 }
 
 
-async function rejectRequest(request, button){
-  if(!adminAuthorized || !request?.id) return;
-  if(!window.confirm('Refuser cette demande ?')) return;
-
-  const old=button.textContent;
-  button.disabled=true;
-  button.textContent='REFUS…';
-
-  try{
-    const response=await fetch(
-      '/api/admin/map/requests/'+encodeURIComponent(request.id)+'/reject',
-      {
-        method:'PATCH',
-        credentials:'include',
-        cache:'no-store',
-        headers:{Accept:'application/json','Content-Type':'application/json'}
-      }
-    );
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok) throw new Error(data.error||('HTTP '+response.status));
-    status('Demande refusée.',true);
-    await loadAdmin();
-  }catch(error){
-    status('Refus impossible : '+error.message,false);
-    button.disabled=false;
-    button.textContent=old;
-  }
-}
-
-
 function renderAdminRequests(){
   if(mode!=='admin' || !Array.isArray(requests) || !requests.length) return;
 
@@ -809,17 +773,12 @@ function renderAdminRequests(){
         'Commentaire : '+esc(r.comment||'—')+
       '</div>'+
       (isPending
-        ? '<div class="request-actions">'+
-            '<button class="btn approveRequestBtn">✓ VALIDER</button>'+
-            '<button class="btn rejectRequestBtn">✕ REFUSER</button>'+
-          '</div>'
+        ? '<div class="request-actions"><button class="btn approveRequestBtn">✓ VALIDER LA DEMANDE</button></div>'
         : '');
 
     if(isPending){
       const approveBtn=card.querySelector('.approveRequestBtn');
-      const rejectBtn=card.querySelector('.rejectRequestBtn');
       if(approveBtn) approveBtn.onclick=()=>approveRequest(r,approveBtn);
-      if(rejectBtn) rejectBtn.onclick=()=>rejectRequest(r,rejectBtn);
     }
 
     if(Number.isFinite(x)&&Number.isFinite(z)){
