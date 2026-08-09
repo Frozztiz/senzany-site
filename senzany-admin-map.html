@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Commandement — MAP SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/map.css?v=1.0"/>
+  <style>
+    .real-map-frame{width:100%;height:920px;border:0;display:block;background:#0b0f10}
+    .map-stage--real{overflow:hidden;padding:0}
+  </style>
 </head>
 <body data-page="commandement" class="map-admin-body">
   <div data-site-header></div>
@@ -34,7 +38,7 @@
           </div>
           <div class="map-panel__section">
             <span class="map-panel__eyebrow">V1 // ÉTAT</span>
-            <p>La carte et les coordonnées sont prêtes. La prochaine étape sera de connecter Supabase puis la détection automatique des mâts de drapeau DayZ.</p>
+            <p>La carte Chernarus et Supabase sont maintenant connectées. Les données privées restent accessibles uniquement via l’accès Commandement.</p>
           </div>
         </aside>
 
@@ -43,12 +47,13 @@
             <div><span>CARTE STAFF</span><small>Zones publiques + demandes + détection jeu</small></div>
             <div class="map-zoom-controls"><button id="zoomOut" type="button">−</button><button id="zoomReset" type="button">100%</button><button id="zoomIn" type="button">+</button></div>
           </div>
-          <div class="map-stage" id="mapStage">
-            <div class="map-canvas" id="mapCanvas">
-              <img src="assets/images/map/chernarus-grid.svg" alt="Fond cartographique Chernarus provisoire" draggable="false"/>
-              <div class="map-marker-layer" id="markerLayer"></div>
-            </div>
-            <div class="map-stage__hint">MAP Commandement · V1 interface</div>
+          <div class="map-stage map-stage--real" id="mapStage">
+            <iframe
+              class="real-map-frame"
+              src="map/index_carte_senzany_v10_2.html?mode=admin"
+              title="Carte Commandement Chernarus Senzany"
+              loading="eager">
+            </iframe>
           </div>
         </div>
       </div>
@@ -57,6 +62,5 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js?v=map-v1"></script>
   <script defer src="assets/js/app.js"></script>
-  <script defer src="assets/js/pages/map.js?v=1.0"></script>
 </body>
 </html>

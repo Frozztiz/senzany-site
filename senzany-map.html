@@ -6,6 +6,11 @@
   <meta name="description" content="Carte interactive Senzany : consulter les zones occupées et demander un emplacement de base."/>
   <title>Carte — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/map.css?v=1.0"/>
+  <style>
+    .real-map-frame{width:100%;height:820px;border:0;display:block;background:#0b0f10}
+    .map-stage--real{overflow:hidden;padding:0}
+    .map-live-note{margin-top:12px;padding:10px 12px;border:1px solid rgba(91,172,229,.28);background:rgba(91,172,229,.06);font-size:12px;line-height:1.55}
+  </style>
 </head>
 <body data-page="map">
   <div data-site-header></div>
@@ -33,7 +38,7 @@
             <span class="map-panel__eyebrow">NOUVELLE IMPLANTATION</span>
             <h2>Choisissez votre zone</h2>
             <p>Cliquez sur « Demander un emplacement », puis sélectionnez précisément votre position sur la carte.</p>
-            <button id="startPlacementBtn" class="map-primary" type="button">+ DEMANDER UN EMPLACEMENT</button>
+            <button id="startPlacementBtn" class="map-primary" type="button" disabled title="Connexion au système de demandes en cours">+ DEMANDER UN EMPLACEMENT</button><div class="map-live-note">La vraie carte Chernarus est maintenant intégrée. Le dépôt d’une demande joueur sera reconnecté à Supabase à l’étape suivante.</div>
           </div>
 
           <div class="map-panel__section map-selection" id="selectionPanel" hidden>
@@ -57,12 +62,13 @@
             <div><span>CHERNARUS+</span><small>Coordonnées DayZ 0 → 15360</small></div>
             <div class="map-zoom-controls"><button id="zoomOut" type="button">−</button><button id="zoomReset" type="button">100%</button><button id="zoomIn" type="button">+</button></div>
           </div>
-          <div class="map-stage" id="mapStage" aria-label="Carte interactive Chernarus">
-            <div class="map-canvas" id="mapCanvas">
-              <img src="assets/images/map/chernarus-grid.svg" alt="Fond cartographique Chernarus provisoire" draggable="false"/>
-              <div class="map-marker-layer" id="markerLayer"></div>
-            </div>
-            <div class="map-stage__hint" id="mapHint">Maintenez et glissez pour déplacer la carte · molette pour zoomer</div>
+          <div class="map-stage map-stage--real" id="mapStage" aria-label="Carte interactive Chernarus">
+            <iframe
+              class="real-map-frame"
+              src="map/index_carte_senzany_v10_2.html?embed=1&mode=public"
+              title="Carte publique Chernarus Senzany"
+              loading="eager">
+            </iframe>
           </div>
         </div>
       </div>
@@ -72,6 +78,5 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js?v=map-v1"></script>
   <script defer src="assets/js/app.js"></script>
-  <script defer src="assets/js/pages/map.js?v=1.0"></script>
 </body>
 </html>
