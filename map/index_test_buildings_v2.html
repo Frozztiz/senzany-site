@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Senzany — TEST bâtiments Vanilla V2</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+html,body,#map{height:100%;margin:0}
+body{background:#0b0f10;font-family:Arial,sans-serif}
+#map{background:#0b0f10}
+.panel{
+ position:absolute;z-index:1200;right:14px;top:14px;width:330px;
+ background:rgba(8,10,11,.96);border:1px solid rgba(255,255,255,.18);
+ color:#fff;padding:14px
+}
+.panel b{display:block;margin-bottom:6px}
+.panel p{font-size:11px;color:#abb2b5;line-height:1.5;margin:5px 0}
+.status{margin-top:10px;border:1px solid #6e5728;padding:8px;color:#f2c46f;font-size:11px}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="panel">
+  <b>SENZANY — TEST VANILLA V2</b>
+  <p>Une seule source Chernarus est utilisée. Les 6 exports ne sont plus fusionnés.</p>
+  <p>Les formes restent approximatives : ce test sert uniquement à contrôler les positions.</p>
+  <div id="status" class="status">Chargement…</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const WORLD=15360, SCALE_AT_MAX=64, PAD_PX=512;
+
+function dayzToLatLng(x,z){
+  const px=PAD_PX+x;
+  const py=PAD_PX+(WORLD-z);
+  return L.latLng(-py/SCALE_AT_MAX,px/SCALE_AT_MAX);
+}
+
+const map=L.map('map',{
+  crs:L.CRS.Simple,
+  minZoom:0,maxZoom:8,zoomSnap:1,zoomDelta:1,
+  attributionControl:false,maxBoundsViscosity:1
+});
+
+const canvasBounds=L.latLngBounds(L.latLng(-256,0),L.latLng(0,256));
+const worldBounds=L.latLngBounds(dayzToLatLng(0,0),dayzToLatLng(WORLD,WORLD));
+
+L.tileLayer('tiles/{z}/{x}/{y}.png',{
+  tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,
+  noWrap:true,bounds:canvasBounds,keepBuffer:4
+}).addTo(map);
+
+map.createPane('roadsPane');
+map.getPane('roadsPane').style.zIndex=450;
+
+L.tileLayer('overlay/usermap_v5/{z}/{x}/{y}.png',{
+  pane:'roadsPane',tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,
+  noWrap:true,bounds:canvasBounds,opacity:.78,keepBuffer:4
+}).addTo(map);
+
+map.setMaxBounds(canvasBounds.pad(.03));
+map.fitBounds(worldBounds);
+map.setView(dayzToLatLng(6566,2985),6);
+</script>
+<script src="buildings-vanilla-overlay.js"></script>
+<script>
+(async()=>{
+  const s=document.getElementById('status');
+  try{
+    const r=await initSenzanyVanillaBuildings();
+    s.textContent='Couche chargée : '+r.count+' structures retenues.';
+  }catch(e){
+    console.error(e);
+    s.textContent='ERREUR : '+e.message;
+    s.style.color='#ff8f8f';
+  }
+})();
+</script>
+</body>
+</html>
