@@ -1,21 +1,43 @@
 const express = require("express");
-
 const router = express.Router();
 
 function supabaseConfig() {
   const url = String(process.env.SUPABASE_URL || "").replace(/\/$/, "");
   const key = process.env.SUPABASE_SECRET_KEY;
-
   if (!url || !key) {
     throw new Error("SUPABASE_URL ou SUPABASE_SECRET_KEY manquante.");
   }
-
   return { url, key };
+}
+
+async function supabaseRequest(path, options = {}) {
+  const { url, key } = supabaseConfig();
+  const response = await fetch(`${url}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+  });
+
+  const text = await response.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+
+  if (!response.ok) {
+    const error = new Error(`Supabase HTTP ${response.status}`);
+    error.status = response.status;
+    error.data = data;
+    throw error;
+  }
+  return data;
 }
 
 async function rpc(functionName, payload = {}) {
   const { url, key } = supabaseConfig();
-
   const response = await fetch(`${url}/rest/v1/rpc/${functionName}`, {
     method: "POST",
     headers: {
@@ -29,12 +51,7 @@ async function rpc(functionName, payload = {}) {
 
   const text = await response.text();
   let data = null;
-
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    data = text;
-  }
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
 
   if (!response.ok) {
     const error = new Error(`Supabase RPC HTTP ${response.status}`);
@@ -42,52 +59,14 @@ async function rpc(functionName, payload = {}) {
     error.data = data;
     throw error;
   }
-
-  return data;
-}
-
-
-async function restGet(table, query = "") {
-  const { url, key } = supabaseConfig();
-
-  const response = await fetch(`${url}/rest/v1/${table}${query}`, {
-    method: "GET",
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      Accept: "application/json",
-    },
-  });
-
-  const text = await response.text();
-  let data = null;
-
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    data = text;
-  }
-
-  if (!response.ok) {
-    const error = new Error(`Supabase REST HTTP ${response.status}`);
-    error.status = response.status;
-    error.data = data;
-    throw error;
-  }
-
   return data;
 }
 
 function normalizeMembers(value) {
   if (Array.isArray(value)) return value;
-
   if (typeof value === "string") {
-    return value
-      .split(/\r?\n|,/)
-      .map((entry) => entry.trim())
-      .filter(Boolean);
+    return value.split(/\r?\n|,/).map(v => v.trim()).filter(Boolean);
   }
-
   return [];
 }
 
@@ -99,55 +78,43 @@ function validateZoneBody(body) {
   const centerZ = Number(body.center_z);
   const radiusM = Number(body.radius_m ?? 60);
 
-  if (!publicName) {
-    return { error: "Le nom public est obligatoire." };
-  }
-
-  if (!["base", "mapping", "event", "special"].includes(zoneType)) {
+  if (!publicName) return { error: "Le nom public est obligatoire." };
+  if (!["base","mapping","event","special"].includes(zoneType)) {
     return { error: "Type de zone invalide." };
   }
-
-  if (!["validated", "pending", "hidden"].includes(publicStatus)) {
+  if (!["validated","pending","hidden"].includes(publicStatus)) {
     return { error: "Statut invalide." };
   }
-
   if (
-    !Number.isFinite(centerX) ||
-    !Number.isFinite(centerZ) ||
-    centerX < 0 ||
-    centerX > 15360 ||
-    centerZ < 0 ||
-    centerZ > 15360
+    !Number.isFinite(centerX) || !Number.isFinite(centerZ) ||
+    centerX < 0 || centerX > 15360 || centerZ < 0 || centerZ > 15360
   ) {
     return { error: "Coordonnées Chernarus invalides." };
   }
-
   if (!Number.isFinite(radiusM) || radiusM < 1 || radiusM > 60) {
     return { error: "Le rayon doit être compris entre 1 et 60 mètres." };
   }
 
   return {
     value: {
-      publicName,
-      zoneType,
-      publicStatus,
-      centerX,
-      centerZ,
-      radiusM: Math.round(radiusM),
+      publicName, zoneType, publicStatus,
+      centerX, centerZ, radiusM: Math.round(radiusM),
     },
   };
 }
 
-// GET /api/admin/map
 router.get("/", async (req, res, next) => {
   try {
     res.set("Cache-Control", "no-store");
 
     const [zones, requests] = await Promise.all([
       rpc("command_map_list"),
-      restGet(
-        "map_requests",
-        "?select=id,requester_steam_id,request_name,comment,center_x,center_z,radius_m,status,created_at&order=created_at.desc"
+      supabaseRequest(
+        "map_requests" +
+        "?select=id,requester_steam_id,request_name,comment,center_x,center_z,radius_m,status,created_at,updated_at" +
+        "&status=eq.pending" +
+        "&order=created_at.asc",
+        { method: "GET" }
       ),
     ]);
 
@@ -160,22 +127,12 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-// POST /api/admin/map
 router.post("/", async (req, res, next) => {
   try {
     const checked = validateZoneBody(req.body || {});
-    if (checked.error) {
-      return res.status(400).json({ error: checked.error });
-    }
+    if (checked.error) return res.status(400).json({ error: checked.error });
 
-    const {
-      publicName,
-      zoneType,
-      publicStatus,
-      centerX,
-      centerZ,
-      radiusM,
-    } = checked.value;
+    const { publicName, zoneType, publicStatus, centerX, centerZ, radiusM } = checked.value;
 
     const zoneId = await rpc("command_map_create", {
       p_public_name: publicName,
@@ -192,37 +149,20 @@ router.post("/", async (req, res, next) => {
       p_actor: req.commandSteamId,
     });
 
-    return res.status(201).json({
-      ok: true,
-      id: zoneId,
-    });
+    return res.status(201).json({ ok: true, id: zoneId });
   } catch (error) {
     next(error);
   }
 });
 
-// PATCH /api/admin/map/:id
 router.patch("/:id", async (req, res, next) => {
   try {
     const zoneId = String(req.params.id || "").trim();
     const checked = validateZoneBody(req.body || {});
+    if (!zoneId) return res.status(400).json({ error: "ID de zone manquant." });
+    if (checked.error) return res.status(400).json({ error: checked.error });
 
-    if (!zoneId) {
-      return res.status(400).json({ error: "ID de zone manquant." });
-    }
-
-    if (checked.error) {
-      return res.status(400).json({ error: checked.error });
-    }
-
-    const {
-      publicName,
-      zoneType,
-      publicStatus,
-      centerX,
-      centerZ,
-      radiusM,
-    } = checked.value;
+    const { publicName, zoneType, publicStatus, centerX, centerZ, radiusM } = checked.value;
 
     const updated = await rpc("command_map_update", {
       p_zone_id: zoneId,
@@ -240,33 +180,101 @@ router.patch("/:id", async (req, res, next) => {
       p_actor: req.commandSteamId,
     });
 
-    if (!updated) {
-      return res.status(404).json({ error: "Zone introuvable." });
-    }
-
+    if (!updated) return res.status(404).json({ error: "Zone introuvable." });
     return res.json({ ok: true });
   } catch (error) {
     next(error);
   }
 });
 
-// DELETE /api/admin/map/:id
 router.delete("/:id", async (req, res, next) => {
   try {
     const zoneId = String(req.params.id || "").trim();
-
-    if (!zoneId) {
-      return res.status(400).json({ error: "ID de zone manquant." });
-    }
+    if (!zoneId) return res.status(400).json({ error: "ID de zone manquant." });
 
     const deleted = await rpc("command_map_delete", {
       p_zone_id: zoneId,
       p_actor: req.commandSteamId,
     });
 
-    if (!deleted) {
-      return res.status(404).json({ error: "Zone introuvable." });
+    if (!deleted) return res.status(404).json({ error: "Zone introuvable." });
+    return res.json({ ok: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Validation en un clic d'une demande joueur.
+router.patch("/requests/:id/approve", async (req, res, next) => {
+  try {
+    const requestId = String(req.params.id || "").trim();
+    if (!requestId) {
+      return res.status(400).json({ error: "ID de demande manquant." });
     }
+
+    const rows = await supabaseRequest(
+      "map_requests" +
+      "?select=id,requester_steam_id,request_name,comment,center_x,center_z,radius_m,status" +
+      `&id=eq.${encodeURIComponent(requestId)}` +
+      "&limit=1",
+      { method: "GET" }
+    );
+
+    const request = Array.isArray(rows) ? rows[0] : null;
+    if (!request) return res.status(404).json({ error: "Demande introuvable." });
+    if (String(request.status) !== "pending") {
+      return res.status(409).json({ error: "Cette demande n'est plus en attente." });
+    }
+
+    const zoneId = await rpc("command_map_create", {
+      p_public_name: String(request.request_name || "Base joueur").trim(),
+      p_zone_type: "base",
+      p_public_status: "validated",
+      p_public_description: null,
+      p_owner_name: null,
+      p_owner_steam_id: String(request.requester_steam_id || "").trim() || null,
+      p_center_x: Number(request.center_x),
+      p_center_z: Number(request.center_z),
+      p_radius_m: Math.min(60, Math.max(1, Number(request.radius_m) || 60)),
+      p_members: [],
+      p_staff_comment: String(request.comment || "").trim() || null,
+      p_actor: req.commandSteamId,
+    });
+
+    await supabaseRequest(
+      `map_requests?id=eq.${encodeURIComponent(requestId)}`,
+      {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({
+          status: "approved",
+          updated_at: new Date().toISOString(),
+        }),
+      }
+    );
+
+    return res.json({ ok: true, zone_id: zoneId, request_id: requestId });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch("/requests/:id/reject", async (req, res, next) => {
+  try {
+    const requestId = String(req.params.id || "").trim();
+    if (!requestId) return res.status(400).json({ error: "ID de demande manquant." });
+
+    await supabaseRequest(
+      `map_requests?id=eq.${encodeURIComponent(requestId)}&status=eq.pending`,
+      {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({
+          status: "rejected",
+          updated_at: new Date().toISOString(),
+        }),
+      }
+    );
 
     return res.json({ ok: true });
   } catch (error) {
