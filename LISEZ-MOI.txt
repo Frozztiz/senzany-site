@@ -1,23 +1,22 @@
-SENZANY MAP V10.5
+SENZANY MAP V10.6 — DEMANDES COMMANDEMENT
 
-CORRECTIONS :
-1. Le panneau admin est MASQUE par défaut.
-   Seul un bouton "OUTILS ADMIN" apparaît en haut à droite.
-   Le panneau s'ouvre uniquement au clic et peut être refermé.
+Correction :
+- /api/admin/map renvoie maintenant aussi public.map_requests.
+- Les demandes joueur en attente apparaissent en ORANGE sur la carte Commandement.
+- Le panneau OUTILS ADMIN affiche aussi les demandes en attente.
+- Le compteur EN ATTENTE de la page Commandement est synchronisé avec Supabase.
 
-2. Le bloc de DEMANDE JOUEUR est restauré.
-   Aucun texte de développement n'est affiché.
-   Les coordonnées X/Z ne sont jamais montrées au joueur.
+Fichiers à remplacer/ajouter :
+1) backend/routes/adminMap.js
+2) map/index_carte_senzany_v10_6.html
+3) senzany-admin-map.html
 
-3. Le joueur clique "DEMANDER UN EMPLACEMENT",
-   choisit sur la carte, saisit un nom/commentaire et envoie.
+Puis :
+Commit + Push GitHub
+Sur VPS :
+cd /var/www/senzany
+git pull
+cd backend
+pm2 restart senzany-api --update-env
 
-INSTALLATION :
-- Remplacer senzany-map.html
-- Remplacer senzany-admin-map.html
-- Ajouter map/index_carte_senzany_v10_5.html
-- Remplacer backend/server.js
-- Ajouter backend/routes/mapRequests.js
-- Exécuter supabase/026_map_requests.sql dans Supabase
-- Commit / Push / git pull
-- pm2 restart senzany-api --update-env
+Aucun nouveau SQL n'est nécessaire pour cette correction.

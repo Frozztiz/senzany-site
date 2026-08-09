@@ -46,6 +46,38 @@ async function rpc(functionName, payload = {}) {
   return data;
 }
 
+
+async function restGet(table, query = "") {
+  const { url, key } = supabaseConfig();
+
+  const response = await fetch(`${url}/rest/v1/${table}${query}`, {
+    method: "GET",
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      Accept: "application/json",
+    },
+  });
+
+  const text = await response.text();
+  let data = null;
+
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
+
+  if (!response.ok) {
+    const error = new Error(`Supabase REST HTTP ${response.status}`);
+    error.status = response.status;
+    error.data = data;
+    throw error;
+  }
+
+  return data;
+}
+
 function normalizeMembers(value) {
   if (Array.isArray(value)) return value;
 
@@ -111,10 +143,17 @@ router.get("/", async (req, res, next) => {
   try {
     res.set("Cache-Control", "no-store");
 
-    const zones = await rpc("command_map_list");
+    const [zones, requests] = await Promise.all([
+      rpc("command_map_list"),
+      restGet(
+        "map_requests",
+        "?select=id,requester_steam_id,request_name,comment,center_x,center_z,radius_m,status,created_at&order=created_at.desc"
+      ),
+    ]);
 
     return res.json({
       zones: Array.isArray(zones) ? zones : [],
+      requests: Array.isArray(requests) ? requests : [],
     });
   } catch (error) {
     next(error);

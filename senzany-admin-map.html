@@ -50,7 +50,7 @@
           <div class="map-stage map-stage--real" id="mapStage">
             <iframe
               class="real-map-frame"
-              src="map/index_carte_senzany_v10_5.html?embed=1&mode=admin"
+              src="map/index_carte_senzany_v10_6.html?embed=1&mode=admin"
               title="Carte Commandement Chernarus Senzany"
               loading="eager">
             </iframe>
@@ -62,5 +62,22 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js?v=map-v1"></script>
   <script defer src="assets/js/app.js"></script>
+
+<script>
+window.addEventListener('message', (event) => {
+  if(event.origin !== location.origin) return;
+  const data = event.data || {};
+  if(data.type !== 'senzany-admin-map-stats') return;
+
+  const approved = document.getElementById('approvedCount');
+  const pending = document.getElementById('pendingCount');
+  const orphan = document.getElementById('orphanCount');
+
+  if(approved) approved.textContent = String(Number(data.approved) || 0);
+  if(pending) pending.textContent = String(Number(data.pending) || 0);
+  if(orphan) orphan.textContent = String(Number(data.orphan) || 0);
+});
+</script>
+
 </body>
 </html>
