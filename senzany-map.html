@@ -120,17 +120,14 @@
     }
 
     function dayzToLatLng(x, z) {
-      const px = PAD_PX + Number(x);
-      const py = PAD_PX + (WORLD - Number(z));
-      return L.latLng(-py / SCALE_AT_MAX, px / SCALE_AT_MAX);
+      // Même calibration XAM que la carte Commandement.
+      return L.latLng((Number(z) / 60) - 256, Number(x) / 60);
     }
 
     function latLngToDayz(latlng) {
-      const px = latlng.lng * SCALE_AT_MAX;
-      const py = -latlng.lat * SCALE_AT_MAX;
       return {
-        x: px - PAD_PX,
-        z: WORLD - (py - PAD_PX)
+        x: Number(latlng.lng) * 60,
+        z: (Number(latlng.lat) + 256) * 60
       };
     }
 
@@ -148,37 +145,52 @@
     const canvasBounds = L.latLngBounds(L.latLng(-256, 0), L.latLng(0, 256));
     const worldBounds = L.latLngBounds(dayzToLatLng(0, 0), dayzToLatLng(WORLD, WORLD));
 
-    // Vraie carte Chernarus déjà présente sur le VPS.
-    const satellite = L.tileLayer('map/tiles/{z}/{x}/{y}.png', {
-      tileSize: 256,
-      minZoom: 0,
-      maxNativeZoom: 6,
-      maxZoom: 8,
-      noWrap: true,
-      bounds: canvasBounds,
-      keepBuffer: 4
-    }).addTo(map);
-
-    map.createPane('roadsPane');
-    map.getPane('roadsPane').style.zIndex = 450;
-
-    const roads = L.tileLayer('map/overlay/usermap_v5/{z}/{x}/{y}.png', {
-      pane: 'roadsPane',
-      tileSize: 256,
-      minZoom: 0,
-      maxNativeZoom: 6,
-      maxZoom: 8,
-      noWrap: true,
-      bounds: canvasBounds,
-      opacity: .90,
-      keepBuffer: 4
-    }).addTo(map);
+    // Même fond XAM topographique que dans Commandement.
+    const xamTopo = L.tileLayer(
+      'https://static.xam.nu/dayz/maps/chernarusplus/1.27/topographic/{z}/{x}/{y}.webp',
+      {
+        tileSize: 256,
+        minZoom: 0,
+        maxNativeZoom: 6,
+        maxZoom: 8,
+        noWrap: true,
+        bounds: canvasBounds,
+        keepBuffer: 4
+      }
+    ).addTo(map);
 
     map.setMaxBounds(canvasBounds.pad(.03));
-    map.fitBounds(canvasBounds, { padding: [0, 0] });
+    map.fitBounds(worldBounds, { padding: [0, 0] });
 
     const zonesLayer = L.layerGroup().addTo(map);
     const selectionLayer = L.layerGroup().addTo(map);
+
+    // Empreintes P3D / bâtiments identiques à Commandement.
+    const buildingsV30Layer = L.layerGroup().addTo(map);
+
+    fetch('map/data/batiments_chernarus_v30.json', { cache: 'no-store' })
+      .then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(data => {
+        const features = Array.isArray(data.features) ? data.features : [];
+        features.forEach(f => {
+          if (!Array.isArray(f.poly)) return;
+          L.polygon(
+            f.poly.map(p => dayzToLatLng(p[0], p[1])),
+            {
+              color: '#2f8cff',
+              weight: 1.15,
+              opacity: .92,
+              fillColor: '#2f8cff',
+              fillOpacity: .12,
+              interactive: false
+            }
+          ).addTo(buildingsV30Layer);
+        });
+      })
+      .catch(error => console.warn('[Senzany Map] Bâtiments P3D indisponibles :', error));
 
     let placementMode = false;
     let currentSelection = null;
@@ -191,7 +203,7 @@
       if (x <= 0 || x > WORLD || z <= 0 || z > WORLD) return;
 
       const center = dayzToLatLng(x, z);
-      const leafletRadius = radius / SCALE_AT_MAX;
+      const leafletRadius = radius / 60;
 
       L.circle(center, {
         radius: leafletRadius,
@@ -288,7 +300,7 @@
       const center = dayzToLatLng(currentSelection.x, currentSelection.z);
 
       L.circle(center, {
-        radius: MAX_RADIUS / SCALE_AT_MAX,
+        radius: MAX_RADIUS / 60,
         color: '#63b9e8',
         fillColor: '#63b9e8',
         weight: 2,
@@ -365,13 +377,13 @@
     document.getElementById('zoomIn').addEventListener('click', () => map.zoomIn());
     document.getElementById('zoomOut').addEventListener('click', () => map.zoomOut());
     document.getElementById('zoomReset').addEventListener('click', () => {
-      map.fitBounds(canvasBounds, { padding: [0, 0] });
+      map.fitBounds(worldBounds, { padding: [0, 0] });
       document.getElementById('zoomReset').textContent = '100%';
     });
 
     map.on('zoomend', () => {
       const z = map.getZoom();
-      const pct = Math.round(Math.pow(2, z - map.getBoundsZoom(canvasBounds)) * 100);
+      const pct = Math.round(Math.pow(2, z - map.getBoundsZoom(worldBounds)) * 100);
       document.getElementById('zoomReset').textContent = Math.max(25, pct) + '%';
     });
 
@@ -379,7 +391,7 @@
     setInterval(refreshZones, 5000);
     setTimeout(() => {
       map.invalidateSize(true);
-      map.fitBounds(canvasBounds, { padding: [0, 0] });
+      map.fitBounds(worldBounds, { padding: [0, 0] });
     }, 250);
   })();
   </script>
