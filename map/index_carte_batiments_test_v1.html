@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Senzany — Test bâtiments vanilla Chernarus+</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --bg:#0b0f10;--panel:rgba(8,10,11,.96);--line:rgba(255,255,255,.14);
+  --text:#f3f3f3;--muted:#9da4a7;--accent:#d33a32;
+}
+html,body,#map{height:100%;margin:0}
+body{background:var(--bg);font-family:Arial,sans-serif;overflow:hidden}
+#map{background:#0d1213}
+.panel{
+  position:absolute;right:14px;top:14px;z-index:1200;width:330px;
+  max-height:calc(100vh - 28px);overflow:auto;padding:14px;
+  color:var(--text);background:var(--panel);border:1px solid var(--line);
+  box-shadow:0 16px 45px rgba(0,0,0,.48)
+}
+.eyebrow{font-size:10px;font-weight:900;letter-spacing:.15em;color:var(--accent)}
+h1{font-size:19px;margin:6px 0 4px}
+.sub{font-size:11px;line-height:1.45;color:var(--muted)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:12px 0}
+.stat{border:1px solid var(--line);background:#101516;padding:8px}
+.stat small{display:block;color:var(--muted);font-size:9px}
+.stat strong{font-size:16px}
+.section{border-top:1px solid var(--line);padding-top:10px;margin-top:10px}
+.section-title{font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:7px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:6px 0;font-size:11px}
+input[type=checkbox]{accent-color:var(--accent)}
+.legend{display:inline-block;width:11px;height:11px;border:1px solid rgba(255,255,255,.8);margin-right:6px;vertical-align:-2px}
+.status{font-size:10px;line-height:1.45;padding:8px;border:1px solid var(--line);background:#111719}
+.status.ok{color:#7de398;border-color:#2d693f}
+.status.err{color:#ff9b9b;border-color:#7a2a2a}
+.coords{
+  position:absolute;left:14px;bottom:14px;z-index:1200;
+  padding:8px 10px;background:rgba(8,10,11,.92);border:1px solid var(--line);
+  color:#eee;font:11px monospace
+}
+.hint{font-size:10px;color:var(--muted);line-height:1.5}
+button{
+  width:100%;padding:8px;border:1px solid var(--line);background:#151a1c;
+  color:white;font-weight:800;cursor:pointer
+}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="coords" id="coords">X — / Z —</div>
+<aside class="panel">
+  <div class="eyebrow">SENZANY // CHERNARUS+</div>
+  <h1>TEST BÂTIMENTS VANILLA</h1>
+  <div class="sub">Page isolée. Elle utilise le JSON extrait directement du WRP et ne modifie pas encore la carte joueur ni Commandement.</div>
+
+  <div class="stats">
+    <div class="stat"><small>OBJETS CHARGÉS</small><strong id="loadedCount">0</strong></div>
+    <div class="stat"><small>VISIBLES</small><strong id="visibleCount">0</strong></div>
+  </div>
+  <div id="status" class="status">Chargement…</div>
+
+  <div class="section">
+    <div class="section-title">CATÉGORIES</div>
+    <label class="row"><span><i class="legend" style="background:#efefef"></i>Maisons</span><input data-cat="houses" type="checkbox" checked></label>
+    <label class="row"><span><i class="legend" style="background:#c8c8c8"></i>Hangars / sheds</span><input data-cat="sheds" type="checkbox" checked></label>
+    <label class="row"><span><i class="legend" style="background:#f2b36d"></i>Industriel</span><input data-cat="industrial" type="checkbox" checked></label>
+    <label class="row"><span><i class="legend" style="background:#84a6d8"></i>Militaire</span><input data-cat="military" type="checkbox" checked></label>
+    <label class="row"><span><i class="legend" style="background:#d89fd1"></i>Spécifique</span><input data-cat="specific" type="checkbox" checked></label>
+    <label class="row"><span><i class="legend" style="background:#b9e08a"></i>Commerces</span><input data-cat="stores" type="checkbox" checked></label>
+    <label class="row"><span><i class="legend" style="background:#a6d7d0"></i>Résidentiel divers</span><input data-cat="residential_misc" type="checkbox"></label>
+    <label class="row"><span><i class="legend" style="background:#b79a78"></i>Ruines</span><input data-cat="ruins" type="checkbox"></label>
+    <label class="row"><span><i class="legend" style="background:#8aa3a8"></i>Arrêts de bus</span><input data-cat="bus" type="checkbox"></label>
+  </div>
+
+  <div class="section">
+    <button id="fitBtn" type="button">RECADRER CHERNARUS</button>
+    <div class="hint" style="margin-top:8px">
+      Les symboles sont dessinés sur Canvas pour rester fluides avec des milliers de bâtiments.
+      Plus tu zoomes, plus leur orientation issue du WRP devient visible.
+    </div>
+  </div>
+</aside>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const WORLD=15360, SCALE_AT_MAX=64;
+function dayzToLatLng(x,z){
+  const px=(x/WORLD)*16384;
+  const py=((WORLD-z)/WORLD)*16384;
+  return L.latLng(-py/SCALE_AT_MAX,px/SCALE_AT_MAX);
+}
+function latLngToDayz(ll){
+  const px=ll.lng*SCALE_AT_MAX, py=-ll.lat*SCALE_AT_MAX;
+  return {x:(px/16384)*WORLD,z:WORLD-(py/16384)*WORLD};
+}
+const map=L.map('map',{
+  crs:L.CRS.Simple,minZoom:0,maxZoom:8,zoomSnap:1,zoomDelta:1,
+  attributionControl:false,maxBoundsViscosity:1
+});
+const canvasBounds=L.latLngBounds(L.latLng(-256,0),L.latLng(0,256));
+const worldBounds=L.latLngBounds(dayzToLatLng(0,0),dayzToLatLng(WORLD,WORLD));
+L.tileLayer('tiles/{z}/{x}/{y}.png',{
+  tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,noWrap:true,bounds:canvasBounds,keepBuffer:4
+}).addTo(map);
+map.createPane('roadsPane');
+map.getPane('roadsPane').style.zIndex=350;
+L.tileLayer('overlay/usermap_v5/{z}/{x}/{y}.png',{
+  pane:'roadsPane',tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,noWrap:true,
+  bounds:canvasBounds,opacity:.68,keepBuffer:4
+}).addTo(map);
+map.fitBounds(worldBounds);
+map.setMaxBounds(canvasBounds.pad(.03));
+
+const colors={
+  houses:'#efefef',sheds:'#c8c8c8',industrial:'#f2b36d',military:'#84a6d8',
+  specific:'#d89fd1',stores:'#b9e08a',residential_misc:'#a6d7d0',
+  ruins:'#b79a78',bus:'#8aa3a8'
+};
+let buildings=[];
+const enabled=new Set(['houses','sheds','industrial','military','specific','stores']);
+
+class BuildingCanvasLayer extends L.Layer{
+  onAdd(map){
+    this._map=map;
+    this._canvas=L.DomUtil.create('canvas','leaflet-building-canvas');
+    const pane=map.getPane('overlayPane');
+    pane.appendChild(this._canvas);
+    this._canvas.style.position='absolute';
+    this._canvas.style.pointerEvents='none';
+    this._ctx=this._canvas.getContext('2d');
+    map.on('move zoom resize',this._schedule,this);
+    this._schedule();
+  }
+  onRemove(map){
+    map.off('move zoom resize',this._schedule,this);
+    this._canvas.remove();
+  }
+  _schedule(){
+    cancelAnimationFrame(this._raf);
+    this._raf=requestAnimationFrame(()=>this._draw());
+  }
+  _draw(){
+    if(!this._map)return;
+    const size=this._map.getSize();
+    const topLeft=this._map.containerPointToLayerPoint([0,0]);
+    const dpr=window.devicePixelRatio||1;
+    this._canvas.width=size.x*dpr;
+    this._canvas.height=size.y*dpr;
+    this._canvas.style.width=size.x+'px';
+    this._canvas.style.height=size.y+'px';
+    L.DomUtil.setPosition(this._canvas,topLeft);
+    const ctx=this._ctx;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,size.x,size.y);
+
+    const bounds=this._map.getBounds();
+    const zoom=this._map.getZoom();
+    const half=zoom>=7?5:zoom>=6?4:zoom>=5?3:2;
+    let visible=0;
+
+    for(const b of buildings){
+      if(!enabled.has(b.category))continue;
+      const ll=dayzToLatLng(b.x,b.z);
+      if(!bounds.contains(ll))continue;
+      visible++;
+      const p=this._map.latLngToContainerPoint(ll);
+      const a=(b.rotation||0)*Math.PI/180;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(a);
+      ctx.globalAlpha=zoom<=3?.45:zoom===4?.62:.82;
+      ctx.fillStyle=colors[b.category]||'#fff';
+      ctx.strokeStyle='rgba(0,0,0,.78)';
+      ctx.lineWidth=zoom>=6?1:.6;
+      // rectangle volontairement compact : position + orientation, pas une fausse empreinte exacte
+      ctx.beginPath();
+      ctx.rect(-half,-Math.max(1,half*.55),half*2,Math.max(2,half*1.1));
+      ctx.fill();
+      if(zoom>=5)ctx.stroke();
+      if(zoom>=7){
+        ctx.beginPath();
+        ctx.moveTo(half,0);
+        ctx.lineTo(half+3,-2);
+        ctx.lineTo(half+3,2);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    document.getElementById('visibleCount').textContent=visible.toLocaleString('fr-FR');
+  }
+}
+const buildingLayer=new BuildingCanvasLayer().addTo(map);
+
+document.querySelectorAll('[data-cat]').forEach(cb=>{
+  cb.addEventListener('change',()=>{
+    if(cb.checked)enabled.add(cb.dataset.cat); else enabled.delete(cb.dataset.cat);
+    buildingLayer._schedule();
+  });
+});
+document.getElementById('fitBtn').onclick=()=>map.fitBounds(worldBounds);
+
+map.on('mousemove',e=>{
+  const p=latLngToDayz(e.latlng);
+  document.getElementById('coords').textContent=
+    'X '+p.x.toFixed(1)+' / Z '+p.z.toFixed(1)+' / zoom '+map.getZoom();
+});
+
+(async()=>{
+  const status=document.getElementById('status');
+  try{
+    const r=await fetch('data/vanilla-buildings-v1.json',{cache:'no-store'});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    buildings=await r.json();
+    document.getElementById('loadedCount').textContent=buildings.length.toLocaleString('fr-FR');
+    status.textContent='WRP connecté — '+buildings.length.toLocaleString('fr-FR')+' objets de bâtiment disponibles.';
+    status.className='status ok';
+    buildingLayer._schedule();
+  }catch(e){
+    status.textContent='Impossible de charger le JSON : '+e.message;
+    status.className='status err';
+  }
+})();
+</script>
+</body>
+</html>
