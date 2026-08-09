@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Senzany — Test bâtiments vanilla Chernarus+</title>
+<title>Senzany — Test bâtiments vanilla Chernarus+ V10.7B</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{
@@ -51,8 +51,8 @@ button{
 <div class="coords" id="coords">X — / Z —</div>
 <aside class="panel">
   <div class="eyebrow">SENZANY // CHERNARUS+</div>
-  <h1>TEST BÂTIMENTS VANILLA</h1>
-  <div class="sub">Page isolée. Elle utilise le JSON extrait directement du WRP et ne modifie pas encore la carte joueur ni Commandement.</div>
+  <h1>TEST BÂTIMENTS VANILLA V10.7B</h1>
+  <div class="sub">Correction coordonnées : conversion identique à la carte Senzany V10.6 (PAD 512 px). JSON WRP inchangé.</div>
 
   <div class="stats">
     <div class="stat"><small>OBJETS CHARGÉS</small><strong id="loadedCount">0</strong></div>
@@ -84,15 +84,16 @@ button{
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const WORLD=15360, SCALE_AT_MAX=64;
+const WORLD=15360, SCALE_AT_MAX=64, PAD_PX=512;
 function dayzToLatLng(x,z){
-  const px=(x/WORLD)*16384;
-  const py=((WORLD-z)/WORLD)*16384;
+  const px=PAD_PX+x;
+  const py=PAD_PX+(WORLD-z);
   return L.latLng(-py/SCALE_AT_MAX,px/SCALE_AT_MAX);
 }
-function latLngToDayz(ll){
-  const px=ll.lng*SCALE_AT_MAX, py=-ll.lat*SCALE_AT_MAX;
-  return {x:(px/16384)*WORLD,z:WORLD-(py/16384)*WORLD};
+function latLngToDayz(latlng){
+  const px=latlng.lng*SCALE_AT_MAX;
+  const py=-latlng.lat*SCALE_AT_MAX;
+  return {x:px-PAD_PX,z:WORLD-(py-PAD_PX)};
 }
 const map=L.map('map',{
   crs:L.CRS.Simple,minZoom:0,maxZoom:8,zoomSnap:1,zoomDelta:1,
