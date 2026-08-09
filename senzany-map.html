@@ -42,9 +42,8 @@
           </div>
 
           <div class="map-panel__section map-selection" id="selectionPanel" hidden>
-            <span class="map-panel__eyebrow">POSITION SÉLECTIONNÉE</span>
-            <div class="map-coords"><div><small>X</small><strong id="selectedX">—</strong></div><div><small>Z</small><strong id="selectedZ">—</strong></div></div>
-            <label>Nom de la demande<input id="requestName" type="text" maxlength="80" placeholder="Ex. Base de notre groupe"></label>
+            <span class="map-panel__eyebrow">EMPLACEMENT SÉLECTIONNÉ</span>
+                        <label>Nom de la demande<input id="requestName" type="text" maxlength="80" placeholder="Ex. Base de notre groupe"></label>
             <label>Commentaire<textarea id="requestComment" rows="4" maxlength="500" placeholder="Précisez votre projet si nécessaire…"></textarea></label>
             <div class="map-radius-note">Zone indicative : <strong>60 m autour du drapeau</strong></div>
             <button id="submitPlacementBtn" class="map-primary" type="button">ENVOYER LA DEMANDE</button>
@@ -53,19 +52,19 @@
 
           <div class="map-panel__section">
             <span class="map-panel__eyebrow">RÈGLE SENZANY</span>
-            <p>Une base validée apparaîtra publiquement comme <strong>zone occupée</strong>. Aucun pseudo ni propriétaire ne sera affiché sur la carte publique.</p>
+            <p>Une base validée apparaîtra publiquement comme <strong>zone occupée</strong>. Aucun pseudo, propriétaire, SteamID ni coordonnée exacte ne sera affiché aux joueurs.</p>
           </div>
         </aside>
 
         <div class="map-stage-card">
           <div class="map-stage-toolbar">
-            <div><span>CHERNARUS+</span><small>Coordonnées DayZ 0 → 15360</small></div>
+            <div><span>CHERNARUS+</span><small>Carte publique des zones d’implantation</small></div>
             <div class="map-zoom-controls"><button id="zoomOut" type="button">−</button><button id="zoomReset" type="button">100%</button><button id="zoomIn" type="button">+</button></div>
           </div>
           <div class="map-stage map-stage--real" id="mapStage" aria-label="Carte interactive Chernarus">
             <iframe
               class="real-map-frame"
-              src="map/index_carte_senzany_v10_2.html?embed=1&mode=public"
+              src="map/index_carte_senzany_v10_3.html?embed=1&mode=public"
               title="Carte publique Chernarus Senzany"
               loading="eager">
             </iframe>

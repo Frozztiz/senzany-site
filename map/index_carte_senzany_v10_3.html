@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Senzany — Carte interactive V10.3</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --bg:#0b0f10;
+  --panel:rgba(8,10,11,.97);
+  --line:rgba(255,255,255,.14);
+  --text:#f3f3f3;
+  --muted:#9da4a7;
+  --accent:#d33a32;
+  --good:#43c269;
+  --warn:#d19a38;
+  --admin:#2f87d8;
+}
+html,body,#map{height:100%;margin:0}
+body{background:var(--bg);font-family:Arial,sans-serif}
+#map{background:var(--bg)}
+.panel{
+  position:absolute;top:14px;right:14px;z-index:1000;width:370px;
+  max-height:calc(100vh - 28px);overflow:auto;background:var(--panel);
+  border:1px solid var(--line);color:var(--text);box-shadow:0 18px 50px rgba(0,0,0,.4)
+}
+.head,.section{padding:13px 15px;border-bottom:1px solid var(--line)}
+.eyebrow{color:var(--accent);font-size:10px;font-weight:800;letter-spacing:.16em;margin-bottom:5px}
+.title{font-size:19px;font-weight:900}
+.sub{margin-top:5px;color:var(--muted);font-size:11px;line-height:1.45}
+.section-title{font-size:10px;font-weight:800;letter-spacing:.14em;color:#cbd0d2;margin-bottom:9px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0;font-size:12px}
+input[type=checkbox]{accent-color:var(--accent)}
+input,select,textarea{
+  box-sizing:border-box;background:#111719;color:white;border:1px solid #303638;
+  padding:8px 9px;font-size:12px;outline:none
+}
+input[type=text],input[type=number],select,textarea{width:100%}
+textarea{min-height:62px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.btn{
+  width:100%;border:1px solid var(--line);background:#151a1c;color:white;
+  padding:9px 10px;font-size:11px;font-weight:800;cursor:pointer
+}
+.btn:hover{background:#1d2326}
+.btn.red{background:var(--accent);border-color:var(--accent)}
+.btn.admin{background:#173653;border-color:#285d87}
+.btn.activeAdmin{background:var(--admin);border-color:var(--admin)}
+.btn.danger{background:#4c1818;border-color:#7a2a2a}
+.help{font-size:10px;color:var(--muted);line-height:1.45;margin-top:8px}
+.coords{background:rgba(8,10,11,.94);color:white;padding:8px 10px;border:1px solid var(--line);font:12px monospace}
+.card{border:1px solid var(--line);background:#101516;padding:10px;margin:7px 0}
+.card-name{font-size:12px;font-weight:800}
+.meta{font-size:10px;color:var(--muted);line-height:1.5;margin-top:5px}
+.badge{font-size:9px;font-weight:800;padding:2px 5px;border:1px solid var(--line)}
+.badge.public{color:#70db8b;border-color:#2d693f}
+.badge.admin{color:#79b9ff;border-color:#315f88}
+.secure{
+  border-left:3px solid var(--admin);background:rgba(47,135,216,.08);
+  padding:9px 10px;margin-top:8px;font-size:10px;line-height:1.5
+}
+.publicOnly{
+  border-left:3px solid var(--good);background:rgba(67,194,105,.07);
+  padding:9px 10px;margin-top:8px;font-size:10px;line-height:1.5
+}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.hidden{display:none!important}
+.mode-banner{
+  position:absolute;left:16px;top:16px;z-index:1000;padding:8px 11px;
+  border:1px solid var(--line);background:rgba(8,10,11,.94);color:white;
+  font-size:11px;font-weight:800
+}
+.mode-banner.admin{border-color:#315f88;color:#8fc5ff}
+.mode-banner.public{border-color:#2d693f;color:#7de398}
+body.embed-mode .panel{display:none!important}
+body.embed-mode .mode-banner{display:none!important}
+body.embed-mode #map{position:absolute;inset:0}
+
+/* Commandement intégré : panneau latéral dédié, jamais par-dessus la carte */
+body.embed-admin{overflow:hidden}
+body.embed-admin #map{
+  position:absolute;
+  top:0;
+  left:0;
+  right:390px;
+  bottom:0;
+}
+body.embed-admin .panel{
+  display:block!important;
+  position:absolute;
+  top:0;
+  right:0;
+  width:390px;
+  height:100vh;
+  max-height:none;
+  border-top:0;
+  border-right:0;
+  border-bottom:0;
+  overflow:auto;
+  box-shadow:-18px 0 45px rgba(0,0,0,.28);
+}
+body.embed-admin .mode-banner{display:none!important}
+
+@media (max-width:1100px){
+  body.embed-admin #map{right:330px}
+  body.embed-admin .panel{width:330px}
+}
+.status{font-size:10px;line-height:1.45;padding:8px 10px;border:1px solid var(--line);background:#111719}
+.status.ok{border-color:#2d693f;color:#82e79b}
+.status.err{border-color:#7a2a2a;color:#ff9b9b}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="modeBanner" class="mode-banner public">VUE JOUEUR — DONNÉES PUBLIQUES UNIQUEMENT</div>
+
+<div class="panel">
+  <div class="head">
+    <div class="eyebrow">SENZANY // CHERNARUS+</div>
+    <div class="title">Carte interactive V10.3</div>
+    <div class="sub">Version connectée au backend Senzany et à Supabase. Les données privées ne sont chargées qu’après autorisation Commandement.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">ACCÈS</div>
+    <button id="publicBtn" class="btn red">VUE JOUEUR</button>
+    <div style="height:6px"></div>
+    <button id="adminBtn" class="btn admin">VUE ADMIN / COMMANDEMENT</button>
+    <div style="height:8px"></div>
+    <div id="apiStatus" class="status">Chargement des données publiques…</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">AFFICHAGE</div>
+    <div class="row"><label><input id="toggleRoads" type="checkbox" checked> Routes & cours d’eau</label></div>
+    <div class="row"><label><input id="toggleGrid" type="checkbox"> Grille 1 km</label></div>
+    <div class="row"><label><input id="toggleBases" type="checkbox" checked> Bases / zones</label></div>
+  </div>
+
+  <div id="adminEditor" class="section hidden">
+    <div class="section-title">FICHE ADMIN — BASE / MAPPING</div>
+    <input id="editId" type="hidden">
+    <input id="name" type="text" placeholder="Nom public">
+    <div style="height:8px"></div>
+    <input id="publicDescription" type="text" placeholder="Description publique (facultatif)">
+    <div style="height:8px"></div>
+    <div class="grid2">
+      <input id="owner" type="text" placeholder="Propriétaire">
+      <input id="steamid" type="text" placeholder="SteamID">
+    </div>
+    <div style="height:8px"></div>
+    <div class="grid2">
+      <input id="x" type="number" step="0.1" placeholder="X">
+      <input id="z" type="number" step="0.1" placeholder="Z">
+    </div>
+    <div style="height:8px"></div>
+    <div class="grid3">
+      <input id="radius" type="number" min="1" max="60" value="60">
+      <select id="type">
+        <option value="base">Base joueur</option>
+        <option value="mapping">Mapping Senzany</option>
+        <option value="event">Événement</option>
+        <option value="special">Zone spéciale</option>
+      </select>
+      <select id="status">
+        <option value="validated">Validée</option>
+        <option value="pending">En attente</option>
+        <option value="hidden">Masquée</option>
+      </select>
+    </div>
+    <div style="height:8px"></div>
+    <textarea id="members" placeholder="Membres / SteamID secondaires — un par ligne"></textarea>
+    <div style="height:8px"></div>
+    <textarea id="staffComment" placeholder="Commentaire staff privé"></textarea>
+    <div style="height:8px"></div>
+    <button id="pickBtn" class="btn">CHOISIR SUR LA CARTE</button>
+    <div style="height:6px"></div>
+    <button id="saveBtn" class="btn red">ENREGISTRER DANS SUPABASE</button>
+    <div style="height:6px"></div>
+    <button id="cancelEditBtn" class="btn hidden">ANNULER LA MODIFICATION</button>
+    <div class="help">Rayon maximal : <b>60 m autour du mât/drapeau</b>. Cette limite est contrôlée dans l’interface, le backend et Supabase.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">ZONES ENREGISTRÉES <span id="zoneCount">(0)</span></div>
+    <div id="list"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const WORLD=15360, SCALE_AT_MAX=64, PAD_PX=512, MAX_RADIUS=60;
+let mode='public';
+let pickMode=false;
+let zones=[];
+let adminAuthorized=false;
+
+function dayzToLatLng(x,z){
+  const px=PAD_PX+x;
+  const py=PAD_PX+(WORLD-z);
+  return L.latLng(-py/SCALE_AT_MAX,px/SCALE_AT_MAX);
+}
+function latLngToDayz(latlng){
+  const px=latlng.lng*SCALE_AT_MAX;
+  const py=-latlng.lat*SCALE_AT_MAX;
+  return {x:px-PAD_PX,z:WORLD-(py-PAD_PX)};
+}
+function esc(s){
+  return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+function status(message, ok=true){
+  const el=document.getElementById('apiStatus');
+  el.textContent=message;
+  el.className='status '+(ok?'ok':'err');
+}
+function statusLabel(value){
+  if(value==='validated') return 'Validée';
+  if(value==='pending') return 'En attente';
+  return 'Masquée';
+}
+function typeLabel(value){
+  if(value==='base') return 'Base joueur';
+  if(value==='mapping') return 'Mapping Senzany';
+  if(value==='event') return 'Événement';
+  return 'Zone spéciale';
+}
+
+const map=L.map('map',{
+  crs:L.CRS.Simple,minZoom:0,maxZoom:8,zoomSnap:1,zoomDelta:1,
+  attributionControl:false,maxBoundsViscosity:1
+});
+const canvasBounds=L.latLngBounds(L.latLng(-256,0),L.latLng(0,256));
+const worldBounds=L.latLngBounds(dayzToLatLng(0,0),dayzToLatLng(WORLD,WORLD));
+
+L.tileLayer('tiles/{z}/{x}/{y}.png',{
+  tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,noWrap:true,bounds:canvasBounds,keepBuffer:4
+}).addTo(map);
+
+map.createPane('roadsPane');
+map.getPane('roadsPane').style.zIndex=450;
+const roads=L.tileLayer('overlay/usermap_v5/{z}/{x}/{y}.png',{
+  pane:'roadsPane',tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,noWrap:true,bounds:canvasBounds,opacity:.9,keepBuffer:4
+}).addTo(map);
+
+map.setMaxBounds(canvasBounds.pad(.03));
+map.fitBounds(worldBounds);
+
+const gridLayer=L.layerGroup();
+for(let x=1000;x<WORLD;x+=1000){
+  L.polyline([dayzToLatLng(x,0),dayzToLatLng(x,WORLD)],{weight:1,opacity:.27,dashArray:'4 6',interactive:false}).addTo(gridLayer);
+}
+for(let z=1000;z<WORLD;z+=1000){
+  L.polyline([dayzToLatLng(0,z),dayzToLatLng(WORLD,z)],{weight:1,opacity:.27,dashArray:'4 6',interactive:false}).addTo(gridLayer);
+}
+
+const zonesLayer=L.layerGroup().addTo(map);
+
+function render(){
+  zonesLayer.clearLayers();
+  const list=document.getElementById('list');
+  list.innerHTML='';
+  document.getElementById('zoneCount').textContent='('+zones.length+')';
+
+  if(!zones.length){
+    list.innerHTML='<div class="meta">Aucune zone enregistrée.</div>';
+    return;
+  }
+
+  zones.forEach(z=>{
+    if(mode==='public'){
+      const card=document.createElement('div');
+      card.className='card';
+      card.innerHTML=
+        '<div class="card-name">'+esc(z.public_name)+' <span class="badge public">PUBLIC</span></div>'+
+        '<div class="meta">Type : '+typeLabel(z.zone_type)+'<br>Statut : '+statusLabel(z.public_status)+
+        (z.public_description?'<br>'+esc(z.public_description):'')+'</div>'+
+        '<div class="publicOnly">La vue joueur ne reçoit ni coordonnées exactes, ni SteamID, ni propriétaire, ni membres, ni commentaire staff.</div>';
+      list.appendChild(card);
+      return;
+    }
+
+    // Les coordonnées n'existent que dans la réponse /api/admin/map.
+    const x=Number(z.center_x);
+    const zz=Number(z.center_z);
+    const radius=Math.min(MAX_RADIUS,Math.max(1,Number(z.radius_m)||60));
+
+    if(Number.isFinite(x)&&Number.isFinite(zz)&&z.public_status!=='hidden'){
+      const c=z.zone_type==='base' ? '#d33a32' : '#3b9bd3';
+
+      L.circle(dayzToLatLng(x,zz),{
+        radius:radius/SCALE_AT_MAX,color:c,fillColor:c,weight:2,fillOpacity:.14
+      }).addTo(zonesLayer);
+
+      const marker=L.circleMarker(dayzToLatLng(x,zz),{
+        radius:5,color:c,fillColor:c,fillOpacity:1,weight:2
+      }).addTo(zonesLayer);
+
+      marker.bindPopup(
+        '<b>'+esc(z.public_name)+'</b><br>'+
+        '<b>COMMANDEMENT</b><br>'+
+        'Propriétaire : '+esc(z.owner_name||'—')+'<br>'+
+        'SteamID : '+esc(z.owner_steam_id||'—')+'<br>'+
+        'X '+x.toFixed(1)+' / Z '+zz.toFixed(1)+'<br>'+
+        'Rayon : '+radius+' m<br>'+
+        'Membres : '+esc(Array.isArray(z.members)?z.members.join(', '):(z.members||'—'))+'<br>'+
+        'Commentaire staff : '+esc(z.staff_comment||'—')
+      );
+    }
+
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=
+      '<div class="card-name">'+esc(z.public_name)+' <span class="badge admin">ADMIN</span></div>'+
+      '<div class="meta">Type : '+typeLabel(z.zone_type)+'<br>Statut : '+statusLabel(z.public_status)+'</div>'+
+      '<div class="secure">'+
+        '<b>Données Commandement</b><br>'+
+        'Propriétaire : '+esc(z.owner_name||'—')+'<br>'+
+        'SteamID : '+esc(z.owner_steam_id||'—')+'<br>'+
+        'Coordonnées : X '+(Number.isFinite(x)?x.toFixed(1):'—')+' / Z '+(Number.isFinite(zz)?zz.toFixed(1):'—')+'<br>'+
+        'Rayon : '+radius+' m<br>'+
+        'Membres : '+esc(Array.isArray(z.members)?z.members.join(', '):(z.members||'—'))+'<br>'+
+        'Commentaire staff : '+esc(z.staff_comment||'—')+
+      '</div>'+
+      '<div class="actions">'+
+        '<button class="btn editBtn">MODIFIER</button>'+
+        '<button class="btn danger deleteBtn">SUPPRIMER</button>'+
+      '</div>';
+
+    if(Number.isFinite(x)&&Number.isFinite(zz)){
+      card.querySelector('.card-name').style.cursor='pointer';
+      card.querySelector('.card-name').onclick=()=>map.setView(dayzToLatLng(x,zz),6);
+    }
+    card.querySelector('.editBtn').onclick=()=>fillEditor(z);
+    card.querySelector('.deleteBtn').onclick=()=>deleteZone(z);
+    list.appendChild(card);
+  });
+}
+
+async function loadPublic(){
+  mode='public';
+  adminAuthorized=false;
+  document.getElementById('adminEditor').classList.add('hidden');
+  document.getElementById('publicBtn').classList.add('red');
+  document.getElementById('adminBtn').classList.remove('activeAdmin');
+
+  const banner=document.getElementById('modeBanner');
+  banner.className='mode-banner public';
+  banner.textContent='VUE JOUEUR — DONNÉES PUBLIQUES UNIQUEMENT';
+
+  status('Chargement des données publiques…',true);
+
+  try{
+    const response=await fetch('/api/map',{credentials:'include',cache:'no-store'});
+    const data=await response.json().catch(()=>({}));
+
+    if(!response.ok) throw new Error(data.error||('HTTP '+response.status));
+
+    zones=Array.isArray(data.zones)?data.zones:[];
+    status('API publique connectée — '+zones.length+' zone(s).',true);
+    render();
+  }catch(error){
+    zones=[];
+    render();
+    status('Erreur API publique : '+error.message,false);
+  }
+}
+
+async function loadAdmin(){
+  status('Vérification de l’accès Commandement…',true);
+
+  try{
+    const response=await fetch('/api/admin/map',{
+      credentials:'include',
+      cache:'no-store'
+    });
+    const data=await response.json().catch(()=>({}));
+
+    if(response.status===401){
+      throw new Error('Connexion Steam requise.');
+    }
+    if(response.status===403){
+      throw new Error('Accès Commandement refusé.');
+    }
+    if(!response.ok){
+      throw new Error(data.error||('HTTP '+response.status));
+    }
+
+    mode='admin';
+    adminAuthorized=true;
+    zones=Array.isArray(data.zones)?data.zones:[];
+
+    document.getElementById('adminEditor').classList.remove('hidden');
+    document.getElementById('publicBtn').classList.remove('red');
+    document.getElementById('adminBtn').classList.add('activeAdmin');
+
+    const banner=document.getElementById('modeBanner');
+    banner.className='mode-banner admin';
+    banner.textContent='VUE ADMIN — DONNÉES COMMANDEMENT';
+
+    status('Accès Commandement validé — '+zones.length+' zone(s).',true);
+    render();
+  }catch(error){
+    adminAuthorized=false;
+    status(error.message,false);
+  }
+}
+
+function resetEditor(){
+  document.getElementById('editId').value='';
+  document.getElementById('name').value='';
+  document.getElementById('publicDescription').value='';
+  document.getElementById('owner').value='';
+  document.getElementById('steamid').value='';
+  document.getElementById('x').value='';
+  document.getElementById('z').value='';
+  document.getElementById('radius').value='60';
+  document.getElementById('type').value='base';
+  document.getElementById('status').value='validated';
+  document.getElementById('members').value='';
+  document.getElementById('staffComment').value='';
+  document.getElementById('saveBtn').textContent='ENREGISTRER DANS SUPABASE';
+  document.getElementById('cancelEditBtn').classList.add('hidden');
+}
+
+function fillEditor(z){
+  document.getElementById('editId').value=z.id||'';
+  document.getElementById('name').value=z.public_name||'';
+  document.getElementById('publicDescription').value=z.public_description||'';
+  document.getElementById('owner').value=z.owner_name||'';
+  document.getElementById('steamid').value=z.owner_steam_id||'';
+  document.getElementById('x').value=z.center_x??'';
+  document.getElementById('z').value=z.center_z??'';
+  document.getElementById('radius').value=Math.min(MAX_RADIUS,Number(z.radius_m)||60);
+  document.getElementById('type').value=z.zone_type||'base';
+  document.getElementById('status').value=z.public_status||'validated';
+  document.getElementById('members').value=Array.isArray(z.members)?z.members.join('\n'):(z.members||'');
+  document.getElementById('staffComment').value=z.staff_comment||'';
+  document.getElementById('saveBtn').textContent='ENREGISTRER LES MODIFICATIONS';
+  document.getElementById('cancelEditBtn').classList.remove('hidden');
+}
+
+function payloadFromEditor(){
+  let radius=Number(document.getElementById('radius').value)||60;
+  radius=Math.min(MAX_RADIUS,Math.max(1,radius));
+  document.getElementById('radius').value=radius;
+
+  return {
+    public_name:document.getElementById('name').value.trim(),
+    public_description:document.getElementById('publicDescription').value.trim(),
+    owner_name:document.getElementById('owner').value.trim(),
+    owner_steam_id:document.getElementById('steamid').value.trim(),
+    center_x:Number(document.getElementById('x').value),
+    center_z:Number(document.getElementById('z').value),
+    radius_m:radius,
+    zone_type:document.getElementById('type').value,
+    public_status:document.getElementById('status').value,
+    members:document.getElementById('members').value,
+    staff_comment:document.getElementById('staffComment').value.trim()
+  };
+}
+
+async function saveZone(){
+  if(!adminAuthorized) return;
+
+  const id=document.getElementById('editId').value.trim();
+  const payload=payloadFromEditor();
+
+  if(!payload.public_name){
+    status('Le nom public est obligatoire.',false);
+    return;
+  }
+  if(!Number.isFinite(payload.center_x)||!Number.isFinite(payload.center_z)){
+    status('Coordonnées X/Z obligatoires.',false);
+    return;
+  }
+
+  status(id?'Modification en cours…':'Enregistrement dans Supabase…',true);
+
+  try{
+    const response=await fetch(id?('/api/admin/map/'+encodeURIComponent(id)):'/api/admin/map',{
+      method:id?'PATCH':'POST',
+      credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    const data=await response.json().catch(()=>({}));
+
+    if(!response.ok) throw new Error(data.error||('HTTP '+response.status));
+
+    resetEditor();
+    await loadAdmin();
+    status(id?'Zone modifiée dans Supabase.':'Zone enregistrée dans Supabase.',true);
+  }catch(error){
+    status('Erreur : '+error.message,false);
+  }
+}
+
+async function deleteZone(z){
+  if(!adminAuthorized) return;
+  if(!confirm('Supprimer définitivement "'+z.public_name+'" ?')) return;
+
+  status('Suppression en cours…',true);
+
+  try{
+    const response=await fetch('/api/admin/map/'+encodeURIComponent(z.id),{
+      method:'DELETE',
+      credentials:'include'
+    });
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok) throw new Error(data.error||('HTTP '+response.status));
+
+    resetEditor();
+    await loadAdmin();
+    status('Zone supprimée.',true);
+  }catch(error){
+    status('Erreur : '+error.message,false);
+  }
+}
+
+document.getElementById('publicBtn').onclick=loadPublic;
+document.getElementById('adminBtn').onclick=loadAdmin;
+
+document.getElementById('toggleRoads').onchange=function(){this.checked?roads.addTo(map):map.removeLayer(roads);}
+document.getElementById('toggleGrid').onchange=function(){this.checked?gridLayer.addTo(map):map.removeLayer(gridLayer);}
+document.getElementById('toggleBases').onchange=function(){this.checked?zonesLayer.addTo(map):map.removeLayer(zonesLayer);}
+
+document.getElementById('pickBtn').onclick=()=>{
+  if(!adminAuthorized)return;
+  pickMode=!pickMode;
+  document.getElementById('pickBtn').classList.toggle('red',pickMode);
+  document.getElementById('pickBtn').textContent=pickMode?'CLIQUE SUR LA CARTE…':'CHOISIR SUR LA CARTE';
+  map.getContainer().style.cursor=pickMode?'crosshair':'grab';
+};
+
+map.on('click',e=>{
+  if(!pickMode||!adminAuthorized)return;
+  const p=latLngToDayz(e.latlng);
+  if(p.x<0||p.x>WORLD||p.z<0||p.z>WORLD)return;
+
+  document.getElementById('x').value=p.x.toFixed(1);
+  document.getElementById('z').value=p.z.toFixed(1);
+  pickMode=false;
+  document.getElementById('pickBtn').classList.remove('red');
+  document.getElementById('pickBtn').textContent='CHOISIR SUR LA CARTE';
+  map.getContainer().style.cursor='grab';
+});
+
+document.getElementById('radius').oninput=function(){
+  if(Number(this.value)>MAX_RADIUS)this.value=MAX_RADIUS;
+  if(Number(this.value)<1)this.value=1;
+};
+
+document.getElementById('saveBtn').onclick=saveZone;
+document.getElementById('cancelEditBtn').onclick=resetEditor;
+
+// Démarrage + mode intégré dans les vraies pages du site.
+const queryParams = new URLSearchParams(location.search);
+const embedded = queryParams.get('embed') === '1';
+const requestedMode = queryParams.get('mode') === 'admin' ? 'admin' : 'public';
+
+if(embedded){
+  if(requestedMode === 'admin'){
+    document.body.classList.add('embed-admin');
+  }else{
+    document.body.classList.add('embed-mode');
+  }
+  setTimeout(()=>map.invalidateSize(), 100);
+}
+
+if(location.protocol === 'file:'){
+  zones=[];
+  render();
+  status('Mode local : carte chargée. API disponible uniquement depuis le site hébergé.', true);
+}else if(requestedMode === 'admin'){
+  loadAdmin();
+}else{
+  loadPublic();
+}
+</script>
+</body>
+</html>
