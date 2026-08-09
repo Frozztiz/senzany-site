@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Senzany — Carte XAM référence</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+html,body,#map{height:100%;margin:0}
+body{background:#0b0f10;font-family:Arial,sans-serif;overflow:hidden}
+#map{background:#0c1011}
+.panel{
+  position:absolute;right:14px;top:14px;z-index:1000;width:285px;
+  padding:14px;background:rgba(7,9,10,.94);color:#eee;
+  border:1px solid rgba(255,255,255,.14);box-shadow:0 12px 35px #0008
+}
+.k{color:#e44b42;font:800 10px Arial;letter-spacing:.15em}
+h1{font-size:18px;margin:6px 0 5px}
+p{font-size:11px;line-height:1.45;color:#b6bdc0;margin:0 0 10px}
+.row{display:flex;gap:7px;margin-top:7px}
+button{
+  flex:1;background:#151a1b;color:#fff;border:1px solid rgba(255,255,255,.16);
+  padding:8px;cursor:pointer;font-weight:800
+}
+button.active{border-color:#e44b42;background:#291312}
+.status{margin-top:10px;padding:8px;border:1px solid #2c6b42;color:#87e59f;font-size:10px}
+.coords{
+  position:absolute;left:14px;bottom:14px;z-index:1000;background:#080a0beF;color:#fff;
+  padding:8px 10px;border:1px solid rgba(255,255,255,.18);font:11px monospace
+}
+.leaflet-control-attribution{font-size:9px;background:rgba(0,0,0,.65)!important;color:#bbb}
+.leaflet-control-attribution a{color:#ddd}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="coords" class="coords">X — / Z —</div>
+<aside class="panel">
+  <div class="k">SENZANY // TEST XAM</div>
+  <h1>BÂTIMENTS FIXES AU SOL</h1>
+  <p>Cette page utilise directement les tuiles cartographiques XAM comme référence. Les bâtiments font partie des tuiles : leur forme, taille et position restent donc fixes quand tu zoomes.</p>
+  <div class="row">
+    <button id="topoBtn" class="active">TOPOGRAPHIQUE</button>
+    <button id="satBtn">SATELLITE</button>
+  </div>
+  <div class="row"><button id="fitBtn">RECADRER CHERNARUS</button></div>
+  <div class="status">Référence XAM active · aucun rectangle Canvas WRP.</div>
+</aside>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const WORLD=15360;
+const MAX_NATIVE_ZOOM=6;
+const SCALE_AT_MAX=64;
+const PAD=512;
+
+// Même placement que notre carte Senzany :
+// le monde 15360 est placé dans une matrice de tuiles 16384×16384 avec 512 px de marge à chaque côté.
+function dayzToLatLng(x,z){
+  const px=PAD+x;
+  const py=PAD+(WORLD-z);
+  return L.latLng(-py/SCALE_AT_MAX,px/SCALE_AT_MAX);
+}
+function latLngToDayz(ll){
+  const px=ll.lng*SCALE_AT_MAX;
+  const py=-ll.lat*SCALE_AT_MAX;
+  return {x:px-PAD,z:WORLD-(py-PAD)};
+}
+
+const map=L.map('map',{
+  crs:L.CRS.Simple,
+  minZoom:0,
+  maxZoom:8,
+  zoomSnap:1,
+  zoomDelta:1,
+  attributionControl:true,
+  maxBoundsViscosity:1
+});
+
+const canvasBounds=L.latLngBounds(L.latLng(-256,0),L.latLng(0,256));
+const worldBounds=L.latLngBounds(dayzToLatLng(0,0),dayzToLatLng(WORLD,WORLD));
+
+const xamTopo=L.tileLayer(
+  'https://static.xam.nu/dayz/maps/chernarusplus/1.27/topographic/{z}/{x}/{y}.webp',
+  {
+    tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,noWrap:true,
+    bounds:canvasBounds,keepBuffer:4,
+    attribution:'Tiles © <a href="https://dayz.xam.nu/" target="_blank" rel="noopener">XAM</a>'
+  }
+);
+
+const xamSatellite=L.tileLayer(
+  'https://static.xam.nu/dayz/maps/chernarusplus/1.27/satellite/{z}/{x}/{y}.webp',
+  {
+    tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,noWrap:true,
+    bounds:canvasBounds,keepBuffer:4,
+    attribution:'Tiles © <a href="https://dayz.xam.nu/" target="_blank" rel="noopener">XAM</a>'
+  }
+);
+
+xamTopo.addTo(map);
+map.fitBounds(worldBounds);
+map.setMaxBounds(canvasBounds.pad(.03));
+
+function setBase(which){
+  if(which==='topo'){
+    if(map.hasLayer(xamSatellite))map.removeLayer(xamSatellite);
+    if(!map.hasLayer(xamTopo))xamTopo.addTo(map);
+    topoBtn.classList.add('active');satBtn.classList.remove('active');
+  }else{
+    if(map.hasLayer(xamTopo))map.removeLayer(xamTopo);
+    if(!map.hasLayer(xamSatellite))xamSatellite.addTo(map);
+    satBtn.classList.add('active');topoBtn.classList.remove('active');
+  }
+}
+const topoBtn=document.getElementById('topoBtn');
+const satBtn=document.getElementById('satBtn');
+topoBtn.onclick=()=>setBase('topo');
+satBtn.onclick=()=>setBase('sat');
+document.getElementById('fitBtn').onclick=()=>map.fitBounds(worldBounds);
+
+map.on('mousemove',e=>{
+  const p=latLngToDayz(e.latlng);
+  document.getElementById('coords').textContent=
+    'X '+p.x.toFixed(1)+' / Z '+p.z.toFixed(1)+' / zoom '+map.getZoom();
+});
+</script>
+</body>
+</html>
