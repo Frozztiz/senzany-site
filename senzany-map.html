@@ -34,9 +34,21 @@
       <div class="wrap map-workspace__grid">
         <aside class="map-panel">
           <div class="map-panel__section">
-            <span class="map-panel__eyebrow">CARTE PUBLIQUE</span>
-            <h2>Zones d’implantation</h2>
-            <p>Consultez les secteurs déjà occupés afin de préparer votre future implantation sur Chernarus.</p>
+            <span class="map-panel__eyebrow">NOUVELLE IMPLANTATION</span>
+            <h2>Choisissez votre zone</h2>
+            <p>Cliquez sur « Demander un emplacement », puis sélectionnez votre position directement sur la carte.</p>
+            <button id="startPlacementBtn" class="map-primary" type="button">+ DEMANDER UN EMPLACEMENT</button>
+          </div>
+
+          <div class="map-panel__section map-selection" id="selectionPanel" hidden>
+            <span class="map-panel__eyebrow">EMPLACEMENT SÉLECTIONNÉ</span>
+            <p>Votre sélection est prête. Les coordonnées exactes restent privées et seront transmises uniquement au staff.</p>
+            <label>Nom de la demande<input id="requestName" type="text" maxlength="80" placeholder="Ex. Base de notre groupe"></label>
+            <label>Commentaire<textarea id="requestComment" rows="4" maxlength="500" placeholder="Précisez votre projet si nécessaire…"></textarea></label>
+            <div class="map-radius-note">Zone demandée : <strong>60 m autour du drapeau</strong></div>
+            <button id="submitPlacementBtn" class="map-primary" type="button">ENVOYER LA DEMANDE</button>
+            <button id="cancelPlacementBtn" class="map-secondary" type="button">ANNULER</button>
+            <div id="requestStatus" style="margin-top:10px;font-size:12px;line-height:1.45"></div>
           </div>
 
           <div class="map-panel__section">
@@ -53,7 +65,7 @@
           <div class="map-stage map-stage--real" id="mapStage" aria-label="Carte interactive Chernarus">
             <iframe
               class="real-map-frame"
-              src="map/index_carte_senzany_v10_4.html?embed=1&mode=public"
+              src="map/index_carte_senzany_v10_5.html?embed=1&mode=public"
               title="Carte publique Chernarus Senzany"
               loading="eager">
             </iframe>
@@ -66,5 +78,114 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js?v=map-v1"></script>
   <script defer src="assets/js/app.js"></script>
+
+<script>
+(() => {
+  const frame = document.querySelector('.real-map-frame');
+  const startBtn = document.getElementById('startPlacementBtn');
+  const panel = document.getElementById('selectionPanel');
+  const submitBtn = document.getElementById('submitPlacementBtn');
+  const cancelBtn = document.getElementById('cancelPlacementBtn');
+  const nameInput = document.getElementById('requestName');
+  const commentInput = document.getElementById('requestComment');
+  const statusEl = document.getElementById('requestStatus');
+
+  let selected = null;
+
+  function setStatus(message, ok = true){
+    statusEl.textContent = message;
+    statusEl.style.color = ok ? '#7de398' : '#ff8f8f';
+  }
+
+  startBtn.addEventListener('click', () => {
+    selected = null;
+    panel.hidden = true;
+    setStatus('');
+    frame.contentWindow.postMessage({type:'senzany-start-placement'}, location.origin);
+    startBtn.textContent = 'CLIQUEZ SUR LA CARTE…';
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    selected = null;
+    panel.hidden = true;
+    nameInput.value = '';
+    commentInput.value = '';
+    setStatus('');
+    startBtn.textContent = '+ DEMANDER UN EMPLACEMENT';
+    frame.contentWindow.postMessage({type:'senzany-cancel-placement'}, location.origin);
+  });
+
+  window.addEventListener('message', (event) => {
+    if(event.origin !== location.origin) return;
+    if(!event.data || event.data.type !== 'senzany-map-selection') return;
+
+    selected = {
+      x: Number(event.data.x),
+      z: Number(event.data.z),
+      radius: 60
+    };
+
+    panel.hidden = false;
+    startBtn.textContent = 'MODIFIER MON EMPLACEMENT';
+    setStatus('Emplacement sélectionné. Complétez votre demande.');
+  });
+
+  submitBtn.addEventListener('click', async () => {
+    if(!selected){
+      setStatus('Sélectionnez d’abord un emplacement sur la carte.', false);
+      return;
+    }
+
+    const name = nameInput.value.trim();
+    const comment = commentInput.value.trim();
+
+    if(!name){
+      setStatus('Donnez un nom à votre demande.', false);
+      return;
+    }
+
+    submitBtn.disabled = true;
+    setStatus('Envoi de la demande…');
+
+    try{
+      const response = await fetch('/api/map/requests', {
+        method:'POST',
+        credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          request_name:name,
+          comment,
+          center_x:selected.x,
+          center_z:selected.z,
+          radius_m:60
+        })
+      });
+
+      const data = await response.json().catch(()=>({}));
+
+      if(response.status === 401){
+        setStatus('Connectez-vous avec Steam avant d’envoyer votre demande.', false);
+        return;
+      }
+
+      if(!response.ok){
+        throw new Error(data.error || ('HTTP '+response.status));
+      }
+
+      setStatus('Demande envoyée au Commandement. ✅');
+      selected = null;
+      nameInput.value = '';
+      commentInput.value = '';
+      startBtn.textContent = '+ DEMANDER UN EMPLACEMENT';
+      frame.contentWindow.postMessage({type:'senzany-cancel-placement'}, location.origin);
+    }catch(error){
+      setStatus('Impossible d’envoyer la demande : '+error.message, false);
+    }finally{
+      submitBtn.disabled = false;
+    }
+  });
+})();
+</script>
+
 </body>
 </html>

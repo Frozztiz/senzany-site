@@ -1,13 +1,23 @@
-SENZANY — Correctif Base des objets v4.0.3
+SENZANY MAP V10.5
 
-Fichiers à copier dans le dépôt en conservant l'arborescence :
-- senzany-admin.html
-- assets/js/admin/admin.js
-- assets/js/admin/api.js
-- assets/js/admin/catalog.js
+CORRECTIONS :
+1. Le panneau admin est MASQUE par défaut.
+   Seul un bouton "OUTILS ADMIN" apparaît en haut à droite.
+   Le panneau s'ouvre uniquement au clic et peut être refermé.
 
-Correction principale : catalog.js importait apiRequest, mais api.js ne l'exportait pas.
-Cette erreur empêchait admin.js de démarrer et bloquait la page sur l'initialisation.
+2. Le bloc de DEMANDE JOUEUR est restauré.
+   Aucun texte de développement n'est affiché.
+   Les coordonnées X/Z ne sont jamais montrées au joueur.
 
-Après copie : Commit, Push origin, puis Ctrl + F5.
-Aucun redémarrage PM2 n'est nécessaire pour ce correctif frontend.
+3. Le joueur clique "DEMANDER UN EMPLACEMENT",
+   choisit sur la carte, saisit un nom/commentaire et envoie.
+
+INSTALLATION :
+- Remplacer senzany-map.html
+- Remplacer senzany-admin-map.html
+- Ajouter map/index_carte_senzany_v10_5.html
+- Remplacer backend/server.js
+- Ajouter backend/routes/mapRequests.js
+- Exécuter supabase/026_map_requests.sql dans Supabase
+- Commit / Push / git pull
+- pm2 restart senzany-api --update-env

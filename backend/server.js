@@ -69,6 +69,7 @@ app.use(
 );
 
 app.use("/api/map", require("./routes/mapPublic"));
+app.use("/api/map/requests", require("./routes/mapRequests"));
 
 app.use(
   "/api/admin/map",
