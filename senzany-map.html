@@ -6,6 +6,7 @@
   <meta name="description" content="Carte interactive Senzany : consulter les zones occupées et demander un emplacement de base."/>
   <title>Carte — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/map.css?v=1.0"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 <body data-page="map">
   <div data-site-header></div>
@@ -34,6 +35,7 @@
             <h2>Choisissez votre zone</h2>
             <p>Cliquez sur « Demander un emplacement », puis sélectionnez précisément votre position sur la carte.</p>
             <button id="startPlacementBtn" class="map-primary" type="button">+ DEMANDER UN EMPLACEMENT</button>
+            <div id="publicMapStatus" style="margin-top:10px;font-size:12px;line-height:1.4;color:#9ba7ad"></div>
           </div>
 
           <div class="map-panel__section map-selection" id="selectionPanel" hidden>
@@ -58,11 +60,7 @@
             <div class="map-zoom-controls"><button id="zoomOut" type="button">−</button><button id="zoomReset" type="button">100%</button><button id="zoomIn" type="button">+</button></div>
           </div>
           <div class="map-stage" id="mapStage" aria-label="Carte interactive Chernarus">
-            <div class="map-canvas" id="mapCanvas">
-              <img src="assets/images/map/chernarus-grid.svg" alt="Fond cartographique Chernarus provisoire" draggable="false"/>
-              <div class="map-marker-layer" id="markerLayer"></div>
-            </div>
-            <div class="map-stage__hint" id="mapHint">Maintenez et glissez pour déplacer la carte · molette pour zoomer</div>
+            <div id="senzanyLeafletMap" style="width:100%;height:100%;min-height:680px;"></div>
           </div>
         </div>
       </div>
@@ -72,7 +70,293 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js?v=map-v1"></script>
   <script defer src="assets/js/app.js"></script>
-  <script defer src="assets/js/pages/map.js?v=1.0"></script>
-  <script defer src="assets/js/pages/map-pending-v2.js?v=2.0"></script>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+  (() => {
+    'use strict';
+
+    const WORLD = 15360;
+    const SCALE_AT_MAX = 64;
+    const PAD_PX = 512;
+    const MAX_RADIUS = 60;
+
+    const statusEl = document.getElementById('publicMapStatus');
+    const startBtn = document.getElementById('startPlacementBtn');
+    const selectionPanel = document.getElementById('selectionPanel');
+    const submitBtn = document.getElementById('submitPlacementBtn');
+    const cancelBtn = document.getElementById('cancelPlacementBtn');
+    const selectedX = document.getElementById('selectedX');
+    const selectedZ = document.getElementById('selectedZ');
+    const requestName = document.getElementById('requestName');
+    const requestComment = document.getElementById('requestComment');
+
+    function setStatus(message, ok = true) {
+      if (!statusEl) return;
+      statusEl.textContent = message;
+      statusEl.style.color = ok ? '#8fd49f' : '#ff9c9c';
+    }
+
+    function dayzToLatLng(x, z) {
+      const px = PAD_PX + Number(x);
+      const py = PAD_PX + (WORLD - Number(z));
+      return L.latLng(-py / SCALE_AT_MAX, px / SCALE_AT_MAX);
+    }
+
+    function latLngToDayz(latlng) {
+      const px = latlng.lng * SCALE_AT_MAX;
+      const py = -latlng.lat * SCALE_AT_MAX;
+      return {
+        x: px - PAD_PX,
+        z: WORLD - (py - PAD_PX)
+      };
+    }
+
+    const map = L.map('senzanyLeafletMap', {
+      crs: L.CRS.Simple,
+      minZoom: 0,
+      maxZoom: 8,
+      zoomSnap: 1,
+      zoomDelta: 1,
+      attributionControl: false,
+      maxBoundsViscosity: 1
+    });
+
+    const canvasBounds = L.latLngBounds(L.latLng(-256, 0), L.latLng(0, 256));
+    const worldBounds = L.latLngBounds(dayzToLatLng(0, 0), dayzToLatLng(WORLD, WORLD));
+
+    // Vraie carte Chernarus déjà présente sur le VPS.
+    const satellite = L.tileLayer('map/tiles/{z}/{x}/{y}.png', {
+      tileSize: 256,
+      minZoom: 0,
+      maxNativeZoom: 6,
+      maxZoom: 8,
+      noWrap: true,
+      bounds: canvasBounds,
+      keepBuffer: 4
+    }).addTo(map);
+
+    map.createPane('roadsPane');
+    map.getPane('roadsPane').style.zIndex = 450;
+
+    const roads = L.tileLayer('map/overlay/usermap_v5/{z}/{x}/{y}.png', {
+      pane: 'roadsPane',
+      tileSize: 256,
+      minZoom: 0,
+      maxNativeZoom: 6,
+      maxZoom: 8,
+      noWrap: true,
+      bounds: canvasBounds,
+      opacity: .90,
+      keepBuffer: 4
+    }).addTo(map);
+
+    map.setMaxBounds(canvasBounds.pad(.03));
+    map.fitBounds(worldBounds);
+
+    const zonesLayer = L.layerGroup().addTo(map);
+    const selectionLayer = L.layerGroup().addTo(map);
+
+    let placementMode = false;
+    let currentSelection = null;
+
+    function addZoneCircle(x, z, radius, color, popupText) {
+      x = Number(x);
+      z = Number(z);
+      radius = Math.min(MAX_RADIUS, Math.max(1, Number(radius) || 60));
+      if (!Number.isFinite(x) || !Number.isFinite(z)) return;
+      if (x < 0 || x > WORLD || z < 0 || z > WORLD) return;
+
+      const center = dayzToLatLng(x, z);
+      const leafletRadius = radius / SCALE_AT_MAX;
+
+      L.circle(center, {
+        radius: leafletRadius,
+        color,
+        fillColor: color,
+        weight: 2,
+        fillOpacity: .17
+      }).bindPopup(popupText).addTo(zonesLayer);
+
+      L.circleMarker(center, {
+        radius: 5,
+        color,
+        fillColor: color,
+        fillOpacity: 1,
+        weight: 2
+      }).addTo(zonesLayer);
+    }
+
+    async function refreshZones() {
+      try {
+        const response = await fetch('/api/map', {
+          credentials: 'include',
+          cache: 'no-store',
+          headers: { Accept: 'application/json' }
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || ('HTTP ' + response.status));
+
+        zonesLayer.clearLayers();
+
+        const zones = Array.isArray(data.zones) ? data.zones : [];
+        zones
+          .filter(z => String(z.public_status || '') === 'validated')
+          .forEach(z => addZoneCircle(
+            z.center_x, z.center_z, z.radius_m,
+            '#d83c3c',
+            '<b>ZONE OCCUPÉE</b>'
+          ));
+
+        const requests = Array.isArray(data.requests) ? data.requests : [];
+        requests
+          .filter(r => String(r.status || 'pending') === 'pending')
+          .forEach(r => addZoneCircle(
+            r.center_x, r.center_z, r.radius_m,
+            '#d7a447',
+            '<b>DEMANDE EN ATTENTE</b>'
+          ));
+
+        setStatus(
+          `${zones.filter(z => z.public_status === 'validated' && z.center_x != null && z.center_z != null).length} zone(s) occupée(s) · ` +
+          `${requests.filter(r => (r.status || 'pending') === 'pending').length} demande(s) en attente`,
+          true
+        );
+      } catch (error) {
+        setStatus('Impossible de charger les implantations : ' + error.message, false);
+      }
+    }
+
+    function cancelSelection() {
+      placementMode = false;
+      currentSelection = null;
+      selectionLayer.clearLayers();
+      selectionPanel.hidden = true;
+      startBtn.textContent = '+ DEMANDER UN EMPLACEMENT';
+      map.getContainer().style.cursor = '';
+      selectedX.textContent = '—';
+      selectedZ.textContent = '—';
+    }
+
+    startBtn.addEventListener('click', () => {
+      placementMode = true;
+      currentSelection = null;
+      selectionLayer.clearLayers();
+      selectionPanel.hidden = false;
+      startBtn.textContent = 'CLIQUEZ SUR LA CARTE';
+      map.getContainer().style.cursor = 'crosshair';
+      setStatus('Cliquez précisément sur la carte pour choisir votre emplacement.', true);
+    });
+
+    cancelBtn.addEventListener('click', cancelSelection);
+
+    map.on('click', e => {
+      if (!placementMode) return;
+
+      const p = latLngToDayz(e.latlng);
+      if (p.x < 0 || p.x > WORLD || p.z < 0 || p.z > WORLD) return;
+
+      currentSelection = {
+        x: Number(p.x.toFixed(2)),
+        z: Number(p.z.toFixed(2))
+      };
+
+      selectionLayer.clearLayers();
+      const center = dayzToLatLng(currentSelection.x, currentSelection.z);
+
+      L.circle(center, {
+        radius: MAX_RADIUS / SCALE_AT_MAX,
+        color: '#63b9e8',
+        fillColor: '#63b9e8',
+        weight: 2,
+        fillOpacity: .18
+      }).addTo(selectionLayer);
+
+      L.circleMarker(center, {
+        radius: 5,
+        color: '#63b9e8',
+        fillColor: '#63b9e8',
+        fillOpacity: 1,
+        weight: 2
+      }).addTo(selectionLayer);
+
+      selectedX.textContent = currentSelection.x.toFixed(2);
+      selectedZ.textContent = currentSelection.z.toFixed(2);
+      startBtn.textContent = 'MODIFIER MON EMPLACEMENT';
+      placementMode = false;
+      map.getContainer().style.cursor = '';
+      setStatus('Emplacement sélectionné. Vous pouvez maintenant envoyer la demande.', true);
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      if (!currentSelection) {
+        setStatus('Choisissez d’abord un emplacement sur la carte.', false);
+        return;
+      }
+
+      const name = requestName.value.trim();
+      const comment = requestComment.value.trim();
+
+      if (!name) {
+        setStatus('Indiquez un nom pour votre demande.', false);
+        requestName.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'ENVOI…';
+
+      try {
+        const response = await fetch('/api/map/requests', {
+          method: 'POST',
+          credentials: 'include',
+          cache: 'no-store',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            request_name: name,
+            comment,
+            center_x: currentSelection.x,
+            center_z: currentSelection.z
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || ('HTTP ' + response.status));
+
+        setStatus('Demande envoyée. Elle apparaît maintenant en orange sur la carte.', true);
+        requestName.value = '';
+        requestComment.value = '';
+        cancelSelection();
+        await refreshZones();
+      } catch (error) {
+        setStatus('Impossible d’envoyer la demande : ' + error.message, false);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'ENVOYER LA DEMANDE';
+      }
+    });
+
+    document.getElementById('zoomIn').addEventListener('click', () => map.zoomIn());
+    document.getElementById('zoomOut').addEventListener('click', () => map.zoomOut());
+    document.getElementById('zoomReset').addEventListener('click', () => {
+      map.fitBounds(worldBounds);
+      document.getElementById('zoomReset').textContent = '100%';
+    });
+
+    map.on('zoomend', () => {
+      const z = map.getZoom();
+      const pct = Math.round(Math.pow(2, z - map.getBoundsZoom(worldBounds)) * 100);
+      document.getElementById('zoomReset').textContent = Math.max(25, pct) + '%';
+    });
+
+    refreshZones();
+    setInterval(refreshZones, 5000);
+    setTimeout(() => map.invalidateSize(), 250);
+  })();
+  </script>
+
 </body>
 </html>
