@@ -5,34 +5,91 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta name="description" content="FAQ officielle Senzany : véhicules, bases, bunkers, skins, économie, mutants, règlement et support."/>
 <title>FAQ — SENZANY</title>
-<link href="assets/css/pages/faq.css?v=2.0.0" rel="stylesheet"/>
+<link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
+<link href="assets/css/shared/footer-v2.css?v=2.1.0" rel="stylesheet"/>
+<link href="assets/css/pages/faq.css?v=3.0.0" rel="stylesheet"/>
 </head>
 <body data-page="faq">
-<div data-site-header=""></div>
-<main class="faq-main">
-<header class="faq-hero"><div class="faq-grid-overlay" aria-hidden="true"></div><div class="wrap faq-hero__inner">
-<div class="faq-status"><span></span> Archives Senzany // Base opérationnelle</div>
-<div class="faq-tag">SENZANY // FAQ OFFICIELLE</div>
-<h1>FAQ <span>Senzany</span></h1>
-<p>Toutes les réponses essentielles pour comprendre les systèmes de Senzany, résoudre rapidement un doute et retourner survivre sur Chernarus.</p>
-<div class="faq-search-shell" role="search">
-<div class="faq-search-code">FAQ // SEARCH</div>
-<input id="faqSearch" type="search" autocomplete="off" placeholder="Ex. fourrière, decay, carte perforée, skin, bitcoin..." aria-label="Rechercher dans la FAQ"/>
-<button id="faqClear" type="button" hidden>Effacer</button>
-<div class="faq-search-state"><strong id="faqResultCount">131</strong> réponses indexées</div>
-</div></div></header>
-<section class="faq-nav-section"><div class="wrap"><div class="faq-category-grid" id="faqCategoryGrid"></div></div></section>
-<section class="faq-content"><div class="wrap">
-<div class="faq-toolbar"><div><div class="faq-tag">Archives interrogées</div><h2 id="faqViewTitle">Toutes les questions</h2></div>
-<button id="faqShowAll" type="button" class="faq-secondary-btn" hidden>Afficher tout</button></div>
-<div id="faqEmpty" class="faq-empty" hidden><strong>Aucune réponse trouvée.</strong><p>Essaie un autre mot-clé ou consulte le Wiki Senzany.</p><a href="senzany-wiki.html">Ouvrir le Wiki ↗</a></div>
-<div id="faqSections"></div></div></section>
-<section class="faq-help"><div class="wrap faq-help__inner"><div><div class="faq-tag">Toujours bloqué ?</div><h2>FAQ → Wiki → Ticket</h2>
-<p>Commence par rechercher ici. Si tu veux approfondir, consulte le Wiki. Si ton problème nécessite l’intervention du staff, ouvre ensuite un ticket sur Discord.</p></div>
-<div class="faq-help__actions"><a href="senzany-wiki.html">Consulter le Wiki</a><a href="https://discord.gg/aJ2eGmqAQv" target="_blank" rel="noopener">Ouvrir Discord ↗</a></div>
-</div></section></main>
-<div data-site-footer=""></div>
-<script defer src="assets/js/components.js"></script>
+<div data-site-header></div>
+
+<main class="faq3">
+  <section class="faq3-hero">
+    <div class="faq3-hero__image"></div>
+    <div class="faq3-hero__veil"></div>
+    <div class="faq3-hero__grid"></div>
+
+    <div class="wrap faq3-hero__inner">
+      <div class="faq3-hero__copy">
+        <div class="faq3-eyebrow">SENZANY // BASE DE CONNAISSANCES</div>
+        <h1>FAQ <span>SENZANY</span></h1>
+        <p>131 réponses issues du fonctionnement réel du serveur. Recherche un mot-clé ou explore les dossiers pour obtenir rapidement ta réponse.</p>
+      </div>
+
+      <div class="faq3-search-zone">
+        <div class="faq3-search">
+          <span class="faq3-search__icon">⌕</span>
+          <input id="faqSearch" type="search" autocomplete="off" placeholder="Rechercher : fourrière, decay, bunker, skin, bitcoin..." aria-label="Rechercher dans la FAQ"/>
+          <button id="faqClear" type="button" hidden>EFFACER</button>
+        </div>
+        <div class="faq3-search__hint">INDEX // QUESTIONS / RÉPONSES / SYSTÈMES SENZANY</div>
+      </div>
+
+      <div class="faq3-counter">
+        <strong id="faqResultCount">131</strong>
+        <span>RÉPONSES<br>DISPONIBLES</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq3-browser">
+    <div class="wrap faq3-browser__grid">
+      <aside class="faq3-sidebar">
+        <div class="faq3-sidebar__head">
+          <span>01 // ARCHIVES</span>
+          <h2>CATÉGORIES</h2>
+        </div>
+        <div id="faqCategoryGrid" class="faq3-categories"></div>
+        <button id="faqShowAll" class="faq3-all" type="button">TOUTES LES QUESTIONS <b>131</b></button>
+      </aside>
+
+      <section class="faq3-results">
+        <header class="faq3-results__head">
+          <div>
+            <span class="faq3-eyebrow">ARCHIVES INTERROGÉES</span>
+            <h2 id="faqViewTitle">VÉHICULES</h2>
+          </div>
+          <div class="faq3-results__status"><i></i><span>BASE OPÉRATIONNELLE</span></div>
+        </header>
+
+        <div id="faqEmpty" class="faq3-empty" hidden>
+          <strong>AUCUNE RÉPONSE TROUVÉE</strong>
+          <p>Essaie un autre mot-clé ou consulte le Wiki Senzany.</p>
+          <a href="senzany-wiki.html">OUVRIR LE WIKI ↗</a>
+        </div>
+
+        <div id="faqSections"></div>
+      </section>
+    </div>
+  </section>
+
+  <section class="faq3-help">
+    <div class="wrap">
+      <div class="faq3-help__title">
+        <span>02 // BESOIN D’AIDE ?</span>
+        <h2>UNE QUESTION.<br><em>TROIS SOLUTIONS.</em></h2>
+      </div>
+      <div class="faq3-help__grid">
+        <a href="senzany-wiki.html"><small>01</small><strong>CONSULTER LE WIKI</strong><p>Guides détaillés, tableaux et fonctionnement complet des systèmes.</p><b>ACCÉDER AU WIKI ↗</b></a>
+        <a href="https://discord.gg/aJ2eGmqAQv" target="_blank" rel="noopener"><small>02</small><strong>OUVRIR UN TICKET</strong><p>Ta réponse n’est pas ici ? Le staff pourra étudier ta situation.</p><b>REJOINDRE DISCORD ↗</b></a>
+        <a href="reglement.html"><small>03</small><strong>RÈGLEMENT DU SERVEUR</strong><p>Consulte les règles officielles qui encadrent l’expérience Senzany.</p><b>LIRE LE RÈGLEMENT ↗</b></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div data-site-footer></div>
+<script defer src="assets/js/components.js?v=faq-v3"></script>
 <script defer src="assets/js/app.js"></script>
-<script defer src="assets/js/pages/faq.js?v=1.0.0"></script>
-</body></html>
+<script defer src="assets/js/pages/faq.js?v=3.0.0"></script>
+</body>
+</html>
