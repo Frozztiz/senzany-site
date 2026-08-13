@@ -11,7 +11,7 @@ body{margin:0;background:#060606;color:var(--cream)}
 
 /* HERO — same visual language as the current Senzany pages */
 .faq3-hero{position:relative;min-height:470px;overflow:hidden;border-bottom:1px solid rgba(214,45,45,.22);display:flex;align-items:center}
-.faq3-hero__image{position:absolute;inset:0;background-image:url("../../images/gallery/gallery-volcan-bateau.png");background-size:cover;background-position:center 52%;filter:saturate(.72) contrast(1.12) brightness(.62);transform:scale(1.03)}
+.faq3-hero__image{position:absolute;inset:0;background-image:url("../../images/backgrounds/hero-bg.jpg");background-size:cover;background-position:68% 34%;filter:saturate(.72) contrast(1.12) brightness(.62);transform:scale(1.03)}
 .faq3-hero__veil{position:absolute;inset:0;background:
 linear-gradient(90deg,rgba(5,5,5,.99) 0%,rgba(5,5,5,.92) 29%,rgba(7,6,5,.72) 58%,rgba(60,12,9,.37) 100%),
 linear-gradient(180deg,rgba(0,0,0,.17),rgba(0,0,0,.62))}
@@ -101,3 +101,15 @@ radial-gradient(circle at 77% 8%,rgba(125,25,18,.08),transparent 28rem),
  .faq3-answer>div{padding:22px}.faq3-help__title{display:block}.faq3-help__title h2{text-align:left;margin-top:13px}.faq3-help__grid{grid-template-columns:1fr}.faq3-help__grid a+a{border-left:0;border-top:1px solid var(--line)}
 }
 @media(max-width:480px){.faq3-categories{grid-template-columns:1fr}.faq3-hero h1{font-size:4.4rem}.faq3-question{grid-template-columns:46px 1fr 36px}}
+
+/* V4 — intégration Senzany plus dense, sans nouvelle image */
+.faq3-hero{min-height:560px}
+.faq3-hero__inner{padding-top:108px;padding-bottom:118px;align-items:center}
+.faq3-browser{padding-top:0;margin-top:-48px;position:relative;z-index:4;background:transparent}
+.faq3-browser__grid{background:rgba(7,7,7,.90);box-shadow:0 24px 80px rgba(0,0,0,.34)}
+.faq3-sidebar,.faq3-results__head,.faq3-section{backdrop-filter:blur(5px)}
+.faq3-help{padding-top:64px}
+@media(max-width:760px){
+  .faq3-browser{margin-top:0;padding-top:28px}
+  .faq3-hero{min-height:auto}
+}

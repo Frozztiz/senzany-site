@@ -1,12 +1,22 @@
-CORRECTIF SENZANY - CHARGEMENT CENTRE DE COMMANDEMENT
+SENZANY — CORRECTION FAQ / INDEX / PAGES INFORMATION
 
-Cause corrigée : admin.js importait un fichier inexistant nommé item-catalog.js.
-Le bon module est catalog.js.
+À copier en conservant exactement l'arborescence :
 
-Fichiers à copier en conservant l'arborescence :
-- senzany-admin.html
-- assets/js/admin/admin.js
-- assets/js/admin/catalog.js
+index.html
+senzany-faq.html
+reglement.html
+conditions-utilisation.html
+politique-confidentialite.html
+mentions-legales.html
+assets/js/components.js
+assets/js/pages/faq.js
+assets/css/pages/faq.css
 
-Après commit + push : recharge avec Ctrl + F5.
-Aucun redémarrage PM2 nécessaire pour ce correctif frontend.
+IMPORTANT :
+- Aucun nouveau visuel n'est ajouté.
+- FAQ + pages d'information réutilisent assets/images/backgrounds/hero-bg.jpg.
+- components.js est restauré à partir de la version complète Senzany
+  (audio ambiant, Carte, Commandement, footer partagé), puis FAQ est ajoutée.
+- index.html conserve son contenu actuel ; la correction principale est la restauration
+  du bon components.js qui avait été écrasé par erreur.
+- Après copie : Ctrl+F5.

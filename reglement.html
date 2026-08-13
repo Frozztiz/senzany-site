@@ -203,13 +203,93 @@
       .toc,.base-flow{grid-template-columns:1fr}
       .back{font-size:.72rem}
     }
-  </style>
+  
+/* ============================================================
+   SENZANY SKIN — sous-page d'information
+   Aucun contenu juridique n'est modifié.
+   Utilise uniquement l'image déjà présente dans le projet.
+   ============================================================ */
+:root{
+  --bg:#080706!important;
+  --panel:rgba(15,12,11,.94)!important;
+  --panel2:rgba(21,16,15,.94)!important;
+  --line:rgba(241,235,225,.14)!important;
+  --text:#f1ebe1!important;
+  --muted:#a79d91!important;
+  --gold:#d1272c!important;
+  --red:#d1272c!important;
+  --green:#47d66b!important;
+}
+body{
+  background:
+    linear-gradient(180deg,rgba(8,7,6,.82),rgba(8,7,6,.98)),
+    url('assets/images/backgrounds/hero-bg.jpg') 68% 32%/cover fixed no-repeat!important;
+  color:var(--text)!important;
+}
+.topbar{
+  background:rgba(7,6,6,.92)!important;
+  border-bottom:1px solid rgba(241,235,225,.12)!important;
+  backdrop-filter:blur(15px)!important;
+}
+.topbar__inner{max-width:1240px!important}
+.brand__mark{
+  width:42px!important;height:42px!important;border:0!important;background:transparent!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+}
+.brand__mark img{width:42px;height:42px;object-fit:contain}
+.brand{letter-spacing:.08em!important;font-weight:900!important}
+.back:hover{color:#fff!important}
+main{max-width:1240px!important;padding-top:72px!important}
+.hero{
+  min-height:390px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  background:
+    linear-gradient(90deg,rgba(7,6,6,.97) 0%,rgba(7,6,6,.83) 44%,rgba(7,6,6,.30) 78%),
+    url('assets/images/backgrounds/hero-bg.jpg') 68% 32%/cover no-repeat!important;
+  border:1px solid rgba(209,39,44,.28)!important;
+  box-shadow:0 30px 90px rgba(0,0,0,.38)!important;
+}
+.hero:after{
+  width:520px!important;height:520px!important;
+  border-color:rgba(209,39,44,.12)!important;
+}
+.hero .eyebrow,.hero .kicker,.hero>span:first-child{color:#d1272c!important}
+.hero h1{
+  font-family:'Arial Narrow',Impact,sans-serif!important;
+  font-weight:900!important;
+  letter-spacing:-.045em!important;
+  line-height:.88!important;
+  text-transform:uppercase!important;
+  color:#f1ebe1!important;
+}
+.toc a,.nav-grid a,.quick-nav a{
+  background:rgba(10,9,8,.88)!important;
+  border-color:rgba(241,235,225,.14)!important;
+}
+.toc a:hover,.nav-grid a:hover,.quick-nav a:hover{
+  border-color:rgba(209,39,44,.55)!important;
+  color:#fff!important;
+  background:rgba(34,15,14,.88)!important;
+}
+section[id],.section,.content-section{
+  background:rgba(9,8,7,.88)!important;
+  border-color:rgba(241,235,225,.13)!important;
+}
+h2::before,.section-number,.num{color:#d1272c!important}
+.notice,.note,.callout{
+  border-color:rgba(209,39,44,.30)!important;
+  background:rgba(28,12,11,.62)!important;
+}
+
+</style>
 </head>
 <body>
   <header class="topbar">
     <div class="topbar__inner">
       <a class="brand" href="index.html" aria-label="Retour à l'accueil Senzany">
-        <span class="brand__mark">S</span>
+        <span class="brand__mark"><img src="assets/images/branding/logo.png" alt="Logo Senzany"></span>
         <span>SENZANY</span>
       </a>
       <a class="back" href="index.html">← Retour au site</a>
