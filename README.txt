@@ -1,22 +1,18 @@
-SENZANY — CORRECTION FAQ / INDEX / PAGES INFORMATION
+SENZANY FAQ V4.1 — HOTFIX
 
-À copier en conservant exactement l'arborescence :
+Corrige :
+- la ligne ACCUEILCARTECOMMUNAUTÉ... affichée en haut à gauche ;
+- le menu responsive / déroulant ;
+- le header sticky ;
+- le fond volcan/personnage qui continue derrière la page au défilement.
 
-index.html
+Aucune nouvelle image.
+
+À remplacer :
 senzany-faq.html
-reglement.html
-conditions-utilisation.html
-politique-confidentialite.html
-mentions-legales.html
+assets/css/pages/faq.css
+assets/css/shared/navigation-unified-v1.css
 assets/js/components.js
 assets/js/pages/faq.js
-assets/css/pages/faq.css
 
-IMPORTANT :
-- Aucun nouveau visuel n'est ajouté.
-- FAQ + pages d'information réutilisent assets/images/backgrounds/hero-bg.jpg.
-- components.js est restauré à partir de la version complète Senzany
-  (audio ambiant, Carte, Commandement, footer partagé), puis FAQ est ajoutée.
-- index.html conserve son contenu actuel ; la correction principale est la restauration
-  du bon components.js qui avait été écrasé par erreur.
-- Après copie : Ctrl+F5.
+Puis CTRL + F5.

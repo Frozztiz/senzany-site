@@ -116,6 +116,18 @@
   transform: none !important;
 }
 
+[data-site-header] .navlinks .staff-admin-link,
+[data-site-header] .navlinks .staff-admin-link:link,
+[data-site-header] .navlinks .staff-admin-link:visited {
+  color: #ef3d44 !important;
+}
+
+[data-site-header] .navlinks .staff-admin-link:hover,
+[data-site-header] .navlinks .staff-admin-link:focus-visible,
+[data-site-header] .navlinks .staff-admin-link.active {
+  color: var(--senzany-nav-paper) !important;
+}
+
 [data-site-header] .btn-join,
 [data-site-header] .btn-join:link,
 [data-site-header] .btn-join:visited {
@@ -163,6 +175,10 @@
   color: var(--senzany-nav-paper) !important;
 }
 
+[data-site-header] .mobile-menu .staff-admin-link {
+  color: #ef3d44 !important;
+}
+
 /* Footer : empêche notamment le mot SENZANY de devenir violet après visite. */
 [data-site-footer] .footer-brand-name {
   font-size: 24px !important;
@@ -182,4 +198,52 @@
   [data-site-header] .burger {
     display: block !important;
   }
+}
+
+
+/* ============================================================
+   V1.1 — structure complète du header partagé
+   ============================================================ */
+[data-site-header]{
+  position:sticky!important;
+  top:0!important;
+  z-index:1000!important;
+  display:block!important;
+}
+[data-site-header] header{
+  position:relative!important;
+  background:rgba(10,9,8,.95)!important;
+  backdrop-filter:blur(8px)!important;
+  border-bottom:1px solid var(--senzany-nav-line)!important;
+}
+[data-site-header] .nav-right{
+  display:flex!important;
+  align-items:center!important;
+  gap:16px!important;
+}
+[data-site-header] .burger{
+  display:none!important;
+  width:38px!important;
+  height:38px!important;
+  padding:0!important;
+  border:1px solid var(--senzany-nav-line)!important;
+  background:transparent!important;
+  color:var(--senzany-nav-paper)!important;
+  font-size:18px!important;
+  cursor:pointer!important;
+}
+[data-site-header] .mobile-menu{
+  display:none!important;
+  flex-direction:column!important;
+  padding:16px 24px!important;
+  border-bottom:1px solid var(--senzany-nav-line)!important;
+  background:rgba(16,14,13,.98)!important;
+}
+[data-site-header] .mobile-menu.open{
+  display:flex!important;
+}
+@media (max-width:1100px){
+  [data-site-header] .navlinks{display:none!important;}
+  [data-site-header] .btn-join{display:none!important;}
+  [data-site-header] .burger{display:block!important;}
 }

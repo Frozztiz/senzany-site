@@ -113,3 +113,35 @@ radial-gradient(circle at 77% 8%,rgba(125,25,18,.08),transparent 28rem),
   .faq3-browser{margin-top:0;padding-top:28px}
   .faq3-hero{min-height:auto}
 }
+
+
+/* ============================================================
+   V4.1 — fond Senzany continu
+   ============================================================ */
+html{background:#080706}
+body{
+  background-color:#080706!important;
+  background-image:
+    linear-gradient(180deg,rgba(8,7,6,.70),rgba(8,7,6,.90)),
+    url("../../images/backgrounds/hero-bg.jpg")!important;
+  background-size:cover!important;
+  background-position:65% 35%!important;
+  background-attachment:fixed!important;
+  background-repeat:no-repeat!important;
+}
+.faq3{background:transparent!important}
+.faq3-hero{background:transparent!important}
+.faq3-hero__image{
+  background-image:url("../../images/backgrounds/hero-bg.jpg")!important;
+  background-position:65% 35%!important;
+}
+.faq3-browser{
+  background:linear-gradient(180deg,rgba(7,7,7,.82),rgba(7,7,7,.91))!important;
+}
+.faq3-browser__grid{background:rgba(7,7,7,.78)!important}
+.faq3-help{
+  background:linear-gradient(180deg,rgba(7,7,7,.88),rgba(7,7,7,.95))!important;
+}
+@media(max-width:900px){
+  body{background-attachment:scroll!important}
+}
