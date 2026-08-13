@@ -41,6 +41,7 @@
     ['map','senzany-map.html','Carte'],
     ['communaute','senzany-communaute.html','Communauté'],
     ['wiki','senzany-wiki.html','Wiki'],
+    ['faq','senzany-faq.html','FAQ'],
     ['evenements','senzany-evenements.html','Événements'],
     ['boutique','senzany-boutique.html','Boutique'],
     ['profil','senzany-profil.html','Mon profil'],
@@ -134,7 +135,6 @@
               <h4>Serveur DayZ</h4>
               <span class="site-footer-v2__server-address">208.115.196.109:2302</span>
               <a class="site-footer-v2__server-connect" href="steam://connect/208.115.196.109:2302">Se connecter au serveur</a>
-              <a href="https://fiveminehosting.com/index.php" rel="noopener" target="_blank">Hébergé en partenariat avec FiveMine Hosting ↗</a>
               <span class="site-footer-v2__portal-info"><small>Portail</small>Version 1.0</span>
             </div>
           </nav>
