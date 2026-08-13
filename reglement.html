@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Règlement officiel du serveur DayZ PVE Senzany.">
+  <title>SENZANY — Règlement du serveur</title>
+  <style>
+    :root{
+      --bg:#080806;
+      --panel:#0e0e0b;
+      --panel2:#13120f;
+      --line:#2b2822;
+      --text:#ebe7de;
+      --muted:#a49c90;
+      --gold:#e2a953;
+      --red:#d84848;
+      --green:#78b36b;
+      --shadow:0 24px 80px rgba(0,0,0,.35);
+      --max:1120px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(226,169,83,.07), transparent 32rem),
+        linear-gradient(180deg,#080806 0%,#0b0a08 100%);
+      color:var(--text);
+      font-family:Inter,Arial,Helvetica,sans-serif;
+      line-height:1.65;
+    }
+    a{color:inherit}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter:blur(14px);
+      background:rgba(8,8,6,.88);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar__inner{
+      max-width:var(--max);
+      margin:auto;
+      min-height:68px;
+      padding:0 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      font-weight:900;
+      letter-spacing:.16em;
+    }
+    .brand__mark{
+      width:34px;height:34px;
+      display:grid;place-items:center;
+      border:1px solid #514330;
+      background:#16120d;
+      color:var(--gold);
+      font-size:16px;
+    }
+    .back{
+      text-decoration:none;
+      color:var(--muted);
+      font-size:.86rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      transition:.2s ease;
+    }
+    .back:hover{color:var(--gold)}
+    main{max-width:var(--max);margin:auto;padding:64px 24px 90px}
+    .hero{
+      border:1px solid var(--line);
+      background:linear-gradient(135deg,rgba(226,169,83,.08),rgba(255,255,255,.018));
+      padding:44px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:after{
+      content:"";
+      position:absolute;inset:auto -120px -160px auto;
+      width:420px;height:420px;border-radius:50%;
+      border:1px solid rgba(226,169,83,.12);
+      box-shadow:0 0 0 50px rgba(226,169,83,.025),0 0 0 100px rgba(226,169,83,.015);
+    }
+    .eyebrow{
+      margin:0 0 10px;
+      color:var(--gold);
+      font-size:.76rem;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+    h1{margin:0;font-size:clamp(2.1rem,6vw,4.7rem);line-height:.95;letter-spacing:-.035em;text-transform:uppercase}
+    .hero p:last-child{max-width:760px;color:var(--muted);font-size:1.02rem;margin:22px 0 0}
+    .notice{
+      margin:26px 0 0;
+      padding:18px 20px;
+      border-left:3px solid var(--gold);
+      background:#11100d;
+      color:#cfc8bd;
+    }
+    .toc{
+      margin:32px 0 54px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    .toc a{
+      text-decoration:none;
+      border:1px solid var(--line);
+      background:var(--panel);
+      padding:13px 14px;
+      color:#c9c2b8;
+      font-size:.84rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      transition:.2s ease;
+    }
+    .toc a:hover{border-color:#6f5531;color:var(--gold);transform:translateY(-1px)}
+    .rule-section{
+      margin:0 0 24px;
+      padding:30px 32px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,var(--panel),#0b0b09);
+    }
+    .rule-section__head{
+      display:flex;gap:14px;align-items:flex-start;margin-bottom:20px
+    }
+    .num{
+      flex:0 0 auto;
+      color:var(--gold);
+      font-size:.73rem;
+      font-weight:900;
+      letter-spacing:.12em;
+      padding-top:6px;
+    }
+    h2{margin:0;font-size:1.35rem;text-transform:uppercase;letter-spacing:.035em}
+    h3{
+      margin:26px 0 10px;
+      font-size:.94rem;
+      color:var(--gold);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    p{margin:0 0 12px}
+    ul{margin:8px 0 0;padding-left:22px}
+    li{margin:7px 0}
+    strong{color:#fff}
+    .forbidden{color:#f0dede}
+    .forbidden li::marker{color:var(--red)}
+    .important{
+      margin-top:18px;
+      padding:14px 16px;
+      border:1px solid #4a3a27;
+      background:#15110c;
+      color:#d9d0c4;
+    }
+    .base-flow{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+      margin:18px 0 8px;
+    }
+    .base-flow div{
+      border:1px solid var(--line);
+      background:#0a0a08;
+      padding:14px 12px;
+      min-height:82px;
+    }
+    .base-flow b{display:block;color:var(--gold);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+    .muted{color:var(--muted)}
+    .sanctions{
+      border-color:#4a2525;
+      background:linear-gradient(180deg,#130d0d,#0d0909);
+    }
+    .sanctions h2{color:#f0dddd}
+    .footer-note{
+      margin-top:36px;
+      text-align:center;
+      color:var(--muted);
+      border-top:1px solid var(--line);
+      padding-top:28px;
+      font-size:.9rem;
+    }
+    @media(max-width:820px){
+      .toc{grid-template-columns:repeat(2,1fr)}
+      .base-flow{grid-template-columns:1fr 1fr}
+      .hero{padding:32px 24px}
+      .rule-section{padding:24px 20px}
+    }
+    @media(max-width:520px){
+      .topbar__inner{padding:0 16px}
+      .brand{letter-spacing:.08em}
+      main{padding:34px 14px 64px}
+      .toc,.base-flow{grid-template-columns:1fr}
+      .back{font-size:.72rem}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="index.html" aria-label="Retour à l'accueil Senzany">
+        <span class="brand__mark">S</span>
+        <span>SENZANY</span>
+      </a>
+      <a class="back" href="index.html">← Retour au site</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Informations // Règlement officiel</p>
+      <h1>Règles du serveur</h1>
+      <p>Bienvenue sur Senzany. Pour que l'expérience PVE reste agréable pour tous, chaque joueur doit respecter les règles ci-dessous.</p>
+      <div class="notice">
+        <strong>À savoir :</strong> ce règlement résume les règles essentielles du serveur. Les guides et astuces disponibles sur le Discord complètent certains points de fonctionnement.
+      </div>
+    </section>
+
+    <nav class="toc" aria-label="Sommaire du règlement">
+      <a href="#general">Règles générales</a>
+      <a href="#loot">Loot & Airdrops</a>
+      <a href="#vehicules">Véhicules</a>
+      <a href="#bases">Bases</a>
+      <a href="#traders">Traders cachés</a>
+      <a href="#sanctions">Sanctions</a>
+    </nav>
+
+    <section class="rule-section" id="general">
+      <div class="rule-section__head">
+        <span class="num">01 //</span>
+        <div>
+          <h2>Règles générales — PVE uniquement</h2>
+          <p class="muted">Senzany est un serveur PVE uniquement.</p>
+        </div>
+      </div>
+
+      <p>Il est formellement interdit de :</p>
+      <ul class="forbidden">
+        <li>Tuer un autre joueur.</li>
+        <li>Voler la tombe d'un joueur.</li>
+        <li>Voler un véhicule ou son contenu.</li>
+        <li>Voler le contenu ou l'intérieur d'une base.</li>
+      </ul>
+
+      <div class="important">
+        Un comportement respectueux et adapté est obligatoire. Les propos sexistes, racistes, antisémites ou violents sont strictement interdits.
+      </div>
+    </section>
+
+    <section class="rule-section" id="loot">
+      <div class="rule-section__head">
+        <span class="num">02 //</span>
+        <div>
+          <h2>Loot & Airdrops</h2>
+          <p class="muted">Préservez l'équilibre du serveur et respectez la priorité des joueurs déjà sur place.</p>
+        </div>
+      </div>
+
+      <h3>Loot</h3>
+      <ul>
+        <li>Le <strong>loot cycling est interdit</strong>.</li>
+        <li>Ramasser tous les objets uniquement pour forcer leur réapparition nuit à la stabilité du serveur.</li>
+        <li>Si vous ne voulez pas d'un objet, laissez-le sur place ou détruisez-le dans un feu.</li>
+      </ul>
+
+      <h3>Bunkers</h3>
+      <ul>
+        <li>Il est interdit d'ouvrir la sortie des bunkers à des joueurs extérieurs à votre groupe initial.</li>
+        <li>Seuls les membres de votre expédition peuvent entrer et sortir.</li>
+        <li>Exception : vous pouvez ouvrir à un coéquipier déjà présent avec vous au départ.</li>
+      </ul>
+
+      <h3>Airdrops</h3>
+      <ul>
+        <li><strong>Premier arrivé, premier servi.</strong></li>
+        <li>Le ou les premiers joueurs arrivés sur place sont prioritaires sur le loot. Ce qu'ils laissent derrière eux devient disponible pour tous.</li>
+        <li>Le premier joueur arrivé en véhicule sur la zone, ou le premier joueur ayant tué l'IA, est considéré comme ayant « claim » l'airdrop.</li>
+        <li>Il est interdit de se servir dans les airdrops d'autres joueurs. Tout manquement peut entraîner une sanction.</li>
+      </ul>
+    </section>
+
+    <section class="rule-section" id="vehicules">
+      <div class="rule-section__head">
+        <span class="num">03 //</span>
+        <div>
+          <h2>Règlement véhicules</h2>
+          <p class="muted">Les véhicules et leur contenu sont protégés par les règles PVE du serveur.</p>
+        </div>
+      </div>
+
+      <ul>
+        <li>Il est interdit de voler un véhicule ou son contenu.</li>
+        <li>Les véhicules doivent être <strong>fermés à clé</strong>. Les clés s'achètent au trader de véhicules.</li>
+        <li>Si un véhicule non verrouillé est pillé, <strong>aucun remboursement</strong> ne sera effectué pour les objets perdus.</li>
+        <li>Les véhicules ne doivent pas rester AFK à proximité du trader de Green Mountain. Un véhicule laissé AFK à cet endroit peut être placé en fourrière.</li>
+      </ul>
+
+      <h3>Si vous trouvez un véhicule sur la carte</h3>
+      <p>Vérifiez qu'il n'appartient à personne avant de le prendre.</p>
+
+      <h3>Pour vérifier</h3>
+      <p>Munissez-vous d'une clé vierge. Si vous n'en avez pas, rendez-vous chez un trader.</p>
+
+      <h3>Pour vendre ou donner un véhicule</h3>
+      <ul>
+        <li>Réinitialisez la clé de propriété avant le transfert.</li>
+        <li>Sans cette opération, le véhicule peut retourner au garage du propriétaire d'origine.</li>
+      </ul>
+    </section>
+
+    <section class="rule-section" id="bases">
+      <div class="rule-section__head">
+        <span class="num">04 //</span>
+        <div>
+          <h2>Bases & construction</h2>
+          <p class="muted">Toute implantation doit être déclarée et validée avant installation.</p>
+        </div>
+      </div>
+
+      <h3>Validation obligatoire</h3>
+      <p>La demande d'emplacement se fait directement depuis la <strong>Carte du site Senzany</strong>. Le joueur sélectionne sa position sur la carte et envoie sa demande. Le staff examine ensuite la demande dans l'espace Commandement et la <strong>valide ou la refuse</strong>.</p>
+
+      <div class="base-flow" aria-label="Étapes de validation d'une base">
+        <div><b>Étape 1</b>Ouvrir la Carte du site.</div>
+        <div><b>Étape 2</b>Choisir l'emplacement souhaité.</div>
+        <div><b>Étape 3</b>Envoyer la demande.</div>
+        <div><b>Étape 4</b>Attendre la décision du staff.</div>
+      </div>
+
+      <ul>
+        <li>Les bases doivent respecter les distances imposées par le serveur, notamment vis-à-vis des zones militaires et des traders.</li>
+        <li>Chaque base doit obligatoirement posséder un <strong>mât et un drapeau</strong>.</li>
+        <li>La zone d'implantation correspond à un rayon maximal de <strong>60 mètres autour du mât/drapeau</strong>.</li>
+        <li>Toutes les bases doivent avoir une <strong>porte et un cadenas à code</strong> (codelock). Ne laissez pas les portes ouvertes.</li>
+        <li>Le nombre de constructions est limité. Les fondations, murs, sols, escaliers, toits et autres éléments de construction sont concernés.</li>
+        <li>Les lampes, abat-jour et autres sources de lumière sont limitées à <strong>2 par joueur et 6 maximum par base</strong>.</li>
+      </ul>
+
+      <h3>Territoire</h3>
+      <p>Pour revendiquer un territoire, construisez un drapeau puis créez votre groupe selon le fonctionnement prévu par le serveur.</p>
+
+      <h3>Restrictions en base</h3>
+      <ul>
+        <li>Nombre de murs BBP limité.</li>
+        <li>Stockage limité.</li>
+        <li>Structures limitées via les points de propriété.</li>
+      </ul>
+
+      <div class="important">
+        Consultez les canaux <strong>Guides & Astuces</strong> du Discord pour les limites détaillées et les règles techniques de construction.
+      </div>
+    </section>
+
+    <section class="rule-section" id="traders">
+      <div class="rule-section__head">
+        <span class="num">05 //</span>
+        <div>
+          <h2>Traders cachés</h2>
+          <p class="muted">BlackMarket / DrugDealer</p>
+        </div>
+      </div>
+
+      <p>Il est interdit de :</p>
+      <ul class="forbidden">
+        <li>Partager ou vendre leur localisation.</li>
+        <li>Divulguer leur position.</li>
+        <li>En parler en présence d'un membre du staff, que ce soit en vocal ou sur Discord.</li>
+      </ul>
+    </section>
+
+    <section class="rule-section sanctions" id="sanctions">
+      <div class="rule-section__head">
+        <span class="num">06 //</span>
+        <div>
+          <h2>Sanctions</h2>
+          <p class="muted">Tout manquement au règlement peut entraîner une sanction adaptée à la situation.</p>
+        </div>
+      </div>
+
+      <ul>
+        <li>Nerf économique.</li>
+        <li>Suppression ou réinitialisation de données.</li>
+        <li>Bannissement temporaire ou définitif.</li>
+      </ul>
+
+      <div class="important">
+        Merci de respecter ces règles afin de garantir une bonne expérience à tous. <strong>Bon jeu sur Senzany !</strong>
+      </div>
+    </section>
+
+    <p class="footer-note">SENZANY — Voici le récit de votre mort.</p>
+  </main>
+</body>
+</html>
