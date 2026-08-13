@@ -40,7 +40,6 @@
     ['accueil','index.html','Accueil'],
     ['map','senzany-map.html','Carte'],
     ['communaute','senzany-communaute.html','Communauté'],
-    ['wiki','senzany-wiki.html','Wiki'],
     ['faq','senzany-faq.html','FAQ'],
     ['evenements','senzany-evenements.html','Événements'],
     ['boutique','senzany-boutique.html','Boutique'],
@@ -118,23 +117,25 @@
               <a href="senzany-map.html">Carte</a>
               <a href="senzany-communaute.html">Communauté</a>
               <a href="senzany-evenements.html">Événements</a>
-              <a href="senzany-wiki.html">Wiki</a>
+              <a href="senzany-faq.html">FAQ</a>
               <a href="senzany-boutique.html">Boutique</a>
               <a href="senzany-profil.html">Mon profil</a>
             </div>
 
             <div class="site-footer-v2__column">
               <h4>Informations</h4>
-              <a href="reglement.html">Règlement du serveur</a>
-              <a href="conditions-utilisation.html">Conditions d’utilisation</a>
-              <a href="politique-confidentialite.html">Politique de confidentialité</a>
-              <a href="mentions-legales.html">Mentions légales</a>
+              <span class="site-footer-v2__pending">Règlement du serveur <small>à venir</small></span>
+              <span class="site-footer-v2__pending">Conditions d’utilisation <small>à venir</small></span>
+              <span class="site-footer-v2__pending">Politique de confidentialité <small>à venir</small></span>
+              <span class="site-footer-v2__pending">Mentions légales <small>à venir</small></span>
             </div>
 
             <div class="site-footer-v2__column site-footer-v2__server-column">
               <h4>Serveur DayZ</h4>
               <span class="site-footer-v2__server-address">208.115.196.109:2302</span>
               <a class="site-footer-v2__server-connect" href="steam://connect/208.115.196.109:2302">Se connecter au serveur</a>
+              <a class="site-footer-v2__hosting-link" href="https://fiveminehosting.com/index.php" rel="noopener" target="_blank">Hébergé en partenariat avec FiveMine Hosting ↗</a>
+              <span class="site-footer-v2__hosting-note">Portail &amp; API hébergés sur infrastructure OVH</span>
               <span class="site-footer-v2__portal-info"><small>Portail</small>Version 1.0</span>
             </div>
           </nav>
