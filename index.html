@@ -7,7 +7,7 @@
 <meta content="Senzany, serveur DayZ PVE français sur Chernarus. Découvrez un univers communautaire immersif, évolutif et riche en contenus." name="description"/>
 <title>SENZANY — Portail officiel DayZ PVE</title>
 <link href="assets/css/shared/navigation-unified-v1.css?v=1.0.0" rel="stylesheet"/>
-<link href="assets/css/pages/accueil.css?v=2.7" rel="stylesheet"/>
+<link href="assets/css/pages/accueil.css?v=2.9-slider-complet" rel="stylesheet"/>
 <link href="assets/css/shared/entry-terminal.css?v=4.0.1" rel="stylesheet"/>
 <script>
 (() => {
@@ -20,12 +20,25 @@
   }
 })();
 </script>
-<link href="assets/css/pages/accueil-carousel-restore.css?v=1.0.0" rel="stylesheet"/>
 </head>
 <body data-page="accueil">
 <div data-site-header=""></div>
 <main class="home-main">
 <section class="home-hero" id="accueil">
+<div class="home-hero-slider" aria-hidden="true">
+  <div class="home-hero-slide home-hero-slide--volcan is-active"></div>
+  <div class="home-hero-slide home-hero-slide--event"></div>
+  <div class="home-hero-slide home-hero-slide--season"></div>
+</div>
+<div class="home-hero-slider__nav" aria-label="Changer l'image d'en-tête">
+  <button type="button" class="home-hero-slider__arrow home-hero-slider__arrow--prev" aria-label="Image précédente">‹</button>
+  <div class="home-hero-slider__dots">
+    <button type="button" class="is-active" data-hero-slide="0" aria-label="Volcan"></button>
+    <button type="button" data-hero-slide="1" aria-label="Événements"></button>
+    <button type="button" data-hero-slide="2" aria-label="Saison"></button>
+  </div>
+  <button type="button" class="home-hero-slider__arrow home-hero-slider__arrow--next" aria-label="Image suivante">›</button>
+</div>
 <div aria-hidden="true" class="home-hero__light"></div>
 <div aria-hidden="true" class="home-hero__grain"></div>
 <div aria-hidden="true" class="home-hero__ash" id="heroAsh"></div>
@@ -34,8 +47,8 @@
 <div aria-hidden="true" class="doomsday-countdown__edge"></div>
 <div class="doomsday-countdown__event">
 <span class="doomsday-countdown__eyebrow">Saison IV // Nouveau départ</span>
-<strong id="hero-countdown-title">21 juillet 2026</strong>
-<small>Wipe officiel — 20h00</small>
+<strong id="hero-countdown-title">21 août 2026</strong>
+<small>Wipe officiel — 00h00</small>
 </div>
 <div aria-label="Compte à rebours avant la Saison 4" class="doomsday-countdown__clock" id="countdown">
 <div class="doomsday-unit"><strong id="cd-d">00</strong><span>Jours</span></div>
@@ -54,6 +67,8 @@
 </section>
 </div><div class="wrap home-hero__inner">
 <div class="home-hero__content home-reveal">
+
+<div class="home-hero-story is-active" data-hero-story="0">
 <p class="home-kicker">01 Senzany // Portail officiel</p>
 <h1 class="home-hero__title">
 <span>VOICI LE RÉCIT</span>
@@ -69,7 +84,8 @@
 <div aria-label="Informations principales" class="home-hero__signals">
 <div><strong>100%</strong><span>PVE français</span></div>
 <div><strong>24/7</strong><span>Serveur actif</span></div>
-<div><strong>5</strong><span>Membres du staff</span></div>
+<div><strong>+18</strong><span>Staff à l’écoute</span></div>
+</div>
 </div>
 </div>
 <div class="home-hero__side home-hero__side--network home-reveal">
@@ -145,7 +161,7 @@
 <div><strong>200+</strong><span>Crafts disponibles</span></div>
 <div><strong>24/7</strong><span>Serveur actif</span></div>
 <div><strong>100%</strong><span>Expérience PVE</span></div>
-<div><strong>5</strong><span>Membres du staff</span></div>
+<div><strong>+18</strong><span>Staff à l’écoute</span></div>
 <div><strong>S4</strong><span>Nouvelle saison</span></div>
 </div>
 </div>
@@ -192,11 +208,10 @@
 </section>
 </main>
 <div data-site-footer=""></div>
-<script defer="" src="assets/js/components.js?v=20260813-index-restore"></script>
+<script defer="" src="assets/js/components.js"></script>
 <script defer="" src="assets/js/app.js"></script>
 <script defer="" src="assets/js/api.js"></script>
 <script defer="" src="assets/js/pages/accueil.js?v=2.7"></script>
 <script defer="" src="assets/js/shared/entry-terminal.js?v=4.0.1"></script>
-<script defer src="assets/js/pages/accueil-carousel-restore.js?v=1.0.0"></script>
 </body>
 </html>
