@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Politique de confidentialité et protection des données du portail Senzany.">
+  <title>SENZANY — Politique de confidentialité</title>
+  <style>
+    :root{
+      --bg:#080806;
+      --panel:#0e0e0b;
+      --panel2:#13120f;
+      --line:#2b2822;
+      --text:#ebe7de;
+      --muted:#a49c90;
+      --gold:#e2a953;
+      --red:#d84848;
+      --green:#78b36b;
+      --shadow:0 24px 80px rgba(0,0,0,.35);
+      --max:1120px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(226,169,83,.07), transparent 32rem),
+        linear-gradient(180deg,#080806 0%,#0b0a08 100%);
+      color:var(--text);
+      font-family:Inter,Arial,Helvetica,sans-serif;
+      line-height:1.65;
+    }
+    a{color:inherit}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter:blur(14px);
+      background:rgba(8,8,6,.88);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar__inner{
+      max-width:var(--max);
+      margin:auto;
+      min-height:68px;
+      padding:0 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      font-weight:900;
+      letter-spacing:.16em;
+    }
+    .brand__mark{
+      width:34px;height:34px;
+      display:grid;place-items:center;
+      border:1px solid #514330;
+      background:#16120d;
+      color:var(--gold);
+      font-size:16px;
+    }
+    .back{
+      text-decoration:none;
+      color:var(--muted);
+      font-size:.86rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      transition:.2s ease;
+    }
+    .back:hover{color:var(--gold)}
+    main{max-width:var(--max);margin:auto;padding:64px 24px 90px}
+    .hero{
+      border:1px solid var(--line);
+      background:linear-gradient(135deg,rgba(226,169,83,.08),rgba(255,255,255,.018));
+      padding:44px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:after{
+      content:"";
+      position:absolute;inset:auto -120px -160px auto;
+      width:420px;height:420px;border-radius:50%;
+      border:1px solid rgba(226,169,83,.12);
+      box-shadow:0 0 0 50px rgba(226,169,83,.025),0 0 0 100px rgba(226,169,83,.015);
+    }
+    .eyebrow{
+      margin:0 0 10px;
+      color:var(--gold);
+      font-size:.76rem;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+    h1{margin:0;font-size:clamp(2.1rem,6vw,4.7rem);line-height:.95;letter-spacing:-.035em;text-transform:uppercase}
+    .hero p:last-child{max-width:760px;color:var(--muted);font-size:1.02rem;margin:22px 0 0}
+    .notice{
+      margin:26px 0 0;
+      padding:18px 20px;
+      border-left:3px solid var(--gold);
+      background:#11100d;
+      color:#cfc8bd;
+    }
+    .toc{
+      margin:32px 0 54px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    .toc a{
+      text-decoration:none;
+      border:1px solid var(--line);
+      background:var(--panel);
+      padding:13px 14px;
+      color:#c9c2b8;
+      font-size:.84rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      transition:.2s ease;
+    }
+    .toc a:hover{border-color:#6f5531;color:var(--gold);transform:translateY(-1px)}
+    .rule-section{
+      margin:0 0 24px;
+      padding:30px 32px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,var(--panel),#0b0b09);
+    }
+    .rule-section__head{
+      display:flex;gap:14px;align-items:flex-start;margin-bottom:20px
+    }
+    .num{
+      flex:0 0 auto;
+      color:var(--gold);
+      font-size:.73rem;
+      font-weight:900;
+      letter-spacing:.12em;
+      padding-top:6px;
+    }
+    h2{margin:0;font-size:1.35rem;text-transform:uppercase;letter-spacing:.035em}
+    h3{
+      margin:26px 0 10px;
+      font-size:.94rem;
+      color:var(--gold);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    p{margin:0 0 12px}
+    ul{margin:8px 0 0;padding-left:22px}
+    li{margin:7px 0}
+    strong{color:#fff}
+    .forbidden{color:#f0dede}
+    .forbidden li::marker{color:var(--red)}
+    .important{
+      margin-top:18px;
+      padding:14px 16px;
+      border:1px solid #4a3a27;
+      background:#15110c;
+      color:#d9d0c4;
+    }
+    .base-flow{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+      margin:18px 0 8px;
+    }
+    .base-flow div{
+      border:1px solid var(--line);
+      background:#0a0a08;
+      padding:14px 12px;
+      min-height:82px;
+    }
+    .base-flow b{display:block;color:var(--gold);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+    .muted{color:var(--muted)}
+    .sanctions{
+      border-color:#4a2525;
+      background:linear-gradient(180deg,#130d0d,#0d0909);
+    }
+    .sanctions h2{color:#f0dddd}
+    .footer-note{
+      margin-top:36px;
+      text-align:center;
+      color:var(--muted);
+      border-top:1px solid var(--line);
+      padding-top:28px;
+      font-size:.9rem;
+    }
+    @media(max-width:820px){
+      .toc{grid-template-columns:repeat(2,1fr)}
+      .base-flow{grid-template-columns:1fr 1fr}
+      .hero{padding:32px 24px}
+      .rule-section{padding:24px 20px}
+    }
+    @media(max-width:520px){
+      .topbar__inner{padding:0 16px}
+      .brand{letter-spacing:.08em}
+      main{padding:34px 14px 64px}
+      .toc,.base-flow{grid-template-columns:1fr}
+      .back{font-size:.72rem}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="index.html" aria-label="Retour à l'accueil Senzany">
+        <span class="brand__mark">S</span>
+        <span>SENZANY</span>
+      </a>
+      <a class="back" href="index.html">← Retour au site</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Informations // Vie privée</p>
+      <h1>Politique de confidentialité</h1>
+      <p>Cette page explique de manière claire quelles données peuvent être utilisées par le portail Senzany, pourquoi elles sont nécessaires et quels sont vos droits.</p>
+      <div class="notice">
+        <strong>Version en vigueur : 13 août 2026.</strong> Cette politique concerne le site et le portail Senzany. Elle sera complétée par l'identité et les coordonnées exactes du responsable du traitement dans les Mentions légales avant publication définitive.
+      </div>
+    </section>
+
+    <nav class="toc" aria-label="Sommaire de la politique de confidentialité">
+      <a href="#responsable">Responsable</a>
+      <a href="#donnees">Données utilisées</a>
+      <a href="#finalites">Finalités</a>
+      <a href="#bases">Bases légales</a>
+      <a href="#destinataires">Destinataires</a>
+      <a href="#conservation">Conservation</a>
+      <a href="#droits">Vos droits</a>
+      <a href="#cookies">Cookies</a>
+    </nav>
+
+    <section class="rule-section" id="responsable">
+      <div class="rule-section__head"><span class="num">01 //</span><div><h2>Responsable du traitement</h2></div></div>
+      <p>Le responsable du traitement est l'éditeur du site Senzany, c'est-à-dire la personne ou l'entité qui détermine les finalités et les moyens des traitements réalisés par le portail.</p>
+      <div class="important">
+        <strong>À compléter avant publication définitive :</strong> identité ou dénomination de l'éditeur, adresse ou siège, et adresse de contact dédiée aux demandes relatives aux données personnelles. Ces informations doivent être identiques à celles figurant dans les Mentions légales.
+      </div>
+    </section>
+
+    <section class="rule-section" id="donnees">
+      <div class="rule-section__head"><span class="num">02 //</span><div><h2>Données susceptibles d'être utilisées</h2></div></div>
+      <p>Senzany limite les données utilisées à celles nécessaires au fonctionnement des services proposés. Selon les fonctionnalités utilisées et la visibilité de vos informations auprès des services concernés, le portail peut traiter les catégories suivantes.</p>
+
+      <h3>Compte Steam</h3>
+      <ul>
+        <li>SteamID64 ;</li>
+        <li>pseudo et avatar Steam ;</li>
+        <li>lien ou informations publiques du profil Steam ;</li>
+        <li>statut et dernière activité lorsque ces informations sont disponibles ;</li>
+        <li>temps total public passé sur DayZ, tous serveurs confondus, lorsque Steam permet sa consultation.</li>
+      </ul>
+
+      <h3>Compte Discord associé</h3>
+      <ul>
+        <li>identifiant Discord ;</li>
+        <li>nom d'utilisateur et avatar Discord ;</li>
+        <li>association entre le compte Discord et le SteamID64 ;</li>
+        <li>rôles détenus sur le Discord Senzany lorsque cette information est utilisée par le portail.</li>
+      </ul>
+
+      <h3>Carte et implantation de base</h3>
+      <ul>
+        <li>SteamID du demandeur ;</li>
+        <li>nom donné à la demande ;</li>
+        <li>commentaire éventuellement renseigné ;</li>
+        <li>position choisie sur la carte et rayon de la zone ;</li>
+        <li>statut de la demande et dates techniques associées.</li>
+      </ul>
+
+      <h3>Données techniques</h3>
+      <p>Le fonctionnement et la sécurisation du service peuvent également entraîner le traitement de données techniques telles que des informations de session, journaux techniques, événements de sécurité et données nécessaires à la détection d'erreurs ou de tentatives d'accès non autorisées.</p>
+
+      <div class="important">
+        Les informations privées relatives aux implantations, notamment les coordonnées exactes, SteamID, informations de propriétaire ou données de traitement staff, ne sont pas destinées à être publiées sur la carte publique.
+      </div>
+    </section>
+
+    <section class="rule-section" id="finalites">
+      <div class="rule-section__head"><span class="num">03 //</span><div><h2>Pourquoi ces données sont-elles utilisées ?</h2></div></div>
+      <p>Les données sont susceptibles d'être utilisées pour les finalités suivantes :</p>
+      <ul>
+        <li>permettre la connexion et reconnaître le joueur authentifié ;</li>
+        <li>afficher les informations de profil disponibles dans l'espace « Mon profil » ;</li>
+        <li>associer, à la demande de l'utilisateur, son compte Discord à son identité Steam ;</li>
+        <li>récupérer les rôles Discord Senzany utiles aux fonctionnalités du portail ;</li>
+        <li>permettre l'envoi, le suivi, la validation ou le refus des demandes d'implantation de base ;</li>
+        <li>gérer les autorisations d'accès aux espaces réservés, notamment Staff et Commandement ;</li>
+        <li>assurer le fonctionnement, la maintenance, le diagnostic et la sécurité du site et de son API ;</li>
+        <li>prévenir les abus, les accès frauduleux et les détournements des fonctionnalités du portail.</li>
+      </ul>
+    </section>
+
+    <section class="rule-section" id="bases">
+      <div class="rule-section__head"><span class="num">04 //</span><div><h2>Bases légales des traitements</h2></div></div>
+      <p>Selon la fonctionnalité concernée, les traitements reposent sur une base légale adaptée au sens du RGPD.</p>
+      <ul>
+        <li><strong>Exécution du service demandé :</strong> lorsque le traitement est nécessaire pour fournir une fonctionnalité que l'utilisateur choisit d'utiliser, par exemple l'authentification ou l'envoi d'une demande via le portail.</li>
+        <li><strong>Intérêt légitime :</strong> lorsque le traitement est nécessaire au fonctionnement, à la sécurisation du portail, à la prévention des abus ou à la gestion raisonnable des accès, sous réserve des droits et libertés des utilisateurs.</li>
+        <li><strong>Consentement :</strong> lorsqu'un traitement ou un traceur nécessite légalement un accord préalable. Dans ce cas, le consentement est demandé séparément et peut être retiré dans les conditions prévues par la réglementation.</li>
+        <li><strong>Obligation légale :</strong> lorsqu'une disposition légale impose la conservation ou le traitement de certaines informations.</li>
+      </ul>
+      <div class="important">L'acceptation des Conditions d'utilisation ne constitue pas, à elle seule, un consentement à des cookies ou traceurs qui nécessiteraient un consentement préalable.</div>
+    </section>
+
+    <section class="rule-section" id="sources">
+      <div class="rule-section__head"><span class="num">05 //</span><div><h2>Origine des données</h2></div></div>
+      <p>Les données peuvent provenir :</p>
+      <ul>
+        <li>directement de l'utilisateur lorsqu'il utilise le site ou remplit une demande ;</li>
+        <li>de Steam lorsque l'utilisateur s'authentifie et que les informations concernées sont accessibles via les services Steam ;</li>
+        <li>de Discord lorsque l'utilisateur choisit d'associer son compte et autorise la connexion correspondante ;</li>
+        <li>du fonctionnement technique du site, de l'API et des mécanismes de sécurité.</li>
+      </ul>
+      <p>Les paramètres, politiques de confidentialité et conditions propres à Steam et Discord restent applicables à leurs propres services.</p>
+    </section>
+
+    <section class="rule-section" id="destinataires">
+      <div class="rule-section__head"><span class="num">06 //</span><div><h2>Destinataires et prestataires techniques</h2></div></div>
+      <p>Les données ne sont accessibles qu'aux personnes ou services qui en ont besoin pour les finalités décrites ci-dessus.</p>
+      <p>Selon la fonctionnalité utilisée, elles peuvent notamment être traitées par :</p>
+      <ul>
+        <li>les membres autorisés de l'équipe Senzany, dans la limite de leurs missions ;</li>
+        <li><strong>Supabase</strong>, utilisé pour le stockage de données nécessaires au portail ;</li>
+        <li><strong>Steam</strong>, pour l'authentification et la récupération des informations accessibles via ses services ;</li>
+        <li><strong>Discord</strong>, lorsque l'utilisateur choisit d'associer son compte ou lorsque le portail récupère les informations nécessaires liées au Discord Senzany ;</li>
+        <li>les prestataires d'hébergement et d'infrastructure nécessaires au fonctionnement du site et de l'API.</li>
+      </ul>
+      <p>Senzany n'a pas vocation à vendre les données personnelles de ses utilisateurs.</p>
+    </section>
+
+    <section class="rule-section" id="transferts">
+      <div class="rule-section__head"><span class="num">07 //</span><div><h2>Localisation et transferts de données</h2></div></div>
+      <p>L'utilisation de services tiers peut conduire à ce que certaines données soient traitées sur des infrastructures situées en dehors de la France ou de l'Espace économique européen, selon la configuration et les engagements contractuels des prestataires concernés.</p>
+      <p>Lorsque la réglementation l'exige, le responsable du traitement doit s'assurer qu'un mécanisme juridique approprié encadre ces transferts et fournir les informations correspondantes aux utilisateurs.</p>
+      <div class="important"><strong>À vérifier avant publication définitive :</strong> région Supabase réellement utilisée, hébergement exact du site/API et modalités applicables aux services Steam et Discord. Nous ne déclarons volontairement aucun pays de stockage sans cette vérification.</div>
+    </section>
+
+    <section class="rule-section" id="conservation">
+      <div class="rule-section__head"><span class="num">08 //</span><div><h2>Durées de conservation</h2></div></div>
+      <p>Les données ne doivent être conservées que pendant une durée proportionnée à la finalité pour laquelle elles sont utilisées.</p>
+      <p>En pratique, les durées exactes doivent être définies selon chaque catégorie : données de compte et d'association, demandes d'implantation, données d'autorisation, journaux techniques et éventuelles données nécessaires au respect d'une obligation légale.</p>
+      <div class="important">
+        <strong>Point à finaliser :</strong> nous ne fixons pas artificiellement de durées dans cette politique tant que les durées réellement appliquées par le portail Senzany et ses sauvegardes n'ont pas été vérifiées. Une durée annoncée publiquement doit correspondre au fonctionnement réel du système.
+      </div>
+    </section>
+
+    <section class="rule-section" id="securite">
+      <div class="rule-section__head"><span class="num">09 //</span><div><h2>Sécurité et confidentialité</h2></div></div>
+      <p>Senzany met en œuvre des mesures techniques et organisationnelles destinées à limiter les accès non autorisés, la divulgation, l'altération ou la perte des données.</p>
+      <p>Les espaces sensibles du portail sont soumis à des contrôles d'authentification et d'autorisation. Les secrets techniques, clés d'API et identifiants de service ne doivent pas être exposés publiquement.</p>
+      <p>Aucun système informatique ne pouvant garantir un risque nul, les mesures de sécurité sont adaptées et améliorées en fonction de l'évolution du portail et des risques identifiés.</p>
+    </section>
+
+    <section class="rule-section" id="droits">
+      <div class="rule-section__head"><span class="num">10 //</span><div><h2>Vos droits</h2></div></div>
+      <p>Dans les conditions prévues par le RGPD et selon la base légale du traitement concerné, vous pouvez notamment disposer des droits suivants :</p>
+      <ul>
+        <li>droit d'accès à vos données ;</li>
+        <li>droit de rectification des données inexactes ;</li>
+        <li>droit à l'effacement dans les cas prévus par la réglementation ;</li>
+        <li>droit à la limitation du traitement ;</li>
+        <li>droit d'opposition lorsque ce droit est applicable ;</li>
+        <li>droit à la portabilité pour les traitements qui remplissent les conditions prévues par le RGPD ;</li>
+        <li>droit de retirer votre consentement à tout moment lorsqu'un traitement repose sur celui-ci, sans remettre en cause la licéité du traitement effectué avant ce retrait.</li>
+      </ul>
+      <p>Pour exercer vos droits, vous pourrez utiliser l'adresse de contact relative aux données personnelles qui sera indiquée dans les Mentions légales et sur cette page.</p>
+      <p>Une vérification raisonnable de l'identité peut être demandée lorsqu'elle est nécessaire pour éviter qu'une personne obtienne ou modifie les données d'un autre utilisateur.</p>
+      <p>Vous disposez également du droit d'introduire une réclamation auprès de la <strong>CNIL</strong> si vous estimez, après avoir contacté le responsable du traitement, que vos droits ne sont pas respectés.</p>
+    </section>
+
+    <section class="rule-section" id="cookies">
+      <div class="rule-section__head"><span class="num">11 //</span><div><h2>Cookies et autres traceurs</h2></div></div>
+      <p>Le portail peut utiliser des mécanismes techniques nécessaires à la connexion, à la sécurité ou au maintien d'une session. Lorsqu'ils sont strictement nécessaires au service demandé par l'utilisateur, ces mécanismes peuvent relever des exemptions prévues par la réglementation.</p>
+      <p>Si Senzany utilise à l'avenir des cookies ou traceurs soumis au consentement — par exemple certains outils de mesure d'audience, de publicité ou de services tiers — ils ne devront pas être déposés ou lus avant que l'utilisateur ait exprimé son choix lorsque la loi l'exige.</p>
+      <p>Un éventuel outil de mesure d'audience ne pourra être présenté comme exempté de consentement que si sa configuration respecte effectivement les critères applicables.</p>
+    </section>
+
+    <section class="rule-section" id="mineurs">
+      <div class="rule-section__head"><span class="num">12 //</span><div><h2>Utilisateurs mineurs</h2></div></div>
+      <p>Le portail n'a pas pour finalité de collecter volontairement des données sensibles concernant les mineurs. Lorsque le consentement constitue la base légale d'un traitement concernant un mineur, les règles spécifiques prévues par la réglementation applicable doivent être respectées.</p>
+    </section>
+
+    <section class="rule-section" id="evolution">
+      <div class="rule-section__head"><span class="num">13 //</span><div><h2>Évolution de cette politique</h2></div></div>
+      <p>Cette politique peut être mise à jour afin de refléter l'évolution du portail, l'ajout ou le retrait de fonctionnalités, un changement de prestataire ou une évolution réglementaire.</p>
+      <p>La date de la version en vigueur est indiquée en haut de cette page. Lorsqu'une modification importante affecte la manière dont les données sont utilisées, une information adaptée pourra être affichée sur le site.</p>
+    </section>
+
+    <section class="rule-section" id="contact">
+      <div class="rule-section__head"><span class="num">14 //</span><div><h2>Contact</h2></div></div>
+      <p>Pour toute question concernant cette politique ou l'exercice de vos droits, contactez le responsable du traitement à l'adresse dédiée qui sera publiée ici et dans les Mentions légales.</p>
+      <div class="important"><strong>Avant mise en ligne :</strong> renseigner le nom réel du responsable du traitement et une adresse de contact valide. Cette information ne doit pas être inventée.</div>
+    </section>
+
+    <p class="footer-note">SENZANY — Voici le récit de votre mort. // Politique de confidentialité — 13 août 2026</p>
+  </main>
+</body>
+</html>
