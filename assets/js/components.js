@@ -135,7 +135,6 @@
               <span class="site-footer-v2__server-address">208.115.196.109:2302</span>
               <a class="site-footer-v2__server-connect" href="steam://connect/208.115.196.109:2302">Se connecter au serveur</a>
               <a class="site-footer-v2__hosting-link" href="https://fiveminehosting.com/index.php" rel="noopener" target="_blank">Hébergé en partenariat avec FiveMine Hosting ↗</a>
-              <span class="site-footer-v2__hosting-note">Portail &amp; API hébergés sur infrastructure OVH</span>
               <span class="site-footer-v2__portal-info"><small>Portail</small>Version 1.0</span>
             </div>
           </nav>

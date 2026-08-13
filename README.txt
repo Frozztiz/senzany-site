@@ -1,18 +1,18 @@
-SENZANY FAQ V4.1 — HOTFIX
+SENZANY — correction demandée
 
-Corrige :
-- la ligne ACCUEILCARTECOMMUNAUTÉ... affichée en haut à gauche ;
-- le menu responsive / déroulant ;
-- le header sticky ;
-- le fond volcan/personnage qui continue derrière la page au défilement.
+1. Footer :
+- conservation de « Hébergé en partenariat avec FiveMine Hosting »
+- suppression de « Portail & API hébergés sur infrastructure OVH »
 
-Aucune nouvelle image.
+2. FAQ :
+- suppression du bloc « Consulter le Wiki »
+- remplacement par « Consulter la FAQ »
+- lien interne vers les questions de la FAQ
+- menu/footer : Wiki remplacé par FAQ
 
 À remplacer :
-senzany-faq.html
-assets/css/pages/faq.css
-assets/css/shared/navigation-unified-v1.css
-assets/js/components.js
-assets/js/pages/faq.js
+- assets/js/components.js
+- senzany-faq.html
+- (faq.css / faq.js inclus par sécurité si tu veux remplacer le pack complet)
 
-Puis CTRL + F5.
+Puis Ctrl + F5.
