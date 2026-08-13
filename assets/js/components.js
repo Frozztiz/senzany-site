@@ -124,16 +124,17 @@
 
             <div class="site-footer-v2__column">
               <h4>Informations</h4>
-              <span class="site-footer-v2__pending">Règlement du serveur <small>à venir</small></span>
-              <span class="site-footer-v2__pending">Conditions d’utilisation <small>à venir</small></span>
-              <span class="site-footer-v2__pending">Politique de confidentialité <small>à venir</small></span>
-              <span class="site-footer-v2__pending">Mentions légales <small>à venir</small></span>
+              <a href="reglement.html">Règlement du serveur</a>
+              <a href="conditions-utilisation.html">Conditions d’utilisation</a>
+              <a href="politique-confidentialite.html">Politique de confidentialité</a>
+              <a href="mentions-legales.html">Mentions légales</a>
             </div>
 
             <div class="site-footer-v2__column site-footer-v2__server-column">
               <h4>Serveur DayZ</h4>
               <span class="site-footer-v2__server-address">208.115.196.109:2302</span>
               <a class="site-footer-v2__server-connect" href="steam://connect/208.115.196.109:2302">Se connecter au serveur</a>
+              <a href="https://fiveminehosting.com/index.php" rel="noopener" target="_blank">Hébergé en partenariat avec FiveMine Hosting ↗</a>
               <span class="site-footer-v2__portal-info"><small>Portail</small>Version 1.0</span>
             </div>
           </nav>

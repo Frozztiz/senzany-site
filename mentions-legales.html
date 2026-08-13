@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Mentions légales du site et du portail Senzany.">
+  <title>SENZANY — Mentions légales</title>
+  <style>
+    :root{
+      --bg:#080806;
+      --panel:#0e0e0b;
+      --panel2:#13120f;
+      --line:#2b2822;
+      --text:#ebe7de;
+      --muted:#a49c90;
+      --gold:#e2a953;
+      --red:#d84848;
+      --green:#78b36b;
+      --shadow:0 24px 80px rgba(0,0,0,.35);
+      --max:1120px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(226,169,83,.07), transparent 32rem),
+        linear-gradient(180deg,#080806 0%,#0b0a08 100%);
+      color:var(--text);
+      font-family:Inter,Arial,Helvetica,sans-serif;
+      line-height:1.65;
+    }
+    a{color:inherit}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter:blur(14px);
+      background:rgba(8,8,6,.88);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar__inner{
+      max-width:var(--max);
+      margin:auto;
+      min-height:68px;
+      padding:0 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      font-weight:900;
+      letter-spacing:.16em;
+    }
+    .brand__mark{
+      width:34px;height:34px;
+      display:grid;place-items:center;
+      border:1px solid #514330;
+      background:#16120d;
+      color:var(--gold);
+      font-size:16px;
+    }
+    .back{
+      text-decoration:none;
+      color:var(--muted);
+      font-size:.86rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      transition:.2s ease;
+    }
+    .back:hover{color:var(--gold)}
+    main{max-width:var(--max);margin:auto;padding:64px 24px 90px}
+    .hero{
+      border:1px solid var(--line);
+      background:linear-gradient(135deg,rgba(226,169,83,.08),rgba(255,255,255,.018));
+      padding:44px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:after{
+      content:"";
+      position:absolute;inset:auto -120px -160px auto;
+      width:420px;height:420px;border-radius:50%;
+      border:1px solid rgba(226,169,83,.12);
+      box-shadow:0 0 0 50px rgba(226,169,83,.025),0 0 0 100px rgba(226,169,83,.015);
+    }
+    .eyebrow{
+      margin:0 0 10px;
+      color:var(--gold);
+      font-size:.76rem;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+    h1{margin:0;font-size:clamp(2.1rem,6vw,4.7rem);line-height:.95;letter-spacing:-.035em;text-transform:uppercase}
+    .hero p:last-child{max-width:760px;color:var(--muted);font-size:1.02rem;margin:22px 0 0}
+    .notice{
+      margin:26px 0 0;
+      padding:18px 20px;
+      border-left:3px solid var(--gold);
+      background:#11100d;
+      color:#cfc8bd;
+    }
+    .toc{
+      margin:32px 0 54px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    .toc a{
+      text-decoration:none;
+      border:1px solid var(--line);
+      background:var(--panel);
+      padding:13px 14px;
+      color:#c9c2b8;
+      font-size:.84rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      transition:.2s ease;
+    }
+    .toc a:hover{border-color:#6f5531;color:var(--gold);transform:translateY(-1px)}
+    .rule-section{
+      margin:0 0 24px;
+      padding:30px 32px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,var(--panel),#0b0b09);
+    }
+    .rule-section__head{
+      display:flex;gap:14px;align-items:flex-start;margin-bottom:20px
+    }
+    .num{
+      flex:0 0 auto;
+      color:var(--gold);
+      font-size:.73rem;
+      font-weight:900;
+      letter-spacing:.12em;
+      padding-top:6px;
+    }
+    h2{margin:0;font-size:1.35rem;text-transform:uppercase;letter-spacing:.035em}
+    h3{
+      margin:26px 0 10px;
+      font-size:.94rem;
+      color:var(--gold);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    p{margin:0 0 12px}
+    ul{margin:8px 0 0;padding-left:22px}
+    li{margin:7px 0}
+    strong{color:#fff}
+    .forbidden{color:#f0dede}
+    .forbidden li::marker{color:var(--red)}
+    .important{
+      margin-top:18px;
+      padding:14px 16px;
+      border:1px solid #4a3a27;
+      background:#15110c;
+      color:#d9d0c4;
+    }
+    .base-flow{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+      margin:18px 0 8px;
+    }
+    .base-flow div{
+      border:1px solid var(--line);
+      background:#0a0a08;
+      padding:14px 12px;
+      min-height:82px;
+    }
+    .base-flow b{display:block;color:var(--gold);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+    .muted{color:var(--muted)}
+    .sanctions{
+      border-color:#4a2525;
+      background:linear-gradient(180deg,#130d0d,#0d0909);
+    }
+    .sanctions h2{color:#f0dddd}
+    .footer-note{
+      margin-top:36px;
+      text-align:center;
+      color:var(--muted);
+      border-top:1px solid var(--line);
+      padding-top:28px;
+      font-size:.9rem;
+    }
+    @media(max-width:820px){
+      .toc{grid-template-columns:repeat(2,1fr)}
+      .base-flow{grid-template-columns:1fr 1fr}
+      .hero{padding:32px 24px}
+      .rule-section{padding:24px 20px}
+    }
+    @media(max-width:520px){
+      .topbar__inner{padding:0 16px}
+      .brand{letter-spacing:.08em}
+      main{padding:34px 14px 64px}
+      .toc,.base-flow{grid-template-columns:1fr}
+      .back{font-size:.72rem}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="index.html" aria-label="Retour à l'accueil Senzany">
+        <span class="brand__mark">S</span>
+        <span>SENZANY</span>
+      </a>
+      <a class="back" href="index.html">← Retour au site</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Informations // Informations légales</p>
+      <h1>Mentions légales</h1>
+      <p>Informations relatives à l'édition, à l'hébergement et au fonctionnement du site Senzany.</p>
+      <div class="notice">
+        <strong>Version provisoire — 13 août 2026.</strong> La structure juridique Senzany étant en cours de création, certaines informations devront être actualisées dès son immatriculation.
+      </div>
+    </section>
+
+    <nav class="toc" aria-label="Sommaire des mentions légales">
+      <a href="#editeur">Éditeur</a>
+      <a href="#publication">Publication</a>
+      <a href="#contact">Contact</a>
+      <a href="#hebergement">Hébergement</a>
+      <a href="#monetisation">Monétisation</a>
+      <a href="#propriete">Propriété</a>
+      <a href="#donnees">Données</a>
+      <a href="#responsabilite">Responsabilité</a>
+    </nav>
+
+    <section class="rule-section" id="editeur">
+      <div class="rule-section__head"><span class="num">01 //</span><div><h2>Éditeur du site</h2></div></div>
+      <p>Le présent site est édité dans le cadre du projet communautaire <strong>SENZANY</strong>, serveur communautaire consacré au jeu DayZ.</p>
+      <p>À la date de publication des présentes mentions, la structure juridique destinée à porter le projet Senzany est <strong>en cours de création</strong>.</p>
+      <p><strong>Responsable actuel :</strong> Kevin Poulin, connu au sein de la communauté sous le pseudonyme « Toad ».</p>
+      <div class="important">
+        Dès la création et l'immatriculation de la structure Senzany, cette rubrique devra être remplacée ou complétée avec ses informations officielles : dénomination sociale, forme juridique, siège social, numéro SIREN/SIRET et, le cas échéant, informations d'immatriculation et capital social.
+      </div>
+    </section>
+
+    <section class="rule-section" id="publication">
+      <div class="rule-section__head"><span class="num">02 //</span><div><h2>Responsable de la publication</h2></div></div>
+      <p><strong>Responsable de la publication :</strong> Kevin Poulin (« Toad »).</p>
+      <p>Le responsable de la publication supervise les contenus publiés sur le site Senzany, sous réserve des contenus, marques et services appartenant à des tiers.</p>
+    </section>
+
+    <section class="rule-section" id="contact">
+      <div class="rule-section__head"><span class="num">03 //</span><div><h2>Contact</h2></div></div>
+      <p>Pour toute question relative au site, à son fonctionnement ou à l'exercice de droits relatifs aux données personnelles :</p>
+      <p><strong>Adresse électronique :</strong> adresse@adeterminer</p>
+      <div class="important">
+        <strong>Information provisoire :</strong> cette adresse est un emplacement temporaire et doit impérativement être remplacée par une adresse électronique réelle et fonctionnelle avant la publication définitive des pages légales.
+      </div>
+    </section>
+
+    <section class="rule-section" id="hebergement">
+      <div class="rule-section__head"><span class="num">04 //</span><div><h2>Hébergement et infrastructure</h2></div></div>
+      <p>L'hébergement de l'infrastructure Senzany destinée à la mise en ligne est prévu en partenariat avec <strong>FiveMine Hosting</strong>, nom commercial utilisé par <strong>DC &amp; K Digital Services</strong>.</p>
+      <p><strong>Partenaire / hébergeur prévu :</strong> FiveMine Hosting — DC &amp; K Digital Services.</p>
+      <p><strong>Site :</strong> <a href="https://fiveminehosting.com/index.php" rel="noopener" target="_blank">FiveMine Hosting ↗</a></p>
+      <div class="important">
+        <strong>À compléter avant publication définitive :</strong> l'adresse légale exacte de l'hébergeur ainsi que les coordonnées officielles exigées pour les mentions d'hébergement. Ces informations ne sont volontairement pas inventées. Si l'architecture d'hébergement évolue avant la mise en ligne, cette rubrique devra être ajustée.
+      </div>
+    </section>
+
+    <section class="rule-section" id="monetisation">
+      <div class="rule-section__head"><span class="num">05 //</span><div><h2>DayZ et monétisation du serveur</h2></div></div>
+      <p>Senzany est un serveur communautaire DayZ indépendant.</p>
+      <p>Le serveur <strong>Senzany figure parmi les serveurs DayZ approuvés pour la monétisation par Bohemia Interactive</strong>. Les activités de monétisation liées au serveur doivent rester conformes aux règles et conditions applicables définies par Bohemia Interactive. <a href="https://old.bohemia.net/monetization/approved/dayz" rel="noopener" target="_blank">Consulter la liste officielle ↗</a></p>
+      <p>La présence de Senzany dans le programme de monétisation ne signifie pas que Bohemia Interactive édite, exploite ou administre le site Senzany.</p>
+      <p>DayZ et les éléments appartenant à Bohemia Interactive demeurent la propriété de leurs titulaires respectifs.</p>
+    </section>
+
+    <section class="rule-section" id="tiers">
+      <div class="rule-section__head"><span class="num">06 //</span><div><h2>Services tiers</h2></div></div>
+      <p>Le portail peut interagir avec des services tiers, notamment Steam et Discord, pour proposer certaines fonctionnalités d'authentification, de profil ou de liaison de compte.</p>
+      <p>Ces services sont exploités indépendamment de Senzany et restent soumis à leurs propres conditions d'utilisation et politiques de confidentialité.</p>
+      <p>La boutique Senzany peut également être proposée au moyen d'une plateforme tierce. Les conditions propres à cette plateforme restent applicables à ses services, sans se substituer aux obligations qui incombent à Senzany pour ses propres activités.</p>
+    </section>
+
+    <section class="rule-section" id="propriete">
+      <div class="rule-section__head"><span class="num">07 //</span><div><h2>Propriété intellectuelle</h2></div></div>
+      <p>Sauf indication contraire, les textes originaux, créations graphiques, éléments d'interface, identité visuelle et contenus spécifiquement réalisés pour le site Senzany sont protégés par les règles applicables en matière de propriété intellectuelle.</p>
+      <p>Toute reproduction, adaptation, diffusion ou exploitation non autorisée de ces éléments est interdite, sous réserve des exceptions prévues par la loi.</p>
+      <p>Les marques, logos, noms, œuvres, jeux, logiciels et autres éléments appartenant à des tiers demeurent la propriété de leurs titulaires respectifs.</p>
+    </section>
+
+    <section class="rule-section" id="donnees">
+      <div class="rule-section__head"><span class="num">08 //</span><div><h2>Données personnelles</h2></div></div>
+      <p>Le portail Senzany peut traiter certaines données nécessaires à son fonctionnement, notamment dans le cadre de l'authentification Steam, de l'association facultative d'un compte Discord, des profils joueurs, des demandes effectuées depuis la carte et de la sécurisation des espaces réservés.</p>
+      <p>Les catégories de données, finalités, bases légales, destinataires, durées de conservation et droits des utilisateurs sont détaillés dans la <a href="politique-confidentialite.html"><strong>Politique de confidentialité</strong></a>.</p>
+      <p>Les utilisateurs peuvent également consulter les <a href="conditions-utilisation.html"><strong>Conditions d'utilisation</strong></a> du portail.</p>
+    </section>
+
+    <section class="rule-section" id="responsabilite">
+      <div class="rule-section__head"><span class="num">09 //</span><div><h2>Responsabilité et disponibilité</h2></div></div>
+      <p>Senzany s'efforce de fournir des informations exactes et de maintenir ses services accessibles. Le site et certaines fonctionnalités peuvent toutefois être temporairement indisponibles en raison d'une maintenance, d'une mise à jour, d'un incident technique ou d'un événement indépendant de la volonté de l'équipe.</p>
+      <p>Les liens vers des sites ou services tiers sont fournis pour faciliter l'utilisation du portail. Senzany n'exerce pas de contrôle général sur les contenus ou services proposés par ces tiers.</p>
+    </section>
+
+    <section class="rule-section" id="droit">
+      <div class="rule-section__head"><span class="num">10 //</span><div><h2>Droit applicable</h2></div></div>
+      <p>Le site et les présentes mentions légales sont soumis au <strong>droit français</strong>, sous réserve des dispositions impératives éventuellement applicables.</p>
+      <p>Les présentes mentions pourront être modifiées afin de refléter l'évolution juridique et technique du projet Senzany, notamment lors de la création de sa future structure juridique.</p>
+    </section>
+
+    <p class="footer-note">SENZANY — Voici le récit de votre mort. // Mentions légales — 13 août 2026</p>
+  </main>
+</body>
+</html>
