@@ -124,10 +124,10 @@
 
             <div class="site-footer-v2__column">
               <h4>Informations</h4>
-              <span class="site-footer-v2__pending">Règlement du serveur <small>à venir</small></span>
-              <span class="site-footer-v2__pending">Conditions d’utilisation <small>à venir</small></span>
-              <span class="site-footer-v2__pending">Politique de confidentialité <small>à venir</small></span>
-              <span class="site-footer-v2__pending">Mentions légales <small>à venir</small></span>
+              <span class="site-footer-v2__pending">Règlement du serveur</span>
+              <span class="site-footer-v2__pending">Conditions d’utilisation</span>
+              <span class="site-footer-v2__pending">Politique de confidentialité</span>
+              <span class="site-footer-v2__pending">Mentions légales</span>
             </div>
 
             <div class="site-footer-v2__column site-footer-v2__server-column">
