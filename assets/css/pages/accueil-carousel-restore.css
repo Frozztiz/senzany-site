@@ -1,0 +1,139 @@
+
+/* ============================================================
+   SENZANY — RESTAURATION DU CARROUSEL HERO DE L'ACCUEIL
+   Patch isolé : n'écrase pas accueil.css ni components.js.
+   ============================================================ */
+
+.home-hero{
+  position:relative!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  background:#080706!important;
+}
+
+/* Les images tournantes sont placées derrière tout le contenu existant */
+.home-hero-carousel{
+  position:absolute;
+  inset:0;
+  z-index:-3;
+  overflow:hidden;
+  pointer-events:none;
+}
+.home-hero-carousel__slide{
+  position:absolute;
+  inset:-2%;
+  opacity:0;
+  transform:scale(1.035);
+  transition:opacity 1.35s ease, transform 9s ease;
+  background-size:cover;
+  background-repeat:no-repeat;
+  background-position:65% 35%;
+  will-change:opacity,transform;
+}
+.home-hero-carousel__slide.is-active{
+  opacity:1;
+  transform:scale(1);
+}
+.home-hero-carousel__slide::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg,rgba(5,4,4,.96) 0%,rgba(5,4,4,.78) 36%,rgba(5,4,4,.24) 70%,rgba(5,4,4,.46) 100%),
+    linear-gradient(180deg,rgba(4,4,4,.10) 0%,rgba(5,4,4,.14) 56%,rgba(8,7,6,.88) 100%);
+}
+
+/* Le contenu actuel (compteur, titre, serveur live) reste au-dessus */
+.home-hero > .home-hero__light,
+.home-hero > .home-hero__grain,
+.home-hero > .home-hero__ash,
+.home-hero > .home-countdown-wrap,
+.home-hero > .home-hero__inner,
+.home-hero > .home-hero__ticker{
+  position:relative;
+  z-index:3;
+}
+
+/* Navigation identique à l'ancien principe : flèches + 3 indicateurs */
+.home-hero-carousel__nav{
+  position:absolute;
+  inset:0;
+  z-index:8;
+  pointer-events:none;
+}
+.home-hero-carousel__arrow{
+  position:absolute;
+  top:50%;
+  width:48px;
+  height:64px;
+  margin-top:-32px;
+  border:1px solid rgba(241,235,225,.20);
+  background:rgba(8,7,6,.48);
+  color:#f1ebe1;
+  display:grid;
+  place-items:center;
+  font-size:26px;
+  cursor:pointer;
+  pointer-events:auto;
+  transition:.25s ease;
+  backdrop-filter:blur(5px);
+}
+.home-hero-carousel__arrow:hover{
+  background:rgba(140,31,31,.64);
+  border-color:rgba(220,44,49,.72);
+}
+.home-hero-carousel__arrow--prev{left:22px}
+.home-hero-carousel__arrow--next{right:22px}
+
+.home-hero-carousel__dots{
+  position:absolute;
+  left:50%;
+  bottom:31px;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:9px;
+  pointer-events:auto;
+}
+.home-hero-carousel__dot{
+  width:31px;
+  height:3px;
+  padding:0;
+  border:0;
+  background:rgba(241,235,225,.28);
+  cursor:pointer;
+  transition:.3s ease;
+}
+.home-hero-carousel__dot.is-active{
+  width:52px;
+  background:#d1272c;
+  box-shadow:0 0 12px rgba(209,39,44,.35);
+}
+
+.home-hero-carousel__counter{
+  position:absolute;
+  right:82px;
+  bottom:25px;
+  z-index:8;
+  color:rgba(241,235,225,.60);
+  font:600 9px 'IBM Plex Mono',monospace;
+  letter-spacing:.15em;
+  pointer-events:none;
+}
+.home-hero-carousel__counter b{color:#d1272c}
+
+/* On évite qu'un ancien background pseudo-élément ne masque les images. */
+.home-hero::before{z-index:-2!important}
+.home-hero::after{z-index:-1!important;pointer-events:none}
+
+@media(max-width:900px){
+  .home-hero-carousel__slide{background-position:center 35%}
+  .home-hero-carousel__arrow{width:38px;height:52px}
+  .home-hero-carousel__arrow--prev{left:8px}
+  .home-hero-carousel__arrow--next{right:8px}
+  .home-hero-carousel__counter{display:none}
+  .home-hero-carousel__dots{bottom:19px}
+}
+@media(prefers-reduced-motion:reduce){
+  .home-hero-carousel__slide{transition:opacity .35s ease;transform:none!important}
+}
