@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Conditions générales d’utilisation du site Senzany.">
+  <title>SENZANY — Conditions d’utilisation</title>
+  <style>
+    :root{
+      --bg:#080806;
+      --panel:#0e0e0b;
+      --panel2:#13120f;
+      --line:#2b2822;
+      --text:#ebe7de;
+      --muted:#a49c90;
+      --gold:#e2a953;
+      --red:#d84848;
+      --green:#78b36b;
+      --shadow:0 24px 80px rgba(0,0,0,.35);
+      --max:1120px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(226,169,83,.07), transparent 32rem),
+        linear-gradient(180deg,#080806 0%,#0b0a08 100%);
+      color:var(--text);
+      font-family:Inter,Arial,Helvetica,sans-serif;
+      line-height:1.65;
+    }
+    a{color:inherit}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter:blur(14px);
+      background:rgba(8,8,6,.88);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar__inner{
+      max-width:var(--max);
+      margin:auto;
+      min-height:68px;
+      padding:0 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      font-weight:900;
+      letter-spacing:.16em;
+    }
+    .brand__mark{
+      width:34px;height:34px;
+      display:grid;place-items:center;
+      border:1px solid #514330;
+      background:#16120d;
+      color:var(--gold);
+      font-size:16px;
+    }
+    .back{
+      text-decoration:none;
+      color:var(--muted);
+      font-size:.86rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      transition:.2s ease;
+    }
+    .back:hover{color:var(--gold)}
+    main{max-width:var(--max);margin:auto;padding:64px 24px 90px}
+    .hero{
+      border:1px solid var(--line);
+      background:linear-gradient(135deg,rgba(226,169,83,.08),rgba(255,255,255,.018));
+      padding:44px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:after{
+      content:"";
+      position:absolute;inset:auto -120px -160px auto;
+      width:420px;height:420px;border-radius:50%;
+      border:1px solid rgba(226,169,83,.12);
+      box-shadow:0 0 0 50px rgba(226,169,83,.025),0 0 0 100px rgba(226,169,83,.015);
+    }
+    .eyebrow{
+      margin:0 0 10px;
+      color:var(--gold);
+      font-size:.76rem;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+    h1{margin:0;font-size:clamp(2.1rem,6vw,4.7rem);line-height:.95;letter-spacing:-.035em;text-transform:uppercase}
+    .hero p:last-child{max-width:760px;color:var(--muted);font-size:1.02rem;margin:22px 0 0}
+    .notice{
+      margin:26px 0 0;
+      padding:18px 20px;
+      border-left:3px solid var(--gold);
+      background:#11100d;
+      color:#cfc8bd;
+    }
+    .toc{
+      margin:32px 0 54px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    .toc a{
+      text-decoration:none;
+      border:1px solid var(--line);
+      background:var(--panel);
+      padding:13px 14px;
+      color:#c9c2b8;
+      font-size:.84rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      transition:.2s ease;
+    }
+    .toc a:hover{border-color:#6f5531;color:var(--gold);transform:translateY(-1px)}
+    .rule-section{
+      margin:0 0 24px;
+      padding:30px 32px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,var(--panel),#0b0b09);
+    }
+    .rule-section__head{
+      display:flex;gap:14px;align-items:flex-start;margin-bottom:20px
+    }
+    .num{
+      flex:0 0 auto;
+      color:var(--gold);
+      font-size:.73rem;
+      font-weight:900;
+      letter-spacing:.12em;
+      padding-top:6px;
+    }
+    h2{margin:0;font-size:1.35rem;text-transform:uppercase;letter-spacing:.035em}
+    h3{
+      margin:26px 0 10px;
+      font-size:.94rem;
+      color:var(--gold);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    p{margin:0 0 12px}
+    ul{margin:8px 0 0;padding-left:22px}
+    li{margin:7px 0}
+    strong{color:#fff}
+    .forbidden{color:#f0dede}
+    .forbidden li::marker{color:var(--red)}
+    .important{
+      margin-top:18px;
+      padding:14px 16px;
+      border:1px solid #4a3a27;
+      background:#15110c;
+      color:#d9d0c4;
+    }
+    .base-flow{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+      margin:18px 0 8px;
+    }
+    .base-flow div{
+      border:1px solid var(--line);
+      background:#0a0a08;
+      padding:14px 12px;
+      min-height:82px;
+    }
+    .base-flow b{display:block;color:var(--gold);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+    .muted{color:var(--muted)}
+    .sanctions{
+      border-color:#4a2525;
+      background:linear-gradient(180deg,#130d0d,#0d0909);
+    }
+    .sanctions h2{color:#f0dddd}
+    .footer-note{
+      margin-top:36px;
+      text-align:center;
+      color:var(--muted);
+      border-top:1px solid var(--line);
+      padding-top:28px;
+      font-size:.9rem;
+    }
+    @media(max-width:820px){
+      .toc{grid-template-columns:repeat(2,1fr)}
+      .base-flow{grid-template-columns:1fr 1fr}
+      .hero{padding:32px 24px}
+      .rule-section{padding:24px 20px}
+    }
+    @media(max-width:520px){
+      .topbar__inner{padding:0 16px}
+      .brand{letter-spacing:.08em}
+      main{padding:34px 14px 64px}
+      .toc,.base-flow{grid-template-columns:1fr}
+      .back{font-size:.72rem}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="index.html" aria-label="Retour à l'accueil Senzany">
+        <span class="brand__mark">S</span>
+        <span>SENZANY</span>
+      </a>
+      <a class="back" href="index.html">← Retour au site</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Informations // Conditions d'utilisation</p>
+      <h1>Conditions d'utilisation</h1>
+      <p>Les présentes conditions encadrent l'accès et l'utilisation du site Senzany, de ses espaces authentifiés et des services communautaires qui y sont proposés.</p>
+      <div class="notice">
+        <strong>Version en vigueur : 13 août 2026.</strong> En utilisant le site et ses fonctionnalités, l'utilisateur s'engage à respecter les présentes conditions ainsi que, lorsqu'il utilise le serveur DayZ Senzany, le règlement du serveur.
+      </div>
+    </section>
+
+    <nav class="toc" aria-label="Sommaire des conditions d'utilisation">
+      <a href="#objet">Objet</a>
+      <a href="#acces">Accès au site</a>
+      <a href="#compte">Compte & Steam</a>
+      <a href="#services">Services</a>
+      <a href="#comportement">Obligations</a>
+      <a href="#contenus">Contenus</a>
+      <a href="#responsabilite">Responsabilité</a>
+      <a href="#evolution">Évolution</a>
+    </nav>
+
+    <section class="rule-section" id="objet">
+      <div class="rule-section__head"><span class="num">01 //</span><div><h2>Objet et champ d'application</h2></div></div>
+      <p>Les présentes Conditions Générales d'Utilisation (« CGU ») définissent les règles applicables à l'accès et à l'utilisation du site internet Senzany et de ses fonctionnalités.</p>
+      <p>Le site est notamment destiné à présenter le serveur DayZ Senzany, ses actualités et ses services communautaires, ainsi qu'à mettre à disposition des joueurs différents outils liés à leur expérience sur le serveur.</p>
+      <p>Les présentes CGU concernent le <strong>site internet</strong>. Le comportement des joueurs sur le serveur de jeu est également soumis au <a href="reglement.html"><strong>Règlement du serveur</strong></a>.</p>
+    </section>
+
+    <section class="rule-section" id="acces">
+      <div class="rule-section__head"><span class="num">02 //</span><div><h2>Accès au site</h2></div></div>
+      <p>La consultation des parties publiques du site est libre, sous réserve de disposer d'un équipement et d'une connexion internet compatibles.</p>
+      <p>Certaines fonctionnalités sont réservées aux utilisateurs authentifiés ou aux membres disposant d'autorisations particulières. Senzany peut notamment restreindre l'accès aux espaces d'administration, de staff ou de Commandement.</p>
+      <p>Les frais liés au matériel, aux logiciels et à la connexion internet nécessaires à l'utilisation du site restent à la charge de l'utilisateur.</p>
+    </section>
+
+    <section class="rule-section" id="compte">
+      <div class="rule-section__head"><span class="num">03 //</span><div><h2>Authentification, compte et identité de jeu</h2></div></div>
+      <p>Lorsque l'accès à une fonctionnalité nécessite une authentification, l'utilisateur doit utiliser son propre compte et ne pas chercher à usurper l'identité ou les droits d'un autre utilisateur.</p>
+      <p>Certaines fonctionnalités peuvent être associées à l'identité de jeu de l'utilisateur, notamment son identifiant Steam, afin de relier les services du site à son profil joueur et de gérer les autorisations correspondantes.</p>
+      <p>L'utilisateur est responsable de la sécurité de ses propres moyens d'authentification. Toute utilisation frauduleuse ou tentative d'accès à une zone non autorisée peut entraîner une restriction d'accès.</p>
+      <div class="important">Les modalités précises relatives aux données personnelles, à leurs finalités et aux droits des utilisateurs seront détaillées dans la <strong>Politique de confidentialité</strong>. Les présentes CGU ne valent pas consentement au dépôt de cookies ou traceurs qui nécessiteraient un consentement spécifique.</div>
+    </section>
+
+    <section class="rule-section" id="services">
+      <div class="rule-section__head"><span class="num">04 //</span><div><h2>Services et fonctionnalités</h2></div></div>
+      <p>Le site peut notamment proposer des informations sur Senzany, une carte interactive, des outils communautaires, des profils joueurs et des fonctionnalités liées à la gestion du serveur.</p>
+      <h3>Demandes d'implantation</h3>
+      <p>La carte permet aux joueurs d'effectuer une demande d'emplacement de base. L'envoi d'une demande <strong>ne constitue pas une validation automatique</strong>. La demande est examinée par le staff Senzany, qui peut l'accepter ou la refuser selon les règles du serveur et la situation de la carte.</p>
+      <p>L'utilisateur s'engage à fournir des informations exactes dans ses demandes et à ne pas détourner les outils du site de leur finalité.</p>
+      <h3>Espaces réservés</h3>
+      <p>Les espaces Staff et Commandement, ainsi que les données qui y sont accessibles, sont strictement réservés aux personnes autorisées. Toute tentative de contournement des contrôles d'accès est interdite.</p>
+    </section>
+
+    <section class="rule-section" id="comportement">
+      <div class="rule-section__head"><span class="num">05 //</span><div><h2>Obligations de l'utilisateur</h2></div></div>
+      <p>L'utilisateur s'engage à utiliser le site de manière loyale, licite et conforme à sa destination.</p>
+      <p>Il est notamment interdit de :</p>
+      <ul class="forbidden">
+        <li>tenter d'accéder sans autorisation à un compte, une interface, une API, une base de données ou un espace réservé ;</li>
+        <li>contourner, neutraliser ou tester abusivement les mécanismes de sécurité et de contrôle d'accès ;</li>
+        <li>perturber volontairement le fonctionnement du site, de ses services ou de son infrastructure ;</li>
+        <li>utiliser des scripts, robots ou procédés automatisés de manière abusive ou susceptible de dégrader le service ;</li>
+        <li>introduire ou tenter d'introduire un code malveillant, un fichier nuisible ou tout dispositif destiné à compromettre le site ;</li>
+        <li>usurper l'identité d'un autre utilisateur ou fournir volontairement des informations trompeuses ;</li>
+        <li>collecter, divulguer ou exploiter sans autorisation des informations privées concernant d'autres utilisateurs ;</li>
+        <li>utiliser le site à des fins illicites ou contraires aux droits de tiers.</li>
+      </ul>
+      <p>Une utilisation abusive peut conduire à la suspension ou au retrait de l'accès aux fonctionnalités concernées, sans préjudice des mesures pouvant être prises sur le serveur Senzany lorsque les faits concernent également celui-ci.</p>
+    </section>
+
+    <section class="rule-section" id="contenus">
+      <div class="rule-section__head"><span class="num">06 //</span><div><h2>Contenus et propriété intellectuelle</h2></div></div>
+      <p>Sauf mention contraire, la structure du site, son identité visuelle, ses textes originaux, créations graphiques, éléments d'interface et contenus spécifiquement créés pour Senzany ne peuvent pas être reproduits, modifiés, distribués ou exploités commercialement sans autorisation du titulaire des droits.</p>
+      <p>Les marques, noms, logos, jeux, visuels et autres éléments appartenant à des tiers restent la propriété de leurs titulaires respectifs.</p>
+      <p>Senzany est une communauté indépendante autour de DayZ. Toute référence à DayZ, Bohemia Interactive, Steam ou à d'autres services tiers ne doit pas être interprétée comme conférant à Senzany des droits sur leurs marques ou comme établissant une affiliation qui n'existerait pas.</p>
+      <p>Lorsque l'utilisateur transmet volontairement un contenu au moyen d'une fonctionnalité du site, il garantit disposer des droits nécessaires pour cette utilisation et s'interdit de transmettre un contenu illicite ou portant atteinte aux droits d'autrui.</p>
+    </section>
+
+    <section class="rule-section" id="tiers">
+      <div class="rule-section__head"><span class="num">07 //</span><div><h2>Services et liens de tiers</h2></div></div>
+      <p>Le site peut contenir des liens ou s'appuyer sur des services exploités par des tiers. Ces services disposent de leurs propres conditions et politiques.</p>
+      <p>Senzany ne contrôle pas le contenu, la disponibilité ou les pratiques des services tiers et ne saurait se substituer à leurs éditeurs pour les obligations qui leur incombent.</p>
+    </section>
+
+    <section class="rule-section" id="disponibilite">
+      <div class="rule-section__head"><span class="num">08 //</span><div><h2>Disponibilité, maintenance et sécurité</h2></div></div>
+      <p>Senzany s'efforce de maintenir le site accessible et fonctionnel, sans garantir une disponibilité permanente ou l'absence totale d'erreurs.</p>
+      <p>L'accès peut être temporairement interrompu ou limité pour des opérations de maintenance, des mises à jour, des raisons de sécurité, un incident technique, une défaillance d'un prestataire ou tout événement indépendant de la volonté de l'équipe.</p>
+      <p>Senzany peut faire évoluer, suspendre ou retirer une fonctionnalité lorsque cela est nécessaire au fonctionnement, à la sécurité ou à l'évolution du projet.</p>
+    </section>
+
+    <section class="rule-section" id="responsabilite">
+      <div class="rule-section__head"><span class="num">09 //</span><div><h2>Responsabilité</h2></div></div>
+      <p>Les informations publiées sur le site sont fournies avec le plus grand soin possible. Elles peuvent toutefois être modifiées, devenir temporairement indisponibles ou contenir une erreur.</p>
+      <p>Chaque utilisateur demeure responsable de l'utilisation qu'il fait du site, de son équipement, de son compte et des informations qu'il transmet.</p>
+      <p>Les présentes CGU n'ont ni pour objet ni pour effet d'exclure une responsabilité qui ne pourrait légalement être exclue ou limitée.</p>
+    </section>
+
+    <section class="rule-section" id="donnees">
+      <div class="rule-section__head"><span class="num">10 //</span><div><h2>Données personnelles et cookies</h2></div></div>
+      <p>Les traitements de données personnelles liés au site font l'objet d'une information distincte dans la <strong>Politique de confidentialité</strong>, qui précisera notamment les données concernées, les finalités, les bases légales, les durées de conservation, les destinataires et les modalités d'exercice des droits.</p>
+      <p>Lorsque des cookies ou autres traceurs nécessitent le consentement de l'utilisateur, celui-ci doit être recueilli séparément. L'acceptation des présentes CGU ne remplace pas ce consentement.</p>
+    </section>
+
+    <section class="rule-section" id="evolution">
+      <div class="rule-section__head"><span class="num">11 //</span><div><h2>Modification des conditions</h2></div></div>
+      <p>Les présentes CGU peuvent être mises à jour afin de tenir compte de l'évolution du site, de ses fonctionnalités ou du cadre juridique applicable.</p>
+      <p>La version publiée sur le site est la version applicable au moment de la consultation. En cas de modification importante affectant les utilisateurs authentifiés ou leurs droits, une information adaptée pourra être mise en place sur le site.</p>
+    </section>
+
+    <section class="rule-section" id="droit">
+      <div class="rule-section__head"><span class="num">12 //</span><div><h2>Droit applicable et contact</h2></div></div>
+      <p>Les présentes CGU sont soumises au <strong>droit français</strong>, sous réserve des dispositions impératives éventuellement applicables.</p>
+      <p>Pour toute question concernant le site ou les présentes conditions, l'utilisateur peut contacter l'équipe Senzany par les moyens de contact officiels indiqués sur le site.</p>
+      <div class="important">Les informations d'identification de l'éditeur du site et de son hébergeur seront regroupées dans la page <strong>Mentions légales</strong>. Elles doivent correspondre aux informations réelles de l'éditeur et de l'hébergement avant publication définitive.</div>
+    </section>
+
+    <p class="footer-note">SENZANY — Voici le récit de votre mort. // Conditions d'utilisation — 13 août 2026</p>
+  </main>
+</body>
+</html>
