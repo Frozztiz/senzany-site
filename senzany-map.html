@@ -261,6 +261,46 @@
     map.setMaxBounds(canvasBounds.pad(.03));
     map.fitBounds(worldBounds, { padding: [0, 0] });
 
+
+    // Empreintes bâtiments Senzany — même couche/calage que Commandement.
+    map.createPane('playerBuildingsPane');
+    map.getPane('playerBuildingsPane').style.zIndex = 440;
+    map.getPane('playerBuildingsPane').style.pointerEvents = 'none';
+
+    const playerBuildingsLayer = L.layerGroup().addTo(map);
+
+    function wrpToSenzanyValidated(x, z) {
+      // Calage validé de l'export local Senzany.
+      const px = 512 + Number(x);
+      const py = 512 + (15360 - Number(z));
+      return L.latLng(-py / 64, px / 64);
+    }
+
+    fetch('map/data/batiments_chernarus_v30.json', { cache: 'force-cache' })
+      .then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(data => {
+        const features = Array.isArray(data.features) ? data.features : [];
+        features.forEach(f => {
+          if (!f || !Array.isArray(f.poly) || f.poly.length < 3) return;
+          L.polygon(
+            f.poly.map(p => wrpToSenzanyValidated(p[0], p[1])),
+            {
+              pane: 'playerBuildingsPane',
+              color: '#202427',
+              weight: .45,
+              opacity: .72,
+              fillColor: '#3f4549',
+              fillOpacity: .58,
+              interactive: false
+            }
+          ).addTo(playerBuildingsLayer);
+        });
+      })
+      .catch(err => console.warn('[Senzany] Couche bâtiments joueur indisponible:', err));
+
     const zonesLayer = L.layerGroup().addTo(map);
     const selectionLayer = L.layerGroup().addTo(map);
 
