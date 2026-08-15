@@ -537,8 +537,8 @@ body.embed-admin-tools #adminEditor::before{
   <div class="section map-display-section">
     <div class="section-title">AFFICHAGE</div>
     <div class="row" style="gap:6px">
-      <button id="baseTopoBtn" class="btn" type="button">CARTE TOPOGRAPHIQUE</button>
-      <button id="baseSatBtn" class="btn red" type="button">CARTE SATELLITE</button>
+      <button id="baseTopoBtn" class="btn" type="button">RENDU CLAIR</button>
+      <button id="baseSatBtn" class="btn red" type="button">RENDU SENZANY</button>
     </div>
     <div class="row"><label><input id="toggleBuildingsV30" type="checkbox"> Bâtiments</label></div>
 <div class="row"><label><input id="toggleRoads" type="checkbox"> Réseau Senzany (overlay)</label></div>
@@ -612,7 +612,7 @@ let publicPickMode=false;
 let publicSelectionLayer=null;
 
 function dayzToLatLng(x,z){
-  // Conversion validée sur 4 points réels XAM / Chernarus.
+  // Conversion validée sur 4 points réels Chernarus / Senzany.
   return L.latLng((Number(z)/60)-256, Number(x)/60);
 }
 function latLngToDayz(latlng){
@@ -675,19 +675,12 @@ const map=L.map('map',{
 const canvasBounds=L.latLngBounds(L.latLng(-256,0),L.latLng(0,256));
 const worldBounds=L.latLngBounds(dayzToLatLng(0,0),dayzToLatLng(WORLD,WORLD));
 
-const xamTopo=L.tileLayer(
-  'https://static.xam.nu/dayz/maps/chernarusplus/1.27/topographic/{z}/{x}/{y}.webp',
+// Fond cartographique SENZANY uniquement : tuiles locales créées/exportées pour le projet.
+const senzanyBase=L.tileLayer(
+  'tiles/{z}/{x}/{y}.png',
   {
     tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,noWrap:true,
-    bounds:canvasBounds,keepBuffer:4
-  }
-);
-
-const xamSatellite=L.tileLayer(
-  'https://static.xam.nu/dayz/maps/chernarusplus/1.27/satellite/{z}/{x}/{y}.webp',
-  {
-    tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,noWrap:true,
-    bounds:canvasBounds,keepBuffer:4
+    bounds:canvasBounds,keepBuffer:4,className:'senzany-map-tiles'
   }
 ).addTo(map);
 
@@ -714,7 +707,7 @@ const zonesLayer=L.layerGroup().addTo(map);
 const buildingsV30Layer=L.layerGroup();
 
 // Calibration définitivement validée.
-function wrpToXamValidated(x,z){
+function wrpToSenzanyValidated(x,z){
   return L.latLng((z/60)-256, x/60);
 }
 
@@ -723,7 +716,7 @@ fetch('data/batiments_chernarus_v30.json',{cache:'no-store'})
 .then(data=>{
   data.features.forEach(f=>{
     L.polygon(
-      f.poly.map(p=>wrpToXamValidated(p[0],p[1])),
+      f.poly.map(p=>wrpToSenzanyValidated(p[0],p[1])),
       {
         weight:1.15,
         opacity:.92,
@@ -1341,30 +1334,29 @@ async function deleteZone(z){
 document.getElementById('publicBtn').onclick=loadPublic;
 document.getElementById('adminBtn').onclick=loadAdmin;
 
-function setXamBase(which){
-  const topoBtn=document.getElementById('baseTopoBtn');
-  const satBtn=document.getElementById('baseSatBtn');
+function setSenzanyRender(which){
+  const clearBtn=document.getElementById('baseTopoBtn');
+  const senzanyBtn=document.getElementById('baseSatBtn');
+  const pane=map.getPane('tilePane');
 
-  if(which==='sat'){
-    if(map.hasLayer(xamTopo)) map.removeLayer(xamTopo);
-    if(!map.hasLayer(xamSatellite)) xamSatellite.addTo(map);
-    topoBtn.classList.remove('red');
-    satBtn.classList.add('red');
+  if(which==='senzany'){
+    pane.style.filter='brightness(.82) saturate(.88) contrast(1.08)';
+    clearBtn.classList.remove('red');
+    senzanyBtn.classList.add('red');
   }else{
-    if(map.hasLayer(xamSatellite)) map.removeLayer(xamSatellite);
-    if(!map.hasLayer(xamTopo)) xamTopo.addTo(map);
-    satBtn.classList.remove('red');
-    topoBtn.classList.add('red');
+    pane.style.filter='brightness(.96) saturate(.94) contrast(1.03)';
+    senzanyBtn.classList.remove('red');
+    clearBtn.classList.add('red');
   }
 
-  // Garde nos couches Senzany au-dessus du fond après le changement.
   if(document.getElementById('toggleRoads').checked && !map.hasLayer(roads)) roads.addTo(map);
   if(document.getElementById('toggleGrid').checked && !map.hasLayer(gridLayer)) gridLayer.addTo(map);
   if(document.getElementById('toggleBases').checked && !map.hasLayer(zonesLayer)) zonesLayer.addTo(map);
 }
 
-document.getElementById('baseTopoBtn').onclick=()=>setXamBase('topo');
-document.getElementById('baseSatBtn').onclick=()=>setXamBase('sat');
+document.getElementById('baseTopoBtn').onclick=()=>setSenzanyRender('clear');
+document.getElementById('baseSatBtn').onclick=()=>setSenzanyRender('senzany');
+setSenzanyRender('senzany');
 document.getElementById('toggleRoads').onchange=function(){this.checked?roads.addTo(map):map.removeLayer(roads);}
 document.getElementById('toggleGrid').onchange=function(){this.checked?gridLayer.addTo(map):map.removeLayer(gridLayer);}
 document.getElementById('toggleBases').onchange=function(){this.checked?zonesLayer.addTo(map):map.removeLayer(zonesLayer);}

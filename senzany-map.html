@@ -27,7 +27,12 @@
     #senzanyLeafletMap .leaflet-map-pane{
       background:#081012 !important;
     }
-  </style>
+  
+    /* Colorimétrie Senzany : assombrit/neutralise légèrement NOS tuiles locales. */
+    #senzanyLeafletMap .senzany-map-tiles {
+      filter: brightness(.82) saturate(.88) contrast(1.08);
+    }
+</style>
 
 
 <style id="senzany-player-v1035">
@@ -208,9 +213,9 @@
     const canvasBounds = L.latLngBounds(L.latLng(-256, 0), L.latLng(0, 256));
     const worldBounds = L.latLngBounds(dayzToLatLng(0, 0), dayzToLatLng(WORLD, WORLD));
 
-    // Fond XAM Satellite : même rendu/couleurs que la référence DayZ XAM.
+    // Fond cartographique SENZANY uniquement : tuiles locales du projet.
     const satellite = L.tileLayer(
-      'https://static.xam.nu/dayz/maps/chernarusplus/1.27/satellite/{z}/{x}/{y}.webp',
+      'map/tiles/{z}/{x}/{y}.png',
       {
         tileSize: 256,
         minZoom: 0,
@@ -218,7 +223,8 @@
         maxZoom: 8,
         noWrap: true,
         bounds: canvasBounds,
-        keepBuffer: 4
+        keepBuffer: 4,
+        className: 'senzany-map-tiles'
       }
     ).addTo(map);
 
