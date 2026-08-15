@@ -735,9 +735,13 @@ fetch('data/batiments_chernarus_v30.json',{cache:'no-store'})
     L.polygon(
       f.poly.map(p=>wrpToSenzanyValidated(p[0],p[1])),
       {
-        weight:1.15,
-        opacity:.92,
-        fillOpacity:.12,
+        // Empreintes bâtiments Senzany :
+        // gris foncé plein pour les intégrer naturellement au fond satellite.
+        color:'#2f3336',
+        weight:.75,
+        opacity:.95,
+        fillColor:'#555a5e',
+        fillOpacity:.72,
         interactive:false
       }
     ).addTo(buildingsV30Layer);
