@@ -8,5 +8,6 @@ router.get("/health", controller.health);
 router.post("/check", controller.check);
 router.post("/claim", controller.claim);
 router.post("/complete", controller.complete);
+router.post("/flagpoles", controller.flagpoles);
 
 module.exports = router;

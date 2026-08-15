@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const flagpoleSnapshotService = require("../services/flagpoleSnapshotService");
 
 function supabaseConfig() {
   const url = String(process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -136,9 +137,25 @@ router.get("/", async (req, res, next) => {
       ),
     ]);
 
+    const safeZones = Array.isArray(zones) ? zones : [];
+    const safeRequests = Array.isArray(requests) ? requests : [];
+    const snapshot = flagpoleSnapshotService.loadSnapshot();
+    const classified = flagpoleSnapshotService.classifyFlagpoles(
+      snapshot.flagpoles,
+      safeZones,
+      safeRequests
+    );
+
     return res.json({
-      zones: Array.isArray(zones) ? zones : [],
-      requests: Array.isArray(requests) ? requests : [],
+      zones: safeZones,
+      requests: safeRequests,
+      flagpoles: classified.flagpoles,
+      flagpoleStats: classified.stats,
+      flagpoleSnapshot: {
+        agentId: snapshot.agentId,
+        receivedAt: snapshot.receivedAt,
+        count: snapshot.count
+      }
     });
   } catch (error) {
     next(error);

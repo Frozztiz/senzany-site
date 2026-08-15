@@ -1,4 +1,5 @@
 const deliveryAgentService = require("../services/deliveryAgentService");
+const flagpoleSnapshotService = require("../services/flagpoleSnapshotService");
 
 function cleanString(value, maxLength = 250) {
   return String(value || "")
@@ -176,6 +177,42 @@ exports.complete = async (req, res) => {
 
     return res.status(500).json({
       error: "Impossible de confirmer la livraison."
+    });
+  }
+};
+
+exports.flagpoles = async (req, res) => {
+  res.set("Cache-Control", "no-store");
+
+  try {
+    const agentId = cleanString(req.body?.agentId || "dayz-server", 100);
+    const flagpoles = Array.isArray(req.body?.flagpoles) ? req.body.flagpoles : [];
+
+    if (flagpoles.length > 2000) {
+      return res.status(400).json({
+        error: "Trop de mâts reçus dans une seule synchronisation."
+      });
+    }
+
+    const snapshot = flagpoleSnapshotService.saveSnapshot({
+      agentId,
+      flagpoles
+    });
+
+    console.log(
+      `[FLAGPOLES] Snapshot reçu de ${snapshot.agentId} : ${snapshot.count} mât(s)`
+    );
+
+    return res.json({
+      ok: true,
+      count: snapshot.count,
+      receivedAt: snapshot.receivedAt
+    });
+  } catch (error) {
+    console.error("[FLAGPOLES] Synchronisation impossible :", error);
+
+    return res.status(500).json({
+      error: "Impossible d'enregistrer les mâts du serveur DayZ."
     });
   }
 };
