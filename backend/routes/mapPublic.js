@@ -1,6 +1,4 @@
 const express = require("express");
-const { verifySteamId } = require("../utils/steamSession");
-
 const router = express.Router();
 
 function supabaseConfig() {
@@ -38,27 +36,81 @@ async function supabaseRequest(path, options = {}) {
   return data;
 }
 
-function currentSteamId(req) {
-  const secret = process.env.SESSION_SECRET;
-  if (!secret) return null;
-  return verifySteamId(req.cookies?.senzany_session, secret);
+async function rpc(functionName, payload = {}) {
+  const { url, key } = supabaseConfig();
+  const response = await fetch(`${url}/rest/v1/rpc/${functionName}`, {
+    method: "POST",
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const text = await response.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+
+  if (!response.ok) {
+    const error = new Error(`Supabase RPC HTTP ${response.status}`);
+    error.status = response.status;
+    error.data = data;
+    throw error;
+  }
+  return data;
 }
 
-// PUBLIC : coordonnées minimales nécessaires à l'affichage.
-// Aucune donnée privée propriétaire / SteamID / membres / commentaire staff.
+function publicZoneKey(zone) {
+  const x = Number(zone?.center_x);
+  const z = Number(zone?.center_z);
+  if (!Number.isFinite(x) || !Number.isFinite(z)) return null;
+  return `${Math.round(x)}:${Math.round(z)}`;
+}
+
+function sanitizeValidatedZones(rows) {
+  const seen = new Set();
+  const result = [];
+
+  for (const zone of (Array.isArray(rows) ? rows : [])) {
+    const status = String(zone?.public_status ?? zone?.status ?? "").toLowerCase();
+    const type = String(zone?.zone_type ?? "base").toLowerCase();
+    const x = Number(zone?.center_x);
+    const z = Number(zone?.center_z);
+
+    if (type !== "base") continue;
+    if (status !== "validated" && status !== "approved") continue;
+    if (!Number.isFinite(x) || !Number.isFinite(z)) continue;
+
+    const key = publicZoneKey(zone);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+
+    result.push({
+      id: zone?.id || null,
+      public_name: "Base occupée",
+      zone_type: "base",
+      public_status: "validated",
+      public_description: null,
+      center_x: x,
+      center_z: z,
+      radius_m: Math.min(60, Math.max(1, Number(zone?.radius_m) || 60)),
+    });
+  }
+
+  return result;
+}
+
+// PUBLIC : toutes les bases validées sont visibles par tous les joueurs,
+// mais aucune donnée privée (SteamID, propriétaire, membres, commentaire staff)
+// ne quitte cette route.
 router.get("/", async (req, res, next) => {
   try {
     res.set("Cache-Control", "no-store");
 
-    const [zones, requests] = await Promise.all([
-      supabaseRequest(
-        "map_zones_public" +
-        "?select=id,public_name,zone_type,public_status,public_description,center_x,center_z,radius_m" +
-        "&is_visible=eq.true" +
-        "&public_status=neq.hidden" +
-        "&order=created_at.asc",
-        { method: "GET" }
-      ),
+    const [commandZones, requests] = await Promise.all([
+      rpc("command_map_list"),
       supabaseRequest(
         "map_requests" +
         "?select=id,center_x,center_z,radius_m,status" +
@@ -68,81 +120,19 @@ router.get("/", async (req, res, next) => {
       ),
     ]);
 
-    return res.json({
-      zones: Array.isArray(zones) ? zones : [],
-      requests: Array.isArray(requests) ? requests : [],
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Demande d'implantation joueur.
-router.post("/requests", async (req, res, next) => {
-  try {
-    const steamId = currentSteamId(req);
-    if (!steamId) {
-      return res.status(401).json({ error: "Connexion Steam requise." });
-    }
-
-    const requestName = String(req.body?.request_name || "").trim();
-    const comment = String(req.body?.comment || "").trim();
-    const centerX = Number(req.body?.center_x);
-    const centerZ = Number(req.body?.center_z);
-
-    if (!requestName || requestName.length > 80) {
-      return res.status(400).json({ error: "Nom de demande invalide." });
-    }
-    if (comment.length > 500) {
-      return res.status(400).json({ error: "Commentaire trop long." });
-    }
-    if (
-      !Number.isFinite(centerX) || !Number.isFinite(centerZ) ||
-      centerX < 0 || centerX > 15360 ||
-      centerZ < 0 || centerZ > 15360
-    ) {
-      return res.status(400).json({ error: "Coordonnées Chernarus invalides." });
-    }
-
-    const inserted = await supabaseRequest("map_requests", {
-      method: "POST",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify({
-        requester_steam_id: String(steamId),
-        request_name: requestName,
-        comment: comment || null,
-        center_x: Number(centerX.toFixed(2)),
-        center_z: Number(centerZ.toFixed(2)),
-        radius_m: 60,
+    const zones = sanitizeValidatedZones(commandZones);
+    const publicRequests = (Array.isArray(requests) ? requests : [])
+      .filter((r) => String(r?.status || "pending") === "pending")
+      .map((r) => ({
+        id: r?.id || null,
+        center_x: Number(r?.center_x),
+        center_z: Number(r?.center_z),
+        radius_m: Math.min(60, Math.max(1, Number(r?.radius_m) || 60)),
         status: "pending",
-      }),
-    });
+      }))
+      .filter((r) => Number.isFinite(r.center_x) && Number.isFinite(r.center_z));
 
-    return res.status(201).json({
-      ok: true,
-      request: Array.isArray(inserted) ? inserted[0] || null : inserted,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.get("/requests/mine", async (req, res, next) => {
-  try {
-    const steamId = currentSteamId(req);
-    if (!steamId) {
-      return res.status(401).json({ error: "Connexion Steam requise." });
-    }
-
-    const rows = await supabaseRequest(
-      "map_requests" +
-      "?select=id,request_name,comment,center_x,center_z,radius_m,status,created_at,updated_at" +
-      `&requester_steam_id=eq.${encodeURIComponent(String(steamId))}` +
-      "&order=created_at.desc",
-      { method: "GET" }
-    );
-
-    return res.json({ requests: Array.isArray(rows) ? rows : [] });
+    return res.json({ zones, requests: publicRequests });
   } catch (error) {
     next(error);
   }

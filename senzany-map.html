@@ -266,6 +266,8 @@
 
         zonesLayer.clearLayers();
 
+        // /api/map renvoie uniquement les bases validées uniques et publiques.
+        // Tous les joueurs voient donc les mêmes implantations validées.
         const zones = Array.isArray(data.zones) ? data.zones : [];
         zones
           .filter(z => String(z.public_status || '') === 'validated')

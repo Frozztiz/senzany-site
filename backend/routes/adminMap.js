@@ -122,6 +122,90 @@ function validateZoneBody(body) {
   };
 }
 
+
+function sameCoordinate(a, b, tolerance = 1) {
+  return Math.abs(Number(a) - Number(b)) <= tolerance;
+}
+
+function findExistingValidatedBase(zones, request) {
+  const rows = Array.isArray(zones) ? zones : [];
+  const steamId = String(request?.requester_steam_id || "").trim();
+
+  return rows.find((zone) => {
+    const zoneStatus = String(zone?.public_status ?? zone?.status ?? "").toLowerCase();
+    const zoneType = String(zone?.zone_type ?? "base").toLowerCase();
+    const ownerSteamId = String(zone?.owner_steam_id || "").trim();
+
+    if (zoneStatus && zoneStatus !== "validated" && zoneStatus !== "approved") return false;
+    if (zoneType !== "base") return false;
+    if (!sameCoordinate(zone?.center_x, request?.center_x)) return false;
+    if (!sameCoordinate(zone?.center_z, request?.center_z)) return false;
+
+    // Si le SteamID est présent des deux côtés, il doit correspondre.
+    if (steamId && ownerSteamId && steamId !== ownerSteamId) return false;
+
+    return true;
+  }) || null;
+}
+
+
+function validatedZoneKey(zone) {
+  const x = Number(zone?.center_x);
+  const z = Number(zone?.center_z);
+  if (!Number.isFinite(x) || !Number.isFinite(z)) return null;
+  // 1 mètre de tolérance : deux lignes au même emplacement = une seule implantation.
+  return `${Math.round(x)}:${Math.round(z)}`;
+}
+
+function dedupeValidatedZones(rows) {
+  const source = Array.isArray(rows) ? rows : [];
+  const seen = new Set();
+  const result = [];
+
+  for (const zone of source) {
+    const status = String(zone?.public_status ?? zone?.status ?? "").toLowerCase();
+    const type = String(zone?.zone_type ?? "base").toLowerCase();
+
+    if (type !== "base" || (status && status !== "validated" && status !== "approved")) {
+      result.push(zone);
+      continue;
+    }
+
+    const key = validatedZoneKey(zone);
+    if (!key) {
+      result.push(zone);
+      continue;
+    }
+
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(zone);
+  }
+
+  return result;
+}
+
+async function assertNoDuplicateValidatedBase(centerX, centerZ, ignoreId = null) {
+  const zones = await rpc("command_map_list");
+  const key = `${Math.round(Number(centerX))}:${Math.round(Number(centerZ))}`;
+
+  const duplicate = (Array.isArray(zones) ? zones : []).find((zone) => {
+    if (ignoreId && String(zone?.id) === String(ignoreId)) return false;
+
+    const status = String(zone?.public_status ?? zone?.status ?? "").toLowerCase();
+    const type = String(zone?.zone_type ?? "base").toLowerCase();
+    if (type !== "base" || (status && status !== "validated" && status !== "approved")) return false;
+
+    return validatedZoneKey(zone) === key;
+  });
+
+  if (duplicate) {
+    const error = new Error("Une base validée existe déjà à cet emplacement.");
+    error.status = 409;
+    throw error;
+  }
+}
+
 router.get("/", async (req, res, next) => {
   try {
     res.set("Cache-Control", "no-store");
@@ -137,7 +221,8 @@ router.get("/", async (req, res, next) => {
       ),
     ]);
 
-    const safeZones = Array.isArray(zones) ? zones : [];
+    const rawZones = Array.isArray(zones) ? zones : [];
+    const safeZones = dedupeValidatedZones(rawZones);
     const safeRequests = Array.isArray(requests) ? requests : [];
     const snapshot = flagpoleSnapshotService.loadSnapshot();
     const classified = flagpoleSnapshotService.classifyFlagpoles(
@@ -162,12 +247,74 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+
+// Diagnostic Commandement : doublons exacts/proches de bases validées.
+// Cette route ne supprime rien ; elle permet de vérifier les données avant nettoyage.
+router.get("/duplicates", async (req, res, next) => {
+  try {
+    const zones = await rpc("command_map_list");
+    const rows = (Array.isArray(zones) ? zones : []).filter((zone) => {
+      const status = String(zone?.public_status ?? zone?.status ?? "").toLowerCase();
+      const type = String(zone?.zone_type ?? "base").toLowerCase();
+      return type === "base" && (!status || status === "validated" || status === "approved");
+    });
+
+    const groups = [];
+    const used = new Set();
+
+    for (let i = 0; i < rows.length; i++) {
+      if (used.has(i)) continue;
+      const group = [rows[i]];
+
+      for (let j = i + 1; j < rows.length; j++) {
+        if (used.has(j)) continue;
+
+        if (
+          sameCoordinate(rows[i]?.center_x, rows[j]?.center_x) &&
+          sameCoordinate(rows[i]?.center_z, rows[j]?.center_z)
+        ) {
+          group.push(rows[j]);
+          used.add(j);
+        }
+      }
+
+      if (group.length > 1) {
+        used.add(i);
+        groups.push({
+          center_x: Number(rows[i]?.center_x),
+          center_z: Number(rows[i]?.center_z),
+          count: group.length,
+          zones: group.map((zone) => ({
+            id: zone?.id || null,
+            public_name: zone?.public_name || null,
+            owner_steam_id: zone?.owner_steam_id || null,
+            created_at: zone?.created_at || null,
+          })),
+        });
+      }
+    }
+
+    return res.json({
+      ok: true,
+      validatedRows: rows.length,
+      duplicateGroups: groups.length,
+      duplicates: groups,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post("/", async (req, res, next) => {
   try {
     const checked = validateZoneBody(req.body || {});
     if (checked.error) return res.status(400).json({ error: checked.error });
 
     const { publicName, zoneType, publicStatus, centerX, centerZ, radiusM } = checked.value;
+
+    if (zoneType === "base" && publicStatus === "validated") {
+      await assertNoDuplicateValidatedBase(centerX, centerZ);
+    }
 
     const zoneId = await rpc("command_map_create", {
       p_public_name: publicName,
@@ -200,6 +347,10 @@ router.patch("/:id", async (req, res, next) => {
     if (checked.error) return res.status(400).json({ error: checked.error });
 
     const { publicName, zoneType, publicStatus, centerX, centerZ, radiusM } = checked.value;
+
+    if (zoneType === "base" && publicStatus === "validated") {
+      await assertNoDuplicateValidatedBase(centerX, centerZ, zoneId);
+    }
 
     const updated = await rpc("command_map_update", {
       p_zone_id: zoneId,
@@ -264,20 +415,31 @@ router.patch("/requests/:id/approve", async (req, res, next) => {
       return res.status(409).json({ error: "Cette demande n'est plus en attente." });
     }
 
-    const zoneId = await rpc("command_map_create", {
-      p_public_name: String(request.request_name || "Base joueur").trim(),
-      p_zone_type: "base",
-      p_public_status: "validated",
-      p_public_description: null,
-      p_owner_name: null,
-      p_owner_steam_id: String(request.requester_steam_id || "").trim() || null,
-      p_center_x: Number(request.center_x),
-      p_center_z: Number(request.center_z),
-      p_radius_m: Math.min(60, Math.max(1, Number(request.radius_m) || 60)),
-      p_members: [],
-      p_staff_comment: String(request.comment || "").trim() || null,
-      p_actor: req.commandSteamId,
-    });
+    // IMPORTANT : validation idempotente.
+    // Si une tentative précédente a créé la zone mais a échoué ensuite
+    // (ex. erreur de droit lors de syncPublicGeometry), on réutilise la zone
+    // existante au lieu d'en créer une deuxième.
+    const existingZones = await rpc("command_map_list");
+    const existingZone = findExistingValidatedBase(existingZones, request);
+
+    let zoneId = existingZone?.id || null;
+
+    if (!zoneId) {
+      zoneId = await rpc("command_map_create", {
+        p_public_name: String(request.request_name || "Base joueur").trim(),
+        p_zone_type: "base",
+        p_public_status: "validated",
+        p_public_description: null,
+        p_owner_name: null,
+        p_owner_steam_id: String(request.requester_steam_id || "").trim() || null,
+        p_center_x: Number(request.center_x),
+        p_center_z: Number(request.center_z),
+        p_radius_m: Math.min(60, Math.max(1, Number(request.radius_m) || 60)),
+        p_members: [],
+        p_staff_comment: String(request.comment || "").trim() || null,
+        p_actor: req.commandSteamId,
+      });
+    }
 
     await syncPublicGeometry(
       zoneId,
@@ -285,6 +447,7 @@ router.patch("/requests/:id/approve", async (req, res, next) => {
       Number(request.center_z),
       Math.min(60, Math.max(1, Number(request.radius_m) || 60))
     );
+
 
     await supabaseRequest(
       `map_requests?id=eq.${encodeURIComponent(requestId)}`,

@@ -433,6 +433,66 @@ body.embed-admin #adminEditor::before{
 }
 </style>
 
+
+<style id="senzany-v1037-split">
+/* V10.37 — la carte et les outils sont réellement séparés dans deux iframes. */
+body.embed-admin-map{
+  overflow:hidden!important;
+  background:#080b0c!important;
+}
+body.embed-admin-map #map{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+}
+body.embed-admin-map .panel,
+body.embed-admin-map .mode-banner,
+body.embed-admin-map .admin-tools-toggle{
+  display:none!important;
+}
+
+body.embed-admin-tools{
+  overflow:hidden!important;
+  background:#0a0d0e!important;
+}
+body.embed-admin-tools #map,
+body.embed-admin-tools .mode-banner,
+body.embed-admin-tools .admin-tools-toggle,
+body.embed-admin-tools .map-panel-head,
+body.embed-admin-tools .map-access-section,
+body.embed-admin-tools .map-display-section{
+  display:none!important;
+}
+body.embed-admin-tools .panel{
+  display:block!important;
+  position:relative!important;
+  inset:auto!important;
+  width:100%!important;
+  height:100vh!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  background:#0a0d0e!important;
+  box-shadow:none!important;
+}
+body.embed-admin-tools #adminEditor{
+  display:block!important;
+}
+body.embed-admin-tools .admin-tools-close{display:none!important}
+body.embed-admin-tools #adminEditor::before{
+  content:"OUTILS COMMANDEMENT";
+  display:block;
+  margin-bottom:12px;
+  color:#d33a32;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.16em;
+}
+</style>
+
 </head>
 <body>
 
@@ -586,6 +646,21 @@ function makeFlagIcon(color){
   });
 }
 
+
+function focusAdminMap(x,z,zoom=7){
+  if(!Number.isFinite(Number(x)) || !Number.isFinite(Number(z))) return;
+  if(requestedMode==='admin-tools'){
+    window.parent.postMessage({
+      type:'senzany-admin-focus',
+      x:Number(x),
+      z:Number(z),
+      zoom:Number(zoom)||7
+    }, location.origin);
+    return;
+  }
+  map.setView(dayzToLatLng(Number(x),Number(z)),Number(zoom)||7);
+}
+
 function typeLabel(value){
   if(value==='base') return 'Base joueur';
   if(value==='mapping') return 'Mapping Senzany';
@@ -687,39 +762,7 @@ setTimeout(()=>{
 },0);
 
 
-const calibrationLayer=L.layerGroup().addTo(map);
-
-// Independent calibration experiment.
-// Existing dayzToLatLng(), tile layers, bounds, API logic and Senzany functions are untouched.
-function wrpToXamExperimental(x,z){
-  // First independent test based on direct 15360 -> 256 map ratio.
-  const ratio=15360/256; // 60
-  return L.latLng((z/ratio)-256, x/ratio);
-}
-
-const CAL_X=7297.875;
-const CAL_Z=2858.933;
-const cal=wrpToXamExperimental(CAL_X,CAL_Z);
-
-L.circleMarker(cal,{
-  radius:8,
-  weight:3,
-  fillOpacity:1
-}).bindTooltip(
-  'SENZANY<br>',
-  {permanent:true,direction:'top',className:'senzany-cal-label'}
-).addTo(calibrationLayer);
-
-// Separate control button: center on experimental marker without touching map initialization.
-const calButton=document.createElement('button');
-calButton.type='button';
-calButton.className='btn red';
-calButton.textContent='RECENTRER LA CARTE';
-calButton.style.marginTop='8px';
-calButton.onclick=()=>map.setView(cal,7);
-document.querySelector('.panel')?.appendChild(calButton);
-
-
+// V10.37 : ancien point de calibration supprimé définitivement.
 function render(){
   zonesLayer.clearLayers();
   const list=document.getElementById('list');
@@ -816,7 +859,7 @@ function render(){
 
     if(Number.isFinite(x)&&Number.isFinite(zz)){
       card.querySelector('.card-name').style.cursor='pointer';
-      card.querySelector('.card-name').onclick=()=>map.setView(dayzToLatLng(x,zz),6);
+      card.querySelector('.card-name').onclick=()=>focusAdminMap(x,zz,6);
     }
     card.querySelector('.editBtn').onclick=()=>fillEditor(z);
     card.querySelector('.deleteBtn').onclick=()=>deleteZone(z);
@@ -883,6 +926,7 @@ async function approveRequest(request, button){
     }
 
     status('Demande validée en un clic.',true);
+    window.parent.postMessage({type:'senzany-admin-data-changed'}, location.origin);
     await loadAdmin();
   }catch(error){
     status('Validation impossible : '+error.message,false);
@@ -922,6 +966,7 @@ async function rejectRequest(request, button){
     }
 
     status('Demande refusée.',true);
+    window.parent.postMessage({type:'senzany-admin-data-changed'}, location.origin);
     await loadAdmin();
   }catch(error){
     status('Refus impossible : '+error.message,false);
@@ -997,7 +1042,7 @@ function renderAdminRequests(){
 
     if(Number.isFinite(x)&&Number.isFinite(z)){
       card.querySelector('.card-name').style.cursor='pointer';
-      card.querySelector('.card-name').onclick=()=>map.setView(dayzToLatLng(x,z),7);
+      card.querySelector('.card-name').onclick=()=>focusAdminMap(x,z,7);
     }
 
     list.prepend(card);
@@ -1076,7 +1121,7 @@ function renderFlagpoles(){
         '</div>';
 
       card.querySelector('.card-name').style.cursor='pointer';
-      card.querySelector('.card-name').onclick=()=>map.setView(center,7);
+      card.querySelector('.card-name').onclick=()=>focusAdminMap(x,z,7);
       list.prepend(card);
     }
   });
@@ -1143,7 +1188,7 @@ async function loadAdmin(){
       ? data.flagpoleStats
       : {total:0,validated:0,pending:0,orphan:0};
 
-    document.getElementById('adminEditor').classList.remove('hidden');
+    if(requestedMode!=='admin-map') document.getElementById('adminEditor').classList.remove('hidden');
     document.getElementById('publicBtn').classList.remove('red');
     document.getElementById('adminBtn').classList.add('activeAdmin');
 
@@ -1168,7 +1213,8 @@ async function loadAdmin(){
       type:'senzany-admin-map-stats',
       approved:approvedCount,
       pending:pendingCount,
-      orphan:Number(flagpoleStats.orphan)||0
+      orphan:Number(flagpoleStats.orphan)||0,
+      flagpoles:Number(flagpoleStats.total)||0
     }, location.origin);
 
     setTimeout(()=>{map.invalidateSize();map.fitBounds(worldBounds);},120);
@@ -1263,6 +1309,7 @@ async function saveZone(){
     resetEditor();
     await loadAdmin();
     status(id?'Zone modifiée dans Supabase.':'Zone enregistrée dans Supabase.',true);
+    window.parent.postMessage({type:'senzany-admin-data-changed'}, location.origin);
   }catch(error){
     status('Erreur : '+error.message,false);
   }
@@ -1285,6 +1332,7 @@ async function deleteZone(z){
     resetEditor();
     await loadAdmin();
     status('Zone supprimée.',true);
+    window.parent.postMessage({type:'senzany-admin-data-changed'}, location.origin);
   }catch(error){
     status('Erreur : '+error.message,false);
   }
@@ -1323,6 +1371,14 @@ document.getElementById('toggleBases').onchange=function(){this.checked?zonesLay
 
 document.getElementById('pickBtn').onclick=()=>{
   if(!adminAuthorized)return;
+
+  if(requestedMode==='admin-tools'){
+    document.getElementById('pickBtn').classList.add('red');
+    document.getElementById('pickBtn').textContent='CLIQUE SUR LA CARTE…';
+    window.parent.postMessage({type:'senzany-admin-start-pick'}, location.origin);
+    return;
+  }
+
   pickMode=!pickMode;
   document.getElementById('pickBtn').classList.toggle('red',pickMode);
   document.getElementById('pickBtn').textContent=pickMode?'CLIQUE SUR LA CARTE…':'CHOISIR SUR LA CARTE';
@@ -1369,6 +1425,17 @@ map.on('click',e=>{
   }
 
   if(!pickMode||!adminAuthorized)return;
+
+  if(requestedMode==='admin-map'){
+    pickMode=false;
+    map.getContainer().style.cursor='grab';
+    window.parent.postMessage({
+      type:'senzany-admin-selection',
+      x:Number(p.x.toFixed(1)),
+      z:Number(p.z.toFixed(1))
+    }, location.origin);
+    return;
+  }
 
   document.getElementById('x').value=p.x.toFixed(1);
   document.getElementById('z').value=p.z.toFixed(1);
@@ -1418,31 +1485,60 @@ window.addEventListener('message',(event)=>{
       publicSelectionLayer=null;
     }
   }
+
+  if(data.type==='senzany-admin-start-pick' && requestedMode==='admin-map'){
+    pickMode=true;
+    map.getContainer().style.cursor='crosshair';
+  }
+
+  if(data.type==='senzany-admin-selection' && requestedMode==='admin-tools'){
+    document.getElementById('x').value=Number(data.x).toFixed(1);
+    document.getElementById('z').value=Number(data.z).toFixed(1);
+    document.getElementById('pickBtn').classList.remove('red');
+    document.getElementById('pickBtn').textContent='CHOISIR SUR LA CARTE';
+  }
+
+  if(data.type==='senzany-admin-focus' && requestedMode==='admin-map'){
+    focusAdminMap(Number(data.x),Number(data.z),Number(data.zoom)||7);
+  }
+
+  if(data.type==='senzany-admin-refresh' && (requestedMode==='admin-map' || requestedMode==='admin-tools')){
+    loadAdmin();
+  }
 });
 
 // Démarrage + mode intégré dans les vraies pages du site.
 const queryParams = new URLSearchParams(location.search);
 const embedded = queryParams.get('embed') === '1';
-const requestedMode = queryParams.get('mode') === 'admin' ? 'admin' : 'public';
+const rawMode = String(queryParams.get('mode') || 'public');
+const requestedMode = ['admin','admin-map','admin-tools'].includes(rawMode) ? rawMode : 'public';
+const requestedAdmin = requestedMode==='admin' || requestedMode==='admin-map' || requestedMode==='admin-tools';
 
 if(embedded){
-  if(requestedMode === 'admin'){
+  if(requestedMode === 'admin-map'){
+    document.body.classList.add('embed-admin-map');
+  }else if(requestedMode === 'admin-tools'){
+    document.body.classList.add('embed-admin-tools');
+  }else if(requestedMode === 'admin'){
     document.body.classList.add('embed-admin');
     document.body.classList.remove('tools-open');
   }else{
     document.body.classList.add('embed-mode');
   }
-  setTimeout(()=>{map.invalidateSize();map.fitBounds(worldBounds);},120);
+
+  if(requestedMode!=='admin-tools'){
+    setTimeout(()=>{map.invalidateSize();map.fitBounds(worldBounds);},120);
+  }
 }
 
 if(location.protocol === 'file:'){
   zones=[];
   render();
   status('Mode local : carte chargée. API disponible uniquement depuis le site hébergé.', true);
-}else if(requestedMode === 'admin'){
+}else if(requestedAdmin){
   loadAdmin();
   setInterval(()=>{
-    if(requestedMode==='admin' && document.visibilityState!=='hidden'){
+    if(requestedAdmin && document.visibilityState!=='hidden'){
       loadAdmin();
     }
   },60000);
