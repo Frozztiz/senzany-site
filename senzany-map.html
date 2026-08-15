@@ -30,10 +30,56 @@
   </style>
 
 
-<style>
-.leaflet-tile-pane img.leaflet-tile{
-  filter: brightness(.88) contrast(1.08) saturate(.72) sepia(.08) hue-rotate(-8deg);
+<style id="senzany-player-v1035">
+.map-legend .flag-legend{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
 }
+.map-legend .flag-shape{
+  position:relative;
+  display:inline-block;
+  width:17px;
+  height:20px;
+}
+.map-legend .flag-shape::before{
+  content:"";
+  position:absolute;
+  left:3px;top:2px;width:2px;height:17px;
+  background:#e9ecef;border-radius:2px;
+}
+.map-legend .flag-shape::after{
+  content:"";
+  position:absolute;
+  left:5px;top:2px;width:11px;height:8px;
+  background:var(--flag-color,#35c46a);
+  clip-path:polygon(0 0,100% 18%,72% 52%,100% 88%,0 100%);
+}
+.player-map-flag{
+  position:relative;
+  width:22px;
+  height:26px;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.65));
+}
+.player-map-flag::before{
+  content:"";
+  position:absolute;
+  left:5px;top:3px;width:2px;height:21px;
+  background:#e9ecef;border-radius:2px;
+}
+.player-map-flag::after{
+  content:"";
+  position:absolute;
+  left:7px;top:3px;width:13px;height:10px;
+  background:var(--flag-color,#35c46a);
+  clip-path:polygon(0 0,100% 18%,72% 52%,100% 88%,0 100%);
+}
+.player-map-flag i{
+  position:absolute;
+  left:2px;bottom:0;width:8px;height:4px;border-radius:50%;
+  background:var(--flag-color,#35c46a);opacity:.9;
+}
+.player-flag-icon{background:transparent!important;border:0!important}
 </style>
 
 </head>
@@ -49,9 +95,9 @@
           <p>Consultez les zones déjà occupées et proposez l’emplacement de votre future base directement sur la carte.</p>
         </div>
         <div class="map-legend">
-          <div><i class="dot dot--occupied"></i><span>Zone occupée</span></div>
-          <div><i class="dot dot--pending"></i><span>Demande en attente</span></div>
-          <div><i class="dot dot--selected"></i><span>Votre sélection</span></div>
+          <div class="flag-legend"><i class="flag-shape" style="--flag-color:#35c46a"></i><span>Base occupée</span></div>
+          <div class="flag-legend"><i class="flag-shape" style="--flag-color:#d7a447"></i><span>Demande en attente</span></div>
+          <div class="flag-legend"><i class="flag-shape" style="--flag-color:#63b9e8"></i><span>Votre sélection</span></div>
         </div>
       </div>
     </section>
@@ -127,7 +173,6 @@
     }
 
     function dayzToLatLng(x, z) {
-      // Même calibration XAM que la carte Commandement.
       return L.latLng((Number(z) / 60) - 256, Number(x) / 60);
     }
 
@@ -136,6 +181,17 @@
         x: Number(latlng.lng) * 60,
         z: (Number(latlng.lat) + 256) * 60
       };
+    }
+
+    function makePlayerFlagIcon(color) {
+      return L.divIcon({
+        className: 'player-flag-icon',
+        html: '<span class="player-map-flag" style="--flag-color:'+color+'"><i></i></span>',
+        iconSize: [22, 26],
+        iconAnchor: [6, 24],
+        popupAnchor: [4, -24],
+        tooltipAnchor: [6, -18]
+      });
     }
 
     const map = L.map('senzanyLeafletMap', {
@@ -152,8 +208,8 @@
     const canvasBounds = L.latLngBounds(L.latLng(-256, 0), L.latLng(0, 256));
     const worldBounds = L.latLngBounds(dayzToLatLng(0, 0), dayzToLatLng(WORLD, WORLD));
 
-    // Même fond XAM satellite sombre que dans Commandement.
-    const xamTopo = L.tileLayer(
+    // Fond XAM Satellite : même rendu/couleurs que la référence DayZ XAM.
+    const satellite = L.tileLayer(
       'https://static.xam.nu/dayz/maps/chernarusplus/1.27/satellite/{z}/{x}/{y}.webp',
       {
         tileSize: 256,
@@ -172,33 +228,6 @@
     const zonesLayer = L.layerGroup().addTo(map);
     const selectionLayer = L.layerGroup().addTo(map);
 
-    // Empreintes P3D / bâtiments identiques à Commandement.
-    const buildingsV30Layer = L.layerGroup().addTo(map);
-
-    fetch('map/data/batiments_chernarus_v30.json', { cache: 'no-store' })
-      .then(r => {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(data => {
-        const features = Array.isArray(data.features) ? data.features : [];
-        features.forEach(f => {
-          if (!Array.isArray(f.poly)) return;
-          L.polygon(
-            f.poly.map(p => dayzToLatLng(p[0], p[1])),
-            {
-              color: '#2f8cff',
-              weight: 1.15,
-              opacity: .92,
-              fillColor: '#2f8cff',
-              fillOpacity: .12,
-              interactive: false
-            }
-          ).addTo(buildingsV30Layer);
-        });
-      })
-      .catch(error => console.warn('[Senzany Map] Bâtiments P3D indisponibles :', error));
-
     let placementMode = false;
     let currentSelection = null;
 
@@ -210,7 +239,7 @@
       if (x <= 0 || x > WORLD || z <= 0 || z > WORLD) return;
 
       const center = dayzToLatLng(x, z);
-      const leafletRadius = radius / 60;
+      const leafletRadius = radius / SCALE_AT_MAX;
 
       L.circle(center, {
         radius: leafletRadius,
@@ -220,12 +249,8 @@
         fillOpacity: .17
       }).bindPopup(popupText).addTo(zonesLayer);
 
-      L.circleMarker(center, {
-        radius: 5,
-        color,
-        fillColor: color,
-        fillOpacity: 1,
-        weight: 2
+      L.marker(center, {
+        icon: makePlayerFlagIcon(color)
       }).addTo(zonesLayer);
     }
 
@@ -246,7 +271,7 @@
           .filter(z => String(z.public_status || '') === 'validated')
           .forEach(z => addZoneCircle(
             z.center_x, z.center_z, z.radius_m,
-            '#d83c3c',
+            '#35c46a',
             '<b>ZONE OCCUPÉE</b>'
           ));
 
@@ -307,19 +332,15 @@
       const center = dayzToLatLng(currentSelection.x, currentSelection.z);
 
       L.circle(center, {
-        radius: MAX_RADIUS / 60,
+        radius: MAX_RADIUS / SCALE_AT_MAX,
         color: '#63b9e8',
         fillColor: '#63b9e8',
         weight: 2,
         fillOpacity: .18
       }).addTo(selectionLayer);
 
-      L.circleMarker(center, {
-        radius: 5,
-        color: '#63b9e8',
-        fillColor: '#63b9e8',
-        fillOpacity: 1,
-        weight: 2
+      L.marker(center, {
+        icon: makePlayerFlagIcon('#63b9e8')
       }).addTo(selectionLayer);
 
       selectedX.textContent = currentSelection.x.toFixed(2);

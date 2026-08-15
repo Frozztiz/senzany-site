@@ -285,38 +285,151 @@ body.embed-admin.tools-open #map{right:0!important}
 }
 </style>
 
-<style>
-/* V10.34 — Commandement en 2 colonnes permanentes + légende + drapeaux */
-.senzany-legend{
-  position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:1250;
-  display:flex;gap:16px;align-items:center;flex-wrap:wrap;
-  padding:9px 12px;background:rgba(8,10,11,.94);border:1px solid rgba(255,255,255,.16);
-  color:#e9ecee;font-size:10px;font-weight:800;letter-spacing:.02em;pointer-events:none
-}
-.senzany-legend .leg{display:flex;align-items:center;gap:6px;white-space:nowrap}
-.senzany-legend .flag{font-size:17px;line-height:1;text-shadow:0 1px 2px #000}
-.senzany-legend .ok{color:#35c46a}.senzany-legend .wait{color:#d7a447}.senzany-legend .bad{color:#e34242}.senzany-legend .pick{color:#69b7e6}
-.senzany-flag-icon{background:transparent!important;border:0!important}
-.senzany-flag-icon .poleflag{font-size:24px;line-height:24px;font-weight:900;text-shadow:0 1px 3px rgba(0,0,0,.95);transform:translate(-2px,-5px)}
+<style id="senzany-v1035-final">
+/* V10.35 — disposition finale Commandement :
+   légende HORS carte + carte libre + outils dans une vraie colonne séparée. */
+.admin-map-legend{display:none}
 
-/* En Commandement : la carte ne passe JAMAIS sous les outils. */
-body.embed-admin{overflow:hidden!important}
-body.embed-admin #map{position:absolute!important;left:0!important;top:0!important;bottom:0!important;right:400px!important}
-body.embed-admin .panel{
-  display:block!important;position:absolute!important;top:0!important;right:0!important;
-  width:400px!important;height:100vh!important;max-height:none!important;overflow-y:auto!important;
-  z-index:1300!important;background:#0a0d0e!important;border:0!important;border-left:1px solid rgba(255,255,255,.16)!important;
-  box-shadow:none!important
+.senzany-map-flag{
+  position:relative;
+  width:22px;
+  height:26px;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.65));
 }
-body.embed-admin .admin-tools-toggle,body.embed-admin .admin-tools-close{display:none!important}
-body.embed-admin .map-panel-head,body.embed-admin .map-access-section,body.embed-admin .map-display-section{display:none!important}
-body.embed-admin #adminEditor{display:block!important;border-top:0!important}
-body.embed-admin #adminEditor::before{content:"OUTILS COMMANDEMENT";display:block;margin-bottom:12px;color:#d33a32;font-size:10px;font-weight:900;letter-spacing:.16em}
-body.embed-admin .senzany-legend{left:calc((100% - 400px)/2)}
-@media(max-width:1100px){
- body.embed-admin #map{right:340px!important}
- body.embed-admin .panel{width:340px!important}
- body.embed-admin .senzany-legend{left:calc((100% - 340px)/2)}
+.senzany-map-flag::before{
+  content:"";
+  position:absolute;
+  left:5px;
+  top:3px;
+  width:2px;
+  height:21px;
+  background:#e9ecef;
+  border-radius:2px;
+}
+.senzany-map-flag::after{
+  content:"";
+  position:absolute;
+  left:7px;
+  top:3px;
+  width:13px;
+  height:10px;
+  background:var(--flag-color,#35c46a);
+  clip-path:polygon(0 0,100% 18%,72% 52%,100% 88%,0 100%);
+  border-radius:1px;
+}
+.senzany-map-flag__dot{
+  position:absolute;
+  left:2px;
+  bottom:0;
+  width:8px;
+  height:4px;
+  border-radius:50%;
+  background:var(--flag-color,#35c46a);
+  opacity:.9;
+}
+.senzany-flag-icon{background:transparent!important;border:0!important}
+
+body.embed-admin{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 420px!important;
+  grid-template-rows:46px minmax(0,1fr)!important;
+  column-gap:14px!important;
+  row-gap:0!important;
+  height:100vh!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  background:#080b0c!important;
+}
+body.embed-admin .admin-map-legend{
+  grid-column:1!important;
+  grid-row:1!important;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  gap:22px;
+  min-width:0;
+  padding:8px 14px;
+  box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.12);
+  border-bottom:0;
+  background:#0b0f10;
+  color:#d9dddf;
+  font-size:11px;
+  font-weight:800;
+}
+body.embed-admin .admin-map-legend__item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+}
+body.embed-admin .admin-map-legend .senzany-map-flag{
+  transform:scale(.68);
+  transform-origin:center;
+  margin:-5px -2px;
+}
+body.embed-admin #map{
+  position:relative!important;
+  inset:auto!important;
+  top:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  left:auto!important;
+  grid-column:1!important;
+  grid-row:2!important;
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  box-sizing:border-box!important;
+}
+body.embed-admin .panel{
+  display:block!important;
+  position:relative!important;
+  inset:auto!important;
+  top:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  left:auto!important;
+  grid-column:2!important;
+  grid-row:1 / span 2!important;
+  width:420px!important;
+  height:100vh!important;
+  max-height:none!important;
+  margin:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  box-sizing:border-box!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+  background:#0a0d0e!important;
+  box-shadow:none!important;
+  z-index:auto!important;
+}
+body.embed-admin .admin-tools-toggle,
+body.embed-admin .admin-tools-close{display:none!important}
+body.embed-admin .map-panel-head,
+body.embed-admin .map-access-section,
+body.embed-admin .map-display-section{display:none!important}
+body.embed-admin #adminEditor{
+  display:block!important;
+  border-top:0!important;
+}
+body.embed-admin #adminEditor::before{
+  content:"OUTILS COMMANDEMENT";
+  display:block;
+  margin-bottom:12px;
+  color:#d33a32;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.16em;
+}
+@media(max-width:1050px){
+  body.embed-admin{
+    grid-template-columns:minmax(0,1fr) 350px!important;
+  }
+  body.embed-admin .panel{width:350px!important}
+  body.embed-admin .admin-map-legend{gap:10px;font-size:10px}
 }
 </style>
 
@@ -325,13 +438,23 @@ body.embed-admin .senzany-legend{left:calc((100% - 400px)/2)}
 
 
 
-<div id="map"></div>
-<div id="mapLegend" class="senzany-legend">
-  <span class="leg"><span class="flag ok">⚑</span> Base validée</span>
-  <span class="leg"><span class="flag wait">⚑</span> Demande en attente</span>
-  <span class="leg admin-legend-only"><span class="flag bad">⚑</span> Base non déclarée</span>
-  <span class="leg public-legend-only"><span class="flag pick">⚑</span> Votre sélection</span>
+
+<div class="admin-map-legend" aria-label="Légende Commandement">
+  <div class="admin-map-legend__item">
+    <span class="senzany-map-flag" style="--flag-color:#35c46a"><i class="senzany-map-flag__dot"></i></span>
+    <span>Base validée</span>
+  </div>
+  <div class="admin-map-legend__item">
+    <span class="senzany-map-flag" style="--flag-color:#d7a447"><i class="senzany-map-flag__dot"></i></span>
+    <span>Demande en attente</span>
+  </div>
+  <div class="admin-map-legend__item">
+    <span class="senzany-map-flag" style="--flag-color:#e34242"><i class="senzany-map-flag__dot"></i></span>
+    <span>Base non déclarée</span>
+  </div>
 </div>
+
+<div id="map"></div>
 <button id="adminToolsToggle" class="admin-tools-toggle" type="button">OUTILS ADMIN</button>
 <div id="modeBanner" class="mode-banner public">VUE JOUEUR — DONNÉES PUBLIQUES UNIQUEMENT</div>
 
@@ -354,10 +477,10 @@ body.embed-admin .senzany-legend{left:calc((100% - 400px)/2)}
   <div class="section map-display-section">
     <div class="section-title">AFFICHAGE</div>
     <div class="row" style="gap:6px">
-      <button id="baseTopoBtn" class="btn red" type="button">CARTE TOPOGRAPHIQUE</button>
-      <button id="baseSatBtn" class="btn" type="button">CARTE SATELLITE</button>
+      <button id="baseTopoBtn" class="btn" type="button">CARTE TOPOGRAPHIQUE</button>
+      <button id="baseSatBtn" class="btn red" type="button">CARTE SATELLITE</button>
     </div>
-    <div class="row"><label><input id="toggleBuildingsV30" type="checkbox" checked> Bâtiments</label></div>
+    <div class="row"><label><input id="toggleBuildingsV30" type="checkbox"> Bâtiments</label></div>
 <div class="row"><label><input id="toggleRoads" type="checkbox"> Réseau Senzany (overlay)</label></div>
     <div class="row"><label><input id="toggleGrid" type="checkbox"> Grille 1 km</label></div>
     <div class="row"><label><input id="toggleBases" type="checkbox" checked> Bases / zones</label></div>
@@ -451,26 +574,23 @@ function statusLabel(value){
   if(value==='pending') return 'En attente';
   return 'Masquée';
 }
+
+function makeFlagIcon(color){
+  return L.divIcon({
+    className:'senzany-flag-icon',
+    html:'<span class="senzany-map-flag" style="--flag-color:'+color+'"><i class="senzany-map-flag__dot"></i></span>',
+    iconSize:[22,26],
+    iconAnchor:[6,24],
+    popupAnchor:[4,-24],
+    tooltipAnchor:[6,-18]
+  });
+}
+
 function typeLabel(value){
   if(value==='base') return 'Base joueur';
   if(value==='mapping') return 'Mapping Senzany';
   if(value==='event') return 'Événement';
   return 'Zone spéciale';
-}
-
-
-function flagIcon(color, size=24){
-  return L.divIcon({
-    className:'senzany-flag-icon',
-    html:'<div class="poleflag" style="color:'+color+'">⚑</div>',
-    iconSize:[size,size],
-    iconAnchor:[5,size-2],
-    popupAnchor:[5,-size+4]
-  });
-}
-function updateLegendMode(){
-  document.querySelectorAll('.admin-legend-only').forEach(el=>el.style.display=mode==='admin'?'flex':'none');
-  document.querySelectorAll('.public-legend-only').forEach(el=>el.style.display=mode==='public'?'flex':'none');
 }
 
 const map=L.map('map',{
@@ -486,7 +606,7 @@ const xamTopo=L.tileLayer(
     tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,noWrap:true,
     bounds:canvasBounds,keepBuffer:4
   }
-).addTo(map);
+);
 
 const xamSatellite=L.tileLayer(
   'https://static.xam.nu/dayz/maps/chernarusplus/1.27/satellite/{z}/{x}/{y}.webp',
@@ -494,7 +614,7 @@ const xamSatellite=L.tileLayer(
     tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,noWrap:true,
     bounds:canvasBounds,keepBuffer:4
   }
-);
+).addTo(map);
 
 map.createPane('roadsPane');
 map.getPane('roadsPane').style.zIndex=450;
@@ -516,7 +636,7 @@ for(let z=1000;z<WORLD;z+=1000){
 
 const zonesLayer=L.layerGroup().addTo(map);
 
-const buildingsV30Layer=L.layerGroup().addTo(map);
+const buildingsV30Layer=L.layerGroup();
 
 // Calibration définitivement validée.
 function wrpToXamValidated(x,z){
@@ -631,7 +751,7 @@ function render(){
           fillOpacity:.13
         }).addTo(zonesLayer);
 
-        L.marker(center,{icon:flagIcon(c,24)}).bindPopup(
+        L.marker(center,{icon:makeFlagIcon(c)}).bindPopup(
           '<b>'+esc(z.public_name||'Zone occupée')+'</b><br>'+
           'Statut : '+statusLabel(z.public_status)
         ).addTo(zonesLayer);
@@ -659,7 +779,9 @@ function render(){
         radius:radius/60,color:c,fillColor:c,weight:2,fillOpacity:.14
       }).addTo(zonesLayer);
 
-      const marker=L.marker(dayzToLatLng(x,zz),{icon:flagIcon(c,24)}).addTo(zonesLayer);
+      const marker=L.marker(dayzToLatLng(x,zz),{
+        icon:makeFlagIcon(c)
+      }).addTo(zonesLayer);
 
       marker.bindPopup(
         '<b>'+esc(z.public_name)+'</b><br>'+
@@ -724,7 +846,7 @@ function renderPublicRequests(){
         fillOpacity:.16
       }).addTo(zonesLayer);
 
-      L.marker(center,{icon:flagIcon('#d7a447',24)})
+      L.marker(center,{icon:makeFlagIcon('#d7a447')})
       .bindTooltip('DEMANDE EN ATTENTE',{
         permanent:false,
         direction:'top',
@@ -831,7 +953,9 @@ function renderAdminRequests(){
         fillOpacity:.18
       }).addTo(zonesLayer);
 
-      const marker=L.marker(dayzToLatLng(x,z),{icon:flagIcon('#d7a447',24)}).addTo(zonesLayer);
+      const marker=L.marker(dayzToLatLng(x,z),{
+        icon:makeFlagIcon('#d7a447')
+      }).addTo(zonesLayer);
 
       marker.bindPopup(
         '<b>DEMANDE EN ATTENTE</b><br>'+
@@ -913,7 +1037,9 @@ function renderFlagpoles(){
       dashArray:state==='orphan' ? '5 5' : null
     }).addTo(zonesLayer);
 
-    const marker=L.marker(center,{icon:flagIcon(color,state==='orphan'?27:24)}).addTo(zonesLayer);
+    const marker=L.marker(center,{
+      icon:makeFlagIcon(color)
+    }).addTo(zonesLayer);
 
     const matchName=p.matchName ? esc(p.matchName) : 'Aucun dossier correspondant';
     const distance=Number.isFinite(Number(p.distanceM))
@@ -958,7 +1084,6 @@ function renderFlagpoles(){
 
 async function loadPublic(){
   mode='public';
-  updateLegendMode();
   adminAuthorized=false;
   document.getElementById('adminEditor').classList.add('hidden');
   document.getElementById('publicBtn').classList.add('red');
@@ -1010,7 +1135,6 @@ async function loadAdmin(){
     }
 
     mode='admin';
-    updateLegendMode();
     adminAuthorized=true;
     zones=Array.isArray(data.zones)?data.zones:[];
     requests=Array.isArray(data.requests)?data.requests:[];
@@ -1042,8 +1166,8 @@ async function loadAdmin(){
 
     window.parent.postMessage({
       type:'senzany-admin-map-stats',
-      approved:Number(flagpoleStats.validated)||0,
-      pending:Number(flagpoleStats.pending)||0,
+      approved:approvedCount,
+      pending:pendingCount,
       orphan:Number(flagpoleStats.orphan)||0
     }, location.origin);
 
@@ -1226,7 +1350,13 @@ map.on('click',e=>{
       weight:2,
       fillOpacity:.16
     }).addTo(group);
-    L.marker(center,{icon:flagIcon('#69b7e6',24)}).addTo(group);
+    L.circleMarker(center,{
+      radius:5,
+      color:'#5bace5',
+      fillColor:'#5bace5',
+      fillOpacity:1,
+      weight:2
+    }).addTo(group);
     publicSelectionLayer=group.addTo(map);
 
     window.parent.postMessage({
@@ -1298,7 +1428,6 @@ const requestedMode = queryParams.get('mode') === 'admin' ? 'admin' : 'public';
 if(embedded){
   if(requestedMode === 'admin'){
     document.body.classList.add('embed-admin');
-    setTimeout(()=>map.invalidateSize(),50);
     document.body.classList.remove('tools-open');
   }else{
     document.body.classList.add('embed-mode');
