@@ -259,9 +259,9 @@ body.embed-admin.tools-open #map{right:0!important}
 .pending-public-label:before{display:none!important}
 .request-actions{
   display:grid;
-  grid-template-columns:1fr;
-  gap:6px;
-  margin-top:8px
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:9px
 }
 .approveRequestBtn{
   background:#1e7c45!important;
@@ -269,15 +269,21 @@ body.embed-admin.tools-open #map{right:0!important}
   color:#fff!important
 }
 .approveRequestBtn:hover{background:#269856!important}
-.approveRequestBtn[disabled]{opacity:.55;cursor:wait}
-</style>
-
-<style>
-.leaflet-tile-pane img.leaflet-tile{
-  filter: brightness(.88) contrast(1.08) saturate(.72) sepia(.08) hue-rotate(-8deg);
+.rejectRequestBtn{
+  background:#742626!important;
+  border-color:#b83c3c!important;
+  color:#fff!important
+}
+.rejectRequestBtn:hover{background:#903030!important}
+.approveRequestBtn[disabled],
+.rejectRequestBtn[disabled]{opacity:.55;cursor:wait}
+.requestDecisionMessage{
+  margin-top:7px;
+  font-size:10px;
+  line-height:1.35;
+  color:#c8cdcf
 }
 </style>
-
 </head>
 <body>
 
@@ -374,6 +380,8 @@ let mode='public';
 let pickMode=false;
 let zones=[];
 let requests=[];
+let flagpoles=[];
+let flagpoleStats={total:0,validated:0,pending:0,orphan:0};
 let adminAuthorized=false;
 let publicPickMode=false;
 let publicSelectionLayer=null;
@@ -720,6 +728,45 @@ async function approveRequest(request, button){
   }
 }
 
+async function rejectRequest(request, button){
+  if(!adminAuthorized || !request?.id) return;
+
+  const label=String(request.request_name||'cette demande');
+  if(!window.confirm('Refuser définitivement la demande « '+label+' » ?')) return;
+
+  const previous=button?.textContent || 'REFUSER';
+  if(button){
+    button.disabled=true;
+    button.textContent='REFUS…';
+  }
+
+  try{
+    const response=await fetch(
+      '/api/admin/map/requests/'+encodeURIComponent(request.id)+'/reject',
+      {
+        method:'PATCH',
+        credentials:'include',
+        cache:'no-store',
+        headers:{Accept:'application/json','Content-Type':'application/json'}
+      }
+    );
+    const data=await response.json().catch(()=>({}));
+
+    if(!response.ok){
+      throw new Error(data.error||('HTTP '+response.status));
+    }
+
+    status('Demande refusée.',true);
+    await loadAdmin();
+  }catch(error){
+    status('Refus impossible : '+error.message,false);
+    if(button){
+      button.disabled=false;
+      button.textContent=previous;
+    }
+  }
+}
+
 
 function renderAdminRequests(){
   if(mode!=='admin' || !Array.isArray(requests) || !requests.length) return;
@@ -773,12 +820,18 @@ function renderAdminRequests(){
         'Commentaire : '+esc(r.comment||'—')+
       '</div>'+
       (isPending
-        ? '<div class="request-actions"><button class="btn approveRequestBtn">✓ VALIDER LA DEMANDE</button></div>'
+        ? '<div class="request-actions">'+
+            '<button class="btn approveRequestBtn">✓ VALIDER</button>'+
+            '<button class="btn rejectRequestBtn">✕ REFUSER</button>'+
+          '</div>'+
+          '<div class="requestDecisionMessage">Validation : la demande devient immédiatement une zone occupée. Refus : la demande disparaît des demandes en attente.</div>'
         : '');
 
     if(isPending){
       const approveBtn=card.querySelector('.approveRequestBtn');
+      const rejectBtn=card.querySelector('.rejectRequestBtn');
       if(approveBtn) approveBtn.onclick=()=>approveRequest(r,approveBtn);
+      if(rejectBtn) rejectBtn.onclick=()=>rejectRequest(r,rejectBtn);
     }
 
     if(Number.isFinite(x)&&Number.isFinite(z)){
@@ -787,6 +840,88 @@ function renderAdminRequests(){
     }
 
     list.prepend(card);
+  });
+}
+
+
+function renderFlagpoles(){
+  if(mode!=='admin' || !Array.isArray(flagpoles) || !flagpoles.length) return;
+
+  flagpoles.forEach((p,index)=>{
+    const x=Number(p.x);
+    const z=Number(p.z);
+    if(!Number.isFinite(x)||!Number.isFinite(z)) return;
+
+    const state=String(p.state||'orphan');
+    const color =
+      state==='validated' ? '#35c46a' :
+      state==='pending' ? '#d7a447' :
+      '#e34242';
+
+    const stateLabel =
+      state==='validated' ? 'BASE VALIDÉE' :
+      state==='pending' ? 'DEMANDE EN ATTENTE' :
+      'BASE NON DÉCLARÉE';
+
+    const center=dayzToLatLng(x,z);
+
+    // Rayon visuel de 60 m autour du mât : cohérent avec la règle d'implantation.
+    L.circle(center,{
+      radius:60/60,
+      color,
+      fillColor:color,
+      weight:2,
+      opacity:.88,
+      fillOpacity:.10,
+      dashArray:state==='orphan' ? '5 5' : null
+    }).addTo(zonesLayer);
+
+    const marker=L.circleMarker(center,{
+      radius:state==='orphan' ? 8 : 7,
+      color:'#0b0f10',
+      fillColor:color,
+      fillOpacity:1,
+      weight:2
+    }).addTo(zonesLayer);
+
+    const matchName=p.matchName ? esc(p.matchName) : 'Aucun dossier correspondant';
+    const distance=Number.isFinite(Number(p.distanceM))
+      ? Number(p.distanceM).toFixed(1)+' m'
+      : '—';
+
+    marker.bindTooltip(stateLabel,{
+      permanent:false,
+      direction:'top',
+      className:'senzany-flagpole-label'
+    });
+
+    marker.bindPopup(
+      '<b>'+stateLabel+'</b><br>'+
+      'Objet : '+esc(p.type||'TerritoryFlag')+'<br>'+
+      'X '+x.toFixed(1)+' / Z '+z.toFixed(1)+'<br>'+
+      'Correspondance : '+matchName+'<br>'+
+      'Distance : '+distance
+    );
+
+    const list=document.getElementById('list');
+    if(list){
+      const card=document.createElement('div');
+      card.className='card flagpole-card flagpole-'+state;
+      card.innerHTML=
+        '<div class="card-name">⚑ '+stateLabel+
+        ' <span class="badge admin">JEU</span></div>'+
+        '<div class="meta">Mât détecté automatiquement<br>'+
+        'X '+x.toFixed(1)+' / Z '+z.toFixed(1)+'</div>'+
+        '<div class="secure">'+
+          '<b>Synchronisation DayZ</b><br>'+
+          'Correspondance : '+matchName+'<br>'+
+          'Distance : '+distance+
+        '</div>';
+
+      card.querySelector('.card-name').style.cursor='pointer';
+      card.querySelector('.card-name').onclick=()=>map.setView(center,7);
+      list.prepend(card);
+    }
   });
 }
 
@@ -846,6 +981,10 @@ async function loadAdmin(){
     adminAuthorized=true;
     zones=Array.isArray(data.zones)?data.zones:[];
     requests=Array.isArray(data.requests)?data.requests:[];
+    flagpoles=Array.isArray(data.flagpoles)?data.flagpoles:[];
+    flagpoleStats=(data.flagpoleStats && typeof data.flagpoleStats==='object')
+      ? data.flagpoleStats
+      : {total:0,validated:0,pending:0,orphan:0};
 
     document.getElementById('adminEditor').classList.remove('hidden');
     document.getElementById('publicBtn').classList.remove('red');
@@ -858,15 +997,21 @@ async function loadAdmin(){
     const pendingCount=requests.filter(r=>String(r.status||'pending')==='pending').length;
     const approvedCount=zones.filter(z=>String(z.public_status||'')==='validated').length;
 
-    status('Commandement connecté — '+zones.length+' zone(s), '+pendingCount+' demande(s) en attente.',true);
+    status(
+      'Commandement connecté — '+zones.length+' zone(s), '+
+      pendingCount+' demande(s), '+
+      flagpoles.length+' mât(s) détecté(s) en jeu.',
+      true
+    );
     render();
     renderAdminRequests();
+    renderFlagpoles();
 
     window.parent.postMessage({
       type:'senzany-admin-map-stats',
-      approved:approvedCount,
-      pending:pendingCount,
-      orphan:0
+      approved:Number(flagpoleStats.validated)||0,
+      pending:Number(flagpoleStats.pending)||0,
+      orphan:Number(flagpoleStats.orphan)||0
     }, location.origin);
 
     setTimeout(()=>{map.invalidateSize();map.fitBounds(worldBounds);},120);
@@ -1139,6 +1284,11 @@ if(location.protocol === 'file:'){
   status('Mode local : carte chargée. API disponible uniquement depuis le site hébergé.', true);
 }else if(requestedMode === 'admin'){
   loadAdmin();
+  setInterval(()=>{
+    if(requestedMode==='admin' && document.visibilityState!=='hidden'){
+      loadAdmin();
+    }
+  },60000);
 }else{
   loadPublic();
 }
