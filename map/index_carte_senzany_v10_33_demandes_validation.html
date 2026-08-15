@@ -720,7 +720,12 @@ const buildingsV30Layer=L.layerGroup().addTo(map);
 
 // Calibration définitivement validée.
 function wrpToSenzanyValidated(x,z){
-  return L.latLng((z/60)-256, x/60);
+  // Projection de l'export LOCAL Senzany utilisée lors du calage bâtiments :
+  // canvas 16384 px = 15360 m + 512 px de marge de chaque côté,
+  // zoom natif 6 => 64 px Leaflet par unité.
+  const px = 512 + Number(x);
+  const py = 512 + (15360 - Number(z));
+  return L.latLng(-py / 64, px / 64);
 }
 
 fetch('data/batiments_chernarus_v30.json',{cache:'no-store'})
