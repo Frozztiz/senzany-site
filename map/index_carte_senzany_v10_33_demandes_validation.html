@@ -686,10 +686,10 @@ const senzanyBase=L.tileLayer(
 
 map.createPane('roadsPane');
 map.getPane('roadsPane').style.zIndex=450;
-const roads=L.tileLayer('overlay/usermap_v5/{z}/{x}/{y}.png',{
+const roads=L.tileLayer('overlay/usermap_v5_senzany/{z}/{x}/{y}.png',{
   pane:'roadsPane',tileSize:256,minZoom:0,maxNativeZoom:6,maxZoom:8,noWrap:true,
-  bounds:canvasBounds,opacity:.9,keepBuffer:4
-});
+  bounds:canvasBounds,opacity:.78,keepBuffer:4
+}).addTo(map);
 
 map.setMaxBounds(canvasBounds.pad(.03));
 map.fitBounds(worldBounds);

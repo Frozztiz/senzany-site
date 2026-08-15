@@ -228,6 +228,24 @@
       }
     ).addTo(map);
 
+    // Overlay cartographique 100 % Senzany — palette harmonisée.
+    map.createPane('senzanyRoadsPane');
+    map.getPane('senzanyRoadsPane').style.zIndex = 450;
+    const senzanyRoads = L.tileLayer(
+      'map/overlay/usermap_v5_senzany/{z}/{x}/{y}.png',
+      {
+        pane: 'senzanyRoadsPane',
+        tileSize: 256,
+        minZoom: 0,
+        maxNativeZoom: 6,
+        maxZoom: 8,
+        noWrap: true,
+        bounds: canvasBounds,
+        opacity: .78,
+        keepBuffer: 4
+      }
+    ).addTo(map);
+
     map.setMaxBounds(canvasBounds.pad(.03));
     map.fitBounds(worldBounds, { padding: [0, 0] });
 
