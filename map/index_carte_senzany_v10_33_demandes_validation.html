@@ -552,7 +552,7 @@ body.embed-admin-tools #adminEditor::before{
       <button id="baseTopoBtn" class="btn" type="button">RENDU CLAIR</button>
       <button id="baseSatBtn" class="btn red" type="button">RENDU SENZANY</button>
     </div>
-    <div class="row"><label><input id="toggleBuildingsV30" type="checkbox"> Bâtiments</label></div>
+    <div class="row"><label><input id="toggleBuildingsV30" type="checkbox" checked> Bâtiments</label></div>
 <div class="row"><label><input id="toggleRoads" type="checkbox"> Réseau Senzany (overlay)</label></div>
     <div class="row"><label><input id="toggleGrid" type="checkbox"> Grille 1 km</label></div>
     <div class="row"><label><input id="toggleBases" type="checkbox" checked> Bases / zones</label></div>
@@ -716,7 +716,7 @@ for(let z=1000;z<WORLD;z+=1000){
 
 const zonesLayer=L.layerGroup().addTo(map);
 
-const buildingsV30Layer=L.layerGroup();
+const buildingsV30Layer=L.layerGroup().addTo(map);
 
 // Calibration définitivement validée.
 function wrpToSenzanyValidated(x,z){
