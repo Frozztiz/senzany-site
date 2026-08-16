@@ -6,6 +6,80 @@
   <title>Staff — SENZANY COMMAND V6.3</title>
   <meta name="description" content="Découvrez les opérateurs qui assurent le fonctionnement du serveur DayZ PVE Senzany." />
   <link rel="stylesheet" href="assets/css/pages/staff-command-v6-3.css" />
+
+<style>
+/* Uniformisation finale des cartes Staff — Toad conserve son format Fondateur */
+#administration .operator-grid,
+#garage .operator-grid {
+  align-items: stretch;
+}
+#administration .compact-card,
+#garage .compact-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#administration .compact-card__media,
+#garage .compact-card__media {
+  height: 250px;
+  min-height: 250px;
+}
+#administration .compact-card__media img,
+#garage .compact-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#administration .compact-card__body,
+#garage .compact-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+#administration .operator-action,
+#garage .operator-action {
+  margin-top: auto;
+}
+
+/* Crevette : même gabarit qu'une carte standard, sans étirement pleine largeur */
+#support .operator-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+#support .compact-card {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#support .compact-card__media {
+  height: 250px;
+  min-height: 250px;
+}
+#support .compact-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#support .compact-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+#support .operator-action {
+  margin-top: auto;
+}
+
+@media (max-width: 980px) {
+  #support .operator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 680px) {
+  #support .operator-grid { grid-template-columns: 1fr; }
+}
+</style>
+
 </head>
 <body data-page="staff">
 <div data-site-header></div>
