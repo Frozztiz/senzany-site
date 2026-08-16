@@ -560,7 +560,14 @@ async function importZip() {
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
-        setFeedback(`Import terminé : ${Number(data.imported || 0).toLocaleString("fr-FR")} objets, ${data.files || 0} fichiers XML, ${Number(data.duplicates || 0).toLocaleString("fr-FR")} doublons fusionnés.`, "success");
+        const details = [
+            `${Number(data.active ?? data.imported ?? 0).toLocaleString("fr-FR")} objets actifs`,
+            `${Number(data.added || 0).toLocaleString("fr-FR")} nouveau(x)`,
+            `${Number(data.reactivated || 0).toLocaleString("fr-FR")} réactivé(s)`,
+            `${Number(data.deactivated || 0).toLocaleString("fr-FR")} ancien(s) désactivé(s)`,
+            `${Number(data.duplicates || 0).toLocaleString("fr-FR")} doublon(s) fusionné(s)`
+        ];
+        setFeedback(`Synchronisation terminée : ${details.join(" · ")}.`, "success");
         await Promise.all([loadStats(), loadImageStats(), searchItems({ resetPage: true })]);
     } catch (error) {
         setFeedback(error.message || "L'import a échoué.", "error");
