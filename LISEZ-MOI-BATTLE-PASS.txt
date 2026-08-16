@@ -1,0 +1,48 @@
+SENZANY — BATTLE PASS V1
+=========================
+
+CE PACK AJOUTE
+- Activation de la carte « 08 Battle Pass » dans le Centre de commandement.
+- Nouvelle page senzany-admin-battlepass.html.
+- Tableau de bord saison : statut, dates, joueurs, Premium, niveau moyen.
+- Gestion des paramètres Saison 01.
+- Création automatique des paliers selon le nombre de niveaux.
+- Récompenses GRATUITES / PREMIUM par palier.
+- Recherche des objets directement dans le catalogue Supabase existant (/api/admin/items).
+- Gestion des joueurs : SteamID64, pseudo, XP, niveau calculé automatiquement, Premium.
+- Historique SQL des ajustements joueurs.
+- Endpoint /api/battle-pass/me préparé pour raccorder ensuite la carte Battle Pass du profil joueur.
+
+IMPORTANT
+Cette V1 gère le Battle Pass dans le portail. Elle ne prétend PAS encore synchroniser automatiquement
+l'XP avec Xandor Season Pass : il faudra identifier le point d'échange du mod (fichier, API, RPC, logs,
+base de données, etc.). Le portail est préparé pour recevoir cette synchronisation ensuite.
+
+ORDRE D'INSTALLATION
+1) Supabase : exécuter supabase/027_battle_pass.sql dans SQL Editor.
+2) Copier les fichiers du pack dans les mêmes chemins du site (remplacer senzany-admin.html et backend/server.js).
+3) Commit + Push avec GitHub Desktop.
+4) VPS :
+   cd /var/www/senzany
+   git pull origin main
+   pm2 restart senzany-api --update-env
+5) Ctrl+F5 sur le Centre de commandement.
+6) Ouvrir « Battle Pass ».
+
+FICHIERS
+- senzany-admin.html                         MODIFIÉ (carte 08 activée)
+- senzany-admin-battlepass.html              NOUVEAU
+- assets/css/pages/admin-battlepass.css      NOUVEAU
+- assets/js/admin/admin-battlepass-page.js   NOUVEAU
+- backend/server.js                          MODIFIÉ (routes montées)
+- backend/routes/adminBattlePass.js          NOUVEAU
+- backend/routes/battlePass.js               NOUVEAU (profil joueur)
+- backend/services/battlePassService.js      NOUVEAU
+- supabase/027_battle_pass.sql               NOUVEAU
+
+TESTS CONSEILLÉS
+- /api/health doit rester 200.
+- La page Battle Pass doit afficher S01.
+- Enregistrer la saison.
+- Modifier un palier et chercher un classname connu (ex. SNAFU, Van, Senzany_STAFF_).
+- Ajouter ton SteamID en joueur et modifier son XP : le niveau doit changer automatiquement.

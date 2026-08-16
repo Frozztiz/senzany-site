@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <title>Commandement — Battle Pass — SENZANY</title>
+  <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-battlepass.css?v=1.0.0" />
+</head>
+<body data-page="admin-battlepass">
+  <div data-site-header></div>
+  <main class="bp-admin-main">
+    <section id="bpAccessLoading" class="admin-gate bp-gate">
+      <div class="admin-gate__icon">★</div>
+      <div><span>AUTHENTIFICATION</span><h2>Initialisation du Battle Pass…</h2><p>Contrôle de ta session Commandement.</p></div>
+    </section>
+    <section id="bpAccessDenied" class="admin-gate admin-gate--danger bp-gate" hidden>
+      <div class="admin-gate__icon">×</div><div><span>ACCÈS REFUSÉ</span><h2>Module réservé au Commandement</h2><p>Ton compte ne possède pas les autorisations nécessaires.</p><a class="admin-button" href="senzany-profil.html">Retour au profil</a></div>
+    </section>
+    <section id="bpAccessError" class="admin-gate admin-gate--danger bp-gate" hidden>
+      <div class="admin-gate__icon">!</div><div><span>ERREUR</span><h2>Impossible de charger le module</h2><p id="bpAccessErrorMessage">Le backend ne répond pas.</p><button id="bpRetryAccess" class="admin-button" type="button">Réessayer</button></div>
+    </section>
+
+    <section id="bpWorkspace" class="bp-workspace" hidden>
+      <header class="bp-topbar">
+        <a class="admin-button admin-button--small" href="senzany-admin.html">← Retour au Commandement</a>
+        <div><span>MODULE 08 // PROGRESSION SAISONNIÈRE</span><strong>BATTLE PASS SENZANY</strong><small>Paliers, récompenses et progression joueurs.</small></div>
+        <button id="bpRefresh" class="admin-button" type="button">Actualiser</button>
+      </header>
+
+      <section class="bp-hero">
+        <div class="bp-hero__copy"><span id="bpSeasonCode">S01 // PRÉPARATION</span><h1 id="bpSeasonName">SAISON 01</h1><p id="bpSeasonDescription">Configure la première saison et ses récompenses.</p></div>
+        <div class="bp-hero__status"><span>STATUT</span><strong id="bpSeasonStatus">BROUILLON</strong><small id="bpSeasonDates">Dates à définir</small></div>
+      </section>
+
+      <section class="bp-stats">
+        <div><span>JOUEURS</span><strong id="bpPlayersCount">0</strong><small>inscrits à la saison</small></div>
+        <div><span>PREMIUM</span><strong id="bpPremiumCount">0</strong><small>pass premium actifs</small></div>
+        <div><span>NIVEAU MOYEN</span><strong id="bpAverageLevel">0</strong><small>progression globale</small></div>
+        <div><span>PALIERS</span><strong id="bpLevelsCount">0</strong><small id="bpLevelsConfigured">0 configuré</small></div>
+      </section>
+
+      <nav class="bp-tabs" role="tablist">
+        <button class="is-active" data-bp-tab="levels" type="button">PALIERS & RÉCOMPENSES</button>
+        <button data-bp-tab="players" type="button">JOUEURS</button>
+        <button data-bp-tab="season" type="button">SAISON</button>
+      </nav>
+
+      <section class="bp-panel" data-bp-panel="levels">
+        <div class="bp-panel__head"><div><span>PROGRESSION</span><h2>Paliers de la saison</h2><p>Configure les pistes gratuite et Premium. Les objets sont recherchés dans le catalogue Supabase.</p></div><div class="bp-level-toolbar"><input id="bpLevelSearch" type="search" placeholder="Rechercher un niveau…" /><select id="bpLevelFilter"><option value="all">Tous</option><option value="configured">Configurés</option><option value="empty">Sans récompense</option></select></div></div>
+        <div id="bpLevelsList" class="bp-levels-list"><div class="admin-list-message">Chargement des paliers…</div></div>
+      </section>
+
+      <section class="bp-panel" data-bp-panel="players" hidden>
+        <div class="bp-panel__head"><div><span>JOUEURS</span><h2>Progression individuelle</h2><p>Recherche un joueur, ajuste son XP et gère son accès Premium.</p></div><div class="bp-player-tools"><input id="bpPlayerSearch" type="search" placeholder="Pseudo ou SteamID64…" /><button id="bpAddPlayer" class="admin-button admin-button--primary" type="button">+ Ajouter un joueur</button></div></div>
+        <div class="bp-player-table-head"><span>JOUEUR</span><span>NIVEAU</span><span>XP</span><span>PASS</span><span>MISE À JOUR</span><span></span></div>
+        <div id="bpPlayersList" class="bp-players-list"><div class="admin-list-message">Aucun joueur.</div></div>
+      </section>
+
+      <section class="bp-panel" data-bp-panel="season" hidden>
+        <div class="bp-panel__head"><div><span>CONFIGURATION</span><h2>Paramètres de la saison</h2><p>Une seule saison peut être active à la fois.</p></div></div>
+        <form id="bpSeasonForm" class="bp-season-form">
+          <label>Code saison<input id="bpSeasonFormCode" maxlength="20" placeholder="S01" required /></label>
+          <label>Nom<input id="bpSeasonFormName" maxlength="100" placeholder="Saison 01" required /></label>
+          <label>Statut<select id="bpSeasonFormStatus"><option value="draft">Brouillon</option><option value="active">Active</option><option value="ended">Terminée</option></select></label>
+          <label>Niveaux maximum<input id="bpSeasonFormMaxLevel" type="number" min="1" max="200" value="50" required /></label>
+          <label>XP par niveau<input id="bpSeasonFormXp" type="number" min="1" max="10000000" value="1000" required /></label>
+          <label>Début<input id="bpSeasonFormStart" type="datetime-local" /></label>
+          <label>Fin<input id="bpSeasonFormEnd" type="datetime-local" /></label>
+          <label class="bp-switch"><input id="bpSeasonFormPremium" type="checkbox" checked /><span>Activer la piste Premium</span></label>
+          <label class="bp-full">Description<textarea id="bpSeasonFormDescription" rows="4" maxlength="1000" placeholder="Présentation de la saison…"></textarea></label>
+          <div id="bpSeasonFeedback" class="admin-feedback bp-full" hidden></div>
+          <button id="bpSaveSeason" class="admin-button admin-button--primary bp-full" type="submit">ENREGISTRER LA SAISON</button>
+        </form>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="bpLevelDialog" class="bp-dialog">
+    <form id="bpLevelForm" method="dialog">
+      <header><div><span>PALIER BATTLE PASS</span><strong>NIVEAU <b id="bpLevelNumber">1</b></strong></div><button id="bpCloseLevel" type="button" aria-label="Fermer">×</button></header>
+      <div class="bp-dialog__body">
+        <div class="bp-reward-columns">
+          <section><div class="bp-track-title"><span>PISTE</span><strong>GRATUITE</strong></div><div id="bpFreeRewards" class="bp-reward-list"></div><button class="admin-button admin-button--small" type="button" data-add-reward="free">+ Ajouter un objet</button><div class="bp-money-grid"><label>Roubles<input id="bpFreeRoubles" type="number" min="0" step="50000" value="0" /></label><label>Bitcoin<input id="bpFreeBitcoin" type="number" min="0" value="0" /></label></div></section>
+          <section><div class="bp-track-title bp-track-title--premium"><span>PISTE</span><strong>PREMIUM</strong></div><div id="bpPremiumRewards" class="bp-reward-list"></div><button class="admin-button admin-button--small" type="button" data-add-reward="premium">+ Ajouter un objet</button><div class="bp-money-grid"><label>Roubles<input id="bpPremiumRoubles" type="number" min="0" step="50000" value="0" /></label><label>Bitcoin<input id="bpPremiumBitcoin" type="number" min="0" value="0" /></label></div></section>
+        </div>
+        <div id="bpLevelFeedback" class="admin-feedback" hidden></div>
+      </div>
+      <footer><button id="bpCancelLevel" class="admin-button" type="button">Annuler</button><button id="bpSaveLevel" class="admin-button admin-button--primary" type="submit">ENREGISTRER LE PALIER</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="bpPlayerDialog" class="bp-dialog bp-dialog--player">
+    <form id="bpPlayerForm" method="dialog">
+      <header><div><span>PROGRESSION JOUEUR</span><strong id="bpPlayerDialogTitle">Ajouter un joueur</strong></div><button id="bpClosePlayer" type="button">×</button></header>
+      <div class="bp-dialog__body bp-player-form">
+        <label>SteamID64<input id="bpPlayerSteamId" inputmode="numeric" maxlength="17" placeholder="7656119XXXXXXXXXX" required /></label>
+        <label>Pseudo<input id="bpPlayerName" maxlength="100" placeholder="Pseudo joueur" /></label>
+        <label>XP total<input id="bpPlayerXp" type="number" min="0" value="0" /></label>
+        <label class="bp-switch"><input id="bpPlayerPremium" type="checkbox" /><span>Pass Premium</span></label>
+        <div id="bpPlayerFeedback" class="admin-feedback bp-full" hidden></div>
+      </div>
+      <footer><button id="bpCancelPlayer" class="admin-button" type="button">Annuler</button><button class="admin-button admin-button--primary" type="submit">ENREGISTRER</button></footer>
+    </form>
+  </dialog>
+
+  <div id="bpItemPicker" class="bp-item-picker" hidden>
+    <button class="bp-item-picker__backdrop" type="button" data-close-picker></button>
+    <section><header><div><span>CATALOGUE SENZANY</span><strong>Ajouter une récompense</strong></div><button type="button" data-close-picker>×</button></header><input id="bpItemSearch" type="search" placeholder="Rechercher un classname…" autocomplete="off" /><div id="bpItemResults"><div class="admin-list-message">Commence à taper un classname.</div></div></section>
+  </div>
+
+  <div data-site-footer></div>
+  <script defer src="assets/js/components.js"></script>
+  <script defer src="assets/js/app.js"></script>
+  <script type="module" src="assets/js/admin/admin-battlepass-page.js?v=1.0.0"></script>
+</body>
+</html>

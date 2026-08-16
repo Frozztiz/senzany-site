@@ -74,6 +74,14 @@ app.use(
   require("./routes/adminEvents")
 );
 
+app.use(
+  "/api/admin/battle-pass",
+  require("./middleware/commandAuth"),
+  require("./routes/adminBattlePass")
+);
+
+app.use("/api/battle-pass", require("./routes/battlePass"));
+
 app.use("/api/map", require("./routes/mapPublic"));
 
 app.use(
