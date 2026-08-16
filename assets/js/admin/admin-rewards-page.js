@@ -44,7 +44,9 @@ const monthlyEls = {
   historyExport: byId("monthlyHistoryExport"),
 };
 let monthlyRun = null;
-let monthlyRankings = [];
+let monthlyRankings = []; // Snapshot servant uniquement à la préparation / distribution.
+let liveMonthlyRankings = []; // Classement Top-Serveurs courant, jamais utilisé pour créer les livraisons.
+let liveVotesPayload = null;
 let monthlyRuns = [];
 let historyRun = null;
 let historyRankings = [];
@@ -319,6 +321,13 @@ async function loadRules() {
     }
     // La bibliothèque doit toujours être reconstruite après le chargement.
     render();
+
+    // Si le classement LIVE est déjà chargé, réappliquer immédiatement les packs
+    // afin qu'une modification Top 1 / Top 2 / Top 3 soit visible sans recharger la page.
+    if (liveVotesPayload) {
+      liveMonthlyRankings = buildLiveMonthlyRankings(liveVotesPayload);
+      renderMonthlyState();
+    }
   } catch (error) {
     setFeedback(els.feedback, error.message, "error");
   } finally { setLoading(els.refresh, false); }
@@ -410,23 +419,65 @@ function monthlyRowState(row) {
   })[row.status] || String(row.status || "").toUpperCase();
 }
 
+
+function findLiveRewardRule(position) {
+  return rules
+    .filter((rule) =>
+      rule.is_active !== false &&
+      rule.reward_type === "votes_ranking" &&
+      Number(rule.rank_min) <= Number(position) &&
+      Number(rule.rank_max) >= Number(position)
+    )
+    .sort((a, b) => Number(a.priority || 100) - Number(b.priority || 100))[0] || null;
+}
+
+function buildLiveMonthlyRankings(data) {
+  const ranking = Array.isArray(data?.ranking) ? data.ranking : [];
+  return ranking.map((row, index) => {
+    const position = Number(row.position || index + 1);
+    const reward = findLiveRewardRule(position);
+    return {
+      position,
+      steam_id: row.steamId || null,
+      player_name: row.memberName || row.playerName || row.steamId || "Pseudo inconnu",
+      aliases: row.playerName ? [row.playerName] : [],
+      votes: Number(row.votes || 0),
+      reward_rule_id: reward?.id || null,
+      reward_name: reward?.name || null,
+      status: row.identified === false || !row.steamId
+        ? "unidentified"
+        : (reward ? "live" : "no_reward"),
+    };
+  });
+}
+
+async function loadLiveMonthlyRanking() {
+  const data = await api("/api/commandement/votes");
+  liveVotesPayload = data;
+  liveMonthlyRankings = buildLiveMonthlyRankings(data);
+  renderMonthlyState();
+}
+
 function renderMonthlyPreview() {
   if (!monthlyEls.preview) return;
-  if (!monthlyRun || !monthlyRankings.length) {
-    monthlyEls.preview.innerHTML = '<div class="admin-list-message">Aucun classement mensuel préparé.</div>';
+
+  if (!liveMonthlyRankings.length) {
+    monthlyEls.preview.innerHTML = '<div class="admin-list-message">Classement Top-Serveurs en cours de chargement…</div>';
     return;
   }
 
-  monthlyEls.preview.innerHTML = monthlyRankings.map((row) => {
+  monthlyEls.preview.innerHTML = liveMonthlyRankings.map((row) => {
     const rewardName = row.reward_name || "Aucun pack configuré";
     const aliases = Array.isArray(row.aliases) ? row.aliases.join(", ") : "";
-    const stateClass = ["no_reward", "no_items"].includes(row.status) ? "is-warning" : row.status === "failed" ? "is-error" : "";
+    const unidentified = row.status === "unidentified";
+    const stateClass = unidentified || row.status === "no_reward" ? "is-warning" : "";
+    const stateLabel = unidentified ? "À ASSOCIER" : (row.reward_name ? "EN DIRECT" : "AUCUN PACK");
     return `<article class="monthly-ranking-row">
       <strong>#${Number(row.position || 0)}</strong>
-      <div class="monthly-ranking-row__player"><b>${escapeHtml(row.player_name || row.steam_id)}</b><small>${escapeHtml(aliases || row.steam_id)}</small></div>
+      <div class="monthly-ranking-row__player"><b>${escapeHtml(row.player_name || row.steam_id)}</b><small>${escapeHtml(aliases || row.steam_id || "Aucun compte Senzany rattaché")}</small></div>
       <div class="monthly-ranking-row__votes">${formatNumber(row.votes)} votes</div>
       <div class="monthly-ranking-row__reward">${escapeHtml(rewardName)}</div>
-      <div class="monthly-ranking-row__state ${stateClass}">${escapeHtml(monthlyRowState(row))}</div>
+      <div class="monthly-ranking-row__state ${stateClass}">${escapeHtml(stateLabel)}</div>
     </article>`;
   }).join("");
 }
@@ -535,16 +586,27 @@ function exportHistoryCsv() {
 
 function renderMonthlyState() {
   if (!monthlyEls.status) return;
-  monthlyEls.status.textContent = monthlyStatusLabel(monthlyRun?.status);
-  monthlyEls.players.textContent = formatNumber(monthlyRun?.ranking_count || monthlyRankings.length || 0);
-  const identifiedCount = monthlyRankings.filter((row) => Boolean(row.steam_id)).length;
-  if (monthlyEls.identifiedNote) monthlyEls.identifiedNote.textContent = `${formatNumber(identifiedCount)} compte${identifiedCount > 1 ? "s" : ""} Senzany identifié${identifiedCount > 1 ? "s" : ""}`;
+
+  // Le panneau "Classement actuel" affiche toujours la situation LIVE.
+  monthlyEls.status.textContent = liveMonthlyRankings.length ? "Classement en direct" : "Synchronisation…";
+  monthlyEls.players.textContent = formatNumber(liveMonthlyRankings.length || 0);
+
+  const identifiedCount = liveMonthlyRankings.filter((row) => Boolean(row.steam_id)).length;
+  if (monthlyEls.identifiedNote) {
+    monthlyEls.identifiedNote.textContent = `${formatNumber(identifiedCount)} compte${identifiedCount > 1 ? "s" : ""} Senzany identifié${identifiedCount > 1 ? "s" : ""}`;
+  }
+
+  // Les livraisons restent liées au snapshot figé : aucune distribution passée n'est modifiée.
   monthlyEls.deliveries.textContent = formatNumber(monthlyRun?.delivery_count || 0);
   monthlyEls.deliveryNote.textContent = monthlyRun?.status === "completed"
-    ? "Distribution terminée"
+    ? `Dernier snapshot : ${monthlyStatusLabel(monthlyRun.status)}`
     : monthlyRun?.status === "failed"
       ? (monthlyRun.error_message || "Certaines livraisons ont échoué")
-      : "Aucune distribution lancée";
+      : monthlyRun
+        ? `Snapshot : ${monthlyStatusLabel(monthlyRun.status)}`
+        : "Aucune distribution lancée";
+
+  // IMPORTANT : la validation continue d'utiliser monthlyRankings (snapshot), jamais le LIVE.
   monthlyEls.approve.disabled = !monthlyRun || !["ready", "failed"].includes(monthlyRun.status);
   renderMonthlyPreview();
 }
@@ -577,7 +639,10 @@ async function loadMonthlyStatus() {
       || monthlyRuns[0] || null;
     if (run?.period && run.period !== selectedPeriod) monthlyEls.period.value = run.period;
     setFeedback(monthlyEls.feedback);
-    await loadMonthlyRun(run?.id);
+    await Promise.all([
+      loadMonthlyRun(run?.id),
+      loadLiveMonthlyRanking(),
+    ]);
   } catch (error) {
     setFeedback(monthlyEls.feedback, error.message, "error");
   } finally {
@@ -601,8 +666,8 @@ async function prepareMonthlyRanking() {
     });
     monthlyRun = data.run || null;
     monthlyRankings = Array.isArray(data.rankings) ? data.rankings : [];
-    setFeedback(monthlyEls.feedback, "Le classement a été préparé. Vérifie l’aperçu avant de créer les livraisons.", "success");
-    renderMonthlyState();
+    setFeedback(monthlyEls.feedback, "Le snapshot de distribution a été préparé. Le classement affiché reste le classement Top-Serveurs en direct.", "success");
+    await loadLiveMonthlyRanking();
   } catch (error) {
     setFeedback(monthlyEls.feedback, error.message, "error");
   } finally {
@@ -626,7 +691,7 @@ async function approveMonthlyRewards() {
       `${summary.created || 0} livraison(s) créée(s), ${summary.skipped || 0} ignorée(s), ${summary.failed || 0} en échec.`,
       summary.failed ? "error" : "success"
     );
-    renderMonthlyState();
+    await loadLiveMonthlyRanking();
   } catch (error) {
     setFeedback(monthlyEls.feedback, error.message, "error");
   } finally {
