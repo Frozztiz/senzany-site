@@ -444,7 +444,7 @@ async function getExistingItems(classnames) {
     const { data, error } = await supabase
       .from("items")
       .select(
-        "classname,display_name,category,subcategory,mod_name,source_file,source_path,is_active,delivery_enabled,shop_enabled,battle_pass_enabled,reward_enabled,metadata,first_seen_at,import_count"
+        "classname,display_name,category,subcategory,mod_name,source_file,source_path,is_active,delivery_enabled,shop_enabled,battle_pass_enabled,reward_enabled,first_seen_at,import_count"
       )
       .in("classname", batch);
 
@@ -470,13 +470,6 @@ function mergeImportedItem(imported, existing) {
     };
   }
 
-  const existingMetadata = existing.metadata && typeof existing.metadata === "object"
-    ? existing.metadata
-    : {};
-  const importedMetadata = imported.metadata && typeof imported.metadata === "object"
-    ? imported.metadata
-    : {};
-
   return {
     ...imported,
     display_name: shouldKeepExistingText(existing.display_name, "", imported.classname)
@@ -494,10 +487,6 @@ function mergeImportedItem(imported, existing) {
     shop_enabled: existing.shop_enabled === true,
     battle_pass_enabled: existing.battle_pass_enabled === true,
     reward_enabled: existing.reward_enabled !== false,
-    metadata: {
-      ...importedMetadata,
-      ...existingMetadata
-    },
     first_seen_at: existing.first_seen_at || imported.first_seen_at || now,
     last_seen_at: now,
     import_count: Math.max(Number(existing.import_count) || 1, 1) + 1

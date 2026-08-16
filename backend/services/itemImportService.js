@@ -113,21 +113,10 @@ async function validateArchive(zipPath) {
 function mergeDuplicateItem(current, incoming) {
   if (!current) return incoming;
 
-  const sources = new Set([
-    ...(current.metadata?.source_paths || []),
-    ...(incoming.metadata?.source_paths || []),
-    current.source_path,
-    incoming.source_path
-  ].filter(Boolean));
-
-  return {
-    ...current,
-    metadata: {
-      ...(current.metadata || {}),
-      ...(incoming.metadata || {}),
-      source_paths: [...sources]
-    }
-  };
+  // La table Supabase `items` ne possède pas de colonne `metadata`.
+  // On conserve simplement la première occurrence du classname et ses
+  // informations de provenance déjà stockées dans source_file/source_path.
+  return current;
 }
 
 async function importZipBuffer(buffer) {
@@ -191,10 +180,6 @@ async function importZipBuffer(buffer) {
           shop_enabled: false,
           battle_pass_enabled: false,
           reward_enabled: true,
-          metadata: {
-            source_paths: [sourcePath],
-            imported_from_types_xml: true
-          },
           last_seen_at: new Date().toISOString()
         };
 
