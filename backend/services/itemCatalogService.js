@@ -238,48 +238,9 @@ async function searchItems({
 
   const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
   const safeOffset = Math.max(Number(offset) || 0, 0);
-
-  let request = supabase
-    .from("items")
-    .select(
-      [
-        "id",
-        "classname",
-        "display_name",
-        "category",
-        "subcategory",
-        "mod_name",
-        "source_file",
-        "source_path",
-        "is_active",
-        "delivery_enabled",
-        "shop_enabled",
-        "battle_pass_enabled",
-        "reward_enabled",
-        "image_url",
-        "image_status",
-        "first_seen_at",
-        "last_seen_at",
-        "updated_at"
-      ].join(","),
-      { count: "exact" }
-    )
-    .eq("is_active", true)
-    .order("classname", { ascending: true })
-    .range(safeOffset, safeOffset + safeLimit - 1);
-
   const safeQuery = sanitizeSearchValue(query);
-  if (safeQuery) {
-    request = request.or(
-      `classname.ilike.%${safeQuery}%,display_name.ilike.%${safeQuery}%`
-    );
-  }
-
   const safeMod = sanitizeSearchValue(mod);
-  if (safeMod) request = request.eq("mod_name", safeMod);
-
   const safeCategory = sanitizeSearchValue(category);
-  if (safeCategory) request = request.eq("category", safeCategory);
 
   const availabilityColumns = {
     delivery: "delivery_enabled",
@@ -288,25 +249,157 @@ async function searchItems({
     reward: "reward_enabled"
   };
 
-  if (availabilityColumns[availability]) {
-    request = request.eq(availabilityColumns[availability], true);
-  }
-
   const allowedImageStatuses = new Set(["found", "pending", "not_found", "error"]);
-  if (allowedImageStatuses.has(imageStatus)) {
-    request = request.eq("image_status", imageStatus);
+
+  const selectColumns = [
+    "id",
+    "classname",
+    "display_name",
+    "category",
+    "subcategory",
+    "mod_name",
+    "source_file",
+    "source_path",
+    "is_active",
+    "delivery_enabled",
+    "shop_enabled",
+    "battle_pass_enabled",
+    "reward_enabled",
+    "image_url",
+    "image_status",
+    "first_seen_at",
+    "last_seen_at",
+    "updated_at"
+  ].join(",");
+
+  function applyCommonFilters(request) {
+    request = request.eq("is_active", true);
+
+    if (safeMod) request = request.eq("mod_name", safeMod);
+    if (safeCategory) request = request.eq("category", safeCategory);
+
+    if (availabilityColumns[availability]) {
+      request = request.eq(availabilityColumns[availability], true);
+    }
+
+    if (allowedImageStatuses.has(imageStatus)) {
+      request = request.eq("image_status", imageStatus);
+    }
+
+    return request;
   }
 
-  const { data, error, count } = await request;
+  // Sans texte de recherche : pagination normale de tout le catalogue actif.
+  if (!safeQuery) {
+    let request = supabase
+      .from("items")
+      .select(selectColumns, { count: "exact" });
 
-  if (error) {
-    console.error("ERREUR SUPABASE ITEMS :", error);
-    throw error;
+    request = applyCommonFilters(request)
+      .order("classname", { ascending: true })
+      .range(safeOffset, safeOffset + safeLimit - 1);
+
+    const { data, error, count } = await request;
+
+    if (error) {
+      console.error("ERREUR SUPABASE ITEMS :", error);
+      throw error;
+    }
+
+    return {
+      items: Array.isArray(data) ? data.map(normalizeItem) : [],
+      total: Number(count) || 0,
+      limit: safeLimit,
+      offset: safeOffset
+    };
   }
+
+  /*
+   * Recherche robuste des classnames.
+   *
+   * PostgREST / SQL LIKE traite "_" et "%" comme des jokers. Or beaucoup
+   * de classnames DayZ/moddés utilisent précisément ces caractères
+   * (ex. Senzany_STAFF_Bag). On utilise donc un fragment alphanumérique
+   * comme ancre côté Supabase, puis on valide le classname complet en JS
+   * avec includes(), où "_" redevient un caractère normal.
+   */
+  const needle = safeQuery.toLowerCase();
+  const anchorParts = safeQuery
+    .split(/[^A-Za-z0-9]+/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+
+  const anchor = anchorParts[0] || safeQuery;
+  const pageSize = 500;
+  const matched = [];
+  let sourceOffset = 0;
+  let finished = false;
+
+  while (!finished) {
+    let request = supabase
+      .from("items")
+      .select(selectColumns);
+
+    request = applyCommonFilters(request);
+
+    // L'ancre est alphanumérique : elle ne contient pas de "_" ou "%"
+    // susceptibles d'être interprétés comme jokers SQL.
+    if (anchor) {
+      request = request.or(
+        `classname.ilike.%${anchor}%,display_name.ilike.%${anchor}%`
+      );
+    }
+
+    request = request
+      .order("classname", { ascending: true })
+      .range(sourceOffset, sourceOffset + pageSize - 1);
+
+    const { data, error } = await request;
+
+    if (error) {
+      console.error("ERREUR SUPABASE ITEMS :", error);
+      throw error;
+    }
+
+    const page = Array.isArray(data) ? data : [];
+
+    for (const row of page) {
+      const classname = String(row?.classname || "").toLowerCase();
+      const displayName = String(row?.display_name || "").toLowerCase();
+
+      if (classname.includes(needle) || displayName.includes(needle)) {
+        matched.push(row);
+      }
+    }
+
+    if (page.length < pageSize) {
+      finished = true;
+    } else {
+      sourceOffset += pageSize;
+    }
+  }
+
+  // Priorité aux classnames qui commencent exactement par la recherche,
+  // puis aux autres correspondances. Cela rend l'autocomplétion plus utile.
+  matched.sort((a, b) => {
+    const aClass = String(a?.classname || "");
+    const bClass = String(b?.classname || "");
+    const aLower = aClass.toLowerCase();
+    const bLower = bClass.toLowerCase();
+
+    const aStarts = aLower.startsWith(needle) ? 0 : 1;
+    const bStarts = bLower.startsWith(needle) ? 0 : 1;
+
+    if (aStarts !== bStarts) return aStarts - bStarts;
+    return aClass.localeCompare(bClass, "fr", { sensitivity: "base" });
+  });
+
+  const paged = matched.slice(safeOffset, safeOffset + safeLimit);
 
   return {
-    items: Array.isArray(data) ? data.map(normalizeItem) : [],
-    total: Number(count) || 0,
+    items: paged.map(normalizeItem),
+    total: matched.length,
     limit: safeLimit,
     offset: safeOffset
   };
