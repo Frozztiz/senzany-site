@@ -8,7 +8,7 @@
   <title>Centre de commandement — SENZANY</title>
 
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.2.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
 </head>
 
 <body data-page="admin" data-build="admin-control-center-v3">
@@ -155,29 +155,78 @@
             </div>
 
             <div class="admin-module-grid admin-module-grid--v2">
-              <button class="admin-module-card admin-module-card--rcon" type="button" disabled>
-                <span class="admin-module-card__index">01</span><span class="admin-module-card__icon">›_</span>
-                <strong>RCON</strong><small>Console distante, annonces, actions joueurs et maintenance.</small>
-                <div class="module-metrics"><b>ONLINE</b><span>Connexion à finaliser</span></div><em>PRIORITÉ ALPHA</em>
+              <button class="admin-module-card admin-module-card--active" type="button" data-admin-link="senzany-admin-events.html">
+                <span class="admin-module-card__index">01</span><span class="admin-module-card__icon">◈</span>
+                <strong>Événements</strong><small>Planifier le calendrier, les événements mystères et leurs révélations.</small>
+                <div class="module-metrics"><b>LIVE</b><span>Calendrier communautaire</span></div><em>OUVRIR LE MODULE</em>
               </button>
-              <button class="admin-module-card" type="button" disabled>
+              <button class="admin-module-card admin-module-card--active" type="button" data-admin-module="players">
                 <span class="admin-module-card__index">02</span><span class="admin-module-card__icon">◎</span>
-                <strong>Joueurs</strong><small>Profils, connexions, sanctions et actions rapides.</small>
-                <div class="module-metrics"><b>-- / --</b><span>Joueurs actifs</span></div><em>À VENIR</em>
+                <strong>Joueurs</strong><small>Liste en direct des survivants actuellement connectés au serveur.</small>
+                <div class="module-metrics"><b id="commandPlayersCardCount">-- / --</b><span>Joueurs actifs</span></div><em>OUVRIR LE MODULE</em>
               </button>
               <button class="admin-module-card admin-module-card--active" type="button" data-admin-module="deliveries">
                 <span class="admin-module-card__index">03</span><span class="admin-module-card__icon">▣</span>
                 <strong>Livraisons</strong><small>Créer, suivre et préparer les récompenses joueurs.</small>
                 <div class="module-metrics"><b>ACTIF</b><span>Module opérationnel</span></div><em>OUVRIR LE MODULE</em>
               </button>
-              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">04</span><span class="admin-module-card__icon">▤</span><strong>Véhicules</strong><small>Suivi du parc et outils de restitution.</small><div class="module-metrics"><b>--</b><span>Entrées suivies</span></div><em>À VENIR</em></button>
-              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">05</span><span class="admin-module-card__icon">◉</span><strong>Discord</strong><small>État du réseau, membres et outils communautaires.</small><div class="module-metrics"><b>SYNC</b><span>API connectée</span></div><em>À VENIR</em></button>
-              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">06</span><span class="admin-module-card__icon">≡</span><strong>Logs</strong><small>Historique des actions sensibles et incidents.</small><div class="module-metrics"><b>LIVE</b><span>Journal sécurisé</span></div><em>À VENIR</em></button>
-              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">07</span><span class="admin-module-card__icon">₽</span><strong>Économie</strong><small>Flux, boutique, récompenses et équilibrage.</small><div class="module-metrics"><b>STABLE</b><span>État économie</span></div><em>À VENIR</em></button>
+              <button class="admin-module-card admin-module-card--active" type="button" data-admin-link="senzany-admin-votes.html"><span class="admin-module-card__index">04</span><span class="admin-module-card__icon">✓</span><strong>Votes</strong><small>Classement mensuel et regroupement automatique des pseudos Top-Serveurs.</small><div class="module-metrics"><b id="commandVotesCardCount">--</b><span>Votes du mois</span></div><em>OUVRIR LE MODULE</em></button>
+              <button class="admin-module-card admin-module-card--active" type="button" data-admin-link="senzany-admin-rewards.html"><span class="admin-module-card__index">05</span><span class="admin-module-card__icon">◆</span><strong>Récompenses</strong><small>Configurer les lots automatiques pour les votes, événements et systèmes du portail.</small><div class="module-metrics"><b>CONFIG</b><span>Règles centralisées</span></div><em>OUVRIR LE MODULE</em></button>
+              <button class="admin-module-card admin-module-card--active" type="button" data-admin-link="senzany-admin-map.html"><span class="admin-module-card__index">06</span><span class="admin-module-card__icon">⌖</span><strong>CARTE / BASES</strong><small>Gérer la carte du serveur, les demandes d’implantation, les bases enregistrées et les zones occupées.</small><div class="module-metrics"><b>MAP</b><span>Gestion des implantations</span></div><em>OUVRIR LA CARTE</em></button>
+              <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">07</span><span class="admin-module-card__icon">≡</span><strong>Logs</strong><small>Historique des actions sensibles et incidents.</small><div class="module-metrics"><b>LIVE</b><span>Journal sécurisé</span></div><em>À VENIR</em></button>
               <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">08</span><span class="admin-module-card__icon">★</span><strong>Battle Pass</strong><small>Paliers, progression et contenus saisonniers.</small><div class="module-metrics"><b>S01</b><span>Saison préparatoire</span></div><em>À VENIR</em></button>
               <button class="admin-module-card" type="button" disabled><span class="admin-module-card__index">09</span><span class="admin-module-card__icon">◇</span><strong>Quêtes & IA</strong><small>Objectifs scénarisés et interactions intelligentes.</small><div class="module-metrics"><b>DEV</b><span>Systèmes en cours</span></div><em>À VENIR</em></button>
               <button class="admin-module-card admin-module-card--active" type="button" data-admin-module="items"><span class="admin-module-card__index">10</span><span class="admin-module-card__icon">⌕</span><strong>Base des objets</strong><small>Importer les types.xml et rechercher les classnames du serveur.</small><div class="module-metrics"><b>ACTIF</b><span>Catalogue Supabase</span></div><em>OUVRIR LE MODULE</em></button>
             </div>
+          </section>
+
+          <!-- Module Joueurs connectés -->
+          <section id="adminPlayersView" class="admin-module-view" hidden>
+            <div class="admin-module-toolbar">
+              <button id="backFromPlayers" class="admin-button admin-button--small" type="button">
+                ← Retour au centre
+              </button>
+              <div>
+                <span>MODULE 02</span>
+                <strong>Joueurs connectés</strong>
+              </div>
+            </div>
+
+            <section class="command-players-panel">
+              <div class="command-players-panel__head">
+                <div>
+                  <span>SUPERVISION DAYZ // TEMPS RÉEL</span>
+                  <h2>Survivants en ligne</h2>
+                  <p>La liste est actualisée automatiquement toutes les 20 secondes.</p>
+                </div>
+                <div class="command-players-summary">
+                  <span>CONNEXIONS</span>
+                  <strong id="commandPlayersCount">-- / --</strong>
+                  <small>Dernière mise à jour : <b id="commandPlayersUpdatedAt">--:--:--</b></small>
+                </div>
+              </div>
+
+              <div class="command-players-toolbar">
+                <div id="commandPlayersStatus" class="command-players-status">INITIALISATION</div>
+                <div class="command-players-toolbar__actions">
+                  <label class="command-players-search">
+                    <span class="sr-only">Rechercher un joueur</span>
+                    <input id="commandPlayersSearch" type="search" autocomplete="off" placeholder="Rechercher un joueur…" />
+                  </label>
+                  <button id="refreshCommandPlayers" class="admin-button admin-button--small" type="button">Actualiser</button>
+                </div>
+              </div>
+
+              <div class="command-player-row command-player-row--header" aria-hidden="true">
+                <div>#</div>
+                <div>JOUEUR</div>
+                <div>PING</div>
+                <div>TEMPS</div>
+              </div>
+              <div id="commandPlayersList" class="command-players-list">
+                <div class="command-players-empty">Connexion au serveur DayZ…</div>
+              </div>
+            </section>
           </section>
 
           <!-- Module Livraisons -->
@@ -324,6 +373,7 @@
             </div>
           </section>
 
+
           <!-- Module Base des objets -->
           <section id="adminItemsView" class="admin-module-view" hidden>
             <div class="admin-module-toolbar">
@@ -449,8 +499,8 @@
         <div class="admin-item-editor__grid">
           <label>Nom affiché<input id="itemEditorDisplayName" type="text" maxlength="160" /></label>
           <label>Nom du mod<input id="itemEditorModName" type="text" maxlength="160" required /></label>
-          <label>Catégorie<input id="itemEditorCategory" type="text" maxlength="100" required /></label>
-          <label>Sous-catégorie<input id="itemEditorSubcategory" type="text" maxlength="100" /></label>
+          <label>Catégorie<select id="itemEditorCategory" required><option value="Autre">Autre</option></select></label>
+          <label>Sous-catégorie<select id="itemEditorSubcategory"><option value="">Sans sous-catégorie</option></select></label>
         </div>
         <div class="admin-item-editor__image-block">
           <div id="itemEditorImagePreview" class="admin-item-editor__preview"><span>Aucune image</span></div>
@@ -472,10 +522,60 @@
     </form>
   </dialog>
 
+
+  <div id="commandPlayerModal" class="command-player-modal" hidden>
+    <button class="command-player-modal__backdrop" type="button" data-close-player-modal aria-label="Fermer la fiche joueur"></button>
+    <section class="command-player-modal__panel" role="dialog" aria-modal="true" aria-labelledby="commandPlayerModalName">
+      <button class="command-player-modal__close" type="button" data-close-player-modal aria-label="Fermer">×</button>
+      <span class="command-player-modal__eyebrow">FICHE JOUEUR // RCON</span>
+      <div class="command-player-modal__title-line"><h3 id="commandPlayerModalName">Joueur</h3><span id="commandPlayerStaffBadge" class="command-player-staff-badge" hidden>STAFF</span></div>
+      <div class="command-player-modal__status"><i></i> SESSION DAYZ ACTIVE</div>
+
+      <dl class="command-player-modal__details">
+        <div><dt>Ping</dt><dd id="commandPlayerModalPing">—</dd></div>
+        <div><dt>Temps de connexion</dt><dd id="commandPlayerModalTime">—</dd></div>
+        <div><dt>GUID BattlEye</dt><dd id="commandPlayerModalGuid">—</dd></div>
+      </dl>
+
+      <section class="command-player-identity">
+        <div class="command-player-section-title"><span>IDENTITÉ PORTAIL</span><small id="commandPlayerIdentityNote">Vérification…</small></div>
+        <div class="command-player-link-grid">
+          <div><span class="command-player-platform-label command-player-platform-label--steam"><i aria-hidden="true">S</i>Steam</span><strong id="commandPlayerSteamStatus">Vérification…</strong><small id="commandPlayerSteamId">—</small></div>
+          <div><span class="command-player-platform-label command-player-platform-label--discord"><i aria-hidden="true">D</i>Discord</span><strong id="commandPlayerDiscordStatus">Vérification…</strong><small id="commandPlayerDiscordName">—</small></div>
+        </div>
+      </section>
+
+      <section class="command-player-actions">
+        <div class="command-player-section-title"><span>ACTIONS RCON</span><small>Motif obligatoire</small></div>
+        <label class="command-player-reason">
+          <span>Motif</span>
+          <input id="commandPlayerActionReason" type="text" maxlength="160" autocomplete="off" placeholder="Indiquer la raison de l’action…" />
+        </label>
+        <div class="command-player-action-buttons">
+          <button id="commandPlayerKick" class="admin-button admin-button--warning" type="button">Kick</button>
+          <label class="command-player-tempban">
+            <select id="commandPlayerBanDuration" aria-label="Durée du bannissement temporaire">
+              <option value="60">1 heure</option>
+              <option value="360">6 heures</option>
+              <option value="1440" selected>1 jour</option>
+              <option value="4320">3 jours</option>
+              <option value="10080">7 jours</option>
+              <option value="43200">30 jours</option>
+            </select>
+            <button id="commandPlayerTempBan" class="admin-button admin-button--danger" type="button">Ban temporaire</button>
+          </label>
+          <button id="commandPlayerPermanentBan" class="admin-button admin-button--danger admin-button--danger-strong" type="button">Ban définitif</button>
+        </div>
+        <div id="commandPlayerActionFeedback" class="command-player-action-feedback" hidden></div>
+      </section>
+      <p class="command-player-modal__note">Les actions sont exécutées côté serveur et restent réservées aux SteamID autorisés dans Commandement.</p>
+    </section>
+  </div>
+
   <div data-site-footer></div>
 
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin.js?v=4.2.1"></script>
+  <script type="module" src="assets/js/admin/admin.js?v=4.9.0"></script>
 </body>
 </html>
