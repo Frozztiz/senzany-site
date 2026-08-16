@@ -68,8 +68,13 @@ app.use(
   require("./routes/adminMonthlyVotes")
 );
 
+app.use(
+  "/api/admin/events",
+  require("./middleware/commandAuth"),
+  require("./routes/adminEvents")
+);
+
 app.use("/api/map", require("./routes/mapPublic"));
-app.use("/api/map/requests", require("./routes/mapRequests"));
 
 app.use(
   "/api/admin/map",
