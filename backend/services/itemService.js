@@ -55,7 +55,126 @@ async function upsertItems(items, batchSize = 300) {
     });
     processed += batch.length;
   }
+
   return processed;
 }
 
-module.exports = { searchItems, getItemsStats, upsertItems };
+async function getAllItems(batchSize = 1000) {
+  const all = [];
+
+  for (let start = 0; ; start += batchSize) {
+    const end = start + batchSize - 1;
+    const rows = await request(
+      "items?select=id,classname,is_active&order=id.asc",
+      {
+        method: "GET",
+        headers: { Range: `${start}-${end}` },
+      }
+    );
+
+    const page = Array.isArray(rows) ? rows : [];
+    all.push(...page);
+
+    if (page.length < batchSize) break;
+  }
+
+  return all;
+}
+
+async function patchItemsByIds(ids, payload, batchSize = 200) {
+  let processed = 0;
+
+  for (let index = 0; index < ids.length; index += batchSize) {
+    const batch = ids.slice(index, index + batchSize).filter(Boolean);
+    if (!batch.length) continue;
+
+    await request(`items?id=in.(${batch.join(",")})`, {
+      method: "PATCH",
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify(payload),
+    });
+
+    processed += batch.length;
+  }
+
+  return processed;
+}
+
+/**
+ * Synchronise Supabase avec le catalogue courant.
+ *
+ * Règles :
+ * - un classname déjà connu conserve ses champs enrichis/manuels
+ *   (display_name, category, image, disponibilités, etc.) ;
+ * - un classname nouveau est créé avec les données générées par l'importeur ;
+ * - un ancien classname absent du nouveau catalogue est seulement désactivé ;
+ * - aucun objet n'est supprimé.
+ */
+async function syncItems(items) {
+  const now = new Date().toISOString();
+  const existingRows = await getAllItems();
+  const existingByClassname = new Map(
+    existingRows
+      .filter((row) => row?.classname)
+      .map((row) => [String(row.classname).toLowerCase(), row])
+  );
+
+  const incomingKeys = new Set(
+    items
+      .filter((item) => item?.classname)
+      .map((item) => String(item.classname).toLowerCase())
+  );
+
+  const newItems = [];
+  const reactivateIds = [];
+
+  for (const item of items) {
+    const key = String(item.classname || "").toLowerCase();
+    const existing = existingByClassname.get(key);
+
+    if (!existing) {
+      newItems.push(item);
+      continue;
+    }
+
+    if (existing.is_active === false) reactivateIds.push(existing.id);
+  }
+
+  // On n'insère que les nouveaux classnames.
+  // Les fiches existantes ne sont volontairement pas réécrites afin de préserver
+  // les enrichissements effectués dans le portail.
+  const added = newItems.length ? await upsertItems(newItems) : 0;
+
+  const reactivated = reactivateIds.length
+    ? await patchItemsByIds(reactivateIds, { is_active: true, updated_at: now })
+    : 0;
+
+  const staleIds = existingRows
+    .filter((row) =>
+      row?.id &&
+      row?.classname &&
+      row.is_active !== false &&
+      !incomingKeys.has(String(row.classname).toLowerCase())
+    )
+    .map((row) => row.id);
+
+  const deactivated = staleIds.length
+    ? await patchItemsByIds(staleIds, { is_active: false, updated_at: now })
+    : 0;
+
+  return {
+    current: items.length,
+    added,
+    reactivated,
+    deactivated,
+    previouslyKnown: Math.max(0, items.length - newItems.length),
+  };
+}
+
+module.exports = {
+  searchItems,
+  getItemsStats,
+  upsertItems,
+  getAllItems,
+  syncItems,
+};

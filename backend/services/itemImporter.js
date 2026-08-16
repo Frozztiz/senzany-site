@@ -1,6 +1,6 @@
 const zlib = require("node:zlib");
 const path = require("node:path");
-const { upsertItems } = require("./itemService");
+const { syncItems } = require("./itemService");
 
 const MAX_ZIP_SIZE = 20 * 1024 * 1024;
 const MAX_FILES = 500;
@@ -128,10 +128,15 @@ async function importItemsZip(buffer) {
   if (!entries.length) throw new Error("Aucun fichier types*.xml trouvé dans le ZIP.");
   const { items, occurrences } = parseItems(entries);
   if (!items.length) throw new Error("Aucun objet DayZ trouvé dans les XML.");
-  const imported = await upsertItems(items);
+  const sync = await syncItems(items);
   return {
     files: entries.length,
-    imported,
+    imported: items.length,
+    active: sync.current,
+    added: sync.added,
+    reactivated: sync.reactivated,
+    deactivated: sync.deactivated,
+    previouslyKnown: sync.previouslyKnown,
     duplicates: Math.max(0, occurrences - items.length),
     occurrences,
   };
