@@ -435,27 +435,71 @@ function shouldKeepExistingText(currentValue, defaultValue, classname) {
   return value.toLowerCase() !== String(defaultValue || "").toLowerCase();
 }
 
-async function getExistingItems(classnames) {
-  const supabase = getSupabaseClient();
-  const existing = new Map();
+async function getAllExistingItems(supabase, pageSize = 1000) {
+  const rows = [];
+  let offset = 0;
 
-  for (let index = 0; index < classnames.length; index += 300) {
-    const batch = classnames.slice(index, index + 300);
+  while (true) {
     const { data, error } = await supabase
       .from("items")
       .select(
-        "classname,display_name,category,subcategory,mod_name,source_file,source_path,is_active,delivery_enabled,shop_enabled,battle_pass_enabled,reward_enabled,first_seen_at,import_count"
+        [
+          "id",
+          "classname",
+          "display_name",
+          "category",
+          "subcategory",
+          "mod_name",
+          "source_file",
+          "source_path",
+          "is_active",
+          "delivery_enabled",
+          "shop_enabled",
+          "battle_pass_enabled",
+          "reward_enabled",
+          "first_seen_at",
+          "last_seen_at",
+          "import_count"
+        ].join(",")
       )
-      .in("classname", batch);
+      .order("id", { ascending: true })
+      .range(offset, offset + pageSize - 1);
 
     if (error) throw error;
 
-    for (const row of data || []) {
-      existing.set(String(row.classname).toLowerCase(), row);
-    }
+    const page = Array.isArray(data) ? data : [];
+    rows.push(...page);
+
+    if (page.length < pageSize) break;
+    offset += pageSize;
   }
 
-  return existing;
+  return rows;
+}
+
+function groupExistingByClassname(rows) {
+  const groups = new Map();
+
+  for (const row of rows) {
+    const key = String(row?.classname || "").trim().toLowerCase();
+    if (!key) continue;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(row);
+  }
+
+  return groups;
+}
+
+function chooseCanonicalExisting(group, importedClassname) {
+  if (!Array.isArray(group) || !group.length) return null;
+
+  const exact = group.find((row) => row.classname === importedClassname);
+  if (exact) return exact;
+
+  const active = group.find((row) => row.is_active !== false);
+  if (active) return active;
+
+  return group[0];
 }
 
 function mergeImportedItem(imported, existing) {
@@ -466,12 +510,14 @@ function mergeImportedItem(imported, existing) {
       ...imported,
       first_seen_at: imported.first_seen_at || now,
       last_seen_at: now,
-      import_count: 1
+      import_count: 1,
+      is_active: true
     };
   }
 
   return {
     ...imported,
+    classname: existing.classname,
     display_name: shouldKeepExistingText(existing.display_name, "", imported.classname)
       ? existing.display_name
       : imported.display_name,
@@ -482,29 +528,86 @@ function mergeImportedItem(imported, existing) {
     mod_name: shouldKeepExistingText(existing.mod_name, DEFAULT_MOD_NAME, imported.classname)
       ? existing.mod_name
       : imported.mod_name,
-    is_active: existing.is_active !== false,
+    is_active: true,
     delivery_enabled: existing.delivery_enabled !== false,
     shop_enabled: existing.shop_enabled === true,
     battle_pass_enabled: existing.battle_pass_enabled === true,
     reward_enabled: existing.reward_enabled !== false,
     first_seen_at: existing.first_seen_at || imported.first_seen_at || now,
     last_seen_at: now,
-    import_count: Math.max(Number(existing.import_count) || 1, 1) + 1
+    import_count: Math.max(Number(existing.import_count) || 0, 0) + 1
   };
 }
 
-async function upsertImportedItems(items, batchSize = 300) {
-  if (!Array.isArray(items) || !items.length) return 0;
+async function setItemsActiveStateByIds(supabase, ids, isActive, batchSize = 300) {
+  if (!ids.length) return 0;
 
-  const supabase = getSupabaseClient();
-  const existingItems = await getExistingItems(items.map((item) => item.classname));
+  const now = new Date().toISOString();
   let processed = 0;
 
-  for (let index = 0; index < items.length; index += batchSize) {
-    const batch = items.slice(index, index + batchSize).map((item) => {
-      const existing = existingItems.get(String(item.classname).toLowerCase());
-      return mergeImportedItem(item, existing);
-    });
+  for (let index = 0; index < ids.length; index += batchSize) {
+    const batch = ids.slice(index, index + batchSize);
+
+    const { error } = await supabase
+      .from("items")
+      .update({
+        is_active: isActive,
+        updated_at: now
+      })
+      .in("id", batch);
+
+    if (error) throw error;
+    processed += batch.length;
+  }
+
+  return processed;
+}
+
+async function upsertImportedItems(items, batchSize = 300) {
+  if (!Array.isArray(items) || !items.length) {
+    return {
+      active: 0,
+      added: 0,
+      reactivated: 0,
+      deactivated: 0,
+      caseDuplicatesDeactivated: 0,
+      previouslyKnown: 0
+    };
+  }
+
+  const supabase = getSupabaseClient();
+  const existingRows = await getAllExistingItems(supabase);
+  const existingGroups = groupExistingByClassname(existingRows);
+
+  const incomingKeys = new Set();
+  const canonicalIds = new Set();
+  const mergedItems = [];
+
+  let added = 0;
+  let reactivated = 0;
+  let previouslyKnown = 0;
+
+  for (const imported of items) {
+    const key = String(imported.classname || "").trim().toLowerCase();
+    if (!key || incomingKeys.has(key)) continue;
+    incomingKeys.add(key);
+
+    const group = existingGroups.get(key) || [];
+    const canonical = chooseCanonicalExisting(group, imported.classname);
+
+    if (!canonical) {
+      added += 1;
+    } else {
+      previouslyKnown += 1;
+      canonicalIds.add(String(canonical.id));
+      if (canonical.is_active === false) reactivated += 1;
+    }
+
+    mergedItems.push(mergeImportedItem(imported, canonical));
+  }
+
+  for (let index = 0; index < mergedItems.length; index += batchSize) {
+    const batch = mergedItems.slice(index, index + batchSize);
 
     const { error } = await supabase
       .from("items")
@@ -514,12 +617,50 @@ async function upsertImportedItems(items, batchSize = 300) {
       });
 
     if (error) throw error;
-    processed += batch.length;
   }
 
-  return processed;
-}
+  const staleIds = [];
+  const caseDuplicateIds = [];
 
+  for (const row of existingRows) {
+    if (row.is_active === false) continue;
+
+    const key = String(row.classname || "").trim().toLowerCase();
+    if (!key) continue;
+
+    if (!incomingKeys.has(key)) {
+      staleIds.push(row.id);
+      continue;
+    }
+
+    if (!canonicalIds.has(String(row.id))) {
+      caseDuplicateIds.push(row.id);
+    }
+  }
+
+  const staleDeactivated = await setItemsActiveStateByIds(
+    supabase,
+    staleIds,
+    false,
+    batchSize
+  );
+
+  const caseDuplicatesDeactivated = await setItemsActiveStateByIds(
+    supabase,
+    caseDuplicateIds,
+    false,
+    batchSize
+  );
+
+  return {
+    active: incomingKeys.size,
+    added,
+    reactivated,
+    deactivated: staleDeactivated + caseDuplicatesDeactivated,
+    caseDuplicatesDeactivated,
+    previouslyKnown
+  };
+}
 
 function cleanText(value, label, maxLength, { allowEmpty = true } = {}) {
   const text = String(value ?? "").trim();

@@ -113,10 +113,14 @@ async function validateArchive(zipPath) {
 function mergeDuplicateItem(current, incoming) {
   if (!current) return incoming;
 
-  // La table Supabase `items` ne possède pas de colonne `metadata`.
-  // On conserve simplement la première occurrence du classname et ses
-  // informations de provenance déjà stockées dans source_file/source_path.
-  return current;
+  // Un seul objet catalogue par classname (comparaison insensible à la casse).
+  // La BDD actuelle ne possède pas de colonne supplémentaire pour mémoriser
+  // plusieurs chemins : on conserve simplement la première source rencontrée.
+  return {
+    ...current,
+    source_file: current.source_file || incoming.source_file,
+    source_path: current.source_path || incoming.source_path
+  };
 }
 
 async function importZipBuffer(buffer) {
@@ -195,7 +199,7 @@ async function importZipBuffer(buffer) {
       throw new Error("Aucun classname DayZ trouvé dans les fichiers types*.xml.");
     }
 
-    const imported = await upsertImportedItems(items);
+    const sync = await upsertImportedItems(items);
 
     return {
       archiveEntries: entries.length,
@@ -204,7 +208,13 @@ async function importZipBuffer(buffer) {
       occurrences,
       uniqueItems: items.length,
       duplicates: Math.max(occurrences - items.length, 0),
-      imported
+      imported: sync.active,
+      active: sync.active,
+      added: sync.added,
+      reactivated: sync.reactivated,
+      deactivated: sync.deactivated,
+      caseDuplicatesDeactivated: sync.caseDuplicatesDeactivated,
+      previouslyKnown: sync.previouslyKnown
     };
   } finally {
     await fs.rm(tempRoot, { recursive: true, force: true });
