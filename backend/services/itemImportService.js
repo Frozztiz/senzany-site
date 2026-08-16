@@ -30,7 +30,15 @@ function normalizeArchivePath(entry) {
 
 function isTypesXml(entry) {
   const fileName = path.posix.basename(normalizeArchivePath(entry));
-  return /^types(?:[_-].+)?\.xml$/i.test(fileName) || /[_-]types\.xml$/i.test(fileName);
+
+  // On accepte désormais tous les XML du ZIP.
+  // Le contenu est ensuite validé par TYPE_PATTERN : seuls les fichiers
+  // contenant réellement des balises <type name="..."> alimentent le catalogue.
+  //
+  // Important pour Senzany : ItemsServer.xml contient de nombreux classnames
+  // valides mais était ignoré auparavant parce que son nom ne commençait pas
+  // par "types".
+  return /\.xml$/i.test(fileName);
 }
 
 function modNameFromEntry(entry) {
@@ -141,7 +149,7 @@ async function importZipBuffer(buffer) {
     const xmlEntries = [...new Set(entries.filter(isTypesXml))];
 
     if (!xmlEntries.length) {
-      throw new Error("Aucun fichier types*.xml trouvé dans le ZIP.");
+      throw new Error("Aucun fichier XML trouvé dans le ZIP.");
     }
 
     const unique = new Map();
@@ -196,7 +204,7 @@ async function importZipBuffer(buffer) {
 
     const items = [...unique.values()];
     if (!items.length) {
-      throw new Error("Aucun classname DayZ trouvé dans les fichiers types*.xml.");
+      throw new Error("Aucun classname DayZ trouvé dans les fichiers XML du ZIP.");
     }
 
     const sync = await upsertImportedItems(items);
