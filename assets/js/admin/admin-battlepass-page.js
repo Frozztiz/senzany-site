@@ -70,8 +70,35 @@ function openLevel(id){ const l=state.levels.find(x=>x.id===id); if(!l)return; s
 function collectReward(track){ const target=track==="free"?byId("bpFreeRewards"):byId("bpPremiumRewards"); const items=[...target.querySelectorAll(".bp-reward-row")].map(r=>({classname:r.querySelector(".bp-reward-class").value,quantity:Number(r.querySelector(".bp-reward-qty").value)||1})); return {items,roubles:Number(track==="free"?byId("bpFreeRoubles").value:byId("bpPremiumRoubles").value)||0,bitcoin:Number(track==="free"?byId("bpFreeBitcoin").value:byId("bpPremiumBitcoin").value)||0}; }
 async function saveLevel(event){event.preventDefault(); if(!state.selectedLevel)return; const el=byId("bpLevelFeedback");feedback(el,"Enregistrement…","loading");try{await apiRequest(`/api/admin/battle-pass/levels/${state.selectedLevel.id}`,{method:"PUT",body:{freeRewards:collectReward("free"),premiumRewards:collectReward("premium")}});byId("bpLevelDialog").close();await loadDashboard();}catch(e){feedback(el,e.message,"error");}}
 
-function openPicker(track){state.pickerTrack=track;byId("bpItemPicker").hidden=false;byId("bpItemSearch").value="";byId("bpItemResults").innerHTML='<div class="admin-list-message">Commence à taper un classname.</div>';setTimeout(()=>byId("bpItemSearch").focus(),0)}
-function closePicker(){byId("bpItemPicker").hidden=true;state.pickerTrack=null;}
+function openPicker(track){
+  state.pickerTrack=track;
+  const levelDialog=byId("bpLevelDialog");
+  state.reopenLevelDialogAsModal=Boolean(levelDialog?.open);
+
+  // Un <dialog>.showModal() est placé dans la top layer du navigateur.
+  // Le picker est un overlay classique : même avec un énorme z-index il resterait dessous.
+  // On sort temporairement le palier de la top layer avant d'afficher le picker.
+  if(state.reopenLevelDialogAsModal){
+    levelDialog.close();
+    levelDialog.setAttribute("open","");
+  }
+
+  byId("bpItemPicker").hidden=false;
+  byId("bpItemSearch").value="";
+  byId("bpItemResults").innerHTML='<div class="admin-list-message">Commence à taper un classname.</div>';
+  setTimeout(()=>byId("bpItemSearch").focus(),0);
+}
+function closePicker(){
+  byId("bpItemPicker").hidden=true;
+  state.pickerTrack=null;
+
+  const levelDialog=byId("bpLevelDialog");
+  if(state.reopenLevelDialogAsModal && levelDialog){
+    levelDialog.removeAttribute("open");
+    levelDialog.showModal();
+  }
+  state.reopenLevelDialogAsModal=false;
+}
 async function searchItems(){const q=byId("bpItemSearch").value.trim();if(q.length<2){byId("bpItemResults").innerHTML='<div class="admin-list-message">Tape au moins 2 caractères.</div>';return;}try{const data=await apiRequest(`/api/admin/items?q=${encodeURIComponent(q)}&limit=20`);const rows=Array.isArray(data.items)?data.items:[];byId("bpItemResults").innerHTML=rows.length?`<div class="bp-item-results">${rows.map(i=>`<button type="button" class="bp-item-result" data-pick-item="${esc(i.className)}"><span><strong>${esc(i.className)}</strong><small>${esc(i.displayName||i.className)} · ${esc(i.modName||"Source inconnue")}</small></span><em>AJOUTER</em></button>`).join("")}</div>`:'<div class="admin-list-message">Aucun objet trouvé.</div>';}catch(e){byId("bpItemResults").innerHTML=`<div class="admin-list-message">${esc(e.message)}</div>`;}}
 function addPickedItem(classname){const target=state.pickerTrack==="free"?byId("bpFreeRewards"):byId("bpPremiumRewards");const empty=target.querySelector(".admin-list-message");if(empty)empty.remove();const row=document.createElement("div");row.className="bp-reward-row";row.innerHTML=`<input class="bp-reward-class" value="${esc(classname)}" readonly><input class="bp-reward-qty" type="number" min="1" max="1000" value="1"><button type="button" data-remove-reward>×</button>`;target.appendChild(row);closePicker();}
 
