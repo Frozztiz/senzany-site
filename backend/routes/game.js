@@ -3,10 +3,10 @@ const { GameDig } = require("gamedig");
 
 const router = express.Router();
 
-const DEFAULT_SERVER_HOST = "208.115.196.109";
-const DEFAULT_GAME_PORT = 2302;
-const DEFAULT_QUERY_PORT = 2303;
-const DEFAULT_MAX_PLAYERS = 50;
+const DEFAULT_SERVER_HOST = "g02.fiveminehosting.com";
+const DEFAULT_GAME_PORT = 30120;
+const DEFAULT_QUERY_PORT = 27016;
+const DEFAULT_MAX_PLAYERS = 64;
 
 const CACHE_DURATION_MS = 20000;
 
