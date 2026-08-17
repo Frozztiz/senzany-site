@@ -1,11 +1,7 @@
-const fs = require("fs");
-const path = require("path");
+const supabaseService = require("./supabaseService");
 
-const DATA_DIR =
-  process.env.FLAGPOLE_DATA_DIR ||
-  path.join(process.cwd(), "data");
-
-const DATA_FILE = path.join(DATA_DIR, "flagpoles.json");
+const SNAPSHOT_TABLE = "dayz_flagpole_snapshot";
+const SNAPSHOT_ID = "current";
 
 function cleanText(value, maxLength = 100) {
   return String(value || "").trim().slice(0, maxLength);
@@ -16,6 +12,15 @@ function finiteNumber(value) {
   return Number.isFinite(number) ? number : null;
 }
 
+function emptySnapshot() {
+  return {
+    agentId: null,
+    receivedAt: null,
+    count: 0,
+    flagpoles: []
+  };
+}
+
 function normalizeFlagpole(row, index) {
   const type = cleanText(row?.type || "TerritoryFlag", 80);
   const x = finiteNumber(row?.x);
@@ -24,7 +29,15 @@ function normalizeFlagpole(row, index) {
 
   if (type !== "TerritoryFlag") return null;
   if (x === null || z === null) return null;
-  if (x < 0 || x > 15360 || z < 0 || z > 15360) return null;
+
+  if (
+    x < 0 ||
+    x > 15360 ||
+    z < 0 ||
+    z > 15360
+  ) {
+    return null;
+  }
 
   return {
     id: `flagpole-${index}-${x.toFixed(2)}-${z.toFixed(2)}`,
@@ -35,101 +48,199 @@ function normalizeFlagpole(row, index) {
   };
 }
 
-function ensureDataDirectory() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-function saveSnapshot({ agentId, flagpoles }) {
-  ensureDataDirectory();
-
-  const normalized = (Array.isArray(flagpoles) ? flagpoles : [])
+async function saveSnapshot({ agentId, flagpoles }) {
+  const normalized = (
+    Array.isArray(flagpoles)
+      ? flagpoles
+      : []
+  )
     .slice(0, 2000)
     .map(normalizeFlagpole)
     .filter(Boolean);
 
+  const receivedAt = new Date().toISOString();
+
   const snapshot = {
-    agentId: cleanText(agentId || "dayz-server", 100),
-    receivedAt: new Date().toISOString(),
+    agentId: cleanText(
+      agentId || "dayz-server",
+      100
+    ),
+    receivedAt,
     count: normalized.length,
     flagpoles: normalized
   };
 
-  const temporary = `${DATA_FILE}.tmp`;
-  fs.writeFileSync(temporary, JSON.stringify(snapshot, null, 2), "utf8");
-  fs.renameSync(temporary, DATA_FILE);
+  const payload = {
+    id: SNAPSHOT_ID,
+    agent_id: snapshot.agentId,
+    received_at: snapshot.receivedAt,
+    count: snapshot.count,
+    flagpoles: snapshot.flagpoles,
+    updated_at: receivedAt
+  };
+
+  await supabaseService.request(
+    `${SNAPSHOT_TABLE}?on_conflict=id`,
+    {
+      method: "POST",
+      headers: {
+        Prefer:
+          "resolution=merge-duplicates,return=minimal"
+      },
+      body: JSON.stringify(payload)
+    }
+  );
 
   return snapshot;
 }
 
-function loadSnapshot() {
+async function loadSnapshot() {
   try {
-    if (!fs.existsSync(DATA_FILE)) {
-      return {
-        agentId: null,
-        receivedAt: null,
-        count: 0,
-        flagpoles: []
-      };
+    const rows = await supabaseService.request(
+      `${SNAPSHOT_TABLE}` +
+        `?id=eq.${encodeURIComponent(SNAPSHOT_ID)}` +
+        "&select=id,agent_id,received_at,count,flagpoles" +
+        "&limit=1",
+      {
+        method: "GET"
+      }
+    );
+
+    if (
+      !Array.isArray(rows) ||
+      rows.length === 0
+    ) {
+      return emptySnapshot();
     }
 
-    const parsed = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
+    const row = rows[0];
+
+    const flagpoles = Array.isArray(row?.flagpoles)
+      ? row.flagpoles
+      : [];
+
     return {
-      agentId: cleanText(parsed?.agentId, 100) || null,
-      receivedAt: parsed?.receivedAt || null,
-      count: Number(parsed?.count) || 0,
-      flagpoles: Array.isArray(parsed?.flagpoles) ? parsed.flagpoles : []
+      agentId:
+        cleanText(row?.agent_id, 100) ||
+        null,
+
+      receivedAt:
+        row?.received_at ||
+        null,
+
+      count:
+        Number(row?.count) ||
+        flagpoles.length ||
+        0,
+
+      flagpoles
     };
   } catch (error) {
-    console.error("[FLAGPOLES] Lecture snapshot impossible :", error);
-    return {
-      agentId: null,
-      receivedAt: null,
-      count: 0,
-      flagpoles: []
-    };
+    console.error(
+      "[FLAGPOLES] Lecture snapshot Supabase impossible :",
+      error?.message || error
+    );
+
+    return emptySnapshot();
   }
 }
 
 function distance2d(aX, aZ, bX, bZ) {
-  return Math.hypot(Number(aX) - Number(bX), Number(aZ) - Number(bZ));
+  return Math.hypot(
+    Number(aX) - Number(bX),
+    Number(aZ) - Number(bZ)
+  );
 }
 
 function getCoordinates(row) {
-  const x = finiteNumber(row?.center_x ?? row?.centerX ?? row?.x);
-  const z = finiteNumber(row?.center_z ?? row?.centerZ ?? row?.z);
-  return x === null || z === null ? null : { x, z };
+  const x = finiteNumber(
+    row?.center_x ??
+      row?.centerX ??
+      row?.x
+  );
+
+  const z = finiteNumber(
+    row?.center_z ??
+      row?.centerZ ??
+      row?.z
+  );
+
+  return x === null || z === null
+    ? null
+    : { x, z };
 }
 
 function isValidatedZone(row) {
   const status = cleanText(
-    row?.public_status ?? row?.status ?? row?.zone_status,
+    row?.public_status ??
+      row?.status ??
+      row?.zone_status,
     40
   ).toLowerCase();
 
-  return !status || status === "validated" || status === "approved";
+  return (
+    !status ||
+    status === "validated" ||
+    status === "approved"
+  );
 }
 
-function classifyFlagpoles(flagpoles, zones, requests) {
-  const zoneRows = Array.isArray(zones) ? zones : [];
-  const requestRows = Array.isArray(requests) ? requests : [];
+function classifyFlagpoles(
+  flagpoles,
+  zones,
+  requests
+) {
+  const zoneRows = Array.isArray(zones)
+    ? zones
+    : [];
 
-  const classified = (Array.isArray(flagpoles) ? flagpoles : []).map((flagpole) => {
+  const requestRows = Array.isArray(requests)
+    ? requests
+    : [];
+
+  const classified = (
+    Array.isArray(flagpoles)
+      ? flagpoles
+      : []
+  ).map((flagpole) => {
     let validatedMatch = null;
     let validatedDistance = Infinity;
 
     for (const zone of zoneRows) {
-      if (!isValidatedZone(zone)) continue;
+      if (!isValidatedZone(zone)) {
+        continue;
+      }
 
-      const coordinates = getCoordinates(zone);
-      if (!coordinates) continue;
+      const coordinates =
+        getCoordinates(zone);
+
+      if (!coordinates) {
+        continue;
+      }
 
       const radius = Math.min(
         60,
-        Math.max(1, Number(zone?.radius_m ?? zone?.radiusM ?? 60) || 60)
+        Math.max(
+          1,
+          Number(
+            zone?.radius_m ??
+              zone?.radiusM ??
+              60
+          ) || 60
+        )
       );
-      const distance = distance2d(flagpole.x, flagpole.z, coordinates.x, coordinates.z);
 
-      if (distance <= radius && distance < validatedDistance) {
+      const distance = distance2d(
+        flagpole.x,
+        flagpole.z,
+        coordinates.x,
+        coordinates.z
+      );
+
+      if (
+        distance <= radius &&
+        distance < validatedDistance
+      ) {
         validatedDistance = distance;
         validatedMatch = zone;
       }
@@ -140,13 +251,17 @@ function classifyFlagpoles(flagpoles, zones, requests) {
         ...flagpole,
         state: "validated",
         matchType: "zone",
-        matchId: validatedMatch.id || null,
+        matchId:
+          validatedMatch.id || null,
         matchName:
           validatedMatch.public_name ||
           validatedMatch.request_name ||
           validatedMatch.owner_name ||
           "Base validée",
-        distanceM: Math.round(validatedDistance * 10) / 10
+        distanceM:
+          Math.round(
+            validatedDistance * 10
+          ) / 10
       };
     }
 
@@ -154,16 +269,36 @@ function classifyFlagpoles(flagpoles, zones, requests) {
     let pendingDistance = Infinity;
 
     for (const request of requestRows) {
-      const coordinates = getCoordinates(request);
-      if (!coordinates) continue;
+      const coordinates =
+        getCoordinates(request);
+
+      if (!coordinates) {
+        continue;
+      }
 
       const radius = Math.min(
         60,
-        Math.max(1, Number(request?.radius_m ?? request?.radiusM ?? 60) || 60)
+        Math.max(
+          1,
+          Number(
+            request?.radius_m ??
+              request?.radiusM ??
+              60
+          ) || 60
+        )
       );
-      const distance = distance2d(flagpole.x, flagpole.z, coordinates.x, coordinates.z);
 
-      if (distance <= radius && distance < pendingDistance) {
+      const distance = distance2d(
+        flagpole.x,
+        flagpole.z,
+        coordinates.x,
+        coordinates.z
+      );
+
+      if (
+        distance <= radius &&
+        distance < pendingDistance
+      ) {
         pendingDistance = distance;
         pendingMatch = request;
       }
@@ -174,9 +309,15 @@ function classifyFlagpoles(flagpoles, zones, requests) {
         ...flagpole,
         state: "pending",
         matchType: "request",
-        matchId: pendingMatch.id || null,
-        matchName: pendingMatch.request_name || "Demande en attente",
-        distanceM: Math.round(pendingDistance * 10) / 10
+        matchId:
+          pendingMatch.id || null,
+        matchName:
+          pendingMatch.request_name ||
+          "Demande en attente",
+        distanceM:
+          Math.round(
+            pendingDistance * 10
+          ) / 10
       };
     }
 
@@ -192,11 +333,27 @@ function classifyFlagpoles(flagpoles, zones, requests) {
 
   return {
     flagpoles: classified,
+
     stats: {
       total: classified.length,
-      validated: classified.filter((item) => item.state === "validated").length,
-      pending: classified.filter((item) => item.state === "pending").length,
-      orphan: classified.filter((item) => item.state === "orphan").length
+
+      validated:
+        classified.filter(
+          (item) =>
+            item.state === "validated"
+        ).length,
+
+      pending:
+        classified.filter(
+          (item) =>
+            item.state === "pending"
+        ).length,
+
+      orphan:
+        classified.filter(
+          (item) =>
+            item.state === "orphan"
+        ).length
     }
   };
 }

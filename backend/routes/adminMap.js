@@ -224,7 +224,7 @@ router.get("/", async (req, res, next) => {
     const rawZones = Array.isArray(zones) ? zones : [];
     const safeZones = dedupeValidatedZones(rawZones);
     const safeRequests = Array.isArray(requests) ? requests : [];
-    const snapshot = flagpoleSnapshotService.loadSnapshot();
+    const snapshot = await flagpoleSnapshotService.loadSnapshot();
     const classified = flagpoleSnapshotService.classifyFlagpoles(
       snapshot.flagpoles,
       safeZones,

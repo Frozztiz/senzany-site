@@ -194,7 +194,7 @@ exports.flagpoles = async (req, res) => {
       });
     }
 
-    const snapshot = flagpoleSnapshotService.saveSnapshot({
+    const snapshot = await flagpoleSnapshotService.saveSnapshot({
       agentId,
       flagpoles
     });
