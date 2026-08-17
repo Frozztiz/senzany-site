@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const SERVER_ADDRESS = "208.115.196.109:2302";
+  const SERVER_ADDRESS = "g02.fiveminehosting.com:30120";
 
   const slots = document.getElementById("slotsInfo");
   const map = document.getElementById("serverMap");
@@ -141,7 +141,7 @@
 
       const players = Number(data?.players);
       const maxPlayers =
-        Number(data?.maxPlayers) || 50;
+        Number(data?.maxPlayers) || 64;
 
       if (
         !data?.online ||

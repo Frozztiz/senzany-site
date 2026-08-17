@@ -106,7 +106,7 @@
             <div class="site-footer-v2__socials" aria-label="Liens externes Senzany">
               <a href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Discord officiel</a>
               <a href="https://top-serveurs.net/dayz/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" rel="noopener" target="_blank">Top-Serveurs</a>
-              <a href="steam://connect/208.115.196.109:2302">Se connecter</a>
+              <a href="steam://connect/g02.fiveminehosting.com:30120">Se connecter</a>
             </div>
           </section>
 
@@ -132,8 +132,8 @@
 
             <div class="site-footer-v2__column site-footer-v2__server-column">
               <h4>Serveur DayZ</h4>
-              <span class="site-footer-v2__server-address">208.115.196.109:2302</span>
-              <a class="site-footer-v2__server-connect" href="steam://connect/208.115.196.109:2302">Se connecter au serveur</a>
+              <span class="site-footer-v2__server-address">g02.fiveminehosting.com:30120</span>
+              <a class="site-footer-v2__server-connect" href="steam://connect/g02.fiveminehosting.com:30120">Se connecter au serveur</a>
               <a class="site-footer-v2__hosting-link" href="https://fiveminehosting.com/index.php" rel="noopener" target="_blank">Hébergé en partenariat avec FiveMine Hosting ↗</a>
               <span class="site-footer-v2__portal-info"><small>Portail</small>Version 1.0</span>
             </div>
