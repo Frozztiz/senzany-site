@@ -1,7 +1,7 @@
 // Interroge l'API Steam (liste des serveurs de jeu) pour récupérer le
 // nombre réel de joueurs connectés sur le serveur Senzany, en direct.
 
-const SERVER_ADDR = "208.115.196.109:2302";
+const SERVER_ADDR = "g02.fiveminehosting.com:30120";
 
 exports.handler = async function () {
   const apiKey = process.env.STEAM_API_KEY;
