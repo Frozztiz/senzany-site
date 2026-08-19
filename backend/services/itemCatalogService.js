@@ -712,31 +712,24 @@ async function upsertImportedItems(items, batchSize = 300) {
     if (error) throw error;
   }
 
-  const staleIds = [];
+  // Un import est cumulatif :
+  // les objets absents du ZIP courant ne doivent PAS être désactivés.
+  // On désactive uniquement les doublons de casse des classnames
+  // réellement présents dans cet import.
   const caseDuplicateIds = [];
 
   for (const row of existingRows) {
     if (row.is_active === false) continue;
 
     const key = String(row.classname || "").trim().toLowerCase();
-    if (!key) continue;
-
-    if (!incomingKeys.has(key)) {
-      staleIds.push(row.id);
-      continue;
-    }
+    if (!key || !incomingKeys.has(key)) continue;
 
     if (!canonicalIds.has(String(row.id))) {
       caseDuplicateIds.push(row.id);
     }
   }
 
-  const staleDeactivated = await setItemsActiveStateByIds(
-    supabase,
-    staleIds,
-    false,
-    batchSize
-  );
+  const staleDeactivated = 0;
 
   const caseDuplicatesDeactivated = await setItemsActiveStateByIds(
     supabase,
