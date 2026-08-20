@@ -10,10 +10,10 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;background:var(--bg);color:var(--paper);font-family:Arial,Helvetica,sans-serif}
-body{overflow:hidden}
+body{overflow-x:hidden;overflow-y:auto}
 button,a{font:inherit}
 
-.experience{position:relative;min-height:100vh;overflow:hidden;background:#020202}
+.experience{position:relative;min-height:100vh;overflow-x:hidden;overflow-y:visible;background:#020202}
 .ambient{position:absolute;inset:0;overflow:hidden}
 .ambient__red{position:absolute;inset:-20%;background:
   radial-gradient(circle at 72% 26%,rgba(181,34,30,.20),transparent 19%),
@@ -76,7 +76,7 @@ button,a{font:inherit}
 .cinematic__flash.flash{animation:flash .55s ease}
 @keyframes flash{0%{opacity:0}20%{opacity:.82}100%{opacity:0}}
 
-.countdown-screen{position:relative;z-index:20;min-height:100vh;display:grid;grid-template-rows:auto 1fr auto;padding:30px 5vw 27px;opacity:0;transform:scale(1.018);transition:opacity 1.2s ease,transform 1.2s ease}
+.countdown-screen{position:relative;z-index:20;min-height:100vh;display:grid;grid-template-rows:auto 1fr auto;padding:30px 5vw 27px;opacity:0;transform:scale(1.018);transition:opacity 1.2s ease,transform 1.2s ease;overflow:visible}
 .countdown-screen.is-visible{opacity:1;transform:none}
 .header,.footer{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between}
 .header__brand strong{display:block;font-size:23px;letter-spacing:.12em}
@@ -128,47 +128,4 @@ button,a{font:inherit}
   .countdown{display:grid;grid-template-columns:1fr 1fr;gap:8px}.countdown>b{display:none}.unit{min-width:0}
   .countdown-screen h2,.scene h2{font-size:clamp(60px,19vw,98px)}.brand-reveal__title{font-size:clamp(80px,24vw,140px)}
   .countdown-info,.footer{align-items:flex-start;flex-direction:column}.header__status{display:none}
-}
-
-/* ===== AFFLUENCE EN DIRECT ===== */
-.live-presence{
-  margin-top:22px;
-  max-width:600px;
-  display:grid;
-  grid-template-columns:auto auto 1fr;
-  align-items:center;
-  gap:14px;
-  padding:15px 17px;
-  border:1px solid rgba(181,43,40,.24);
-  background:linear-gradient(90deg,rgba(123,18,18,.10),rgba(7,7,7,.55));
-}
-.live-presence__icon{
-  width:32px;height:32px;display:grid;place-items:center;
-  border:1px solid rgba(45,224,132,.22);
-  background:rgba(45,224,132,.04);
-}
-.live-presence__icon span{
-  width:8px;height:8px;border-radius:50%;
-  background:#2de084;
-  box-shadow:0 0 0 0 rgba(45,224,132,.48);
-  animation:presencePulse 1.7s infinite;
-}
-.live-presence__copy{display:flex;align-items:baseline;gap:9px}
-.live-presence__copy strong{
-  font-size:25px;line-height:1;color:#f0ebe6;letter-spacing:-.04em;
-}
-.live-presence__copy span{
-  color:#aaa19c;font-size:9px;letter-spacing:.19em;font-weight:900;
-}
-.live-presence small{
-  justify-self:end;color:#665f5b;font-size:8px;letter-spacing:.17em;font-weight:900;
-}
-@keyframes presencePulse{
-  70%{box-shadow:0 0 0 8px rgba(45,224,132,0)}
-  100%{box-shadow:0 0 0 0 rgba(45,224,132,0)}
-}
-@media(max-width:780px){
-  .live-presence{grid-template-columns:auto 1fr}
-  .live-presence small{grid-column:1/-1;justify-self:start}
-  .live-presence__copy{flex-wrap:wrap}
 }
