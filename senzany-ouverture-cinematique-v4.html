@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#020202">
+  <meta name="description" content="Ouverture publique du portail Senzany — 21 août 2026 à 15h00.">
+  <title>SENZANY — Ouverture publique</title>
+  <link rel="stylesheet" href="assets/css/cinematique-v4.css">
+</head>
+<body>
+  <main class="experience" id="experience">
+
+    <div class="ambient" aria-hidden="true">
+      <div class="ambient__red"></div>
+      <div class="ambient__fog ambient__fog--1"></div>
+      <div class="ambient__fog ambient__fog--2"></div>
+      <div class="ambient__embers" id="embers"></div>
+      <div class="ambient__grid"></div>
+      <div class="ambient__grain"></div>
+      <div class="ambient__vignette"></div>
+    </div>
+
+    <button class="skip" id="skipIntro" type="button">PASSER L'INTRO</button>
+
+    <section class="cinematic" id="cinematic" aria-label="Introduction Senzany">
+      <div class="bars" aria-hidden="true"></div>
+
+      <article class="scene scene--01">
+        <p class="micro">21 AOÛT 2026</p>
+        <h2>UN NOUVEAU<br><span>CHAPITRE.</span></h2>
+      </article>
+
+      <article class="scene scene--02">
+        <p class="micro">APRÈS DES MOIS DE TRAVAIL</p>
+        <h2>LE PORTAIL<br><span>PREND VIE.</span></h2>
+      </article>
+
+      <article class="scene scene--03">
+        <div class="brand-reveal">
+          <div class="brand-reveal__line"></div>
+          <h1 class="brand-reveal__title">SENZANY</h1>
+          <p>VOICI LE RÉCIT DE VOTRE MORT</p>
+        </div>
+      </article>
+
+      <article class="scene scene--04">
+        <div class="features">
+          <span>PROFILS</span>
+          <i></i>
+          <span>VOTES</span>
+          <i></i>
+          <span>LIVRAISONS</span>
+          <i></i>
+          <span>ÉVÉNEMENTS</span>
+          <i></i>
+          <span>BATTLE PASS</span>
+        </div>
+      </article>
+
+      <article class="scene scene--05">
+        <p class="micro">OUVERTURE PUBLIQUE</p>
+        <h2>RENDEZ-VOUS<br><span>À 15H00.</span></h2>
+      </article>
+
+      <div class="cinematic__flash" id="introFlash" aria-hidden="true"></div>
+    </section>
+
+    <section class="countdown-screen" id="countdownScreen" aria-labelledby="countdownTitle">
+      <header class="header">
+        <div class="header__brand">
+          <strong>SENZANY</strong>
+          <span>PORTAIL OFFICIEL</span>
+        </div>
+        <div class="header__status"><i></i> SYSTÈME PRÊT</div>
+      </header>
+
+      <div class="countdown-screen__inner">
+        <div class="countdown-screen__copy">
+          <p class="eyebrow">OUVERTURE PUBLIQUE // 21.08.2026</p>
+          <h2 id="countdownTitle">LE PORTAIL<br><span>S'OUVRE BIENTÔT.</span></h2>
+          <p class="lead">
+            La nouvelle expérience Senzany sera accessible à tous<br>
+            le <strong>vendredi 21 août 2026 à 15H00</strong>.
+          </p>
+        </div>
+
+        <div class="countdown-wrap">
+          <div class="countdown" id="countdown" aria-live="polite">
+            <article class="unit">
+              <strong id="days">00</strong>
+              <span>JOURS</span>
+            </article>
+            <b>:</b>
+            <article class="unit">
+              <strong id="hours">00</strong>
+              <span>HEURES</span>
+            </article>
+            <b>:</b>
+            <article class="unit">
+              <strong id="minutes">00</strong>
+              <span>MINUTES</span>
+            </article>
+            <b>:</b>
+            <article class="unit unit--seconds">
+              <strong id="seconds">00</strong>
+              <span>SECONDES</span>
+            </article>
+          </div>
+
+          <div class="countdown-info">
+            <span><i></i> COMPTE À REBOURS SYNCHRONISÉ</span>
+            <span id="parisClock">PARIS // --:--:--</span>
+          </div>
+
+          <div class="progress">
+            <div class="progress__top">
+              <span>DÉPLOIEMENT DU PORTAIL</span>
+              <strong id="progressText">0%</strong>
+            </div>
+            <div class="progress__track"><span id="progressBar"></span></div>
+          </div>
+        </div>
+
+        <section class="opened" id="opened" hidden>
+          <p><i></i> ACCÈS PUBLIC AUTORISÉ</p>
+          <h3>LE PORTAIL EST OUVERT.</h3>
+          <span>Bienvenue dans le nouveau chapitre de Senzany.</span>
+          <a href="https://senzany.com/">ENTRER SUR SENZANY <b>↗</b></a>
+        </section>
+      </div>
+
+      <footer class="footer">
+        <span>SENZANY // PVE FRANÇAIS // CHERNARUS+</span>
+        <span>VOICI LE RÉCIT DE VOTRE MORT</span>
+      </footer>
+    </section>
+  </main>
+
+  <script src="assets/js/cinematique-v4.js"></script>
+</body>
+</html>
