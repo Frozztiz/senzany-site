@@ -4,7 +4,7 @@
   const PAGE_DATA = {
     seasonStartDate: "2026-08-09T00:00:00",
     nextWipeDate: "2026-08-21",
-    eventDate: "2026-08-21T00:00:00",
+    eventDate: "2026-08-21T18:00:00+02:00",
   };
 
   const setText = (id, value) => {
@@ -37,7 +37,7 @@
     );
 
     if (eventTime) {
-      eventTime.textContent = "Wipe officiel — 00h00";
+      eventTime.textContent = "Wipe officiel — 18h00";
     }
   }
 
