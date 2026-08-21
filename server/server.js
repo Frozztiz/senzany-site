@@ -8,25 +8,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use((req, res, next) => {
-    const startedAt = Date.now();
-
-    res.on("finish", () => {
-        console.log(
-            new Date().toISOString(),
-            req.method,
-            req.url,
-            "STATUS:",
-            res.statusCode,
-            "DUREE:",
-            Date.now() - startedAt,
-            "ms"
-        );
-    });
-
-    next();
-});
-
 
 // Présence web anonyme : un identifiant temporaire par navigateur.
 // Aucune IP ni donnée personnelle n'est conservée.
@@ -35,8 +16,11 @@ const presenceVisitors = new Map();
 
 function cleanupPresence() {
   const cutoff = Date.now() - PRESENCE_TTL_MS;
+
   for (const [visitorId, lastSeen] of presenceVisitors.entries()) {
-    if (lastSeen < cutoff) presenceVisitors.delete(visitorId);
+    if (lastSeen < cutoff) {
+      presenceVisitors.delete(visitorId);
+    }
   }
 }
 
@@ -44,16 +28,19 @@ app.post("/api/presence/ping", (req, res) => {
   const visitorId = String(req.body?.visitorId || "").trim();
 
   if (!/^[a-zA-Z0-9_-]{16,80}$/.test(visitorId)) {
-    return res.status(400).json({ error: "Identifiant de présence invalide." });
+    return res.status(400).json({
+      error: "Identifiant de présence invalide.",
+    });
   }
 
   cleanupPresence();
   presenceVisitors.set(visitorId, Date.now());
 
+  res.set("Cache-Control", "no-store");
   res.json({
     ok: true,
     online: presenceVisitors.size,
-    ttlSeconds: Math.floor(PRESENCE_TTL_MS / 1000)
+    ttlSeconds: Math.floor(PRESENCE_TTL_MS / 1000),
   });
 });
 
@@ -63,7 +50,7 @@ app.get("/api/presence", (req, res) => {
   res.set("Cache-Control", "no-store");
   res.json({
     ok: true,
-    online: presenceVisitors.size
+    online: presenceVisitors.size,
   });
 });
 
@@ -73,82 +60,16 @@ app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
     service: "Senzany API",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
 app.use("/api/topserveurs", require("./routes/topserveurs"));
-app.use("/api/vote-wallet", require("./routes/voteWallet"));
 app.use("/api/discord", require("./routes/discord"));
 app.use("/api/game", require("./routes/game"));
-app.use("/api/steam", require("./routes/steam"));
-app.use("/api/commandement", require("./routes/commandement"));
-app.use(
-  "/api/rcon",
-  require("./middleware/commandAuth"),
-  require("./routes/rcon")
-);
-app.use("/api/delivery-agent", require("./routes/deliveryAgent"));
-app.use(
-  "/api/admin/deliveries",
-  require("./middleware/commandAuth"),
-  require("./routes/adminDeliveries")
-);
-app.use(
-  "/api/admin/items",
-  require("./middleware/commandAuth"),
-  require("./routes/adminItems")
-);
-app.use(
-  "/api/admin/rewards",
-  require("./middleware/commandAuth"),
-  require("./routes/adminRewards")
-);
-app.use(
-  "/api/admin/monthly-votes",
-  require("./middleware/commandAuth"),
-  require("./routes/adminMonthlyVotes")
-);
-
-app.use(
-  "/api/admin/events",
-  require("./middleware/commandAuth"),
-  require("./routes/adminEvents")
-);
-
-app.use(
-  "/api/admin/battle-pass",
-  require("./middleware/commandAuth"),
-  require("./routes/adminBattlePass")
-);
-
-app.use("/api/battle-pass", require("./routes/battlePass"));
-
-app.use("/api/map", require("./routes/mapPublic"));
-
-app.use(
-  "/api/admin/map",
-  require("./middleware/commandAuth"),
-  require("./routes/adminMap")
-);
-
-app.use((req, res) => {
-  res.status(404).json({
-    error: "Route API introuvable."
-  });
-});
-
-app.use((error, req, res, next) => {
-  console.error("Erreur API Senzany :", error);
-
-  res.status(500).json({
-    error: "Erreur interne du serveur."
-  });
-});
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "127.0.0.1", () => {
   console.log(`Senzany API démarrée sur le port ${PORT}`);
-  require("./services/monthlyVoteRewardService").startScheduler();
 });
