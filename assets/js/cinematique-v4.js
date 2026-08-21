@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  const OPENING_DATE = new Date("2026-08-21T15:00:00+02:00");
+  const OPENING_DATE = new Date("2026-08-21T18:00:00+02:00");
   const PREP_START = new Date("2026-08-20T00:00:00+02:00");
   const INTRO_DURATION = 18000;
 
@@ -19,9 +19,7 @@
     seconds: document.getElementById("seconds"),
     progressBar: document.getElementById("progressBar"),
     progressText: document.getElementById("progressText"),
-    parisClock: document.getElementById("parisClock"),
-    livePresenceCount: document.getElementById("livePresenceCount"),
-    livePresenceLabel: document.getElementById("livePresenceLabel")
+    parisClock: document.getElementById("parisClock")
   };
 
   let introFinished = false;
@@ -79,48 +77,6 @@
     els.parisClock.textContent = `PARIS // ${time}`;
   }
 
-
-  function getPresenceVisitorId() {
-    const storageKey = "senzany_presence_id";
-    let visitorId = localStorage.getItem(storageKey);
-
-    if (!visitorId) {
-      if (window.crypto?.randomUUID) {
-        visitorId = window.crypto.randomUUID().replace(/-/g, "");
-      } else {
-        visitorId = `${Date.now().toString(36)}_${Math.random().toString(36).slice(2)}_${Math.random().toString(36).slice(2)}`;
-      }
-      localStorage.setItem(storageKey, visitorId);
-    }
-
-    return visitorId;
-  }
-
-  async function pingPresence() {
-    try {
-      const response = await fetch("/api/presence/ping", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        cache: "no-store",
-        body: JSON.stringify({ visitorId: getPresenceVisitorId() })
-      });
-
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-      const data = await response.json();
-      const online = Number.isFinite(Number(data.online)) ? Number(data.online) : 0;
-
-      if (els.livePresenceCount) els.livePresenceCount.textContent = String(online);
-      if (els.livePresenceLabel) {
-        els.livePresenceLabel.textContent =
-          online === 1 ? "PERSONNE PRÉSENTE" : "PERSONNES PRÉSENTES";
-      }
-    } catch (error) {
-      console.warn("Présence Senzany indisponible :", error);
-      if (els.livePresenceCount) els.livePresenceCount.textContent = "—";
-    }
-  }
-
   function updateCountdown() {
     const now = Date.now();
     const diff = OPENING_DATE.getTime() - now;
@@ -152,11 +108,9 @@
 
   updateCountdown();
   updateParisClock();
-  pingPresence();
 
   window.setInterval(updateCountdown, 1000);
   window.setInterval(updateParisClock, 1000);
-  window.setInterval(pingPresence, 20 * 1000);
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     finishIntro();
