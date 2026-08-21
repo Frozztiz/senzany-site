@@ -100,6 +100,8 @@ app.use(
   require("./routes/adminMonthlyVotes")
 );
 
+app.use("/api/events", require("./routes/events"));
+
 app.use(
   "/api/admin/events",
   require("./middleware/commandAuth"),
