@@ -97,27 +97,66 @@
   }
 
   async function pingPresence() {
+    const updatePresenceDisplay = (online) => {
+      const count = Number.isFinite(Number(online)) ? Number(online) : 0;
+
+      if (els.livePresenceCount) {
+        els.livePresenceCount.textContent = String(count);
+      }
+
+      if (els.livePresenceLabel) {
+        els.livePresenceLabel.textContent =
+          count === 1 ? "PERSONNE PRÉSENTE" : "PERSONNES PRÉSENTES";
+      }
+    };
+
     try {
       const response = await fetch("/api/presence/ping", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         cache: "no-store",
-        body: JSON.stringify({ visitorId: getPresenceVisitorId() })
+        credentials: "same-origin",
+        body: JSON.stringify({
+          visitorId: getPresenceVisitorId()
+        })
       });
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`POST /api/presence/ping : HTTP ${response.status}`);
+      }
 
       const data = await response.json();
-      const online = Number.isFinite(Number(data.online)) ? Number(data.online) : 0;
+      updatePresenceDisplay(data.online);
+      return;
+    } catch (postError) {
+      console.warn("Ping présence indisponible, lecture du compteur :", postError);
+    }
 
-      if (els.livePresenceCount) els.livePresenceCount.textContent = String(online);
-      if (els.livePresenceLabel) {
-        els.livePresenceLabel.textContent =
-          online === 1 ? "PERSONNE PRÉSENTE" : "PERSONNES PRÉSENTES";
+    try {
+      const response = await fetch(`/api/presence?_=${Date.now()}`, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json"
+        },
+        cache: "no-store",
+        credentials: "same-origin"
+      });
+
+      if (!response.ok) {
+        throw new Error(`GET /api/presence : HTTP ${response.status}`);
       }
+
+      const data = await response.json();
+      updatePresenceDisplay(data.online);
     } catch (error) {
       console.warn("Présence Senzany indisponible :", error);
-      if (els.livePresenceCount) els.livePresenceCount.textContent = "—";
+
+      if (els.livePresenceCount) {
+        els.livePresenceCount.textContent = "—";
+      }
     }
   }
 
