@@ -3,8 +3,8 @@
 
   const PAGE_DATA = {
     seasonStartDate: "2026-08-09T00:00:00",
-    nextWipeDate: "2026-08-21",
-    eventDate: "2026-08-21T18:00:00+02:00",
+    nextWipeDate: "2026-08-23",
+    eventDate: "2026-08-23T18:00:00+02:00",
   };
 
   const setText = (id, value) => {
@@ -20,7 +20,7 @@
       `${PAGE_DATA.nextWipeDate}T00:00:00`
     );
 
-    setText("hero-countdown-title", "21 août 2026");
+    setText("hero-countdown-title", "23 août 2026");
     setText("statPlayers", "Connexion…");
     setText("statVotes", "—");
 
@@ -37,7 +37,7 @@
     );
 
     if (eventTime) {
-      eventTime.textContent = "Wipe officiel — 18h00";
+      eventTime.textContent = "Ouverture Saison 4 — 18h00";
     }
   }
 
