@@ -1,4 +1,5 @@
 const express = require("express");
+const { randomUUID } = require("crypto");
 const { createClient } = require("@supabase/supabase-js");
 const router = express.Router();
 
@@ -55,6 +56,97 @@ router.post("/",async(req,res)=>{try{
   const {data,error}=await db().from("events").insert(p).select("*").single();
   if(error)return fail(res,error); res.status(201).json({event:norm(data)});
 }catch(e){ if(/obligatoire/i.test(e?.message||""))return res.status(400).json({error:e.message}); fail(res,e)}});
+
+router.post(
+  "/upload-image",
+  express.raw({
+    type: ["image/jpeg", "image/png", "image/webp"],
+    limit: "5mb"
+  }),
+  async (req, res) => {
+    try {
+      const contentType = String(req.headers["content-type"] || "")
+        .split(";")[0]
+        .trim()
+        .toLowerCase();
+
+      const extensions = {
+        "image/jpeg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp"
+      };
+
+      const extension = extensions[contentType];
+      if (!extension) {
+        return res.status(415).json({
+          error: "Format d'image non accepté. Utilise JPG, PNG ou WEBP."
+        });
+      }
+
+      if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+        return res.status(400).json({
+          error: "Aucune image reçue."
+        });
+      }
+
+      if (req.body.length > 5 * 1024 * 1024) {
+        return res.status(413).json({
+          error: "L'image dépasse la limite de 5 Mo."
+        });
+      }
+
+      const bucketName = String(
+        process.env.EVENT_IMAGES_BUCKET || "event-images"
+      ).trim();
+
+      const safeOriginalName = String(req.query.filename || "event")
+        .replace(/[^a-zA-Z0-9._-]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 80);
+
+      const baseName =
+        safeOriginalName.replace(/\.[^.]+$/, "") || "event";
+
+      const objectPath =
+        `events/${Date.now()}-${randomUUID()}-${baseName}.${extension}`;
+
+      const client = db();
+      const { error } = await client.storage
+        .from(bucketName)
+        .upload(objectPath, req.body, {
+          contentType,
+          cacheControl: "31536000",
+          upsert: false
+        });
+
+      if (error) return fail(res, error);
+
+      const { data } = client.storage
+        .from(bucketName)
+        .getPublicUrl(objectPath);
+
+      const url = data?.publicUrl;
+      if (!url) {
+        return res.status(500).json({
+          error: "URL publique de l'image introuvable."
+        });
+      }
+
+      return res.status(201).json({
+        ok: true,
+        url,
+        path: objectPath
+      });
+    } catch (e) {
+      if (e?.type === "entity.too.large") {
+        return res.status(413).json({
+          error: "L'image dépasse la limite de 5 Mo."
+        });
+      }
+      return fail(res, e);
+    }
+  }
+);
 
 router.get("/:id",async(req,res)=>{try{
   const {data,error}=await db().from("events").select("*").eq("id",req.params.id).maybeSingle();
