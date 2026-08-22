@@ -1,0 +1,20 @@
+SENZANY — JOURNAL AUTOMATIQUE V2
+
+À partir de cette version, seuls les commits préfixés sont ajoutés automatiquement :
+
+[FEATURE] Titre de la nouveauté
+[FIX] Titre du correctif
+[SYSTEM] Titre de la modification système
+
+Dans GitHub Desktop :
+- Summary = le titre avec son préfixe.
+- Description = l'explication qui apparaîtra dans le journal.
+
+Exemple :
+Summary:
+[FEATURE] Ajout recherche joueurs
+
+Description:
+Ajout d'une recherche par pseudo et SteamID dans le Centre de Commandement.
+
+Les commits sans préfixe (up, ok, test, etc.) sont ignorés.

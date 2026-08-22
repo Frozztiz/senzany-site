@@ -1,0 +1,104 @@
+name: Journal automatique Senzany
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  changelog:
+    # Évite la boucle quand ce workflow crée son propre commit.
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Ajouter le commit au journal si nécessaire
+        id: changelog
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          COMMIT_DATE: ${{ github.event.head_commit.timestamp }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          from datetime import datetime
+
+          message = os.environ.get("COMMIT_MESSAGE", "").replace("\r\n", "\n")
+          lines = message.split("\n")
+          subject = lines[0].strip() if lines else ""
+          body = "\n".join(lines[1:]).strip()
+
+          match = re.match(r"^\[(FEATURE|FIX|SYSTEM)\]\s+(.+)$", subject, re.I)
+          if not match:
+              print("Commit ignoré : pas de préfixe [FEATURE], [FIX] ou [SYSTEM].")
+              Path("/tmp/changelog_changed").write_text("0")
+              raise SystemExit(0)
+
+          type_map = {
+              "FEATURE": "feature",
+              "FIX": "fix",
+              "SYSTEM": "system",
+          }
+
+          change_type = type_map[match.group(1).upper()]
+          title = match.group(2).strip()
+          description = body or title
+
+          raw_date = os.environ.get("COMMIT_DATE", "")
+          try:
+              date = datetime.fromisoformat(raw_date.replace("Z", "+00:00")).date().isoformat()
+          except Exception:
+              date = datetime.utcnow().date().isoformat()
+
+          sha = os.environ.get("COMMIT_SHA", "")
+          path = Path("data/updates.json")
+          if path.exists():
+              payload = json.loads(path.read_text(encoding="utf-8"))
+          else:
+              payload = {"version": 2, "entries": []}
+
+          entries = payload.setdefault("entries", [])
+
+          # Idempotence : ne jamais ajouter deux fois le même commit.
+          if any(entry.get("commit") == sha for entry in entries):
+              print("Commit déjà présent dans le journal.")
+              Path("/tmp/changelog_changed").write_text("0")
+              raise SystemExit(0)
+
+          entries.append({
+              "date": date,
+              "type": change_type,
+              "title": title,
+              "description": description,
+              "details": [],
+              "commit": sha
+          })
+
+          entries.sort(key=lambda x: x.get("date", ""), reverse=True)
+          payload["version"] = 2
+          payload["updatedAt"] = date
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+          Path("/tmp/changelog_changed").write_text("1")
+          print(f"Ajouté au journal : {change_type} — {title}")
+          PY
+
+          echo "changed=$(cat /tmp/changelog_changed)" >> "$GITHUB_OUTPUT"
+
+      - name: Enregistrer le journal
+        if: steps.changelog.outputs.changed == '1'
+        run: |
+          git config user.name "Senzany Changelog Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/updates.json
+          git commit -m "[skip changelog] Mise à jour automatique du journal"
+          git push

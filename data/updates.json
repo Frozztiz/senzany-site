@@ -1,0 +1,270 @@
+{
+  "version": 2,
+  "updatedAt": "2026-08-22",
+  "entries": [
+    {
+      "date": "2026-08-22",
+      "type": "feature",
+      "title": "Historique individuel des cagnottes",
+      "description": "Ajout du journal de cagnotte par SteamID dans le profil joueur et dans le centre de gestion des votes.",
+      "details": [
+        "Détail des crédits de vote",
+        "Affichage des réclamations",
+        "Solde, gains cumulés et montant réclamé côté Commandement"
+      ]
+    },
+    {
+      "date": "2026-08-22",
+      "type": "fix",
+      "title": "Correction du calcul des cagnottes de votes",
+      "description": "Correction de la baseline lors de l'association d'un nouveau pseudo afin d'éviter de créditer rétroactivement des votes déjà comptabilisés.",
+      "details": []
+    },
+    {
+      "date": "2026-08-22",
+      "type": "feature",
+      "title": "Centre de gestion des votes",
+      "description": "Suivi centralisé des votes Top-Serveurs avec joueurs identifiés, pseudos non reliés et classement global.",
+      "details": []
+    },
+    {
+      "date": "2026-08-22",
+      "type": "system",
+      "title": "Journal des mises à jour",
+      "description": "Création du module 07 dans le Centre de Commandement pour conserver une vision claire des fonctionnalités et patchs déployés sur Senzany.",
+      "details": []
+    },
+    {
+      "date": "2026-08-20",
+      "type": "feature",
+      "title": "Page d'ouverture du portail",
+      "description": "Ajout d'une page dédiée à l'ouverture de Senzany afin de préparer et accompagner la mise en ligne publique du portail.",
+      "details": []
+    },
+    {
+      "date": "2026-08-20",
+      "type": "system",
+      "title": "API de présence visiteurs",
+      "description": "Ajout d'une API de présence pour suivre le nombre de visiteurs présents sur le portail.",
+      "details": []
+    },
+    {
+      "date": "2026-08-19",
+      "type": "system",
+      "title": "Migration de la configuration serveur FiveMine",
+      "description": "Adaptation de la configuration du portail au nouvel environnement d'hébergement FiveMine.",
+      "details": []
+    },
+    {
+      "date": "2026-08-17",
+      "type": "system",
+      "title": "Migration des mâts vers Supabase",
+      "description": "Migration des données de flagpoles vers Supabase afin de centraliser les informations utilisées par le Commandement et la carte.",
+      "details": []
+    },
+    {
+      "date": "2026-08-16",
+      "type": "feature",
+      "title": "Battle Pass",
+      "description": "Première intégration du module Battle Pass au portail et au Centre de Commandement.",
+      "details": []
+    },
+    {
+      "date": "2026-08-09",
+      "type": "feature",
+      "title": "Carte interactive Senzany",
+      "description": "Ajout d'une nouvelle carte interactive de Chernarus avec tuiles et routes, puis évolution du système de gestion des demandes.",
+      "details": []
+    },
+    {
+      "date": "2026-08-09",
+      "type": "feature",
+      "title": "Validation des demandes sur la carte",
+      "description": "Évolution de la carte Senzany avec un système de suivi et de validation des demandes d'implantation.",
+      "details": []
+    },
+    {
+      "date": "2026-08-08",
+      "type": "system",
+      "title": "Refonte visuelle du portail",
+      "description": "Déploiement d'une nouvelle génération visuelle du site Senzany avec plusieurs itérations majeures de l'interface.",
+      "details": []
+    },
+    {
+      "date": "2026-08-04",
+      "type": "feature",
+      "title": "Développement du système Événements",
+      "description": "Mise en place et évolution du module Événements du portail.",
+      "details": []
+    },
+    {
+      "date": "2026-08-03",
+      "type": "system",
+      "title": "Sécurisation de Mon Profil",
+      "description": "Renforcement de la sécurité de la page Mon Profil et poursuite de l'évolution des fonctions liées aux votes.",
+      "details": []
+    },
+    {
+      "date": "2026-08-03",
+      "type": "feature",
+      "title": "Récompenses et classement mensuel",
+      "description": "Évolution du système de récompenses et du classement mensuel associé aux votes.",
+      "details": []
+    },
+    {
+      "date": "2026-08-02",
+      "type": "feature",
+      "title": "Classement des votes",
+      "description": "Mise en place et premières évolutions de l'affichage des votes et du classement mensuel de la communauté.",
+      "details": []
+    },
+    {
+      "date": "2026-07-31",
+      "type": "feature",
+      "title": "Connexion BattlEye RCON",
+      "description": "Connexion du portail au serveur via BattlEye RCON pour récupérer et suivre les joueurs connectés.",
+      "details": [
+        "Suivi des joueurs RCON",
+        "Recherche et fiche joueur",
+        "Compteur de joueurs alimenté par RCON"
+      ]
+    },
+    {
+      "date": "2026-07-31",
+      "type": "fix",
+      "title": "Compteur joueurs via RCON",
+      "description": "Correction du compteur de joueurs affiché sur l'accueil afin de l'alimenter avec les données RCON.",
+      "details": []
+    },
+    {
+      "date": "2026-07-29",
+      "type": "feature",
+      "title": "Catalogue d'objets V2",
+      "description": "Déploiement d'une nouvelle génération du catalogue avec gestionnaire d'objets, filtres, classification et taxonomie complète.",
+      "details": [
+        "Catégories et sous-catégories",
+        "Classification automatique",
+        "Outils Modifier et Copier"
+      ]
+    },
+    {
+      "date": "2026-07-29",
+      "type": "system",
+      "title": "Audit sécurité et structure utilisateurs",
+      "description": "Audit de la sécurité et de la structure des utilisateurs accompagné d'une évolution du profil.",
+      "details": []
+    },
+    {
+      "date": "2026-07-28",
+      "type": "feature",
+      "title": "API Delivery Agent",
+      "description": "Ajout de l'API Delivery Agent pour préparer la communication entre le portail et les systèmes de livraison côté serveur.",
+      "details": []
+    },
+    {
+      "date": "2026-07-28",
+      "type": "system",
+      "title": "Commandement V3",
+      "description": "Nouvelle évolution du Centre de Commandement et de ses outils d'administration.",
+      "details": []
+    },
+    {
+      "date": "2026-07-24",
+      "type": "system",
+      "title": "Nouvelle entrée et cinématique du site",
+      "description": "Déploiement d'une nouvelle entrée du portail avec une nouvelle cinématique et plusieurs évolutions de la page d'accueil.",
+      "details": []
+    },
+    {
+      "date": "2026-07-23",
+      "type": "fix",
+      "title": "Statut serveur DayZ",
+      "description": "Amélioration du statut serveur, correction du nombre de joueurs et du port de requête DayZ.",
+      "details": []
+    },
+    {
+      "date": "2026-07-23",
+      "type": "fix",
+      "title": "Restauration de l'accueil",
+      "description": "Restauration et correction de plusieurs éléments de la page d'accueil, du réseau et du compte à rebours.",
+      "details": []
+    },
+    {
+      "date": "2026-07-21",
+      "type": "feature",
+      "title": "Backend des livraisons",
+      "description": "Ajout du backend nécessaire au système de livraisons joueurs et intégration de Supabase.",
+      "details": []
+    },
+    {
+      "date": "2026-07-21",
+      "type": "system",
+      "title": "Reconstruction du terminal Staff",
+      "description": "Reconstruction du terminal Staff et amélioration du Centre de Commandement avec sécurisation des droits Steam.",
+      "details": []
+    },
+    {
+      "date": "2026-07-21",
+      "type": "fix",
+      "title": "Protection de l'environnement de déploiement",
+      "description": "Protection du fichier d'environnement pendant le déploiement afin de préserver la configuration sensible du backend.",
+      "details": []
+    },
+    {
+      "date": "2026-07-19",
+      "type": "feature",
+      "title": "Terminal Survivant",
+      "description": "Création et évolution du Terminal Survivant, future base de la page de profil du portail.",
+      "details": []
+    },
+    {
+      "date": "2026-07-19",
+      "type": "feature",
+      "title": "Centre de Commandement",
+      "description": "Création puis évolution du terminal Staff jusqu'au Command Center, avec navigation unifiée.",
+      "details": []
+    },
+    {
+      "date": "2026-07-19",
+      "type": "system",
+      "title": "Refonte de l'accueil et de l'identité visuelle",
+      "description": "Refonte importante de l'accueil avec cinématique, ChernarusPlus, ambiance musicale et plusieurs itérations visuelles.",
+      "details": []
+    },
+    {
+      "date": "2026-07-19",
+      "type": "feature",
+      "title": "Refonte des pages Jouer et Communauté",
+      "description": "Nouvelle page Jouer plus immersive et refonte complète de la page Communauté.",
+      "details": []
+    },
+    {
+      "date": "2026-07-18",
+      "type": "system",
+      "title": "Refonte de l'architecture backend",
+      "description": "Réorganisation de l'architecture backend avec séparation des services et contrôleurs, puis ajout des routes de statistiques jeu et Discord.",
+      "details": []
+    },
+    {
+      "date": "2026-07-18",
+      "type": "feature",
+      "title": "Discord dans le profil",
+      "description": "Ajout de l'architecture Discord et affichage des rôles Discord dans le profil joueur.",
+      "details": []
+    },
+    {
+      "date": "2026-07-17",
+      "type": "feature",
+      "title": "Premières statistiques Top-Serveurs",
+      "description": "Création des premières fonctions dédiées aux statistiques Top-Serveurs et premières évolutions de l'accueil.",
+      "details": []
+    },
+    {
+      "date": "2026-07-12",
+      "type": "system",
+      "title": "Naissance du portail Senzany",
+      "description": "Début de l'historique Git du portail Senzany avec les premiers fichiers du projet et la configuration de déploiement.",
+      "details": []
+    }
+  ]
+}
