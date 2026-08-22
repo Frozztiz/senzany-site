@@ -61,9 +61,8 @@ router.post("/aliases", async (req, res) => {
 
   try {
     const requestedAlias = voteAliasService.cleanAlias(req.body?.alias);
-    const baseline = await topServeursService.getPlayerVotes({ aliases: [requestedAlias] });
     const alias = await voteAliasService.addForSteamId(steamId, requestedAlias);
-    await voteWalletService.registerAlias({ aliasEntry: alias, steamId, baselineVotes: Number(baseline.votes || 0) });
+    await voteWalletService.registerAlias({ aliasEntry: alias, steamId, baselineVotes: 0 });
     return res.status(201).json({ alias });
   } catch (error) {
     console.error("Top-Serveurs alias add:", error);
