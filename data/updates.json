@@ -35,6 +35,14 @@
       "details": []
     },
     {
+      "date": "2026-08-22",
+      "type": "system",
+      "title": "Automatisation du journal des mises à jour",
+      "description": "Mise en place de la génération automatique du journal à partir des futurs commits GitHub préfixés.",
+      "details": [],
+      "commit": "e539917a1dedec5b850a1a2fec5a74cc2853160d"
+    },
+    {
       "date": "2026-08-20",
       "type": "feature",
       "title": "Page d'ouverture du portail",
