@@ -1,0 +1,16 @@
+/* SENZANY — RCON : liaison durable GUID BattlEye -> compte Senzany */
+.command-player-identity-linker{margin-top:18px;padding-top:18px;border-top:1px solid rgba(238,231,220,.10)}
+.command-player-member-search{width:100%;min-height:44px;margin-top:12px;padding:0 13px;border:1px solid rgba(238,231,220,.14);background:#0d0b0a;color:var(--paper);font:11px 'IBM Plex Mono';outline:none}
+.command-player-member-search:focus{border-color:rgba(207,153,57,.65);box-shadow:0 0 0 2px rgba(207,153,57,.07)}
+.command-player-member-results{display:grid;gap:7px;max-height:230px;margin-top:10px;overflow:auto}
+.command-player-linker-result{display:flex;align-items:center;justify-content:space-between;gap:15px;width:100%;padding:11px 12px;border:1px solid rgba(238,231,220,.11);background:rgba(255,255,255,.018);color:var(--paper);text-align:left;cursor:pointer}
+.command-player-linker-result:hover{border-color:rgba(207,153,57,.55);background:rgba(207,153,57,.055)}
+.command-player-linker-result span{display:grid;gap:4px;min-width:0}
+.command-player-linker-result strong{font:600 11px 'IBM Plex Mono';overflow:hidden;text-overflow:ellipsis}
+.command-player-linker-result small{font:8px 'IBM Plex Mono';color:var(--muted);letter-spacing:.04em}
+.command-player-linker-result em{flex:0 0 auto;padding:5px 7px;border:1px solid rgba(207,153,57,.32);color:var(--amber);font:600 8px 'IBM Plex Mono';font-style:normal;letter-spacing:.08em}
+.command-player-linker-empty{padding:12px;border:1px dashed rgba(238,231,220,.12);color:var(--muted);font:9px 'IBM Plex Mono'}
+.command-player-linker-empty.is-error{border-color:rgba(209,43,49,.3);color:#e98b8f}
+.command-player-identity-feedback{margin-top:9px;padding:9px 11px;border:1px solid rgba(207,153,57,.25);color:var(--amber);font:9px 'IBM Plex Mono'}
+.command-player-identity-feedback.is-success{border-color:rgba(95,196,118,.35);color:#7fdf98}
+.command-player-identity-feedback.is-error{border-color:rgba(209,43,49,.35);color:#ec8b8f}

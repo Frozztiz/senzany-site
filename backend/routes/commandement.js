@@ -36,12 +36,57 @@ function normalizePlayerName(value) {
     .toLocaleLowerCase("fr-FR");
 }
 
+function portalIdentityFromLink(link, overrides = {}) {
+  if (!link?.steam_id) return null;
+
+  const steamId = String(link.steam_id);
+
+  return {
+    matched: true,
+    steamLinked: true,
+    steamId,
+    steamName: overrides.steamName || null,
+    steamProfileUrl: overrides.steamProfileUrl || null,
+    discordLinked: Boolean(link.discord_id),
+    discordId: link.discord_id ? String(link.discord_id) : null,
+    discordUsername: link.discord_username || null,
+    linkedAt: link.created_at || null,
+    battleyeGuid: link.battleye_guid || null,
+    matchMethod: overrides.matchMethod || "battleye-guid",
+    isStaff: isCommandAuthorized(steamId)
+  };
+}
+
+async function getPortalIdentityByBattleyeGuid(guid) {
+  const cleanGuid = String(guid || "").trim().toLowerCase();
+  if (!/^[a-f0-9]{32}$/.test(cleanGuid)) return null;
+
+  const rows = await supabaseService.request(
+    `user_links?battleye_guid=eq.${encodeURIComponent(cleanGuid)}&select=steam_id,discord_id,discord_username,discord_avatar,created_at,battleye_guid&limit=2`,
+    { method: "GET" }
+  );
+
+  if (!Array.isArray(rows) || rows.length === 0) return null;
+
+  if (rows.length > 1) {
+    return {
+      matched: false,
+      ambiguous: true,
+      matchMethod: "battleye-guid"
+    };
+  }
+
+  return portalIdentityFromLink(rows[0], {
+    matchMethod: "battleye-guid"
+  });
+}
+
 async function getPortalIdentityByPlayerName(playerName) {
   const normalizedTarget = normalizePlayerName(playerName);
   if (!normalizedTarget) return null;
 
   const links = await supabaseService.request(
-    "user_links?select=steam_id,discord_id,discord_username,discord_avatar,created_at&limit=1000",
+    "user_links?select=steam_id,discord_id,discord_username,discord_avatar,created_at,battleye_guid&limit=1000",
     { method: "GET" }
   );
 
@@ -82,7 +127,8 @@ async function getPortalIdentityByPlayerName(playerName) {
   if (matches.length !== 1) {
     return {
       matched: false,
-      ambiguous: matches.length > 1
+      ambiguous: matches.length > 1,
+      matchMethod: "exact-steam-name"
     };
   }
 
@@ -94,19 +140,18 @@ async function getPortalIdentityByPlayerName(playerName) {
 
   if (!link) return null;
 
-  return {
-    matched: true,
-    steamLinked: true,
-    steamId: String(profile.steamid),
+  return portalIdentityFromLink(link, {
     steamName: profile.personaname || null,
     steamProfileUrl: profile.profileurl || null,
-    discordLinked: Boolean(link.discord_id),
-    discordId: link.discord_id ? String(link.discord_id) : null,
-    discordUsername: link.discord_username || null,
-    linkedAt: link.created_at || null,
-    matchMethod: "exact-steam-name",
-    isStaff: isCommandAuthorized(String(profile.steamid))
-  };
+    matchMethod: "exact-steam-name"
+  });
+}
+
+async function getPortalIdentityForPlayer(player) {
+  const byGuid = await getPortalIdentityByBattleyeGuid(player?.guid);
+  if (byGuid?.matched || byGuid?.ambiguous) return byGuid;
+
+  return getPortalIdentityByPlayerName(player?.name);
 }
 
 async function getCurrentPlayer(playerId) {
@@ -878,8 +923,8 @@ router.get(
       }
 
       const identity =
-        await getPortalIdentityByPlayerName(
-          player.name
+        await getPortalIdentityForPlayer(
+          player
         );
 
       return res.json({
@@ -909,6 +954,211 @@ router.get(
           error:
             "Impossible de vérifier la liaison Steam / Discord."
         });
+    }
+  }
+);
+
+router.get(
+  "/players/linkable-members",
+  commandAuth,
+  async (req, res) => {
+    res.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, private"
+    );
+
+    try {
+      const search = String(req.query?.q || "")
+        .trim()
+        .toLocaleLowerCase("fr-FR");
+
+      const rows = await supabaseService.request(
+        "user_links?select=steam_id,discord_id,discord_username,discord_avatar,battleye_guid,created_at&order=discord_username.asc.nullslast&limit=1000",
+        { method: "GET" }
+      );
+
+      const members = (Array.isArray(rows) ? rows : [])
+        .filter((row) => {
+          if (!search) return true;
+
+          return [
+            row.steam_id,
+            row.discord_id,
+            row.discord_username
+          ]
+            .map((value) =>
+              String(value || "")
+                .toLocaleLowerCase("fr-FR")
+            )
+            .some((value) => value.includes(search));
+        })
+        .slice(0, 40)
+        .map((row) => ({
+          steamId: String(row.steam_id || ""),
+          discordId: row.discord_id
+            ? String(row.discord_id)
+            : null,
+          discordUsername:
+            row.discord_username || null,
+          discordAvatar:
+            row.discord_avatar || null,
+          battleyeGuid:
+            row.battleye_guid || null,
+          alreadyLinked:
+            Boolean(row.battleye_guid)
+        }));
+
+      return res.json({
+        ok: true,
+        members
+      });
+    } catch (error) {
+      console.error(
+        "[COMMANDEMENT] Liste des comptes Senzany indisponible :",
+        error?.message || error
+      );
+
+      return res.status(502).json({
+        error:
+          "Impossible de charger les comptes Senzany."
+      });
+    }
+  }
+);
+
+router.post(
+  "/players/:playerId/identity/link",
+  commandAuth,
+  express.json(),
+  async (req, res) => {
+    res.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, private"
+    );
+
+    const steamId = String(
+      req.body?.steamId || ""
+    ).trim();
+
+    if (!/^\d{17}$/.test(steamId)) {
+      return res.status(400).json({
+        error: "SteamID64 invalide."
+      });
+    }
+
+    try {
+      const player =
+        await getCurrentPlayer(
+          req.params.playerId
+        );
+
+      if (!player) {
+        return res.status(404).json({
+          error:
+            "Ce joueur n’est plus connecté."
+        });
+      }
+
+      const guid = String(
+        player.guid || ""
+      )
+        .trim()
+        .toLowerCase();
+
+      if (!/^[a-f0-9]{32}$/.test(guid)) {
+        return res.status(400).json({
+          error:
+            "Le GUID BattlEye du joueur est indisponible."
+        });
+      }
+
+      const [memberRows, guidRows] =
+        await Promise.all([
+          supabaseService.request(
+            `user_links?steam_id=eq.${encodeURIComponent(steamId)}&select=steam_id,discord_id,discord_username,discord_avatar,battleye_guid,created_at&limit=1`,
+            { method: "GET" }
+          ),
+          supabaseService.request(
+            `user_links?battleye_guid=eq.${encodeURIComponent(guid)}&select=steam_id,discord_username,battleye_guid&limit=2`,
+            { method: "GET" }
+          )
+        ]);
+
+      if (
+        !Array.isArray(memberRows) ||
+        memberRows.length === 0
+      ) {
+        return res.status(404).json({
+          error:
+            "Ce compte Senzany n’existe pas."
+        });
+      }
+
+      const conflict = (
+        Array.isArray(guidRows)
+          ? guidRows
+          : []
+      ).find(
+        (row) =>
+          String(row.steam_id) !== steamId
+      );
+
+      if (conflict) {
+        return res.status(409).json({
+          error:
+            `Ce GUID BattlEye est déjà relié au compte ${conflict.discord_username || conflict.steam_id}.`
+        });
+      }
+
+      await supabaseService.request(
+        `user_links?steam_id=eq.${encodeURIComponent(steamId)}`,
+        {
+          method: "PATCH",
+          headers: {
+            Prefer: "return=minimal"
+          },
+          body: JSON.stringify({
+            battleye_guid: guid
+          })
+        }
+      );
+
+      const identity =
+        portalIdentityFromLink(
+          {
+            ...memberRows[0],
+            battleye_guid: guid
+          },
+          {
+            matchMethod:
+              "battleye-guid"
+          }
+        );
+
+      console.warn(
+        `[COMMANDEMENT] Liaison RCON par ${req.commandSteamId || "staff"} : ${player.name} (${guid}) -> ${steamId}`
+      );
+
+      return res.json({
+        ok: true,
+        player: {
+          id: player.id,
+          name: player.name,
+          guid
+        },
+        identity
+      });
+    } catch (error) {
+      console.error(
+        "[COMMANDEMENT] Liaison GUID / compte Senzany échouée :",
+        error?.message || error
+      );
+
+      return res.status(502).json({
+        error:
+          error?.message ||
+          "Impossible d’enregistrer la liaison."
+      });
     }
   }
 );

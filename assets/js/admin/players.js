@@ -33,8 +33,15 @@ const elements = {
     kick: document.getElementById("commandPlayerKick"),
     tempBan: document.getElementById("commandPlayerTempBan"),
     permanentBan: document.getElementById("commandPlayerPermanentBan"),
-    feedback: document.getElementById("commandPlayerActionFeedback")
+    feedback: document.getElementById("commandPlayerActionFeedback"),
+    identityLinker: document.getElementById("commandPlayerIdentityLinker"),
+    memberSearch: document.getElementById("commandPlayerMemberSearch"),
+    memberResults: document.getElementById("commandPlayerMemberResults"),
+    identityFeedback: document.getElementById("commandPlayerIdentityFeedback")
 };
+
+let linkableMembers = [];
+let identityLinkInFlight = false;
 
 function escapeHtml(value) {
     return String(value ?? "")
@@ -116,6 +123,11 @@ function setLinkStatus(element, linked, linkedText, unlinkedText) {
 
 function resetIdentity() {
     if (elements.staffBadge) elements.staffBadge.hidden = true;
+    if (elements.identityLinker) elements.identityLinker.hidden = true;
+    if (elements.memberSearch) elements.memberSearch.value = "";
+    if (elements.memberResults) elements.memberResults.innerHTML = "";
+    if (elements.identityFeedback) elements.identityFeedback.hidden = true;
+    linkableMembers = [];
     if (elements.identityNote) elements.identityNote.textContent = "Vérification…";
     if (elements.steamStatus) {
         elements.steamStatus.textContent = "Vérification…";
@@ -127,6 +139,103 @@ function resetIdentity() {
         elements.discordStatus.className = "";
     }
     if (elements.discordName) elements.discordName.textContent = "—";
+}
+
+
+function renderIdentityLinkMembers() {
+    if (!elements.memberResults) return;
+
+    const search = normalizeSearch(elements.memberSearch?.value);
+    const rows = linkableMembers.filter((member) => {
+        if (!search) return true;
+        return [
+            member.discordUsername,
+            member.steamId,
+            member.discordId
+        ].some((value) => normalizeSearch(value).includes(search));
+    }).slice(0, 20);
+
+    if (!rows.length) {
+        elements.memberResults.innerHTML = '<div class="command-player-linker-empty">Aucun compte Senzany correspondant.</div>';
+        return;
+    }
+
+    elements.memberResults.innerHTML = rows.map((member) => `
+        <button class="command-player-linker-result" type="button" data-link-steamid="${escapeHtml(member.steamId)}">
+            <span><strong>${escapeHtml(member.discordUsername || "Compte Senzany")}</strong><small>SteamID ${escapeHtml(member.steamId)}</small></span>
+            <em>${member.alreadyLinked ? "GUID DÉJÀ LIÉ" : "ASSOCIER"}</em>
+        </button>
+    `).join("");
+}
+
+async function loadLinkableMembers() {
+    if (!elements.identityLinker) return;
+
+    elements.identityLinker.hidden = false;
+    if (elements.memberResults) {
+        elements.memberResults.innerHTML = '<div class="command-player-linker-empty">Chargement des comptes Senzany…</div>';
+    }
+
+    try {
+        const response = await fetch("/api/commandement/players/linkable-members", {
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: { Accept: "application/json" }
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || `Erreur ${response.status}`);
+        linkableMembers = Array.isArray(payload.members) ? payload.members : [];
+        renderIdentityLinkMembers();
+    } catch (error) {
+        if (elements.memberResults) {
+            elements.memberResults.innerHTML = `<div class="command-player-linker-empty is-error">${escapeHtml(error.message || "Comptes indisponibles.")}</div>`;
+        }
+    }
+}
+
+async function linkSelectedPlayerToSteamId(steamId) {
+    if (!selectedPlayer || identityLinkInFlight) return;
+
+    const member = linkableMembers.find((entry) => String(entry.steamId) === String(steamId));
+    const label = member?.discordUsername || steamId;
+
+    if (!window.confirm(`Associer définitivement ${selectedPlayer.name} au compte Senzany ${label} ?`)) return;
+
+    identityLinkInFlight = true;
+    if (elements.identityFeedback) {
+        elements.identityFeedback.hidden = false;
+        elements.identityFeedback.className = "command-player-identity-feedback";
+        elements.identityFeedback.textContent = "Enregistrement de la liaison GUID BattlEye…";
+    }
+
+    try {
+        const response = await fetch(`/api/commandement/players/${encodeURIComponent(selectedPlayer.id)}/identity/link`, {
+            method: "POST",
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ steamId })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || `Erreur ${response.status}`);
+
+        if (elements.identityFeedback) {
+            elements.identityFeedback.className = "command-player-identity-feedback is-success";
+            elements.identityFeedback.textContent = "Compte Senzany associé avec succès.";
+        }
+
+        await loadPlayerIdentity(selectedPlayer);
+    } catch (error) {
+        if (elements.identityFeedback) {
+            elements.identityFeedback.className = "command-player-identity-feedback is-error";
+            elements.identityFeedback.textContent = error.message || "Association impossible.";
+        }
+    } finally {
+        identityLinkInFlight = false;
+    }
 }
 
 async function loadPlayerIdentity(player) {
@@ -145,8 +254,9 @@ async function loadPlayerIdentity(player) {
             if (elements.identityNote) {
                 elements.identityNote.textContent = identity.ambiguous
                     ? "Plusieurs comptes Steam portent ce pseudo"
-                    : "Aucune correspondance exacte dans le portail";
+                    : "GUID BattlEye non associé à un compte Senzany";
             }
+            await loadLinkableMembers();
             return;
         }
 
@@ -158,9 +268,16 @@ async function loadPlayerIdentity(player) {
         setLinkStatus(elements.discordStatus, identity.discordLinked, "Lié au portail", "Non lié");
         if (elements.steamId) elements.steamId.textContent = identity.steamId || "—";
         if (elements.discordName) elements.discordName.textContent = identity.discordUsername || "—";
-        if (elements.identityNote) elements.identityNote.textContent = identity.isStaff
-            ? "Compte portail reconnu — membre du staff"
-            : "Correspondance confirmée par le pseudo Steam";
+        if (elements.identityLinker) elements.identityLinker.hidden = true;
+        if (elements.identityNote) {
+            if (identity.isStaff) {
+                elements.identityNote.textContent = "Compte portail reconnu — membre du staff";
+            } else if (identity.matchMethod === "battleye-guid") {
+                elements.identityNote.textContent = "Compte reconnu par GUID BattlEye";
+            } else {
+                elements.identityNote.textContent = "Correspondance provisoire par pseudo Steam";
+            }
+        }
         renderPlayerRows();
     } catch (error) {
         setLinkStatus(elements.steamStatus, false, "Lié", "Vérification impossible");
@@ -328,6 +445,11 @@ export function initializePlayers({ onBack } = {}) {
     elements.kick?.addEventListener("click", () => runPlayerAction("kick"));
     elements.tempBan?.addEventListener("click", () => runPlayerAction("tempban"));
     elements.permanentBan?.addEventListener("click", () => runPlayerAction("permban"));
+    elements.memberSearch?.addEventListener("input", renderIdentityLinkMembers);
+    elements.memberResults?.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-link-steamid]");
+        if (button) linkSelectedPlayerToSteamId(button.dataset.linkSteamid);
+    });
     document.addEventListener("keydown", (event) => { if (event.key === "Escape") closePlayerModal(); });
     elements.backButton?.addEventListener("click", () => { stopPlayersAutoRefresh(); closePlayerModal(); onBack?.(); });
 }
