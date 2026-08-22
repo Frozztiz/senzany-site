@@ -59,6 +59,14 @@
       "commit": "77529a127cef67941e3a180c253b0437c003f6ae"
     },
     {
+      "date": "2026-08-22",
+      "type": "fix",
+      "title": "Restauration du module Mises à jour",
+      "description": "Restauration du module Mises à jour",
+      "details": [],
+      "commit": "8be48c89163e8f2b3fc9ad08f7a696c360f6fc94"
+    },
+    {
       "date": "2026-08-20",
       "type": "feature",
       "title": "Page d'ouverture du portail",
