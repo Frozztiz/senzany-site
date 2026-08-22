@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <title>Mises à jour — SENZANY</title>
+  <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-updates.css?v=1.0.0" />
+</head>
+<body data-page="admin-updates">
+  <div data-site-header></div>
+  <main class="updates-main">
+    <section class="updates-hero">
+      <div class="updates-wrap">
+        <a class="updates-back" href="senzany-admin.html">← Retour au Commandement</a>
+        <span class="updates-kicker">MODULE 07 // JOURNAL DE DÉVELOPPEMENT</span>
+        <h1>MISES À JOUR</h1>
+        <p>Historique centralisé des nouvelles fonctionnalités, correctifs et évolutions du portail Senzany.</p>
+      </div>
+    </section>
+
+    <section class="updates-wrap updates-content">
+      <div class="updates-toolbar">
+        <div>
+          <span>ÉTAT DU PORTAIL</span>
+          <strong>Journal des évolutions</strong>
+        </div>
+        <div class="updates-filters" aria-label="Filtres">
+          <button class="is-active" data-filter="all" type="button">TOUT</button>
+          <button data-filter="feature" type="button">FONCTIONNALITÉS</button>
+          <button data-filter="fix" type="button">CORRECTIFS</button>
+          <button data-filter="system" type="button">SYSTÈME</button>
+        </div>
+      </div>
+
+      <div class="updates-timeline" id="updatesTimeline">
+        <article class="update-entry" data-type="feature">
+          <div class="update-date"><strong>22</strong><span>AOÛT<br>2026</span></div>
+          <div class="update-card">
+            <div class="update-meta"><span class="tag feature">NOUVEAUTÉ</span><time>22/08/2026</time></div>
+            <h2>Historique individuel des cagnottes</h2>
+            <p>Ajout du journal de cagnotte par SteamID dans le profil joueur et dans le centre de gestion des votes.</p>
+            <ul><li>Détail des crédits de vote</li><li>Affichage des réclamations</li><li>Solde, gains cumulés et montant réclamé côté Commandement</li></ul>
+          </div>
+        </article>
+
+        <article class="update-entry" data-type="fix">
+          <div class="update-date"><strong>22</strong><span>AOÛT<br>2026</span></div>
+          <div class="update-card">
+            <div class="update-meta"><span class="tag fix">CORRECTIF</span><time>22/08/2026</time></div>
+            <h2>Correction du calcul des cagnottes de votes</h2>
+            <p>Correction de la baseline lors de l'association d'un nouveau pseudo afin d'éviter de créditer rétroactivement des votes déjà comptabilisés.</p>
+          </div>
+        </article>
+
+        <article class="update-entry" data-type="feature">
+          <div class="update-date"><strong>22</strong><span>AOÛT<br>2026</span></div>
+          <div class="update-card">
+            <div class="update-meta"><span class="tag feature">NOUVEAUTÉ</span><time>22/08/2026</time></div>
+            <h2>Centre de gestion des votes</h2>
+            <p>Suivi centralisé des votes Top-Serveurs avec joueurs identifiés, pseudos non reliés et classement global.</p>
+          </div>
+        </article>
+
+        <article class="update-entry" data-type="system">
+          <div class="update-date"><strong>22</strong><span>AOÛT<br>2026</span></div>
+          <div class="update-card">
+            <div class="update-meta"><span class="tag system">SYSTÈME</span><time>22/08/2026</time></div>
+            <h2>Journal des mises à jour</h2>
+            <p>Création du module 07 dans le Centre de Commandement pour conserver une vision claire des fonctionnalités et patchs déployés sur Senzany.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <div data-site-footer></div>
+  <script defer src="assets/js/components.js"></script>
+  <script defer src="assets/js/app.js"></script>
+  <script defer src="assets/js/admin/admin-updates-page.js?v=1.0.0"></script>
+</body>
+</html>
