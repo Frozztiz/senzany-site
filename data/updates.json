@@ -51,6 +51,14 @@
       "commit": "629de8ef3a100c0fa3182a33b8c7daf42368a923"
     },
     {
+      "date": "2026-08-22",
+      "type": "feature",
+      "title": "Liaison RCON par GUID BattlEye",
+      "description": "Liaison RCON par GUID BattlEye",
+      "details": [],
+      "commit": "77529a127cef67941e3a180c253b0437c003f6ae"
+    },
+    {
       "date": "2026-08-20",
       "type": "feature",
       "title": "Page d'ouverture du portail",
