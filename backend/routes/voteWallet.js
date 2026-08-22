@@ -30,6 +30,18 @@ router.get('/', async(req,res)=>{
   }catch(error){console.error('[VOTE WALLET] summary',error);res.status(error.status||502).json({error:error.message||'Cagnotte indisponible.'});}
 });
 
+router.get('/history', async(req,res)=>{
+  res.set('Cache-Control','no-store');
+  const steamId=steamIdFrom(req,res); if(!steamId)return;
+  try{
+    const operations=await voteWalletService.getHistory(steamId,500);
+    res.json({steamId,operations});
+  }catch(error){
+    console.error('[VOTE WALLET] history',error);
+    res.status(error.status||500).json({error:error.message||'Historique indisponible.'});
+  }
+});
+
 router.post('/claim', async(req,res)=>{
   res.set('Cache-Control','no-store');
   const steamId=steamIdFrom(req,res); if(!steamId)return;

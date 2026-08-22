@@ -91,7 +91,7 @@ function renderLinkedCard(row) {
     <div class="votes-member-card__rank">#${number(row.position)}</div>
     <div class="votes-member-card__head"><div><strong>${escapeHtml(row.playerName)}</strong><small>SteamID ${escapeHtml(row.steamId || "—")}</small><div class="votes-member-card__links"><span class="${hasSteam ? "is-online" : "is-offline"}"><i>S</i>Steam</span><span class="${hasDiscord ? "is-online" : "is-offline"}"><i>D</i>Discord</span></div></div><b>${number(row.votes)} <span>votes</span></b></div>
     <div class="votes-member-card__body"><span>PSEUDOS DÉCLARÉS</span><ul>${aliasRows || "<li><span>Aucun pseudo</span></li>"}</ul></div>
-    <div class="votes-member-card__footer"><span>${aliases.length} pseudo${aliases.length > 1 ? "s" : ""}</span><span>${(row.matchedNames || []).length} retrouvé${(row.matchedNames || []).length > 1 ? "s" : ""}</span></div>
+    <div class="votes-member-card__footer"><span>${aliases.length} pseudo${aliases.length > 1 ? "s" : ""}</span><span>${(row.matchedNames || []).length} retrouvé${(row.matchedNames || []).length > 1 ? "s" : ""}</span><button type="button" class="votes-history-button" data-history-steamid="${escapeHtml(row.steamId)}" data-history-name="${escapeHtml(row.playerName)}">Historique cagnotte</button></div>
   </article>`;
 }
 
@@ -109,6 +109,10 @@ function renderRankingCard(row) {
     <i>${row.identified ? "IDENTIFIÉ" : "À ASSOCIER"}</i>
   </article>`;
 }
+
+function historyLabel(kind){ return ({vote_credit:"Crédit de vote",claim:"Cagnotte réclamée",refund:"Remboursement",regularization:"Régularisation"})[kind] || String(kind || "Opération").replaceAll("_", " "); }
+function closeHistoryModal(){const modal=byId("votesHistoryModal");if(!modal)return;modal.hidden=true;modal.setAttribute("aria-hidden","true");}
+async function openHistoryModal(steamId,name){const modal=byId("votesHistoryModal");modal.hidden=false;modal.setAttribute("aria-hidden","false");byId("votesHistoryTitle").textContent=name||"Historique du joueur";byId("votesHistoryIdentity").textContent=`SteamID ${steamId}`;byId("votesHistoryWallet").innerHTML="";byId("votesHistoryList").innerHTML='<div class="admin-list-message">Chargement de toutes les opérations…</div>';try{const response=await fetch(`/api/commandement/votes/history/${encodeURIComponent(steamId)}`,{credentials:"same-origin",cache:"no-store",headers:{Accept:"application/json"}});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||`Erreur ${response.status}`);const wallet=data.wallet||{};byId("votesHistoryWallet").innerHTML=`<div><span>SOLDE</span><strong>${number(wallet.balance).toLocaleString("fr-FR")} $</strong></div><div><span>GAGNÉ À VIE</span><strong>${number(wallet.lifetime_earned).toLocaleString("fr-FR")} $</strong></div><div><span>RÉCLAMÉ À VIE</span><strong>${number(wallet.lifetime_claimed).toLocaleString("fr-FR")} $</strong></div>`;const ops=Array.isArray(data.operations)?data.operations:[];byId("votesHistoryList").innerHTML=ops.length?ops.map(op=>{const amount=number(op.amount),meta=op.metadata||{},date=op.created_at?new Date(op.created_at).toLocaleString("fr-FR"):"—",details=[op.period?`Période ${op.period}`:"",number(op.votes)>0?`${number(op.votes)} vote${number(op.votes)>1?"s":""}`:"",meta.alias?`Pseudo ${escapeHtml(meta.alias)}`:""].filter(Boolean).join(" // ");return `<article class="votes-history-row ${amount<0?"is-debit":"is-credit"}"><div><strong>${escapeHtml(historyLabel(op.kind))}</strong><small>${escapeHtml(date)}${details?" // "+details:""}</small></div><b>${amount>0?"+":""}${amount.toLocaleString("fr-FR")} $</b></article>`}).join(""):'<div class="admin-list-message">Aucune opération enregistrée pour ce SteamID.</div>';}catch(error){byId("votesHistoryList").innerHTML=`<div class="admin-list-message">${escapeHtml(error.message||"Historique indisponible.")}</div>`;}}
 
 function availableMembers() {
   return Array.isArray(payload?.members) ? payload.members : [];
@@ -246,3 +250,7 @@ byId("votesMemberResults")?.addEventListener("click", (event) => {
 });
 document.querySelectorAll("[data-close-associate]").forEach((element) => element.addEventListener("click", closeAssociateModal));
 document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !byId("votesAssociateModal")?.hidden) closeAssociateModal(); });
+
+byId("votesLinkedList")?.addEventListener("click",(event)=>{const button=event.target.closest("[data-history-steamid]");if(!button)return;openHistoryModal(button.dataset.historySteamid,button.dataset.historyName);});
+document.querySelectorAll("[data-close-history]").forEach((el)=>el.addEventListener("click",closeHistoryModal));
+document.addEventListener("keydown",(event)=>{if(event.key==="Escape"&&!byId("votesHistoryModal")?.hidden)closeHistoryModal();});

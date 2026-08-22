@@ -149,4 +149,13 @@ async function claimAll({ steamId, playerName }) {
   }
 }
 
-module.exports = { AMOUNT_PER_VOTE, currentPeriod, milestones, registerAlias, closeAliasOwnership, syncForPlayer, getSummary, claimAll };
+async function getHistory(steamId, limit = 500) {
+  const safeLimit = Math.max(1, Math.min(1000, Number.parseInt(limit, 10) || 500));
+  const rows = await supabaseService.request(
+    `vote_wallet_ledger?steam_id=eq.${encodeURIComponent(String(steamId))}&select=id,steam_id,kind,amount,period,ownership_id,votes,claim_id,idempotency_key,metadata,created_at&order=created_at.desc&limit=${safeLimit}`,
+    { method:'GET' }
+  );
+  return Array.isArray(rows) ? rows : [];
+}
+
+module.exports = { AMOUNT_PER_VOTE, currentPeriod, milestones, registerAlias, closeAliasOwnership, syncForPlayer, getSummary, getHistory, claimAll };

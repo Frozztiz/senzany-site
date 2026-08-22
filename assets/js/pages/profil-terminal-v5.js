@@ -164,6 +164,9 @@
     if(milestones){milestones.innerHTML="";(Array.isArray(wallet.milestones)?wallet.milestones:[]).forEach(tier=>{const el=document.createElement("div");el.className=`vote-milestone ${tier.unlocked?"vote-milestone--unlocked":""}`;el.innerHTML=`<strong>${tier.value}</strong><small>${tier.unlocked?"DÉBLOQUÉ":"PALIER"}</small>`;milestones.appendChild(el)})}
     if(claim){claim.disabled=(Number(wallet.balance)||0)<=0||!wallet.claimConfigured;claim.title=!wallet.claimConfigured?"Conversion de la monnaie DayZ à configurer sur le serveur":"";claim.textContent=(Number(wallet.balance)||0)>0?`CLAIM ${formatMoney(wallet.balance)}`:"CAGNOTTE VIDE"}
   }
+  function walletOperationLabel(kind){return ({vote_credit:"Crédit de vote",claim:"Cagnotte réclamée",refund:"Remboursement",regularization:"Régularisation"})[kind]||String(kind||"Opération").replaceAll("_"," ");}
+  function renderVoteWalletHistory(operations){const list=document.getElementById("voteWalletHistory");if(!list)return;const rows=Array.isArray(operations)?operations:[];if(!rows.length){list.innerHTML='<p class="vote-wallet-history__empty">Aucune opération enregistrée pour ton SteamID.</p>';return}list.innerHTML="";rows.forEach(op=>{const amount=Number(op.amount||0),meta=op.metadata||{},item=document.createElement("article");item.className=`vote-wallet-history__item ${amount<0?"is-debit":"is-credit"}`;const date=op.created_at?new Intl.DateTimeFormat("fr-FR",{dateStyle:"short",timeStyle:"short"}).format(new Date(op.created_at)):"—";const details=[op.period?`Période ${op.period}`:null,Number(op.votes||0)>0?`${Number(op.votes)} vote${Number(op.votes)>1?"s":""}`:null,meta.alias?`Pseudo : ${meta.alias}`:null].filter(Boolean).join(" // ");item.innerHTML=`<div><strong>${walletOperationLabel(op.kind)}</strong><small>${date}${details?" // "+details:""}</small></div><b>${amount>0?"+":""}${formatMoney(amount)}</b>`;list.appendChild(item)})}
+  async function loadVoteWalletHistory(){const list=document.getElementById("voteWalletHistory");try{const response=await fetch("/api/vote-wallet/history",{credentials:"same-origin",cache:"no-store",headers:{Accept:"application/json"}});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||`Erreur ${response.status}`);renderVoteWalletHistory(data.operations)}catch(error){if(list)list.innerHTML=`<p class="vote-wallet-history__empty vote-wallet-history__empty--error">${String(error.message||"Historique indisponible.")}</p>`}}
   function showWalletFeedback(message,isError=false){const el=document.getElementById("voteWalletFeedback");if(!el)return;el.hidden=false;el.textContent=message;el.classList.toggle("vote-wallet-feedback--error",isError)}
   async function loadVoteWallet(){try{const wallet=await window.SenzanyAPI.voteWallet.get();renderVoteWallet(wallet);return wallet}catch(error){showWalletFeedback(error.message||"Cagnotte indisponible.",true);return null}}
 
@@ -236,7 +239,7 @@
   }
 
   async function refreshVoteAliasesAndTotal(){
-    await Promise.all([loadVoteAliases(),loadPersonalVotes(),loadVoteWallet()]);
+    await Promise.all([loadVoteAliases(),loadPersonalVotes(),loadVoteWallet(),loadVoteWalletHistory()]);
   }
 
   const voteAliasForm=document.getElementById("voteAliasForm");
@@ -279,12 +282,15 @@
   });
 
 
+  const voteWalletHistoryRefresh=document.getElementById("voteWalletHistoryRefresh");
+  if(voteWalletHistoryRefresh)voteWalletHistoryRefresh.addEventListener("click",async()=>{voteWalletHistoryRefresh.disabled=true;await loadVoteWalletHistory();voteWalletHistoryRefresh.disabled=false});
+
   const voteWalletClaim=document.getElementById("voteWalletClaim");
   if(voteWalletClaim)voteWalletClaim.addEventListener("click",async()=>{
     if(voteWalletClaim.disabled)return;
     if(!confirm("Créer maintenant une livraison en jeu avec toute ta cagnotte disponible ?"))return;
     voteWalletClaim.disabled=true;voteWalletClaim.textContent="CRÉATION DE LA LIVRAISON…";
-    try{const result=await window.SenzanyAPI.voteWallet.claim();renderVoteWallet(result.summary);showWalletFeedback(`${formatMoney(result.amount)} ont été transformés en livraison. Tu peux maintenant la récupérer en jeu.`);appendLog(`Cagnotte réclamée : ${formatMoney(result.amount)}`,0)}
+    try{const result=await window.SenzanyAPI.voteWallet.claim();renderVoteWallet(result.summary);showWalletFeedback(`${formatMoney(result.amount)} ont été transformés en livraison. Tu peux maintenant la récupérer en jeu.`);appendLog(`Cagnotte réclamée : ${formatMoney(result.amount)}`,0);await loadVoteWalletHistory()}
     catch(error){showWalletFeedback(error.message||"Impossible de créer la livraison.",true);await loadVoteWallet()}
   });
 

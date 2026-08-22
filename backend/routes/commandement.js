@@ -4,6 +4,7 @@ const supabaseService = require("../services/supabaseService");
 const playerSessionService = require("../services/playerSessionService");
 const topServeursService = require("../services/topServeursService");
 const voteAliasService = require("../services/voteAliasService");
+const voteWalletService = require("../services/voteWalletService");
 
 const router = express.Router();
 
@@ -606,6 +607,26 @@ router.get(
             error.message ||
             "Classement des votes indisponible."
         });
+    }
+  }
+);
+
+router.get(
+  "/votes/history/:steamId",
+  commandAuth,
+  async (req, res) => {
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
+    const steamId = String(req.params?.steamId || "").trim();
+    if (!/^\d{17}$/.test(steamId)) return res.status(400).json({ error: "SteamID64 invalide." });
+    try {
+      const [operations, walletRows] = await Promise.all([
+        voteWalletService.getHistory(steamId, 1000),
+        supabaseService.request(`vote_wallets?steam_id=eq.${encodeURIComponent(steamId)}&select=steam_id,balance,lifetime_earned,lifetime_claimed,updated_at&limit=1`, { method: "GET" }).catch(() => [])
+      ]);
+      return res.json({ steamId, wallet: Array.isArray(walletRows) && walletRows.length ? walletRows[0] : null, operations });
+    } catch (error) {
+      console.error("[COMMANDEMENT] Historique cagnotte indisponible :", error);
+      return res.status(500).json({ error: error.message || "Historique indisponible." });
     }
   }
 );
