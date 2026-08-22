@@ -6,10 +6,10 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   changelog:
-    # Évite la boucle quand ce workflow crée son propre commit.
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
@@ -67,7 +67,6 @@ jobs:
 
           entries = payload.setdefault("entries", [])
 
-          # Idempotence : ne jamais ajouter deux fois le même commit.
           if any(entry.get("commit") == sha for entry in entries):
               print("Commit déjà présent dans le journal.")
               Path("/tmp/changelog_changed").write_text("0")
@@ -102,3 +101,10 @@ jobs:
           git add data/updates.json
           git commit -m "[skip changelog] Mise à jour automatique du journal"
           git push
+
+      - name: Déployer le journal sur OVH
+        if: steps.changelog.outputs.changed == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run "Deploy Senzany to OVH" --ref main
