@@ -1,6 +1,6 @@
 class SZD_Settings
 {
-    string apiUrl = "http://213.32.88.222";
+    string apiUrl = "https://senzany.com";
     string apiKey = "CHANGE_ME";
     string agentId = "senzany-dayz-officiel-01";
     int pollIntervalSeconds = 30;

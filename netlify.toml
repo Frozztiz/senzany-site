@@ -4,7 +4,7 @@
 
 [[redirects]]
   from = "/api/game/stats"
-  to = "http://213.32.88.222/api/game/stats"
+  to = "https://senzany.com/api/game/stats"
   status = 200
   force = true
 
