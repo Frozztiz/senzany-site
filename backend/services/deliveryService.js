@@ -153,10 +153,11 @@ async function createDelivery({
         item.name || item.displayName || className
       ).trim();
 
-      const quantity = Math.max(
-        1,
-        Math.min(1000, Number(item.quantity) || 1)
-      );
+        const requestedQuantity = Math.floor(Number(item.quantity) || 1);
+        const quantity =
+          className === "SenzanyBankCredit"
+            ? Math.max(1, Math.min(100000000, requestedQuantity))
+            : Math.max(1, Math.min(1000, requestedQuantity));
 
       return {
         delivery_id: delivery.id,
