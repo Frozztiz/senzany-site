@@ -82,6 +82,7 @@ app.use(
 
 app.use("/api/battle-pass", require("./routes/battlePass"));
 
+app.use("/api/map/requests", require("./routes/mapRequests"));
 app.use("/api/map", require("./routes/mapPublic"));
 
 app.use(

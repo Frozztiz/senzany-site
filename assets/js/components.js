@@ -105,7 +105,7 @@
             <p>Senzany est un serveur DayZ PVE immersif sur Chernarus, avec une progression évolutive, des événements réguliers et une communauté francophone active.</p>
             <div class="site-footer-v2__socials" aria-label="Liens externes Senzany">
               <a href="https://discord.gg/aJ2eGmqAQv" rel="noopener" target="_blank">Discord officiel</a>
-              <a href="https://top-serveurs.net/dayz/senzany-wipe2303-pve-fr-voici-le-recit-de-votre-mort" rel="noopener" target="_blank">Top-Serveurs</a>
+              <a href="https://top-serveurs.net/dayz/vote/senzany-wipe2308-pve-fr-voici-le-recit-de-votre-mort" rel="noopener" target="_blank">Top-Serveurs</a>
               <a href="steam://connect/g02.fiveminehosting.com:30120">Se connecter</a>
             </div>
           </section>
