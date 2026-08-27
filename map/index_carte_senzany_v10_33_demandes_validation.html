@@ -760,42 +760,55 @@ const zonesLayer=L.layerGroup().addTo(map);
     // suppriment jamais les zones fixes du serveur.
     // -------------------------------------------------------------------------
     const SENZANY_SPECIAL_ZONES = [
-      // OUEST / SUD-OUEST
-      {name:'Green Mountain Trader', x:3700, z:6200, icon:'🛡️', color:'#00ef35', restrictedRadius:1600},
-      {name:'Camp House GreenMountain', x:3500, z:7400, icon:'⚑', color:'#00a8ff'},
-      {name:'Pavlovo Toxic Zone', x:2150, z:3640, icon:'☠', color:'#ff1f1f', haloRadius:220, haloColor:'#00ef35'},
-      {name:'DNA Bunker Lv2', x:2670, z:2600, icon:'☠', color:'#ff1f1f'},
-      {name:'', x:2700, z:1500, color:'#ff642d', restrictedRadius:850},
-      {name:'ZONE IA', x:2300, z:700, icon:'♟', color:'#ff1f1f', haloRadius:700, haloColor:'#ff1f1f'},
-      {name:'DNA Bunker Lv2', x:8600, z:3180, icon:'☠', color:'#ff1f1f'},
+      // Cercles orange seuls — repris des deux captures de référence
+      {name:'', x:1459, z:7222, color:'#ff642d', restrictedRadius:784},
+      {name:'', x:4081, z:6055, color:'#ff642d', restrictedRadius:1407},
+      {name:'', x:13784, z:6570, color:'#ff642d', restrictedRadius:1407},
+      {name:'', x:3086, z:1600, color:'#ff642d', restrictedRadius:782},
+      {name:'', x:11345, z:2863, color:'#ff642d', restrictedRadius:783},
+      {name:'', x:13201, z:3335, color:'#ff642d', restrictedRadius:783},
+      {name:'', x:1735, z:13684, color:'#ff642d', restrictedRadius:1236},
+      {name:'', x:6857, z:13633, color:'#ff642d', restrictedRadius:1424},
+      {name:'', x:8619, z:13035, color:'#ff642d', restrictedRadius:802},
+      {name:'', x:11871, z:12309, color:'#ff642d', restrictedRadius:964},
+      {name:'', x:4620, z:11436, color:'#ff642d', restrictedRadius:827},
+      {name:'', x:4620, z:10411, color:'#ff642d', restrictedRadius:1236},
+      {name:'', x:5565, z:9719, color:'#ff642d', restrictedRadius:793},
 
-      // SUD-EST / CÔTE
-      {name:'', x:12150, z:3060, color:'#ff642d', restrictedRadius:1100},
-      {name:'ZONE PVP', x:14500, z:3020, icon:'☠', color:'#ff1f1f', restrictedRadius:460},
-      {name:'Volcan', x:12300, z:2200, icon:'▲', color:'#d90f1d', haloRadius:640, haloColor:'#d90f1d'},
-      {name:'PetrolRig Zone Toxique', x:14650, z:4650, icon:'☠', color:'#ff1f1f'},
-      {name:'Solnechnyi Trader', x:13800, z:6950, icon:'🛡️', color:'#00ef35', restrictedRadius:1500},
+      // Marqueurs visibles sur les captures
+      {name:'Camp House GreenMountain', x:3840, z:7234, icon:'⚑', color:'#00a8ff'},
+      {name:'Green Mountain Trader', x:4011, z:6083, icon:'🛡️', color:'#00ef35'},
+      {name:'Solnechnyi Trader', x:13589, z:6822, icon:'🛡️', color:'#00ef35'},
 
-      // NORD-OUEST / TISY
-      {name:'', x:1300, z:14100, color:'#ff642d', restrictedRadius:1400},
-      {name:'DNA Bunker Lv5', x:500, z:14900, icon:'☠', color:'#ff1f1f'},
-      {name:'Tisy Toxic Zone', x:1640, z:14000, icon:'☠', color:'#ff1f1f', haloRadius:340, haloColor:'#00ef35'},
-      {name:'DNA Bunker L3', x:4300, z:15030, icon:'☠', color:'#ff1f1f'},
-      {name:'DNA Bunker Roche', x:5400, z:15060, icon:'☠', color:'#ff1f1f'},
+      {name:'Pavlovo Toxic Zone', x:2580, z:3641, icon:'☠', color:'#ff1f1f',
+       haloRadius:210, haloColor:'#ff1f1f'},
+      {name:'DNA Bunker Lv2', x:3076, z:2653, icon:'☠', color:'#ff1f1f'},
+      {name:'DNA Bunker Lv2', x:8728, z:3167, icon:'☠', color:'#ff1f1f'},
+      {name:'Volcan', x:12192, z:2290, icon:'▲', color:'#d90f1d',
+       haloRadius:614, haloColor:'#d90f1d'},
+      {name:'ZONE IA', x:2743, z:850, icon:'♟', color:'#ff1f1f',
+       haloRadius:664, haloColor:'#ff1f1f'},
+      {name:'ZONE PVP', x:14292, z:3040, icon:'☠', color:'#ff1f1f',
+       haloRadius:421, haloColor:'#ff1f1f'},
+      {name:'PetrolRig Zone Toxique', x:14458, z:4649, icon:'☠', color:'#ff1f1f'},
 
-      // NORD / KAMENSK / SEVEROGRAD
-      {name:'Kamensk Trader', x:6850, z:14000, icon:'🛡️', color:'#00ef35', restrictedRadius:1470},
-      {name:'Kamensk Toxic Zone', x:8000, z:14670, icon:'☠', color:'#ff1f1f', haloRadius:340, haloColor:'#00ef35'},
-      {name:'Bunker Severograd Kareer', x:8760, z:13330, icon:'⚒', color:'#ff1f1f', restrictedRadius:860},
+      {name:'DNA Bunker Lv5', x:1053, z:14424, icon:'☠', color:'#ff1f1f'},
+      {name:'Tisy Toxic Zone', x:2057, z:13698, icon:'☠', color:'#ff1f1f',
+       haloRadius:316, haloColor:'#00ef35'},
+      {name:'DNA Bunker L3', x:4436, z:14654, icon:'☠', color:'#ff1f1f'},
+      {name:'DNA Bunker Roche', x:4812, z:14587, icon:'☠', color:'#ff1f1f'},
+      {name:'Kamensk Toxic Zone', x:7914, z:14294, icon:'☠', color:'#ff1f1f',
+       haloRadius:188, haloColor:'#00ef35'},
+      {name:'Kamensk Trader', x:6840, z:13664, icon:'🛡️', color:'#00ef35'},
+      {name:'Bunker Severograd Kareer', x:8612, z:13020, icon:'⚒', color:'#ff1f1f'},
+      {name:'Airstrip Toxic Zone', x:11855, z:12382, icon:'☠', color:'#ff1f1f',
+       haloRadius:299, haloColor:'#00ef35'},
+      {name:'Rify Toxic Zone', x:13312, z:10958, icon:'☠', color:'#ff1f1f',
+       haloRadius:171, haloColor:'#00ef35'}
 
-      // NWAF / VYBOR — ensemble de zones Tier 3 visible sur la capture
-      {name:'', x:4400, z:11200, color:'#ff642d', restrictedRadius:1250},
-      {name:'', x:5000, z:10100, color:'#ff642d', restrictedRadius:1250},
-      {name:'', x:4300, z:9600, color:'#ff642d', restrictedRadius:1100},
-
-      // NORD-EST / KRASNO / RIFY
-      {name:'Airstrip Toxic Zone', x:12330, z:12570, icon:'☠', color:'#ff1f1f', restrictedRadius:1030, haloRadius:340, haloColor:'#00ef35'},
-      {name:'Rify Toxic Zone', x:13900, z:11050, icon:'☠', color:'#ff1f1f', haloRadius:340, haloColor:'#00ef35'}
+      // Volontairement absents :
+      // - Vehicule Airdrop
+      // - Tier 3 Military (looted)
     ];
 
     const specialZonesLayer = L.layerGroup().addTo(map);
