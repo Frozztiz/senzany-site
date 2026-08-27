@@ -99,6 +99,38 @@
 }
 </style>
 
+
+<style id="senzany-special-zones-v1">
+  .senzany-special-zone-icon{
+    background:transparent!important;
+    border:0!important;
+  }
+  .senzany-special-zone-label{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    white-space:nowrap;
+    font:600 13px/1.05 Arial,sans-serif;
+    text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 2px rgba(0,0,0,.9);
+    transform:translateY(-50%);
+    pointer-events:none;
+  }
+  .senzany-special-zone-label .sz-icon{
+    font-size:18px;
+    line-height:1;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.9));
+  }
+  .senzany-restricted-circle{
+    stroke:#ff642d!important;
+    stroke-width:1.35!important;
+    fill:url(#senzanyDiagonalHatch)!important;
+    fill-opacity:1!important;
+  }
+  .senzany-special-halo{
+    stroke-width:1.5!important;
+  }
+</style>
+
 </head>
 <body data-page="map">
   <div data-site-header></div>
@@ -115,6 +147,7 @@
           <div class="flag-legend"><i class="flag-shape" style="--flag-color:#35c46a"></i><span>Base occupée</span></div>
           <div class="flag-legend"><i class="flag-shape" style="--flag-color:#d7a447"></i><span>Demande en attente</span></div>
           <div class="flag-legend"><i class="flag-shape" style="--flag-color:#63b9e8"></i><span>Votre sélection</span></div>
+          <div class="flag-legend"><span style="color:#ff642d;font-size:18px;line-height:1">◯</span><span>Zones serveur</span></div>
         </div>
       </div>
     </section>
@@ -303,6 +336,157 @@
 
     const zonesLayer = L.layerGroup().addTo(map);
     const selectionLayer = L.layerGroup().addTo(map);
+
+
+    // -------------------------------------------------------------------------
+    // ZONES SERVEUR SENZANY
+    // Placement recalé sur les 2 captures de référence fournies (Chernarus 0→15360).
+    // Cette couche est séparée des bases/demandes afin que leurs refresh API ne
+    // suppriment jamais les zones fixes du serveur.
+    // -------------------------------------------------------------------------
+    const SENZANY_SPECIAL_ZONES = [
+      // OUEST / SUD-OUEST
+      {name:'Green Mountain Trader', x:3700, z:6200, icon:'🛡️', color:'#00ef35', restrictedRadius:1600},
+      {name:'Camp House GreenMountain', x:3500, z:7400, icon:'⚑', color:'#00a8ff'},
+      {name:'Pavlovo Toxic Zone', x:2150, z:3640, icon:'☠', color:'#ff1f1f', haloRadius:220, haloColor:'#00ef35'},
+      {name:'DNA Bunker Lv2', x:2670, z:2600, icon:'☠', color:'#ff1f1f'},
+      {name:'', x:2700, z:1500, color:'#ff642d', restrictedRadius:850},
+      {name:'ZONE IA', x:2300, z:700, icon:'♟', color:'#ff1f1f', haloRadius:700, haloColor:'#ff1f1f'},
+      {name:'DNA Bunker Lv2', x:8600, z:3180, icon:'☠', color:'#ff1f1f'},
+
+      // SUD-EST / CÔTE
+      {name:'', x:12150, z:3060, color:'#ff642d', restrictedRadius:1100},
+      {name:'Tier 3 Military (looted)', x:13400, z:3110, icon:'◎', color:'#ff6a00', restrictedRadius:850},
+      {name:'ZONE PVP', x:14500, z:3020, icon:'☠', color:'#ff1f1f', restrictedRadius:460},
+      {name:'Volcan', x:12300, z:2200, icon:'▲', color:'#d90f1d', haloRadius:640, haloColor:'#d90f1d'},
+      {name:'PetrolRig Zone Toxique', x:14650, z:4650, icon:'☠', color:'#ff1f1f'},
+      {name:'Solnechnyi Trader', x:13800, z:6950, icon:'🛡️', color:'#00ef35', restrictedRadius:1500},
+
+      // NORD-OUEST / TISY
+      {name:'', x:1300, z:14100, color:'#ff642d', restrictedRadius:1400},
+      {name:'DNA Bunker Lv5', x:500, z:14900, icon:'☠', color:'#ff1f1f'},
+      {name:'Tisy Toxic Zone', x:1640, z:14000, icon:'☠', color:'#ff1f1f', haloRadius:340, haloColor:'#00ef35'},
+      {name:'DNA Bunker L3', x:4300, z:15030, icon:'☠', color:'#ff1f1f'},
+      {name:'DNA Bunker Roche', x:5400, z:15060, icon:'☠', color:'#ff1f1f'},
+
+      // NORD / KAMENSK / SEVEROGRAD
+      {name:'Kamensk Trader', x:6850, z:14000, icon:'🛡️', color:'#00ef35', restrictedRadius:1470},
+      {name:'Kamensk Toxic Zone', x:8000, z:14670, icon:'☠', color:'#ff1f1f', haloRadius:340, haloColor:'#00ef35'},
+      {name:'Bunker Severograd Kareer', x:8760, z:13330, icon:'⚒', color:'#ff1f1f', restrictedRadius:860},
+
+      // NWAF / VYBOR — ensemble de zones Tier 3 visible sur la capture
+      {name:'', x:4400, z:11200, color:'#ff642d', restrictedRadius:1250},
+      {name:'', x:5000, z:10100, color:'#ff642d', restrictedRadius:1250},
+      {name:'', x:4300, z:9600, color:'#ff642d', restrictedRadius:1100},
+      {name:'Tier 3 Military (looted)', x:4740, z:9950, icon:'◎', color:'#ff6a00'},
+      {name:'Vehicule Airdrop', x:4720, z:8160, icon:'◎', color:'#ff6a00'},
+
+      // NORD-EST / KRASNO / RIFY
+      {name:'Airstrip Toxic Zone', x:12330, z:12570, icon:'☠', color:'#ff1f1f', restrictedRadius:1030, haloRadius:340, haloColor:'#00ef35'},
+      {name:'Rify Toxic Zone', x:13900, z:11050, icon:'☠', color:'#ff1f1f', haloRadius:340, haloColor:'#00ef35'}
+    ];
+
+    const specialZonesLayer = L.layerGroup().addTo(map);
+
+    const specialSvgRenderer = L.svg({padding:.5});
+    specialSvgRenderer.addTo(map);
+
+    function ensureSenzanyStripePattern(){
+      const svg = specialSvgRenderer._container;
+      if(!svg || svg.querySelector('#senzanyDiagonalHatch')) return;
+      const ns='http://www.w3.org/2000/svg';
+      const defs=document.createElementNS(ns,'defs');
+      const pattern=document.createElementNS(ns,'pattern');
+      pattern.setAttribute('id','senzanyDiagonalHatch');
+      pattern.setAttribute('patternUnits','userSpaceOnUse');
+      pattern.setAttribute('width','12');
+      pattern.setAttribute('height','12');
+      pattern.setAttribute('patternTransform','rotate(45)');
+
+      const bg=document.createElementNS(ns,'rect');
+      bg.setAttribute('width','12');
+      bg.setAttribute('height','12');
+      bg.setAttribute('fill','rgba(255,100,45,0.035)');
+
+      const line=document.createElementNS(ns,'line');
+      line.setAttribute('x1','0');
+      line.setAttribute('y1','0');
+      line.setAttribute('x2','0');
+      line.setAttribute('y2','12');
+      line.setAttribute('stroke','#ff642d');
+      line.setAttribute('stroke-width','2');
+      line.setAttribute('stroke-opacity','.78');
+
+      pattern.appendChild(bg);
+      pattern.appendChild(line);
+      defs.appendChild(pattern);
+      svg.insertBefore(defs,svg.firstChild);
+    }
+
+    function makeSpecialZoneIcon(zone){
+      const label = zone.name
+        ? '<span class="senzany-special-zone-label" style="color:'+zone.color+'">'+
+            '<span class="sz-icon">'+(zone.icon||'●')+'</span>'+
+            '<span>'+zone.name+'</span>'+
+          '</span>'
+        : '';
+      return L.divIcon({
+        className:'senzany-special-zone-icon',
+        html:label,
+        iconSize:[260,28],
+        iconAnchor:[8,14]
+      });
+    }
+
+    function renderSenzanySpecialZones(){
+      specialZonesLayer.clearLayers();
+      ensureSenzanyStripePattern();
+
+      SENZANY_SPECIAL_ZONES.forEach(zone=>{
+        const x=Number(zone.x), z=Number(zone.z);
+        if(!Number.isFinite(x)||!Number.isFinite(z)) return;
+        const center=dayzToLatLng(x,z);
+
+        if(Number(zone.restrictedRadius)>0){
+          L.circle(center,{
+            renderer:specialSvgRenderer,
+            radius:Number(zone.restrictedRadius)/60,
+            color:'#ff642d',
+            weight:1.35,
+            opacity:.9,
+            fill:true,
+            fillOpacity:1,
+            interactive:false,
+            className:'senzany-restricted-circle'
+          }).addTo(specialZonesLayer);
+        }
+
+        if(Number(zone.haloRadius)>0){
+          const hc=zone.haloColor||zone.color||'#ff1f1f';
+          L.circle(center,{
+            radius:Number(zone.haloRadius)/60,
+            color:hc,
+            fillColor:hc,
+            weight:1.5,
+            opacity:.95,
+            fillOpacity:.035,
+            interactive:false,
+            className:'senzany-special-halo'
+          }).addTo(specialZonesLayer);
+        }
+
+        if(zone.name){
+          L.marker(center,{
+            icon:makeSpecialZoneIcon(zone),
+            interactive:false,
+            keyboard:false
+          }).addTo(specialZonesLayer);
+        }
+      });
+    }
+
+    renderSenzanySpecialZones();
+
 
     let placementMode = false;
     let currentSelection = null;
