@@ -760,55 +760,69 @@ const zonesLayer=L.layerGroup().addTo(map);
     // suppriment jamais les zones fixes du serveur.
     // -------------------------------------------------------------------------
     const SENZANY_SPECIAL_ZONES = [
-      // Cercles orange seuls — repris des deux captures de référence
-      {name:'', x:1459, z:7222, color:'#ff642d', restrictedRadius:784},
-      {name:'', x:4081, z:6055, color:'#ff642d', restrictedRadius:1900},
-      {name:'', x:13784, z:6570, color:'#ff642d', restrictedRadius:1407},
-      {name:'', x:3086, z:1600, color:'#ff642d', restrictedRadius:782},
-      {name:'', x:11345, z:2863, color:'#ff642d', restrictedRadius:783},
-      {name:'', x:13201, z:3335, color:'#ff642d', restrictedRadius:783},
-      {name:'', x:1735, z:13684, color:'#ff642d', restrictedRadius:1540},
-      {name:'', x:6857, z:13633, color:'#ff642d', restrictedRadius:1424},
-      {name:'', x:8619, z:13035, color:'#ff642d', restrictedRadius:802},
-      {name:'', x:11871, z:12309, color:'#ff642d', restrictedRadius:1325},
-      {name:'', x:4460, z:11380, color:'#ff642d', restrictedRadius:1220},
-      {name:'', x:4700, z:10380, color:'#ff642d', restrictedRadius:1390},
-      {name:'', x:5200, z:9550, color:'#ff642d', restrictedRadius:1160},
+      // --- OUEST / GREEN MOUNTAIN : 3 cercles visibles sur la capture ---
+      {name:'', x:1445, z:7260, color:'#ff642d', restrictedRadius:790},
+      {name:'', x:3070, z:5400, color:'#ff642d', restrictedRadius:820},
+      {name:'', x:4080, z:6445, color:'#ff642d', restrictedRadius:1400},
+      {name:'Camp House GreenMountain', x:3500, z:7380, icon:'⚑', color:'#00a8ff'},
+      {name:'Green Mountain Trader', x:4000, z:6070, icon:'🛡️', color:'#00ef35'},
 
-      // Marqueurs visibles sur les captures
-      {name:'Camp House GreenMountain', x:3840, z:7234, icon:'⚑', color:'#00a8ff'},
-      {name:'Green Mountain Trader', x:4011, z:6083, icon:'🛡️', color:'#00ef35'},
-      {name:'Solnechnyi Trader', x:13589, z:6822, icon:'🛡️', color:'#00ef35'},
+      // --- SUD-OUEST ---
+      {name:'Pavlovo Toxic Zone', x:2580, z:3640, icon:'☠', color:'#ff1f1f',
+       haloRadius:205, haloColor:'#ff1f1f'},
+      {name:'DNA Bunker Lv2', x:3075, z:2650, icon:'☠', color:'#ff1f1f'},
+      {name:'', x:3080, z:1660, color:'#ff642d', restrictedRadius:800},
+      {name:'ZONE IA', x:2740, z:850, icon:'♟', color:'#ff1f1f',
+       haloRadius:660, haloColor:'#ff1f1f'},
 
-      {name:'Pavlovo Toxic Zone', x:2580, z:3641, icon:'☠', color:'#ff1f1f',
-       haloRadius:210, haloColor:'#ff1f1f'},
-      {name:'DNA Bunker Lv2', x:3076, z:2653, icon:'☠', color:'#ff1f1f'},
-      {name:'DNA Bunker Lv2', x:8728, z:3167, icon:'☠', color:'#ff1f1f'},
-      {name:'Volcan', x:12192, z:2290, icon:'▲', color:'#d90f1d',
-       haloRadius:614, haloColor:'#d90f1d'},
-      {name:'ZONE IA', x:2743, z:850, icon:'♟', color:'#ff1f1f',
-       haloRadius:664, haloColor:'#ff1f1f'},
-      {name:'ZONE PVP', x:14292, z:3040, icon:'☠', color:'#ff1f1f',
-       haloRadius:421, haloColor:'#ff1f1f'},
-      {name:'PetrolRig Zone Toxique', x:14458, z:4649, icon:'☠', color:'#ff1f1f'},
+      // --- SUD / SUD-EST : tous les cercles visibles, même sans texte Tier/Airdrop ---
+      {name:'DNA Bunker Lv2', x:8725, z:3165, icon:'☠', color:'#ff1f1f'},
+      {name:'', x:11360, z:2970, color:'#ff642d', restrictedRadius:840},
+      {name:'', x:12140, z:3350, color:'#ff642d', restrictedRadius:810},
+      {name:'', x:13255, z:3400, color:'#ff642d', restrictedRadius:780},
+      {name:'', x:14320, z:3120, color:'#ff642d', restrictedRadius:430},
+      {name:'Volcan', x:12190, z:2290, icon:'▲', color:'#d90f1d',
+       haloRadius:615, haloColor:'#d90f1d'},
+      {name:'ZONE PVP', x:14320, z:3120, icon:'☠', color:'#ff1f1f'},
+      {name:'PetrolRig Zone Toxique', x:14460, z:4650, icon:'☠', color:'#ff1f1f'},
 
-      {name:'DNA Bunker Lv5', x:1053, z:14424, icon:'☠', color:'#ff1f1f'},
-      {name:'Tisy Toxic Zone', x:2057, z:13698, icon:'☠', color:'#ff1f1f',
-       haloRadius:316, haloColor:'#00ef35'},
-      {name:'DNA Bunker L3', x:4436, z:14654, icon:'☠', color:'#ff1f1f'},
-      {name:'DNA Bunker Roche', x:4812, z:14587, icon:'☠', color:'#ff1f1f'},
-      {name:'Kamensk Toxic Zone', x:7914, z:14294, icon:'☠', color:'#ff1f1f',
-       haloRadius:188, haloColor:'#00ef35'},
-      {name:'Kamensk Trader', x:6840, z:13664, icon:'🛡️', color:'#00ef35'},
-      {name:'Bunker Severograd Kareer', x:8612, z:13020, icon:'⚒', color:'#ff1f1f'},
-      {name:'Airstrip Toxic Zone', x:11855, z:12382, icon:'☠', color:'#ff1f1f',
-       haloRadius:299, haloColor:'#00ef35'},
-      {name:'Rify Toxic Zone', x:13312, z:10958, icon:'☠', color:'#ff1f1f',
-       haloRadius:171, haloColor:'#00ef35'}
+      // --- SOLNECHNYI : un seul grand cercle hachuré ---
+      {name:'', x:13795, z:6600, color:'#ff642d', restrictedRadius:1410},
+      {name:'Solnechnyi Trader', x:13590, z:6820, icon:'🛡️', color:'#00ef35'},
 
-      // Volontairement absents :
-      // - Vehicule Airdrop
-      // - Tier 3 Military (looted)
+      // --- TISY : grand cercle + DEUX cercles verts intérieurs ---
+      {name:'', x:1745, z:13760, color:'#ff642d', restrictedRadius:1290},
+      {name:'DNA Bunker Lv5', x:1050, z:14420, icon:'☠', color:'#ff1f1f'},
+      {name:'', x:1835, z:13970, color:'#00ef35', haloRadius:420, haloColor:'#00ef35'},
+      {name:'Tisy Toxic Zone', x:2070, z:13680, icon:'☠', color:'#ff1f1f',
+       haloRadius:390, haloColor:'#00ef35'},
+      {name:'DNA Bunker L3', x:4435, z:14655, icon:'☠', color:'#ff1f1f'},
+      {name:'DNA Bunker Roche', x:4810, z:14590, icon:'☠', color:'#ff1f1f'},
+
+      // --- KAMENSK / SEVEROGRAD ---
+      {name:'', x:7130, z:13620, color:'#ff642d', restrictedRadius:1450},
+      {name:'Kamensk Toxic Zone', x:7915, z:14295, icon:'☠', color:'#ff1f1f',
+       haloRadius:320, haloColor:'#00ef35'},
+      {name:'Kamensk Trader', x:6840, z:13665, icon:'🛡️', color:'#00ef35'},
+      {name:'', x:8990, z:12975, color:'#ff642d', restrictedRadius:850},
+      {name:'Bunker Severograd Kareer', x:8610, z:13020, icon:'⚒', color:'#ff1f1f'},
+
+      // --- NWAF / VYBOR : TROIS cercles distincts et chevauchés ---
+      {name:'', x:4590, z:11210, color:'#ff642d', restrictedRadius:1100},
+      {name:'', x:4730, z:10330, color:'#ff642d', restrictedRadius:1100},
+      {name:'', x:5170, z:9450, color:'#ff642d', restrictedRadius:1100},
+
+      // --- AIRSTRIP / KRASNO : grand cercle + petit cercle vert intérieur ---
+      {name:'', x:12150, z:12380, color:'#ff642d', restrictedRadius:1050},
+      {name:'Airstrip Toxic Zone', x:11855, z:12380, icon:'☠', color:'#ff1f1f',
+       haloRadius:310, haloColor:'#00ef35'},
+
+      // --- RIFY : petit cercle vert uniquement ---
+      {name:'Rify Toxic Zone', x:13310, z:10960, icon:'☠', color:'#ff1f1f',
+       haloRadius:190, haloColor:'#00ef35'}
+
+      // Les libellés/points "Vehicule Airdrop" et "Tier 3 Military (looted)"
+      // sont volontairement absents. Les cercles visibles sur les captures restent.
     ];
 
     const specialZonesLayer = L.layerGroup().addTo(map);
