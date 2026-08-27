@@ -8,87 +8,107 @@
   <link rel="stylesheet" href="assets/css/pages/staff-command-v6-3.css" />
 
 <style>
-/* Uniformisation finale des cartes Staff — Toad conserve son format Fondateur */
+/* Cartes Staff : dimensions cohérentes entre Administration, Support et Garage */
 #administration .operator-grid,
-#garage .operator-grid {
+#support .operator-grid {
   align-items: stretch;
 }
+
 #administration .compact-card,
+#support .compact-card,
 #garage .compact-card {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
+
 #administration .compact-card__media,
+#support .compact-card__media,
 #garage .compact-card__media {
   height: 250px;
   min-height: 250px;
 }
+
 #administration .compact-card__media img,
+#support .compact-card__media img,
 #garage .compact-card__media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
 #administration .compact-card__body,
+#support .compact-card__body,
 #garage .compact-card__body {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
+
 #administration .operator-action,
+#support .operator-action,
 #garage .operator-action {
   margin-top: auto;
 }
 
-/* Crevette : même gabarit qu'une carte standard, sans étirement pleine largeur */
-#support .operator-grid {
+/* Support : 4 cartes régulières sur une seule ligne sur grand écran */
+#support .support-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: stretch;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
 }
 
-#support .compact-card:only-child {
-  grid-column: 2;
+/* Garage : mêmes largeurs de cartes que les cartes Administration, centrées */
+#garage .garage-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 18px;
 }
-#support .compact-card {
-  width: 100%;
-  max-width: none;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+
+#garage .garage-grid .compact-card {
+  grid-column: span 2;
 }
-#support .compact-card__media {
-  height: 250px;
-  min-height: 250px;
+
+#garage .garage-grid .compact-card:first-child {
+  grid-column: 2 / span 2;
 }
-#support .compact-card__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+
+#garage .garage-grid .compact-card:last-child {
+  grid-column: 4 / span 2;
 }
+
+/* Les cartes Support à 4 colonnes sont légèrement plus compactes */
 #support .compact-card__body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-#support .operator-action {
-  margin-top: auto;
+  padding-left: 18px;
+  padding-right: 18px;
 }
 
-@media (max-width: 980px) {
-  #support .operator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#support .compact-card h3 {
+  font-size: clamp(1.35rem, 1.7vw, 1.75rem);
 }
+
+@media (max-width: 1100px) {
+  #support .support-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #garage .garage-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #garage .garage-grid .compact-card,
+  #garage .garage-grid .compact-card:first-child,
+  #garage .garage-grid .compact-card:last-child {
+    grid-column: auto;
+  }
+}
+
 @media (max-width: 680px) {
-  #support .operator-grid { grid-template-columns: 1fr; }
+  #support .support-grid,
+  #garage .garage-grid {
+    grid-template-columns: 1fr;
+  }
 }
-
-.operator-grid--4{grid-template-columns:repeat(4,minmax(0,1fr))}
-.operator-grid--4 .compact-card__body{padding:16px}
-.operator-grid--4 .compact-card__body h3{font-size:clamp(1.2rem,1.7vw,1.65rem)}
-@media(max-width:1100px){.operator-grid--4{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:720px){.operator-grid--4{grid-template-columns:1fr}}
-
 </style>
 
 </head>
@@ -143,7 +163,7 @@
   <section class="command-section" id="administration" data-unit="ADMIN">
     <div class="wrap">
       <header class="section-console"><div><span>02 // ADMINISTRATION</span><h2>PILOTAGE DU SERVEUR</h2></div><p>Coordination quotidienne, évolution du projet et organisation communautaire.</p></header>
-      <div class="operator-grid operator-grid--4">
+      <div class="operator-grid operator-grid--3">
 <article class="compact-card reveal tone-admin">
 <div class="compact-card__media"><img src="assets/images/staff/staff-frozzz-v4.jpg" alt="FroZzZ"><span>ADMIN // A01</span></div>
 <div class="compact-card__body"><div class="mini-status"><i></i> En ligne</div><h3>FROZZZ</h3><h4>Administrateur Réseau</h4><p>Chargé notamment du développement et de la connectivité du Site et du Discord.</p><div class="skill-row"><span>Réseau</span><span>Site</span><span>Discord</span></div><a class="operator-action" href="https://steamcommunity.com/profiles/76561197985997015" target="_blank" rel="noopener">Consulter le profil <b>↗</b></a></div>
@@ -163,33 +183,43 @@
   <section class="command-section" id="support" data-unit="SUPPORT">
     <div class="wrap">
       <header class="section-console"><div><span>03 // SUPPORT</span><h2>ASSISTANCE AUX SURVIVANTS</h2></div><p>Premier point de contact pour les questions, les tickets et l’accompagnement.</p></header>
-      <div class="operator-grid operator-grid--3">
+      <div class="operator-grid support-grid">
         <article class="compact-card reveal tone-support">
           <div class="compact-card__media"><img src="assets/images/staff/staff-drmoji.png" alt="DrMoji"><span>SUPPORT // S01</span></div>
           <div class="compact-card__body"><div class="mini-status"><i></i> Disponible</div><h3>DRMOJI</h3><h4>Support</h4><p>Écoute, entraide et accompagnement quotidien de la communauté.</p><div class="skill-row"><span>Entraide</span><span>Accueil</span><span>Suivi</span></div><a class="operator-action" href="https://steamcommunity.com/profiles/76561198280114119" target="_blank" rel="noopener">Consulter le profil <b>↗</b></a></div>
         </article>
+
         <article class="compact-card reveal tone-support">
           <div class="compact-card__media"><img src="assets/images/staff/staff-leloupsolitaire.png" alt="Le Loup Solitaire"><span>SUPPORT // S02</span></div>
           <div class="compact-card__body"><div class="mini-status"><i></i> Disponible</div><h3>LE LOUP<br>SOLITAIRE</h3><h4>Support</h4><p>Écoute, entraide et accompagnement quotidien de la communauté.</p><div class="skill-row"><span>Entraide</span><span>Accueil</span><span>Suivi</span></div><span class="operator-action operator-action--disabled">Dossier opérateur à venir</span></div>
         </article>
+
         <article class="compact-card reveal tone-support">
           <div class="compact-card__media"><img src="assets/images/staff/staff-blackfenrir.png" alt="Blackfenrir"><span>SUPPORT // S03</span></div>
           <div class="compact-card__body"><div class="mini-status"><i></i> Disponible</div><h3>BLACKFENRIR</h3><h4>Support</h4><p>Écoute, entraide et accompagnement quotidien de la communauté.</p><div class="skill-row"><span>Entraide</span><span>Accueil</span><span>Suivi</span></div><span class="operator-action operator-action--disabled">Dossier opérateur à venir</span></div>
         </article>
+
+        <article class="compact-card reveal tone-support">
+          <div class="compact-card__media"><img src="assets/images/staff/staff-crevette.png" alt="Crevette"><span>SUPPORT // S04</span></div>
+          <div class="compact-card__body"><div class="mini-status"><i></i> Disponible</div><h3>CREVETTE</h3><h4>Support</h4><p>Accueil des joueurs, accompagnement et relais vers les équipes spécialisées.</p><div class="skill-row"><span>Accueil</span><span>Suivi</span><span>Orientation</span></div><a class="operator-action" href="https://steamcommunity.com/profiles/76561199849256902" target="_blank" rel="noopener">Consulter le profil <b>↗</b></a></div>
+        </article>
       </div>
-    <article class="compact-card reveal tone-support">
-<div class="compact-card__media"><img src="assets/images/staff/staff-crevette.png" alt="Crevette"><span>SUPPORT // S04</span></div>
-<div class="compact-card__body"><div class="mini-status"><i></i> Disponible</div><h3>CREVETTE</h3><h4>Support</h4><p>Accueil des joueurs, accompagnement et relais vers les équipes spécialisées.</p><div class="skill-row"><span>Accueil</span><span>Suivi</span><span>Orientation</span></div><a class="operator-action" href="https://steamcommunity.com/profiles/76561199187996911" target="_blank" rel="noopener">Consulter le profil <b>↗</b></a></div>
-</article>
-</div>
+    </div>
   </section>
 
   <section class="command-section" id="garage" data-unit="GARAGE">
     <div class="wrap">
       <header class="section-console"><div><span>04 // GARAGE</span><h2>UNITÉ VÉHICULE</h2></div><p>Spécialistes des véhicules, du dépannage et des demandes mécaniques.</p></header>
-      <div class="operator-grid operator-grid--2">
-        <article class="compact-card reveal tone-garage"><div class="compact-card__media"><img src="assets/images/staff/staff-werz-assassin.png" alt="Werz_assassin"><span>GARAGE // G01</span></div><div class="compact-card__body"><div class="mini-status"><i></i> Unité active</div><h3>WERZ_ASSASSIN</h3><h4>Véhicules & dépannage</h4><p>Gestion des véhicules et assistance mécanique des survivants.</p><div class="skill-row"><span>Véhicules</span><span>Dépannage</span></div><span class="operator-action operator-action--disabled">Dossier opérateur à venir</span></div></article>
-        <article class="compact-card reveal tone-garage"><div class="compact-card__media"><img src="assets/images/staff/staff-le-g.png" alt="Le G"><span>GARAGE // G02</span></div><div class="compact-card__body"><div class="mini-status"><i></i> Unité active</div><h3>LE G</h3><h4>Interventions garage</h4><p>Interventions véhicule et accompagnement des joueurs au garage.</p><div class="skill-row"><span>Intervention</span><span>Garage</span></div><span class="operator-action operator-action--disabled">Dossier opérateur à venir</span></div></article>
+      <div class="operator-grid garage-grid">
+        <article class="compact-card reveal tone-garage">
+          <div class="compact-card__media"><img src="assets/images/staff/staff-werz-assassin.png" alt="Werz_assassin"><span>GARAGE // G01</span></div>
+          <div class="compact-card__body"><div class="mini-status"><i></i> Unité active</div><h3>WERZ_ASSASSIN</h3><h4>Véhicules & dépannage</h4><p>Gestion des véhicules et assistance mécanique des survivants.</p><div class="skill-row"><span>Véhicules</span><span>Dépannage</span></div><span class="operator-action operator-action--disabled">Dossier opérateur à venir</span></div>
+        </article>
+
+        <article class="compact-card reveal tone-garage">
+          <div class="compact-card__media"><img src="assets/images/staff/staff-le-g.png" alt="Le G"><span>GARAGE // G02</span></div>
+          <div class="compact-card__body"><div class="mini-status"><i></i> Unité active</div><h3>LE G</h3><h4>Interventions garage</h4><p>Interventions véhicule et accompagnement des joueurs au garage.</p><div class="skill-row"><span>Intervention</span><span>Garage</span></div><span class="operator-action operator-action--disabled">Dossier opérateur à venir</span></div>
+        </article>
       </div>
     </div>
   </section>
