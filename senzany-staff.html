@@ -82,6 +82,13 @@
 @media (max-width: 680px) {
   #support .operator-grid { grid-template-columns: 1fr; }
 }
+
+.operator-grid--4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.operator-grid--4 .compact-card__body{padding:16px}
+.operator-grid--4 .compact-card__body h3{font-size:clamp(1.2rem,1.7vw,1.65rem)}
+@media(max-width:1100px){.operator-grid--4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.operator-grid--4{grid-template-columns:1fr}}
+
 </style>
 
 </head>
@@ -97,7 +104,7 @@
         <p class="command-hero__lead">Une équipe réunie autour d’une même mission : construire une expérience PVE durable, accompagner les survivants et faire évoluer le serveur chaque jour.</p>
         <div class="network-line"><span class="led"></span> RÉSEAU OPÉRATIONNEL <b>COMMAND NODE // SENZANY</b> <b>CHERNARUS // PVE</b></div>
         <div class="hero-metrics">
-          <div><strong>09</strong><span>Membres</span></div>
+          <div><strong>10</strong><span>Membres</span></div>
           <div><strong>04</strong><span>Unités</span></div>
           <div><strong>01</strong><span>Mission</span></div>
         </div>
@@ -112,7 +119,7 @@
     <div class="wrap unit-tabs__grid">
       <a href="#direction" class="is-active"><strong>01</strong><span>Direction<small>1 opérateur</small></span></a>
       <a href="#administration"><strong>02</strong><span>Administration<small>3 opérateurs</small></span></a>
-      <a href="#support"><strong>03</strong><span>Support<small>3 opérateurs</small></span></a>
+      <a href="#support"><strong>03</strong><span>Support<small>4 opérateurs</small></span></a>
       <a href="#garage"><strong>04</strong><span>Garage<small>2 opérateurs</small></span></a>
     </div>
   </nav>
@@ -136,7 +143,7 @@
   <section class="command-section" id="administration" data-unit="ADMIN">
     <div class="wrap">
       <header class="section-console"><div><span>02 // ADMINISTRATION</span><h2>PILOTAGE DU SERVEUR</h2></div><p>Coordination quotidienne, évolution du projet et organisation communautaire.</p></header>
-      <div class="operator-grid operator-grid--3">
+      <div class="operator-grid operator-grid--4">
 <article class="compact-card reveal tone-admin">
 <div class="compact-card__media"><img src="assets/images/staff/staff-frozzz-v4.jpg" alt="FroZzZ"><span>ADMIN // A01</span></div>
 <div class="compact-card__body"><div class="mini-status"><i></i> En ligne</div><h3>FROZZZ</h3><h4>Administrateur Réseau</h4><p>Chargé notamment du développement et de la connectivité du Site et du Discord.</p><div class="skill-row"><span>Réseau</span><span>Site</span><span>Discord</span></div><a class="operator-action" href="https://steamcommunity.com/profiles/76561197985997015" target="_blank" rel="noopener">Consulter le profil <b>↗</b></a></div>
@@ -170,7 +177,11 @@
           <div class="compact-card__body"><div class="mini-status"><i></i> Disponible</div><h3>BLACKFENRIR</h3><h4>Support</h4><p>Écoute, entraide et accompagnement quotidien de la communauté.</p><div class="skill-row"><span>Entraide</span><span>Accueil</span><span>Suivi</span></div><span class="operator-action operator-action--disabled">Dossier opérateur à venir</span></div>
         </article>
       </div>
-    </div>
+    <article class="compact-card reveal tone-support">
+<div class="compact-card__media"><img src="assets/images/staff/staff-crevette.png" alt="Crevette"><span>SUPPORT // S04</span></div>
+<div class="compact-card__body"><div class="mini-status"><i></i> Disponible</div><h3>CREVETTE</h3><h4>Support</h4><p>Accueil des joueurs, accompagnement et relais vers les équipes spécialisées.</p><div class="skill-row"><span>Accueil</span><span>Suivi</span><span>Orientation</span></div><a class="operator-action" href="https://steamcommunity.com/profiles/76561199187996911" target="_blank" rel="noopener">Consulter le profil <b>↗</b></a></div>
+</article>
+</div>
   </section>
 
   <section class="command-section" id="garage" data-unit="GARAGE">
