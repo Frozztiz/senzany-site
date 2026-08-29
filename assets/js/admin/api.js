@@ -3,10 +3,16 @@
  * Fichier : assets/js/admin/api.js
  */
 
+const isLocalDevHost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+const localApiBaseUrl = "http://127.0.0.1:3000";
+
 export async function apiRequest(url, options = {}) {
-    const response = await fetch(url, {
+    const targetUrl = isLocalDevHost ? `${localApiBaseUrl}${url}` : url;
+    const response = await fetch(targetUrl, {
         method: options.method || "GET",
-        credentials: "same-origin",
+        credentials: isLocalDevHost ? "omit" : "same-origin",
         cache: "no-store",
         signal: options.signal,
         headers: {

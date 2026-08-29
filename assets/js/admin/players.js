@@ -1,3 +1,9 @@
+const isLocalDevHost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+const localApiBaseUrl = "http://127.0.0.1:3000";
+const localApiUrl = (path) => isLocalDevHost ? `${localApiBaseUrl}${path}` : path;
+
 const AUTO_REFRESH_MS = 20000;
 
 let refreshTimer = null;
@@ -177,8 +183,8 @@ async function loadLinkableMembers() {
     }
 
     try {
-        const response = await fetch("/api/commandement/players/linkable-members", {
-            credentials: "same-origin",
+        const response = await fetch(localApiUrl("/api/commandement/players/linkable-members"), {
+            credentials: isLocalDevHost ? "omit" : "same-origin",
             cache: "no-store",
             headers: { Accept: "application/json" }
         });
@@ -209,9 +215,9 @@ async function linkSelectedPlayerToSteamId(steamId) {
     }
 
     try {
-        const response = await fetch(`/api/commandement/players/${encodeURIComponent(selectedPlayer.id)}/identity/link`, {
+        const response = await fetch(localApiUrl(`/api/commandement/players/${encodeURIComponent(selectedPlayer.id)}/identity/link`), {
             method: "POST",
-            credentials: "same-origin",
+            credentials: isLocalDevHost ? "omit" : "same-origin",
             cache: "no-store",
             headers: {
                 Accept: "application/json",
@@ -241,8 +247,8 @@ async function linkSelectedPlayerToSteamId(steamId) {
 async function loadPlayerIdentity(player) {
     resetIdentity();
     try {
-        const response = await fetch(`/api/commandement/players/${encodeURIComponent(player.id)}/identity`, {
-            credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" }
+        const response = await fetch(localApiUrl(`/api/commandement/players/${encodeURIComponent(player.id)}/identity`), {
+            credentials: isLocalDevHost ? "omit" : "same-origin", cache: "no-store", headers: { Accept: "application/json" }
         });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(payload.error || `Erreur ${response.status}`);
@@ -376,7 +382,7 @@ export async function loadPlayers() {
     requestInFlight = true;
     if (elements.refreshButton) { elements.refreshButton.disabled = true; elements.refreshButton.textContent = "Actualisation…"; }
     try {
-        const response = await fetch("/api/commandement/players", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
+        const response = await fetch(localApiUrl("/api/commandement/players"), { credentials: isLocalDevHost ? "omit" : "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(payload.error || `Erreur ${response.status}`);
         renderPlayers(payload);
@@ -408,8 +414,8 @@ async function runPlayerAction(action) {
     try {
         const body = { action, reason };
         if (action === "tempban") body.minutes = Number(elements.banDuration?.value || 1440);
-        const response = await fetch(`/api/commandement/players/${encodeURIComponent(selectedPlayer.id)}/action`, {
-            method: "POST", credentials: "same-origin", cache: "no-store",
+        const response = await fetch(localApiUrl(`/api/commandement/players/${encodeURIComponent(selectedPlayer.id)}/action`), {
+            method: "POST", credentials: isLocalDevHost ? "omit" : "same-origin", cache: "no-store",
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             body: JSON.stringify(body)
         });
