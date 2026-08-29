@@ -7,6 +7,12 @@ import { loadDeliveries } from "./deliveries.js";
 import { initializeCatalog, openCatalog } from "./catalog.js";
 import { initializePlayers, openPlayers, stopPlayersAutoRefresh, loadPlayers } from "./players.js?v=4.8.0";
 
+const isLocalDevHost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+const localApiBaseUrl = "http://127.0.0.1:3000";
+const localApiUrl = (path) => isLocalDevHost ? `${localApiBaseUrl}${path}` : path;
+
 const PLAYERS_CARD_REFRESH_MS = 20000;
 let playersCardRefreshTimer = null;
 
@@ -132,10 +138,23 @@ async function loadVotesCardCount() {
     const card = document.getElementById("commandVotesCardCount");
     if (!card) return;
     try {
-        const response = await fetch("/api/commandement/votes", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
+        const response = await fetch(localApiUrl("/api/commandement/votes"), { credentials: isLocalDevHost ? "omit" : "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
         if (!response.ok) throw new Error();
         const payload = await response.json();
-        card.textContent = payload.totals?.votes ?? 0;
+        const totals = payload.totals || {};
+        card.textContent = totals.realVotes ?? totals.votes ?? 0;
+
+        let detail = document.getElementById("commandVotesCardBreakdown");
+        if (!detail) {
+            detail = document.createElement("small");
+            detail.id = "commandVotesCardBreakdown";
+            detail.style.display = "block";
+            detail.style.marginTop = "6px";
+            detail.style.opacity = "0.78";
+            card.insertAdjacentElement("afterend", detail);
+        }
+        detail.textContent =
+            `${totals.attributedVotes ?? 0} attribués · ${totals.unattributedVotes ?? 0} non attribués`;
     } catch (_) {
         card.textContent = "--";
     }
@@ -162,6 +181,22 @@ function isStaff(user) {
 
 async function checkAccess() {
     showAccessView("loading");
+
+    // DEV LOCAL UNIQUEMENT : accès visuel complet au Centre de Commandement.
+    // La production senzany.com continue d'utiliser l'authentification normale.
+    if (isLocalDevHost) {
+        if (elements.backendStatus) elements.backendStatus.textContent = "LOCAL DEV";
+        const sessionLabel = document.querySelector(".admin-status-bar strong");
+        if (sessionLabel) sessionLabel.textContent = "AUTORISÉ // LOCAL DEV";
+        const operator = document.getElementById("commandOperator");
+        if (operator) operator.textContent = "DÉVELOPPEMENT LOCAL";
+        const steamIdLabel = document.getElementById("commandSteamId");
+        if (steamIdLabel) steamIdLabel.textContent = "STEAMID // LOCAL";
+        showAccessView("dashboard");
+        showHome();
+        runBootSequence();
+        return;
+    }
 
     if (elements.backendStatus) {
         elements.backendStatus.textContent = "CONNEXION...";

@@ -1,3 +1,9 @@
+const isLocalDevHost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+const localApiBaseUrl = "http://127.0.0.1:3000";
+const localApiUrl = (path) => isLocalDevHost ? `${localApiBaseUrl}${path}` : path;
+
 const byId = (id) => document.getElementById(id);
 let payload = null;
 let pendingAssociation = null;
@@ -32,8 +38,13 @@ function setView(name) {
 
 async function checkAccess() {
   setView("loading");
+  if (isLocalDevHost) {
+    setView("dashboard");
+    await loadVotes();
+    return;
+  }
   try {
-    const response = await fetch("/api/commandement/access", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch(localApiUrl("/api/commandement/access"), { credentials: isLocalDevHost ? "omit" : "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
     const data = await response.json().catch(() => ({}));
     if (response.status === 401) { window.location.href = "/api/steam/login"; return; }
     if (response.status === 403 || data.authorized !== true) { setView("denied"); return; }
@@ -112,7 +123,7 @@ function renderRankingCard(row) {
 
 function historyLabel(kind){ return ({vote_credit:"Crédit de vote",claim:"Cagnotte réclamée",refund:"Remboursement",regularization:"Régularisation"})[kind] || String(kind || "Opération").replaceAll("_", " "); }
 function closeHistoryModal(){const modal=byId("votesHistoryModal");if(!modal)return;modal.hidden=true;modal.setAttribute("aria-hidden","true");}
-async function openHistoryModal(steamId,name){const modal=byId("votesHistoryModal");if(!modal)return;modal.hidden=false;modal.setAttribute("aria-hidden","false");byId("votesHistoryTitle").textContent=name||"Historique du joueur";byId("votesHistoryIdentity").textContent=`SteamID ${steamId}`;byId("votesHistoryWallet").innerHTML="";byId("votesHistoryList").innerHTML='<div class="admin-list-message">Chargement de toutes les opérations…</div>';try{const response=await fetch(`/api/commandement/votes/history/${encodeURIComponent(steamId)}`,{credentials:"same-origin",cache:"no-store",headers:{Accept:"application/json"}});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||`Erreur ${response.status}`);const wallet=data.wallet||{};byId("votesHistoryWallet").innerHTML=`<div><span>SOLDE</span><strong>${number(wallet.balance).toLocaleString("fr-FR")} $</strong></div><div><span>GAGNÉ À VIE</span><strong>${number(wallet.lifetime_earned).toLocaleString("fr-FR")} $</strong></div><div><span>RÉCLAMÉ À VIE</span><strong>${number(wallet.lifetime_claimed).toLocaleString("fr-FR")} $</strong></div>`;const ops=Array.isArray(data.operations)?data.operations:[];byId("votesHistoryList").innerHTML=ops.length?ops.map(op=>{const amount=number(op.amount),meta=op.metadata||{},date=op.created_at?new Date(op.created_at).toLocaleString("fr-FR"):"—",details=[op.period?`Période ${op.period}`:"",number(op.votes)>0?`${number(op.votes)} vote${number(op.votes)>1?"s":""}`:"",meta.alias?`Pseudo ${escapeHtml(meta.alias)}`:""].filter(Boolean).join(" // ");return `<article class="votes-history-row ${amount<0?"is-debit":"is-credit"}"><div><strong>${escapeHtml(historyLabel(op.kind))}</strong><small>${escapeHtml(date)}${details?" // "+details:""}</small></div><b>${amount>0?"+":""}${amount.toLocaleString("fr-FR")} $</b></article>`}).join(""):'<div class="admin-list-message">Aucune opération enregistrée pour ce SteamID.</div>';}catch(error){byId("votesHistoryList").innerHTML=`<div class="admin-list-message">${escapeHtml(error.message||"Historique indisponible.")}</div>`;}}
+async function openHistoryModal(steamId,name){const modal=byId("votesHistoryModal");if(!modal)return;modal.hidden=false;modal.setAttribute("aria-hidden","false");byId("votesHistoryTitle").textContent=name||"Historique du joueur";byId("votesHistoryIdentity").textContent=`SteamID ${steamId}`;byId("votesHistoryWallet").innerHTML="";byId("votesHistoryList").innerHTML='<div class="admin-list-message">Chargement de toutes les opérations…</div>';try{const response=await fetch(localApiUrl(`/api/commandement/votes/history/${encodeURIComponent(steamId)}`),{credentials:isLocalDevHost ? "omit" : "same-origin",cache:"no-store",headers:{Accept:"application/json"}});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||`Erreur ${response.status}`);const wallet=data.wallet||{};byId("votesHistoryWallet").innerHTML=`<div><span>SOLDE</span><strong>${number(wallet.balance).toLocaleString("fr-FR")} $</strong></div><div><span>GAGNÉ À VIE</span><strong>${number(wallet.lifetime_earned).toLocaleString("fr-FR")} $</strong></div><div><span>RÉCLAMÉ À VIE</span><strong>${number(wallet.lifetime_claimed).toLocaleString("fr-FR")} $</strong></div>`;const ops=Array.isArray(data.operations)?data.operations:[];byId("votesHistoryList").innerHTML=ops.length?ops.map(op=>{const amount=number(op.amount),meta=op.metadata||{},date=op.created_at?new Date(op.created_at).toLocaleString("fr-FR"):"—",details=[op.period?`Période ${op.period}`:"",number(op.votes)>0?`${number(op.votes)} vote${number(op.votes)>1?"s":""}`:"",meta.alias?`Pseudo ${escapeHtml(meta.alias)}`:""].filter(Boolean).join(" // ");return `<article class="votes-history-row ${amount<0?"is-debit":"is-credit"}"><div><strong>${escapeHtml(historyLabel(op.kind))}</strong><small>${escapeHtml(date)}${details?" // "+details:""}</small></div><b>${amount>0?"+":""}${amount.toLocaleString("fr-FR")} $</b></article>`}).join(""):'<div class="admin-list-message">Aucune opération enregistrée pour ce SteamID.</div>';}catch(error){byId("votesHistoryList").innerHTML=`<div class="admin-list-message">${escapeHtml(error.message||"Historique indisponible.")}</div>`;}}
 
 function availableMembers() {
   return Array.isArray(payload?.members) ? payload.members : [];
@@ -157,9 +168,9 @@ async function associateAlias(steamId) {
   feedback.textContent = "Association en cours…";
   document.querySelectorAll(".votes-member-result").forEach((button) => { button.disabled = true; });
   try {
-    const response = await fetch("/api/commandement/votes/associate", {
+    const response = await fetch(localApiUrl("/api/commandement/votes/associate"), {
       method: "POST",
-      credentials: "same-origin",
+      credentials: isLocalDevHost ? "omit" : "same-origin",
       cache: "no-store",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ steamId, alias: pendingAssociation.alias })
@@ -207,12 +218,27 @@ async function loadVotes() {
   setSyncState("loading", "SYNCHRONISATION");
   setRefreshLoading(true);
   try {
-    const response = await fetch("/api/commandement/votes", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch(localApiUrl("/api/commandement/votes"), { credentials: isLocalDevHost ? "omit" : "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
     payload = data;
-    byId("votesTotal").textContent = number(data.totals?.votes);
-    byId("votesLinked").textContent = number(data.totals?.identifiedPlayers);
+    const totals = data.totals || {};
+    byId("votesTotal").textContent = number(totals.realVotes ?? totals.votes);
+
+    let breakdown = byId("votesTotalBreakdown");
+    if (!breakdown && byId("votesTotal")) {
+      breakdown = document.createElement("small");
+      breakdown.id = "votesTotalBreakdown";
+      breakdown.style.display = "block";
+      breakdown.style.marginTop = "6px";
+      breakdown.style.opacity = "0.78";
+      byId("votesTotal").insertAdjacentElement("afterend", breakdown);
+    }
+    if (breakdown) {
+      breakdown.textContent = `${number(totals.attributedVotes)} attribués · ${number(totals.unattributedVotes)} non attribués`;
+    }
+
+    byId("votesLinked").textContent = number(totals.identifiedPlayers);
     byId("votesUnknown").textContent = number(data.totals?.unidentifiedNames);
     byId("votesRate").textContent = `${associationRate()} %`;
     byId("votesUpdated").textContent = data.updatedAt ? new Date(data.updatedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "—";
