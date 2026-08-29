@@ -701,13 +701,49 @@ async function approveMonthlyRewards() {
 
 async function checkAccess() {
   showOnly(els.loading);
+
+  // MODE DEV LOCAL : permet d'afficher le Commandement sur localhost sans connexion Steam.
+  // Cette exception ne peut pas s'activer sur senzany.com.
+  const isLocalDev =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
+  if (isLocalDev) {
+    showOnly(els.workspace);
+    resetForm();
+
+    // On tente quand même de charger les vraies données disponibles.
+    await Promise.allSettled([
+      loadRules(),
+      loadMonthlyStatus(),
+    ]);
+
+    return;
+  }
+
   try {
-    const response = await fetch("/api/commandement/access", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("/api/commandement/access", {
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+    });
+
     const data = await response.json().catch(() => ({}));
-    if (response.status === 401 || response.status === 403 || data.authorized !== true) { showOnly(els.denied); return; }
+
+    if (response.status === 401 || response.status === 403 || data.authorized !== true) {
+      showOnly(els.denied);
+      return;
+    }
+
     if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
-    showOnly(els.workspace); resetForm(); await Promise.all([loadRules(), loadMonthlyStatus()]);
-  } catch (error) { byId("rewardsAccessErrorMessage").textContent = error.message; showOnly(els.error); }
+
+    showOnly(els.workspace);
+    resetForm();
+    await Promise.all([loadRules(), loadMonthlyStatus()]);
+  } catch (error) {
+    byId("rewardsAccessErrorMessage").textContent = error.message;
+    showOnly(els.error);
+  }
 }
 
 els.form.addEventListener("submit", saveRule);
