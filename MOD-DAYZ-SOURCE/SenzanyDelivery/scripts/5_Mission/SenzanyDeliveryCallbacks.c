@@ -58,3 +58,22 @@ class SZD_CompleteCallback : RestCallback
         Print("[SenzanyDelivery] COMPLETE reponse : " + data);
     }
 };
+
+class SZD_FlagpoleCallback : RestCallback
+{
+    override void OnError(int errorCode)
+    {
+        Print("[SenzanyDelivery] FLAGPOLES ERREUR - code : " + errorCode.ToString());
+    }
+
+    override void OnTimeout()
+    {
+        Print("[SenzanyDelivery] FLAGPOLES TIMEOUT");
+    }
+
+    override void OnSuccess(string data, int dataSize)
+    {
+        Print("[SenzanyDelivery] FLAGPOLES succes");
+        Print("[SenzanyDelivery] FLAGPOLES reponse : " + data);
+    }
+};
