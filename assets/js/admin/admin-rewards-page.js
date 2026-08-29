@@ -55,9 +55,18 @@ function showOnly(target) {
   [els.loading, els.denied, els.error, els.workspace].forEach((node) => { if (node) node.hidden = node !== target; });
 }
 
+const isLocalDevHost =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+const localApiBaseUrl = "http://127.0.0.1:3000";
+
 async function api(url, options = {}) {
-  const response = await fetch(url, {
-    method: options.method || "GET", credentials: "same-origin", cache: "no-store",
+  const targetUrl = isLocalDevHost ? `${localApiBaseUrl}${url}` : url;
+  const response = await fetch(targetUrl, {
+    method: options.method || "GET",
+    credentials: isLocalDevHost ? "omit" : "same-origin",
+    cache: "no-store",
     headers: { Accept: "application/json", "Content-Type": "application/json" },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
@@ -451,8 +460,9 @@ function buildLiveMonthlyRankings(data) {
   });
 }
 
-async function loadLiveMonthlyRanking() {
-  const data = await api("/api/commandement/votes");
+async function loadLiveMonthlyRanking({ cacheBust = false } = {}) {
+  const suffix = cacheBust ? `?refresh=${Date.now()}` : "";
+  const data = await api(`/api/commandement/votes${suffix}`);
   liveVotesPayload = data;
   liveMonthlyRankings = buildLiveMonthlyRankings(data);
   renderMonthlyState();
@@ -624,12 +634,16 @@ async function loadMonthlyRun(runId) {
   renderMonthlyState();
 }
 
-async function loadMonthlyStatus() {
+async function loadMonthlyStatus({ manual = false } = {}) {
   if (!monthlyEls.refresh) return;
-  setLoading(monthlyEls.refresh, true, "Chargement…");
-  setFeedback(monthlyEls.feedback, "Chargement de l’automatisation mensuelle…", "loading");
+  setLoading(monthlyEls.refresh, true, manual ? "Actualisation…" : "Chargement…");
+  setFeedback(
+    monthlyEls.feedback,
+    manual ? "Actualisation du classement Top-Serveurs…" : "Chargement de l’automatisation mensuelle…",
+    "loading"
+  );
   try {
-    const data = await api("/api/admin/monthly-votes/status");
+    const data = await api(`/api/admin/monthly-votes/status${manual ? `?refresh=${Date.now()}` : ""}`);
     monthlyRuns = Array.isArray(data.runs) ? data.runs : [];
     populateHistorySelect();
     monthlyEls.schedule.textContent = `${data.nextAutomaticSnapshot} — ${data.distributionMode}`;
@@ -641,8 +655,22 @@ async function loadMonthlyStatus() {
     setFeedback(monthlyEls.feedback);
     await Promise.all([
       loadMonthlyRun(run?.id),
-      loadLiveMonthlyRanking(),
+      loadLiveMonthlyRanking({ cacheBust: manual }),
     ]);
+
+    if (manual) {
+      const refreshedAt = new Intl.DateTimeFormat("fr-FR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        timeZone: "Europe/Paris",
+      }).format(new Date());
+      setFeedback(
+        monthlyEls.feedback,
+        `Classement actualisé à ${refreshedAt} — ${formatNumber(liveMonthlyRankings.length)} votant(s).`,
+        "success"
+      );
+    }
   } catch (error) {
     setFeedback(monthlyEls.feedback, error.message, "error");
   } finally {
@@ -704,11 +732,7 @@ async function checkAccess() {
 
   // MODE DEV LOCAL : permet d'afficher le Commandement sur localhost sans connexion Steam.
   // Cette exception ne peut pas s'activer sur senzany.com.
-  const isLocalDev =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-
-  if (isLocalDev) {
+  if (isLocalDevHost) {
     showOnly(els.workspace);
     resetForm();
 
@@ -797,7 +821,7 @@ document.addEventListener("keydown", (event) => {
 });
 monthlyEls.prepare?.addEventListener("click", prepareMonthlyRanking);
 monthlyEls.approve?.addEventListener("click", approveMonthlyRewards);
-monthlyEls.refresh?.addEventListener("click", loadMonthlyStatus);
+monthlyEls.refresh?.addEventListener("click", () => loadMonthlyStatus({ manual: true }));
 monthlyEls.period?.addEventListener("change", loadMonthlyStatus);
 monthlyEls.currentTab?.addEventListener("click", () => switchMonthlyView("current"));
 monthlyEls.historyTab?.addEventListener("click", () => { switchMonthlyView("history"); if (monthlyEls.historySelect.value) loadHistoryRun(monthlyEls.historySelect.value); });
