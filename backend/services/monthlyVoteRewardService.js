@@ -7,6 +7,8 @@ const deliveryService = require("./deliveryService");
 const RUNS_TABLE = "monthly_vote_runs";
 const RANKINGS_TABLE = "monthly_vote_rankings";
 const TIME_ZONE = "Europe/Paris";
+const BANK_CREDIT_CLASSNAME = "SenzanyBankCredit";
+const BITCOIN_CLASSNAME = "bitcoin";
 
 function periodFromDate(date = new Date(), offsetMonths = 0) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -44,6 +46,38 @@ function normalizeItems(items) {
       quantity: Math.max(1, Number.parseInt(item?.quantity, 10) || 1),
     }))
     .filter((item) => item.className);
+}
+
+function appendSplitItem(items, className, name, quantity, maxPerLine = 1000) {
+  let remaining = Math.max(0, Number.parseInt(quantity, 10) || 0);
+  while (remaining > 0) {
+    const chunk = Math.min(remaining, maxPerLine);
+    items.push({ className, name, quantity: chunk });
+    remaining -= chunk;
+  }
+}
+
+function buildRewardDeliveryItems(reward) {
+  const items = normalizeItems(reward?.items);
+
+  const roubles = Math.max(0, Number.parseInt(reward?.roubles, 10) || 0);
+  if (roubles > 0) {
+    items.push({
+      className: BANK_CREDIT_CLASSNAME,
+      name: "Crédit bancaire",
+      quantity: roubles,
+    });
+  }
+
+  const bitcoinAmount = Math.max(
+    0,
+    Number.parseInt(reward?.bitcoinAmount ?? reward?.bitcoin_amount, 10) || 0
+  );
+  if (bitcoinAmount > 0) {
+    appendSplitItem(items, BITCOIN_CLASSNAME, "Bitcoin", bitcoinAmount);
+  }
+
+  return items;
 }
 
 async function getRunByPeriod(period) {
@@ -132,15 +166,25 @@ async function buildGroupedRanking() {
     .map((group, index) => ({ ...group, position: index + 1 }));
 }
 
-function findRewardRule(rules, position) {
+function findRewardRule(rules, votes) {
+  const voteCount = Math.max(0, Number(votes || 0));
+
   return (Array.isArray(rules) ? rules : [])
-    .filter((rule) =>
-      rule.is_active !== false &&
-      rule.reward_type === "votes_ranking" &&
-      Number(rule.rank_min) <= position &&
-      Number(rule.rank_max) >= position
-    )
-    .sort((a, b) => Number(a.priority || 100) - Number(b.priority || 100))[0] || null;
+    .filter((rule) => {
+      const threshold = Number(rule.threshold_value);
+      return (
+        rule.is_active !== false &&
+        rule.reward_type === "votes_threshold" &&
+        Number.isFinite(threshold) &&
+        threshold > 0 &&
+        threshold <= voteCount
+      );
+    })
+    .sort((a, b) => {
+      const thresholdDifference = Number(b.threshold_value) - Number(a.threshold_value);
+      if (thresholdDifference !== 0) return thresholdDifference;
+      return Number(a.priority || 100) - Number(b.priority || 100);
+    })[0] || null;
 }
 
 function snapshotReward(rule) {
@@ -150,6 +194,7 @@ function snapshotReward(rule) {
     name: rule.name,
     description: rule.description || "",
     roubles: Number(rule.roubles || 0),
+    bitcoinAmount: Number(rule.bitcoin_amount || 0),
     battlePassXp: Number(rule.battle_pass_xp || 0),
     items: normalizeItems(rule.items),
     rankMin: Number(rule.rank_min || 1),
@@ -194,7 +239,7 @@ async function prepare(periodInput, { force = false } = {}) {
   ]);
 
   const rows = groupedRanking.map((entry) => {
-    const rule = findRewardRule(rules, entry.position);
+    const rule = findRewardRule(rules, entry.votes);
     return {
       run_id: run.id,
       position: entry.position,
@@ -251,6 +296,7 @@ function buildDeliveryMessage(row, reward) {
     `Classement : #${row.position} — ${row.votes} vote${row.votes > 1 ? "s" : ""}.`,
   ];
   if (reward.roubles > 0) parts.push(`Roubles prévus : ${reward.roubles}.`);
+  if (reward.bitcoinAmount > 0) parts.push(`Bitcoin prévu : ${reward.bitcoinAmount}.`);
   if (reward.battlePassXp > 0) parts.push(`XP Battle Pass prévue : ${reward.battlePassXp}.`);
   return parts.join(" ").slice(0, 500);
 }
@@ -308,16 +354,31 @@ async function approve(runId, actorSteamId) {
       skipped += 1;
       continue;
     }
+
     const reward = row.reward_snapshot;
-    const items = normalizeItems(reward?.items);
-    if (!reward || !items.length) {
+    if (!reward) {
       skipped += 1;
       await supabaseService.request(`${RANKINGS_TABLE}?id=eq.${encodeURIComponent(row.id)}`, {
         method: "PATCH",
         headers: { Prefer: "return=minimal" },
         body: JSON.stringify({
-          status: reward ? "no_items" : "no_reward",
-          error_message: reward ? "Le pack ne contient aucun objet DayZ." : null,
+          status: "no_reward",
+          error_message: null,
+          updated_at: new Date().toISOString(),
+        }),
+      });
+      continue;
+    }
+
+    const items = buildRewardDeliveryItems(reward);
+    if (!items.length) {
+      skipped += 1;
+      await supabaseService.request(`${RANKINGS_TABLE}?id=eq.${encodeURIComponent(row.id)}`, {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({
+          status: "no_items",
+          error_message: "Le pack ne contient aucun objet, rouble ou Bitcoin à livrer.",
           updated_at: new Date().toISOString(),
         }),
       });
