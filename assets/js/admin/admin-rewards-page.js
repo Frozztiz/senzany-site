@@ -429,10 +429,11 @@ function monthlyRowState(row) {
 }
 
 
-function findLiveRewardRule(votes) {
+function findLiveRewardRule(votes, rewardRules = rules) {
   const voteCount = Math.max(0, Number(votes || 0));
+  const availableRules = Array.isArray(rewardRules) ? rewardRules : [];
 
-  return rules
+  return availableRules
     .filter((rule) => {
       const threshold = Number(rule.threshold_value);
       return (
@@ -450,7 +451,7 @@ function findLiveRewardRule(votes) {
     })[0] || null;
 }
 
-function buildLiveMonthlyRankings(data) {
+function buildLiveMonthlyRankings(data, rewardRules = rules) {
   const identified = Array.isArray(data?.identified) ? data.identified : [];
   const unidentified = Array.isArray(data?.unidentified) ? data.unidentified : [];
 
@@ -488,7 +489,7 @@ function buildLiveMonthlyRankings(data) {
 
   return grouped.map((row, index) => {
     const position = index + 1;
-    const reward = findLiveRewardRule(row.votes);
+    const reward = findLiveRewardRule(row.votes, rewardRules);
     return {
       position,
       steam_id: row.steam_id,
@@ -515,12 +516,11 @@ async function loadLiveMonthlyRanking({ cacheBust = false } = {}) {
     api(`/api/admin/rewards${suffix}`),
   ]);
 
-  if (Array.isArray(rewardsData?.rules)) {
-    rules = rewardsData.rules;
-  }
+  const liveRewardRules = Array.isArray(rewardsData?.rules) ? rewardsData.rules : [];
+  rules = liveRewardRules;
 
   liveVotesPayload = votesData;
-  liveMonthlyRankings = buildLiveMonthlyRankings(votesData);
+  liveMonthlyRankings = buildLiveMonthlyRankings(votesData, liveRewardRules);
   renderMonthlyState();
 }
 
