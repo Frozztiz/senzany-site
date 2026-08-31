@@ -441,19 +441,53 @@ function findLiveRewardRule(position) {
 }
 
 function buildLiveMonthlyRankings(data) {
-  const ranking = Array.isArray(data?.ranking) ? data.ranking : [];
-  return ranking.map((row, index) => {
-    const position = Number(row.position || index + 1);
+  const identified = Array.isArray(data?.identified) ? data.identified : [];
+  const unidentified = Array.isArray(data?.unidentified) ? data.unidentified : [];
+
+  // Reprend le regroupement déjà calculé par le module Votes :
+  // un joueur identifié = un SteamID + la somme des votes de tous ses pseudos déclarés.
+  // Les pseudos non encore rattachés restent visibles individuellement pour pouvoir
+  // être associés avant la préparation du snapshot mensuel.
+  const grouped = [
+    ...identified.map((row) => ({
+      steam_id: row.steamId || null,
+      player_name: row.memberName || row.playerName || row.steamId || "Pseudo inconnu",
+      aliases: Array.isArray(row.matchedNames) && row.matchedNames.length
+        ? row.matchedNames
+        : (Array.isArray(row.aliases) ? row.aliases : (row.playerName ? [row.playerName] : [])),
+      votes: Number(row.votes || 0),
+      identified: true,
+    })),
+    ...unidentified.map((row) => ({
+      steam_id: null,
+      player_name: row.playerName || "Pseudo inconnu",
+      aliases: row.playerName ? [row.playerName] : [],
+      votes: Number(row.votes || 0),
+      identified: false,
+    })),
+  ]
+    .filter((row) => row.votes > 0)
+    .sort((a, b) =>
+      b.votes - a.votes ||
+      String(a.player_name || "").localeCompare(
+        String(b.player_name || ""),
+        "fr",
+        { sensitivity: "base" }
+      )
+    );
+
+  return grouped.map((row, index) => {
+    const position = index + 1;
     const reward = findLiveRewardRule(position);
     return {
       position,
-      steam_id: row.steamId || null,
-      player_name: row.memberName || row.playerName || row.steamId || "Pseudo inconnu",
-      aliases: row.playerName ? [row.playerName] : [],
-      votes: Number(row.votes || 0),
+      steam_id: row.steam_id,
+      player_name: row.player_name,
+      aliases: row.aliases,
+      votes: row.votes,
       reward_rule_id: reward?.id || null,
       reward_name: reward?.name || null,
-      status: row.identified === false || !row.steamId
+      status: !row.identified || !row.steam_id
         ? "unidentified"
         : (reward ? "live" : "no_reward"),
     };
