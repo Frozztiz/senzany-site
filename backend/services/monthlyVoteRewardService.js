@@ -132,15 +132,25 @@ async function buildGroupedRanking() {
     .map((group, index) => ({ ...group, position: index + 1 }));
 }
 
-function findRewardRule(rules, position) {
+function findRewardRule(rules, votes) {
+  const voteCount = Math.max(0, Number(votes || 0));
+
   return (Array.isArray(rules) ? rules : [])
-    .filter((rule) =>
-      rule.is_active !== false &&
-      rule.reward_type === "votes_ranking" &&
-      Number(rule.rank_min) <= position &&
-      Number(rule.rank_max) >= position
-    )
-    .sort((a, b) => Number(a.priority || 100) - Number(b.priority || 100))[0] || null;
+    .filter((rule) => {
+      const threshold = Number(rule.threshold_value);
+      return (
+        rule.is_active !== false &&
+        rule.reward_type === "votes_threshold" &&
+        Number.isFinite(threshold) &&
+        threshold > 0 &&
+        threshold <= voteCount
+      );
+    })
+    .sort((a, b) => {
+      const thresholdDifference = Number(b.threshold_value) - Number(a.threshold_value);
+      if (thresholdDifference !== 0) return thresholdDifference;
+      return Number(a.priority || 100) - Number(b.priority || 100);
+    })[0] || null;
 }
 
 function snapshotReward(rule) {
@@ -194,7 +204,7 @@ async function prepare(periodInput, { force = false } = {}) {
   ]);
 
   const rows = groupedRanking.map((entry) => {
-    const rule = findRewardRule(rules, entry.position);
+    const rule = findRewardRule(rules, entry.votes);
     return {
       run_id: run.id,
       position: entry.position,
