@@ -41,3 +41,22 @@ class SZD_ClaimResponse
 {
     ref SZD_Delivery delivery;
 };
+class SZD_FlagpoleData
+{
+    string type;
+    float x;
+    float y;
+    float z;
+};
+
+class SZD_FlagpoleSnapshotRequest
+{
+    string agentId;
+    string agentKey;
+    ref array<ref SZD_FlagpoleData> flagpoles;
+
+    void SZD_FlagpoleSnapshotRequest()
+    {
+        flagpoles = new array<ref SZD_FlagpoleData>();
+    }
+};

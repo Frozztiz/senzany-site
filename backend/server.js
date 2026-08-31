@@ -4,6 +4,33 @@ require("dotenv").config();
 
 const app = express();
 
+const localDevEnabled = process.env.SENZANY_LOCAL_DEV === "true";
+const localDevOrigins = new Set([
+  "http://localhost:8888",
+  "http://127.0.0.1:8888",
+]);
+
+// Développement local uniquement : autorise le frontend Netlify Dev à lire
+// l'API Express locale. Cette branche reste inactive en production.
+if (localDevEnabled) {
+  app.use((req, res, next) => {
+    const origin = String(req.headers.origin || "");
+
+    if (localDevOrigins.has(origin)) {
+      res.setHeader("Access-Control-Allow-Origin", origin);
+      res.setHeader("Vary", "Origin");
+      res.setHeader("Access-Control-Allow-Headers", "Accept, Content-Type");
+      res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    }
+
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(204);
+    }
+
+    next();
+  });
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -109,5 +136,11 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "127.0.0.1", () => {
   console.log(`Senzany API démarrée sur le port ${PORT}`);
+
+  if (localDevEnabled) {
+    console.log("[LOCAL DEV] Mode lecture seule actif — scheduler mensuel désactivé.");
+    return;
+  }
+
   require("./services/monthlyVoteRewardService").startScheduler();
 });

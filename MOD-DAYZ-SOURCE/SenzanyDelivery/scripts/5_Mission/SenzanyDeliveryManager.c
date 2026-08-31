@@ -7,6 +7,8 @@ class SZD_DeliveryManager
     protected RestContext m_RestContext;
     protected bool m_IsRunning;
     protected float m_PollTimer;
+    protected float m_FlagpoleTimer;
+    protected static const float FLAGPOLE_SYNC_INTERVAL = 300.0;
 
     void SZD_DeliveryManager()
     {
@@ -35,6 +37,7 @@ class SZD_DeliveryManager
         }
 
         m_PollTimer = 0;
+        m_FlagpoleTimer = 0;
         m_IsRunning = true;
     }
 
@@ -52,14 +55,100 @@ class SZD_DeliveryManager
         }
 
         m_PollTimer += timeslice;
+        m_FlagpoleTimer += timeslice;
 
-        if (m_PollTimer < m_Settings.pollIntervalSeconds)
+        if (m_PollTimer >= m_Settings.pollIntervalSeconds)
+        {
+            m_PollTimer = 0;
+            PollConnectedPlayers();
+        }
+
+        if (m_FlagpoleTimer >= FLAGPOLE_SYNC_INTERVAL)
+        {
+            m_FlagpoleTimer = 0;
+            SyncFlagpoles();
+        }
+    }
+
+    protected void SyncFlagpoles()
+    {
+        if (!m_Settings)
         {
             return;
         }
 
-        m_PollTimer = 0;
-        PollConnectedPlayers();
+        // ChernarusPlus fait environ 15,36 km de cote. Un rayon de 12 km
+        // depuis le centre couvre toute la carte, coins compris.
+        vector mapCenter = "7680 0 7680";
+        float scanRadius = 12000.0;
+
+        ref array<Object> objects = new array<Object>();
+        ref array<CargoBase> proxyCargos = new array<CargoBase>();
+        GetGame().GetObjectsAtPosition3D(mapCenter, scanRadius, objects, proxyCargos);
+
+        SZD_FlagpoleSnapshotRequest request = new SZD_FlagpoleSnapshotRequest();
+        request.agentId = m_Settings.agentId;
+        request.agentKey = m_Settings.apiKey;
+
+        foreach (Object obj : objects)
+        {
+            if (!obj)
+            {
+                continue;
+            }
+
+            TerritoryFlag flagpole = TerritoryFlag.Cast(obj);
+
+            if (!flagpole)
+            {
+                continue;
+            }
+
+            vector position = flagpole.GetPosition();
+            SZD_FlagpoleData flagpoleData = new SZD_FlagpoleData();
+            flagpoleData.type = flagpole.GetType();
+            flagpoleData.x = position[0];
+            flagpoleData.y = position[1];
+            flagpoleData.z = position[2];
+            request.flagpoles.Insert(flagpoleData);
+        }
+
+        Print("[SenzanyDelivery] FLAGPOLES scan termine - " + request.flagpoles.Count().ToString() + " mat(s) trouve(s)");
+
+        RestApi restApi = GetRestApi();
+
+        if (!restApi)
+        {
+            Print("[SenzanyDelivery] FLAGPOLES ERREUR - GetRestApi a retourne null");
+            return;
+        }
+
+        RestContext flagpoleContext = restApi.GetRestContext(m_Settings.apiUrl);
+
+        if (!flagpoleContext)
+        {
+            Print("[SenzanyDelivery] FLAGPOLES ERREUR - GetRestContext a echoue");
+            return;
+        }
+
+        JsonSerializer serializer = new JsonSerializer();
+        string payload;
+
+        if (!serializer.WriteToString(request, false, payload))
+        {
+            Print("[SenzanyDelivery] FLAGPOLES ERREUR - serialisation impossible");
+            return;
+        }
+
+        flagpoleContext.SetHeader("application/json");
+
+        Print("[SenzanyDelivery] POST " + m_Settings.apiUrl + "/api/delivery-agent/flagpoles");
+        Print("[SenzanyDelivery] FLAGPOLES Agent ID : " + m_Settings.agentId);
+
+        SZD_FlagpoleCallback callback = new SZD_FlagpoleCallback();
+        int requestState = flagpoleContext.POST(callback, "/api/delivery-agent/flagpoles", payload);
+
+        Print("[SenzanyDelivery] FLAGPOLES requete envoyee - " + request.flagpoles.Count().ToString() + " mat(s) - etat initial : " + requestState.ToString());
     }
 
     protected void PollConnectedPlayers()
@@ -507,3 +596,4 @@ class SZD_DeliveryManager
         return true;
     }
 };
+

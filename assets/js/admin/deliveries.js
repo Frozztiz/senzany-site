@@ -23,6 +23,13 @@ import {
     escapeHtml
 } from "./items.js";
 
+const isLocalDev = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+const localApiBaseUrl = "http://127.0.0.1:3000";
+
+function adminApiUrl(path) {
+    return isLocalDev ? `${localApiBaseUrl}${path}` : path;
+}
+
 const elements = {
     form: document.getElementById("deliveryForm"),
     steamId: document.getElementById("deliverySteamId"),
@@ -43,6 +50,139 @@ const elements = {
     empty: document.getElementById("deliveriesEmpty"),
     list: document.getElementById("deliveriesList")
 };
+
+
+let registeredPlayers = [];
+
+
+function ensureRegisteredPlayerPickerStyle() {
+    if (document.getElementById("deliveryRegisteredPlayerStyle")) {
+        return;
+    }
+
+    const style = document.createElement("style");
+    style.id = "deliveryRegisteredPlayerStyle";
+    style.textContent = `
+        #deliveryRegisteredPlayer {
+            width: 100%;
+            min-height: 48px;
+            padding: 0 14px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 10px;
+            background: #171717;
+            color: #f1f1f1;
+            font: inherit;
+            color-scheme: dark;
+            outline: none;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        #deliveryRegisteredPlayer:hover {
+            border-color: rgba(255, 255, 255, 0.30);
+            background: #1b1b1b;
+        }
+
+        #deliveryRegisteredPlayer:focus {
+            border-color: rgba(190, 35, 35, 0.85);
+            box-shadow: 0 0 0 2px rgba(190, 35, 35, 0.12);
+        }
+
+        #deliveryRegisteredPlayer:disabled {
+            opacity: 0.65;
+            cursor: wait;
+        }
+
+        #deliveryRegisteredPlayer option {
+            background: #171717;
+            color: #f1f1f1;
+        }
+    `;
+
+    document.head.appendChild(style);
+}
+
+
+function createRegisteredPlayerPicker() {
+    if (!elements.steamId || document.getElementById("deliveryRegisteredPlayer")) {
+        return;
+    }
+
+    ensureRegisteredPlayerPickerStyle();
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "admin-field";
+    wrapper.innerHTML = `
+        <label for="deliveryRegisteredPlayer">Joueur enregistré</label>
+        <select id="deliveryRegisteredPlayer" aria-label="Choisir un joueur enregistré">
+            <option value="">Chargement des joueurs…</option>
+        </select>
+        <small>Sélectionne un joueur pour remplir automatiquement son SteamID64 et son nom.</small>
+    `;
+
+    const steamField = elements.steamId.closest(".admin-field");
+    steamField?.parentNode?.insertBefore(wrapper, steamField);
+
+    elements.playerPicker = wrapper.querySelector("#deliveryRegisteredPlayer");
+
+    elements.playerPicker?.addEventListener("change", () => {
+        const steamId = elements.playerPicker.value;
+        const player = registeredPlayers.find((entry) => entry.steamId === steamId);
+
+        if (!player) return;
+
+        elements.steamId.value = player.steamId;
+        if (elements.playerName && player.playerName) {
+            elements.playerName.value = player.playerName;
+        }
+    });
+}
+
+function renderRegisteredPlayers() {
+    if (!elements.playerPicker) return;
+
+    const options = registeredPlayers.map((player) => {
+        const label = player.playerName
+            ? `${player.playerName} — ${player.steamId}`
+            : player.steamId;
+
+        return `<option value="${escapeHtml(player.steamId)}">${escapeHtml(label)}</option>`;
+    });
+
+    elements.playerPicker.innerHTML = [
+        '<option value="">— Choisir un joueur enregistré —</option>',
+        ...options
+    ].join("");
+}
+
+async function loadRegisteredPlayers() {
+    createRegisteredPlayerPicker();
+    if (!elements.playerPicker) return;
+
+    elements.playerPicker.disabled = true;
+    elements.playerPicker.innerHTML = '<option value="">Chargement des joueurs…</option>';
+
+    try {
+        const response = await fetch(adminApiUrl("/api/admin/deliveries/players"), {
+            method: "GET",
+            credentials: isLocalDev ? "omit" : "same-origin",
+            cache: "no-store",
+            headers: { Accept: "application/json" }
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data.error || `Erreur ${response.status}`);
+        }
+
+        registeredPlayers = Array.isArray(data.players) ? data.players : [];
+        renderRegisteredPlayers();
+    } catch (error) {
+        console.error("[Senzany Admin] Erreur chargement joueurs enregistrés :", error);
+        elements.playerPicker.innerHTML = '<option value="">Joueurs indisponibles</option>';
+    } finally {
+        elements.playerPicker.disabled = false;
+    }
+}
 
 function validateSteamId(steamId) {
     return /^\d{17}$/.test(steamId);
@@ -262,6 +402,10 @@ async function loadDeliveries() {
 function resetDeliveryForm() {
     elements.form?.reset();
 
+    if (elements.playerPicker) {
+        elements.playerPicker.value = "";
+    }
+
     clearItemRows(elements.itemsList);
 }
 
@@ -357,6 +501,7 @@ async function handleDeliverySubmit(event) {
 }
 
 function initializeDeliveries() {
+    loadRegisteredPlayers();
     if (
         elements.itemsList &&
         !elements.itemsList.children.length

@@ -19,3 +19,6 @@ Thumbs.db
 # La source unique du backend dans Git est backend/
 server/
 STRUCTURE-CORRIGEE.zip
+
+# Local Netlify folder
+.netlify

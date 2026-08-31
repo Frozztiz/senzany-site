@@ -122,15 +122,31 @@ export async function loadVotes() {
 
   cachedPayload = payload;
   if (feedback) feedback.hidden = true;
-  el("adminVotesTotal").textContent = payload.totals?.votes ?? 0;
-  el("adminVotesIdentified").textContent = payload.totals?.identifiedPlayers ?? 0;
+  const totals = payload.totals || {};
+  el("adminVotesTotal").textContent = totals.realVotes ?? totals.votes ?? 0;
+
+  let breakdown = el("adminVotesBreakdown");
+  if (!breakdown && el("adminVotesTotal")) {
+    breakdown = document.createElement("small");
+    breakdown.id = "adminVotesBreakdown";
+    breakdown.style.display = "block";
+    breakdown.style.marginTop = "6px";
+    breakdown.style.opacity = "0.78";
+    el("adminVotesTotal").insertAdjacentElement("afterend", breakdown);
+  }
+  if (breakdown) {
+    breakdown.textContent =
+      `${totals.attributedVotes ?? 0} attribués · ${totals.unattributedVotes ?? 0} non attribués`;
+  }
+
+  el("adminVotesIdentified").textContent = totals.identifiedPlayers ?? 0;
   el("adminVotesUnknown").textContent = payload.totals?.unidentifiedNames ?? 0;
   el("adminVotesUpdated").textContent = payload.updatedAt
     ? new Date(payload.updatedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
     : "--:--";
 
   const card = el("commandVotesCardCount");
-  if (card) card.textContent = payload.totals?.votes ?? 0;
+  if (card) card.textContent = totals.realVotes ?? totals.votes ?? 0;
   render();
 }
 

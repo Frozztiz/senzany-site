@@ -1,4 +1,7 @@
 (() => {
+  const isLocalDevHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const localApiBaseUrl = "http://127.0.0.1:3000";
+  const localApiUrl = (path) => isLocalDevHost ? `${localApiBaseUrl}${path}` : path;
   const state = { events: [], selectedId: null, imageUploading: false };
   const $ = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -37,7 +40,7 @@
     imageStatus('Envoi de l’image en cours…', 'loading');
     $('chooseEventImage').disabled = true;
     try {
-      const response = await fetch(`/api/admin/events/upload-image?filename=${encodeURIComponent(file.name)}`, {
+      const response = await fetch(localApiUrl(`/api/admin/events/upload-image?filename=${encodeURIComponent(file.name)}`), {
         method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': file.type, Accept: 'application/json' }, body: file,
       });
       const data = await response.json().catch(()=>({}));
@@ -52,14 +55,15 @@
     }
   }
   async function api(path='', options={}) {
-    const response = await fetch(`/api/admin/events${path}`, { credentials:'same-origin', cache:'no-store', headers:{Accept:'application/json','Content-Type':'application/json',...(options.headers||{})}, ...options });
+    const response = await fetch(localApiUrl(`/api/admin/events${path}`), { credentials:isLocalDevHost ? 'omit' : 'same-origin', cache:'no-store', headers:{Accept:'application/json','Content-Type':'application/json',...(options.headers||{})}, ...options });
     if (response.status===204) return null;
     const data=await response.json().catch(()=>({}));
     if(!response.ok) throw new Error(data.error||`HTTP ${response.status}`);
     return data;
   }
   async function checkAccess(){
-    try { const response=await fetch('/api/commandement/access',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}}); const data=await response.json().catch(()=>({})); if(!response.ok||data.authorized!==true) throw new Error(data.error||'Accès refusé.'); showWorkspace(); await loadEvents(); }
+    if (isLocalDevHost) { showWorkspace(); await loadEvents(); return; }
+    try { const response=await fetch('/api/commandement/access',{credentials:isLocalDevHost ? 'omit' : 'same-origin',cache:'no-store',headers:{Accept:'application/json'}}); const data=await response.json().catch(()=>({})); if(!response.ok||data.authorized!==true) throw new Error(data.error||'Accès refusé.'); showWorkspace(); await loadEvents(); }
     catch(error){ showGate(error.message); }
   }
   function toLocalInput(value){ if(!value) return ''; const d=new Date(value); const offset=d.getTimezoneOffset(); return new Date(d.getTime()-offset*60000).toISOString().slice(0,16); }

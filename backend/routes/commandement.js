@@ -427,9 +427,10 @@ router.get(
     );
 
     try {
-      const [ranking, aliases, links] =
+      const [ranking, topServeursStats, aliases, links] =
         await Promise.all([
           topServeursService.getPlayersRanking(),
+          topServeursService.getStats(),
           voteAliasService.listAll(),
           supabaseService
             .request(
@@ -578,13 +579,30 @@ router.get(
         ranking: fullRanking,
 
         totals: {
-          votes: ranking.reduce(
+          // Total réellement affiché par Top-Serveurs pour le mois courant.
+          realVotes: Number(topServeursStats?.monthlyVotes || 0),
+
+          // Somme des votes rattachés à un pseudo dans players-ranking.
+          attributedVotes: ranking.reduce(
             (sum, entry) =>
               sum +
               Number(
                 entry.votes || 0
               ),
             0
+          ),
+
+          // Conservé pour compatibilité avec les anciens écrans.
+          votes: Number(topServeursStats?.monthlyVotes || 0),
+
+          // Votes comptabilisés par Top-Serveurs mais absents du classement nominatif.
+          unattributedVotes: Math.max(
+            0,
+            Number(topServeursStats?.monthlyVotes || 0) -
+              ranking.reduce(
+                (sum, entry) => sum + Number(entry.votes || 0),
+                0
+              )
           ),
 
           voteNames:
