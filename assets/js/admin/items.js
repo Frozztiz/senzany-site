@@ -96,7 +96,7 @@ function attachItemAutocomplete(row) {
         render([], "Recherche en cours…");
 
         try {
-            const data = await apiRequest(`/api/admin/items?q=${encodeURIComponent(query)}&limit=12`, {
+            const data = await apiRequest(`/api/admin/items?q=${encodeURIComponent(query)}&limit=100`, {
                 signal: controller.signal
             });
             const normalizedQuery = query.toLowerCase();
