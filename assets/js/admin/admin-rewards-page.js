@@ -506,9 +506,21 @@ function buildLiveMonthlyRankings(data) {
 
 async function loadLiveMonthlyRanking({ cacheBust = false } = {}) {
   const suffix = cacheBust ? `?refresh=${Date.now()}` : "";
-  const data = await api(`/api/commandement/votes${suffix}`);
-  liveVotesPayload = data;
-  liveMonthlyRankings = buildLiveMonthlyRankings(data);
+
+  // Recharge les packs avant de calculer le classement LIVE.
+  // Cela évite que le classement soit construit avec un tableau `rules`
+  // encore vide lorsque les requêtes initiales partent en parallèle.
+  const [votesData, rewardsData] = await Promise.all([
+    api(`/api/commandement/votes${suffix}`),
+    api(`/api/admin/rewards${suffix}`),
+  ]);
+
+  if (Array.isArray(rewardsData?.rules)) {
+    rules = rewardsData.rules;
+  }
+
+  liveVotesPayload = votesData;
+  liveMonthlyRankings = buildLiveMonthlyRankings(votesData);
   renderMonthlyState();
 }
 
