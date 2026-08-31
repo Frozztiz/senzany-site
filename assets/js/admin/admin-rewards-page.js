@@ -429,15 +429,25 @@ function monthlyRowState(row) {
 }
 
 
-function findLiveRewardRule(position) {
+function findLiveRewardRule(votes) {
+  const voteCount = Math.max(0, Number(votes || 0));
+
   return rules
-    .filter((rule) =>
-      rule.is_active !== false &&
-      rule.reward_type === "votes_ranking" &&
-      Number(rule.rank_min) <= Number(position) &&
-      Number(rule.rank_max) >= Number(position)
-    )
-    .sort((a, b) => Number(a.priority || 100) - Number(b.priority || 100))[0] || null;
+    .filter((rule) => {
+      const threshold = Number(rule.threshold_value);
+      return (
+        rule.is_active !== false &&
+        rule.reward_type === "votes_threshold" &&
+        Number.isFinite(threshold) &&
+        threshold > 0 &&
+        threshold <= voteCount
+      );
+    })
+    .sort((a, b) => {
+      const thresholdDifference = Number(b.threshold_value) - Number(a.threshold_value);
+      if (thresholdDifference !== 0) return thresholdDifference;
+      return Number(a.priority || 100) - Number(b.priority || 100);
+    })[0] || null;
 }
 
 function buildLiveMonthlyRankings(data) {
@@ -478,7 +488,7 @@ function buildLiveMonthlyRankings(data) {
 
   return grouped.map((row, index) => {
     const position = index + 1;
-    const reward = findLiveRewardRule(position);
+    const reward = findLiveRewardRule(row.votes);
     return {
       position,
       steam_id: row.steam_id,
