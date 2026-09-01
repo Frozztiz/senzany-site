@@ -11,9 +11,11 @@ BEGIN;
 -- Principe :
 -- - au premier passage sur un nouveau mois, si un état du mois précédent existe,
 --   on place l'ownership en "rollover_pending" ;
--- - tant que le compteur source n'est pas redescendu sous le dernier compteur du
---   mois précédent, aucun vote du nouveau mois n'est crédité ;
--- - dès que la baisse est observée, le reset Top-Serveurs est considéré comme
+-- - tant que le compteur source n'est pas redescendu sous le plus grand compteur
+--   stale observé, aucun vote du nouveau mois n'est crédité ;
+-- - si le compteur stale continue d'augmenter avant le reset, cette nouvelle
+--   valeur maximale est mémorisée ;
+-- - dès qu'une baisse est observée, le reset Top-Serveurs est considéré comme
 --   confirmé et le compteur courant devient le vrai compteur du nouveau mois ;
 -- - les votes présents après ce reset sont alors crédités une seule fois.
 --
@@ -29,7 +31,7 @@ COMMENT ON COLUMN public.vote_wallet_alias_periods.rollover_pending IS
   'Vrai lorsque le nouveau mois attend encore la confirmation du reset du compteur Top-Serveurs.';
 
 COMMENT ON COLUMN public.vote_wallet_alias_periods.rollover_previous_votes IS
-  'Dernier compteur connu du mois précédent utilisé comme garde de rollover.';
+  'Plus grand compteur stale observé avant confirmation du reset mensuel Top-Serveurs.';
 
 CREATE OR REPLACE FUNCTION public.credit_vote_wallet_alias(
   p_ownership_id uuid,
@@ -61,19 +63,20 @@ BEGIN
   WHERE id = p_ownership_id
   FOR UPDATE;
 
-  IF NOT FOUND OR v_owner.ended_at IS NOT NULL THEN
+  IF NOT FOUND THEN
     RETURN QUERY
-    SELECT
-      0,
-      0::bigint,
-      COALESCE(
-        (
-          SELECT balance
-          FROM public.vote_wallets
-          WHERE steam_id = v_owner.steam_id
-        ),
-        0
-      );
+    SELECT 0, 0::bigint, 0::bigint;
+    RETURN;
+  END IF;
+
+  IF v_owner.ended_at IS NOT NULL THEN
+    SELECT COALESCE(balance, 0)
+    INTO v_balance
+    FROM public.vote_wallets
+    WHERE steam_id = v_owner.steam_id;
+
+    RETURN QUERY
+    SELECT 0, 0::bigint, COALESCE(v_balance, 0);
     RETURN;
   END IF;
 
@@ -122,7 +125,7 @@ BEGIN
 
       IF FOUND AND GREATEST(COALESCE(v_previous.last_seen_votes, 0), 0) > 0 THEN
         -- Nouveau mois : on attend explicitement de voir le compteur source
-        -- repasser sous le dernier compteur du mois précédent.
+        -- repasser sous le plus grand compteur stale connu.
         INSERT INTO public.vote_wallet_alias_periods(
           ownership_id,
           period,
@@ -139,7 +142,10 @@ BEGIN
           0,
           v_current,
           true,
-          GREATEST(COALESCE(v_previous.last_seen_votes, 0), 0)
+          GREATEST(
+            COALESCE(v_previous.last_seen_votes, 0),
+            v_current
+          )
         )
         RETURNING * INTO v_state;
 
@@ -169,14 +175,19 @@ BEGIN
   END IF;
 
   -- Tant que Top-Serveurs expose encore le compteur de l'ancien mois,
-  -- on mémorise l'observation mais on ne crédite RIEN.
+  -- on ne crédite RIEN.
   IF v_state.rollover_pending THEN
     IF v_current >= v_state.rollover_previous_votes THEN
       UPDATE public.vote_wallet_alias_periods
       SET last_seen_votes = v_current,
+          rollover_previous_votes = GREATEST(
+            rollover_previous_votes,
+            v_current
+          ),
           updated_at = now()
       WHERE ownership_id = p_ownership_id
-        AND period = p_period;
+        AND period = p_period
+      RETURNING * INTO v_state;
 
       SELECT COALESCE(balance, 0)
       INTO v_balance
@@ -188,8 +199,9 @@ BEGIN
       RETURN;
     END IF;
 
-    -- Le compteur est redescendu : reset confirmé.
-    -- Le compteur courant représente désormais les vrais votes du nouveau mois.
+    -- Le compteur est redescendu sous le maximum stale mémorisé :
+    -- reset confirmé. Le compteur courant représente les vrais votes
+    -- du nouveau mois.
     UPDATE public.vote_wallet_alias_periods
     SET baseline_votes = 0,
         credited_votes = 0,
@@ -204,7 +216,8 @@ BEGIN
 
   v_eligible := GREATEST(v_current - v_state.baseline_votes, 0);
   v_delta := GREATEST(v_eligible - v_state.credited_votes, 0);
-  v_amount := v_delta::bigint * GREATEST(COALESCE(p_amount_per_vote, 0), 0)::bigint;
+  v_amount := v_delta::bigint
+              * GREATEST(COALESCE(p_amount_per_vote, 0), 0)::bigint;
 
   UPDATE public.vote_wallet_alias_periods
   SET credited_votes = GREATEST(credited_votes, v_eligible),
