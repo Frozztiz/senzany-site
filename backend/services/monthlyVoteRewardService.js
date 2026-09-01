@@ -74,7 +74,7 @@ function buildRewardDeliveryItems(reward) {
     Number.parseInt(reward?.bitcoinAmount ?? reward?.bitcoin_amount, 10) || 0
   );
   if (bitcoinAmount > 0) {
-    appendSplitItem(items, BITCOIN_CLASSNAME, "Bitcoin", bitcoinAmount);
+    appendSplitItem(items, BITCOIN_CLASSNAME, "Bitcoin", bitcoinAmount, 500);
   }
 
   return items;
@@ -166,7 +166,7 @@ async function buildGroupedRanking() {
     .map((group, index) => ({ ...group, position: index + 1 }));
 }
 
-function findRewardRule(rules, votes) {
+function findRewardRules(rules, votes) {
   const voteCount = Math.max(0, Number(votes || 0));
 
   return (Array.isArray(rules) ? rules : [])
@@ -181,25 +181,54 @@ function findRewardRule(rules, votes) {
       );
     })
     .sort((a, b) => {
-      const thresholdDifference = Number(b.threshold_value) - Number(a.threshold_value);
+      const thresholdDifference = Number(a.threshold_value) - Number(b.threshold_value);
       if (thresholdDifference !== 0) return thresholdDifference;
       return Number(a.priority || 100) - Number(b.priority || 100);
-    })[0] || null;
+    });
 }
 
-function snapshotReward(rule) {
-  if (!rule) return null;
+function snapshotReward(rules) {
+  const reachedRules = Array.isArray(rules) ? rules : [];
+  if (!reachedRules.length) return null;
+
+  const highestRule = reachedRules[reachedRules.length - 1];
+  const items = [];
+  let roubles = 0;
+  let bitcoinAmount = 0;
+  let battlePassXp = 0;
+
+  for (const rule of reachedRules) {
+    items.push(...normalizeItems(rule.items));
+    roubles += Math.max(0, Number(rule.roubles || 0));
+    bitcoinAmount += Math.max(0, Number(rule.bitcoin_amount || 0));
+    battlePassXp += Math.max(0, Number(rule.battle_pass_xp || 0));
+  }
+
   return {
-    id: rule.id,
-    name: rule.name,
-    description: rule.description || "",
-    roubles: Number(rule.roubles || 0),
-    bitcoinAmount: Number(rule.bitcoin_amount || 0),
-    battlePassXp: Number(rule.battle_pass_xp || 0),
-    items: normalizeItems(rule.items),
-    rankMin: Number(rule.rank_min || 1),
-    rankMax: Number(rule.rank_max || 1),
-    priority: Number(rule.priority || 100),
+    // Compatibilité avec l'interface et l'historique existants : le palier le
+    // plus élevé reste la règle principale, mais la récompense est cumulative.
+    id: highestRule.id,
+    name: highestRule.name,
+    description: `Récompenses cumulées jusqu’au palier ${Number(highestRule.threshold_value)} votes.`,
+    roubles,
+    bitcoinAmount,
+    battlePassXp,
+    items,
+    rankMin: Number(highestRule.rank_min || 1),
+    rankMax: Number(highestRule.rank_max || 1),
+    priority: Number(highestRule.priority || 100),
+    thresholdValue: Number(highestRule.threshold_value || 0),
+    cumulative: true,
+    reachedRules: reachedRules.map((rule) => ({
+      id: rule.id,
+      name: rule.name,
+      thresholdValue: Number(rule.threshold_value || 0),
+      roubles: Number(rule.roubles || 0),
+      bitcoinAmount: Number(rule.bitcoin_amount || 0),
+      battlePassXp: Number(rule.battle_pass_xp || 0),
+      items: normalizeItems(rule.items),
+      priority: Number(rule.priority || 100),
+    })),
   };
 }
 
@@ -239,7 +268,9 @@ async function prepare(periodInput, { force = false } = {}) {
   ]);
 
   const rows = groupedRanking.map((entry) => {
-    const rule = findRewardRule(rules, entry.votes);
+    const reachedRules = findRewardRules(rules, entry.votes);
+    const highestRule = reachedRules.length ? reachedRules[reachedRules.length - 1] : null;
+    const reward = snapshotReward(reachedRules);
     return {
       run_id: run.id,
       position: entry.position,
@@ -247,10 +278,10 @@ async function prepare(periodInput, { force = false } = {}) {
       player_name: entry.playerName,
       votes: entry.votes,
       aliases: entry.aliases,
-      reward_rule_id: rule?.id || null,
-      reward_name: rule?.name || null,
-      reward_snapshot: snapshotReward(rule),
-      status: !entry.steamId ? "unidentified" : (rule ? "ready" : "no_reward"),
+      reward_rule_id: highestRule?.id || null,
+      reward_name: highestRule?.name || null,
+      reward_snapshot: reward,
+      status: !entry.steamId ? "unidentified" : (reward ? "ready" : "no_reward"),
       delivery_id: null,
       error_message: null,
       updated_at: new Date().toISOString(),
@@ -451,8 +482,8 @@ async function status() {
     currentPeriod,
     previousPeriod,
     runs: Array.isArray(rows) ? rows : [],
-    nextAutomaticSnapshot: "Dernier jour du mois à 23:55 (Europe/Paris)",
-    distributionMode: "Validation manuelle le 1er du mois",
+    nextAutomaticSnapshot: null,
+    distributionMode: "Préparation et validation manuelles",
   };
 }
 
@@ -520,7 +551,7 @@ async function schedulerTick() {
 }
 
 function startScheduler() {
-  if (String(process.env.MONTHLY_VOTE_SCHEDULER_ENABLED || "true").toLowerCase() === "false") {
+  if (String(process.env.MONTHLY_VOTE_SCHEDULER_ENABLED || "false").toLowerCase() === "false") {
     console.log("[VOTES MENSUELS] Planificateur désactivé par configuration.");
     return null;
   }
