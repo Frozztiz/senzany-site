@@ -33,6 +33,7 @@ const monthlyEls = {
   refresh: byId("refreshMonthlyRewards"),
   feedback: byId("monthlyRewardFeedback"),
   preview: byId("monthlyRewardPreview"),
+  rankingCount: byId("monthlyRankingCount"),
   currentTab: byId("monthlyCurrentTab"),
   historyTab: byId("monthlyHistoryTab"),
   currentPanel: byId("monthlyCurrentPanel"),
@@ -55,18 +56,9 @@ function showOnly(target) {
   [els.loading, els.denied, els.error, els.workspace].forEach((node) => { if (node) node.hidden = node !== target; });
 }
 
-const isLocalDevHost =
-  window.location.hostname === "localhost" ||
-  window.location.hostname === "127.0.0.1";
-
-const localApiBaseUrl = "http://127.0.0.1:3000";
-
 async function api(url, options = {}) {
-  const targetUrl = isLocalDevHost ? `${localApiBaseUrl}${url}` : url;
-  const response = await fetch(targetUrl, {
-    method: options.method || "GET",
-    credentials: isLocalDevHost ? "omit" : "same-origin",
-    cache: "no-store",
+  const response = await fetch(url, {
+    method: options.method || "GET", credentials: "same-origin", cache: "no-store",
     headers: { Accept: "application/json", "Content-Type": "application/json" },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
@@ -429,103 +421,51 @@ function monthlyRowState(row) {
 }
 
 
-function findLiveRewardRule(votes, rewardRules = rules) {
-  const voteCount = Math.max(0, Number(votes || 0));
-  const availableRules = Array.isArray(rewardRules) ? rewardRules : [];
-
-  return availableRules
-    .filter((rule) => {
-      const threshold = Number(rule.threshold_value);
-      return (
-        rule.is_active !== false &&
-        rule.reward_type === "votes_threshold" &&
-        Number.isFinite(threshold) &&
-        threshold > 0 &&
-        threshold <= voteCount
-      );
-    })
-    .sort((a, b) => {
-      const thresholdDifference = Number(b.threshold_value) - Number(a.threshold_value);
-      if (thresholdDifference !== 0) return thresholdDifference;
-      return Number(a.priority || 100) - Number(b.priority || 100);
-    })[0] || null;
+function findLiveRewardRule(position) {
+  return rules
+    .filter((rule) =>
+      rule.is_active !== false &&
+      rule.reward_type === "votes_ranking" &&
+      Number(rule.rank_min) <= Number(position) &&
+      Number(rule.rank_max) >= Number(position)
+    )
+    .sort((a, b) => Number(a.priority || 100) - Number(b.priority || 100))[0] || null;
 }
 
-function buildLiveMonthlyRankings(data, rewardRules = rules) {
-  const identified = Array.isArray(data?.identified) ? data.identified : [];
-  const unidentified = Array.isArray(data?.unidentified) ? data.unidentified : [];
-
-  // Reprend le regroupement déjà calculé par le module Votes :
-  // un joueur identifié = un SteamID + la somme des votes de tous ses pseudos déclarés.
-  // Les pseudos non encore rattachés restent visibles individuellement pour pouvoir
-  // être associés avant la préparation du snapshot mensuel.
-  const grouped = [
-    ...identified.map((row) => ({
-      steam_id: row.steamId || null,
-      player_name: row.memberName || row.playerName || row.steamId || "Pseudo inconnu",
-      aliases: Array.isArray(row.matchedNames) && row.matchedNames.length
-        ? row.matchedNames
-        : (Array.isArray(row.aliases) ? row.aliases : (row.playerName ? [row.playerName] : [])),
-      votes: Number(row.votes || 0),
-      identified: true,
-    })),
-    ...unidentified.map((row) => ({
-      steam_id: null,
-      player_name: row.playerName || "Pseudo inconnu",
-      aliases: row.playerName ? [row.playerName] : [],
-      votes: Number(row.votes || 0),
-      identified: false,
-    })),
-  ]
-    .filter((row) => row.votes > 0)
-    .sort((a, b) =>
-      b.votes - a.votes ||
-      String(a.player_name || "").localeCompare(
-        String(b.player_name || ""),
-        "fr",
-        { sensitivity: "base" }
-      )
-    );
-
-  return grouped.map((row, index) => {
-    const position = index + 1;
-    const reward = findLiveRewardRule(row.votes, rewardRules);
+function buildLiveMonthlyRankings(data) {
+  const ranking = Array.isArray(data?.ranking) ? data.ranking : [];
+  return ranking.map((row, index) => {
+    const position = Number(row.position || index + 1);
+    const reward = findLiveRewardRule(position);
     return {
       position,
-      steam_id: row.steam_id,
-      player_name: row.player_name,
-      aliases: row.aliases,
-      votes: row.votes,
+      steam_id: row.steamId || null,
+      player_name: row.memberName || row.playerName || row.steamId || "Pseudo inconnu",
+      aliases: row.playerName ? [row.playerName] : [],
+      votes: Number(row.votes || 0),
       reward_rule_id: reward?.id || null,
       reward_name: reward?.name || null,
-      status: !row.identified || !row.steam_id
+      status: row.identified === false || !row.steamId
         ? "unidentified"
         : (reward ? "live" : "no_reward"),
     };
   });
 }
 
-async function loadLiveMonthlyRanking({ cacheBust = false } = {}) {
-  const suffix = cacheBust ? `?refresh=${Date.now()}` : "";
-
-  // Recharge les packs avant de calculer le classement LIVE.
-  // Cela évite que le classement soit construit avec un tableau `rules`
-  // encore vide lorsque les requêtes initiales partent en parallèle.
-  const [votesData, rewardsData] = await Promise.all([
-    api(`/api/commandement/votes${suffix}`),
-    api(`/api/admin/rewards${suffix}`),
-  ]);
-
-  const liveRewardRules = Array.isArray(rewardsData?.rules) ? rewardsData.rules : [];
-  rules = liveRewardRules;
-
-  liveVotesPayload = votesData;
-  liveMonthlyRankings = buildLiveMonthlyRankings(votesData, liveRewardRules);
+async function loadLiveMonthlyRanking() {
+  const data = await api("/api/commandement/votes");
+  liveVotesPayload = data;
+  liveMonthlyRankings = buildLiveMonthlyRankings(data);
   renderMonthlyState();
 }
 
 function renderMonthlyPreview() {
   if (!monthlyEls.preview) return;
+
+  if (monthlyEls.rankingCount) {
+    const count = liveMonthlyRankings.length;
+    monthlyEls.rankingCount.textContent = `${count} joueur${count > 1 ? "s" : ""}`;
+  }
 
   if (!liveMonthlyRankings.length) {
     monthlyEls.preview.innerHTML = '<div class="admin-list-message">Classement Top-Serveurs en cours de chargement…</div>';
@@ -690,16 +630,12 @@ async function loadMonthlyRun(runId) {
   renderMonthlyState();
 }
 
-async function loadMonthlyStatus({ manual = false } = {}) {
+async function loadMonthlyStatus() {
   if (!monthlyEls.refresh) return;
-  setLoading(monthlyEls.refresh, true, manual ? "Actualisation…" : "Chargement…");
-  setFeedback(
-    monthlyEls.feedback,
-    manual ? "Actualisation du classement Top-Serveurs…" : "Chargement de l’automatisation mensuelle…",
-    "loading"
-  );
+  setLoading(monthlyEls.refresh, true, "Chargement…");
+  setFeedback(monthlyEls.feedback, "Chargement de l’automatisation mensuelle…", "loading");
   try {
-    const data = await api(`/api/admin/monthly-votes/status${manual ? `?refresh=${Date.now()}` : ""}`);
+    const data = await api("/api/admin/monthly-votes/status");
     monthlyRuns = Array.isArray(data.runs) ? data.runs : [];
     populateHistorySelect();
     monthlyEls.schedule.textContent = `${data.nextAutomaticSnapshot} — ${data.distributionMode}`;
@@ -711,22 +647,8 @@ async function loadMonthlyStatus({ manual = false } = {}) {
     setFeedback(monthlyEls.feedback);
     await Promise.all([
       loadMonthlyRun(run?.id),
-      loadLiveMonthlyRanking({ cacheBust: manual }),
+      loadLiveMonthlyRanking(),
     ]);
-
-    if (manual) {
-      const refreshedAt = new Intl.DateTimeFormat("fr-FR", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        timeZone: "Europe/Paris",
-      }).format(new Date());
-      setFeedback(
-        monthlyEls.feedback,
-        `Classement actualisé à ${refreshedAt} — ${formatNumber(liveMonthlyRankings.length)} votant(s).`,
-        "success"
-      );
-    }
   } catch (error) {
     setFeedback(monthlyEls.feedback, error.message, "error");
   } finally {
@@ -788,7 +710,11 @@ async function checkAccess() {
 
   // MODE DEV LOCAL : permet d'afficher le Commandement sur localhost sans connexion Steam.
   // Cette exception ne peut pas s'activer sur senzany.com.
-  if (isLocalDevHost) {
+  const isLocalDev =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
+  if (isLocalDev) {
     showOnly(els.workspace);
     resetForm();
 
@@ -877,7 +803,7 @@ document.addEventListener("keydown", (event) => {
 });
 monthlyEls.prepare?.addEventListener("click", prepareMonthlyRanking);
 monthlyEls.approve?.addEventListener("click", approveMonthlyRewards);
-monthlyEls.refresh?.addEventListener("click", () => loadMonthlyStatus({ manual: true }));
+monthlyEls.refresh?.addEventListener("click", loadMonthlyStatus);
 monthlyEls.period?.addEventListener("change", loadMonthlyStatus);
 monthlyEls.currentTab?.addEventListener("click", () => switchMonthlyView("current"));
 monthlyEls.historyTab?.addEventListener("click", () => { switchMonthlyView("history"); if (monthlyEls.historySelect.value) loadHistoryRun(monthlyEls.historySelect.value); });

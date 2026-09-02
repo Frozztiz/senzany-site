@@ -7,7 +7,7 @@
   <title>Commandement — Récompenses — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
   <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=11.0.2" />
+  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=11.1.0" />
 </head>
 <body data-page="admin-rewards">
   <div data-site-header></div>
@@ -62,9 +62,21 @@
         </div>
 
         <div id="monthlyCurrentPanel" class="monthly-view-panel">
-          <div id="monthlyRewardPreview" class="monthly-reward-preview">
-            <div class="admin-list-message">Aucun classement mensuel préparé.</div>
-          </div>
+          <details id="monthlyRankingDisclosure" class="monthly-ranking-disclosure">
+            <summary>
+              <div>
+                <span>CLASSEMENT COMPLET</span>
+                <strong>Afficher / masquer la liste des votants</strong>
+              </div>
+              <div class="monthly-ranking-disclosure__meta">
+                <b id="monthlyRankingCount">0 joueur</b>
+                <i aria-hidden="true">⌄</i>
+              </div>
+            </summary>
+            <div id="monthlyRewardPreview" class="monthly-reward-preview">
+              <div class="admin-list-message">Aucun classement mensuel préparé.</div>
+            </div>
+          </details>
         </div>
 
         <div id="monthlyHistoryPanel" class="monthly-view-panel monthly-history" hidden>
@@ -200,6 +212,6 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=11.2.0"></script>
+  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=11.1.0"></script>
 </body>
 </html>

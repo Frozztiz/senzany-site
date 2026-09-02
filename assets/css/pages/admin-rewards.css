@@ -1,37 +1,232 @@
 body[data-page="admin-rewards"]{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0,rgba(130,12,12,.13),transparent 34%),#080706;color:#f3eee8}.rewards-page{width:min(1720px,calc(100% - 40px));margin:0 auto;padding:150px 0 90px}.rewards-gate{max-width:1100px;margin:0 auto}.rewards-workspace{width:100%}.rewards-module-toolbar{display:flex;align-items:center;gap:22px;margin-bottom:22px;padding:18px 20px;border:1px solid #352c28;background:linear-gradient(90deg,rgba(28,22,19,.98),rgba(13,11,10,.98))}.rewards-module-toolbar>div{display:flex;flex-direction:column}.rewards-module-toolbar span{color:#ef3d35;font:800 10px monospace;letter-spacing:2px}.rewards-module-toolbar strong{margin-top:5px;font-size:18px}.rewards-module-toolbar small{margin-top:4px;color:#8c827c}.rewards-layout{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:22px;align-items:start}.rewards-editor-card{position:sticky;top:92px}.rewards-editor-card form{padding:25px}.reward-grid{display:grid;gap:15px}.reward-grid--two{grid-template-columns:1fr 1fr}.rewards-page select,.rewards-page input,.rewards-page textarea{width:100%;border:1px solid rgba(255,255,255,.15);border-radius:0;background:#100e0d;color:#f5f0ea;padding:13px 14px;outline:none}.rewards-page select:focus,.rewards-page input:focus,.rewards-page textarea:focus{border-color:#96352f;box-shadow:0 0 0 2px rgba(176,40,32,.12)}.rewards-items{margin-top:8px;padding-top:20px;border-top:1px solid rgba(255,255,255,.09)}.reward-options{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,.09)}.reward-toggle{display:flex;align-items:center;gap:10px;padding:13px 14px;border:1px solid rgba(255,255,255,.12);background:#100e0d;font-weight:700}.reward-toggle input{width:auto}.reward-priority{width:150px;margin:0}.reward-form-actions{display:flex;gap:12px;margin-top:20px}.reward-form-actions .admin-button--submit{flex:1;margin:0}.rewards-summary-strip{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(255,255,255,.09)}.rewards-summary-strip>div{padding:16px 18px;border-right:1px solid rgba(255,255,255,.09)}.rewards-summary-strip>div:last-child{border-right:0}.rewards-summary-strip span{display:block;color:#8a817b;font:700 9px monospace;letter-spacing:1.5px;text-transform:uppercase}.rewards-summary-strip strong{display:block;margin-top:7px;color:#55df91;font-size:24px}.rewards-filters{display:grid;grid-template-columns:1fr 180px auto;gap:10px;padding:16px;border-bottom:1px solid rgba(255,255,255,.09)}.rewards-list{max-height:calc(100vh - 310px);overflow:auto;padding:16px}.reward-rule{margin-bottom:12px;padding:18px;border:1px solid #3d2825;background:linear-gradient(130deg,rgba(24,18,16,.96),rgba(10,9,8,.98));transition:transform .18s ease,border-color .18s ease}.reward-rule:hover{transform:translateY(-2px);border-color:#7b302a}.reward-rule.is-inactive{opacity:.58}.reward-rule__top{display:flex;justify-content:space-between;gap:18px}.reward-rule__top span{color:#ee3b34;font:800 9px monospace;letter-spacing:1.8px}.reward-rule__top h3{margin:5px 0 2px;font-size:20px}.reward-rule__top small{color:#9a9089}.reward-rule__top em{height:max-content;padding:6px 9px;border:1px solid #2d6c42;color:#59dc86;font:800 9px monospace;font-style:normal}.is-inactive .reward-rule__top em{border-color:#6f2826;color:#e76b65}.reward-rule__message{margin:14px 0;color:#b8aea7;line-height:1.55}.reward-rule__values{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.reward-rule__values>div{padding:11px 12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02)}.reward-rule__values span,.reward-rule__items>span{display:block;color:#857b75;font:700 9px monospace;letter-spacing:1.4px}.reward-rule__values strong{display:block;margin-top:5px}.reward-rule__items{margin-top:14px}.reward-rule__items>div{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.reward-rule__items small{padding:7px 9px;border:1px solid rgba(255,255,255,.1);background:#0b0a09}.reward-rule__actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px}.admin-button--danger{border-color:#712623!important;color:#ef7770!important}.admin-feedback[data-state="success"]{border-color:#28683f;color:#69dc91;background:rgba(24,90,48,.12)}.admin-feedback[data-state="error"]{border-color:#7d2c28;color:#ef7b74;background:rgba(110,28,24,.12)}@media(max-width:1100px){.rewards-layout{grid-template-columns:1fr}.rewards-editor-card{position:relative;top:auto}.rewards-list{max-height:none}.rewards-page{padding-top:110px}}@media(max-width:720px){.rewards-page{width:min(100% - 20px,1720px)}.rewards-module-toolbar{align-items:flex-start;flex-direction:column}.reward-grid--two,.rewards-summary-strip,.rewards-filters{grid-template-columns:1fr}.rewards-summary-strip>div{border-right:0;border-bottom:1px solid rgba(255,255,255,.09)}.reward-options{align-items:stretch;flex-direction:column}.reward-priority{width:100%}.reward-form-actions{flex-direction:column}}
 
-/* === Monthly rewards / classement mensuel === */
-body[data-page="admin-rewards"] .monthly-reward-automation{overflow:hidden}
-body[data-page="admin-rewards"] .monthly-reward-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid rgba(255,255,255,.08)}
-body[data-page="admin-rewards"] .monthly-reward-grid>div{min-width:0;padding:18px 20px;border-right:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.015)}
+
+/* =========================================================
+   SENZANY REWARDS UI 11.1
+   Classement repliable + bibliothèque de packs modernisée
+   ========================================================= */
+
+body[data-page="admin-rewards"] .monthly-reward-automation{
+  overflow:hidden;
+  border-color:#332824;
+  background:linear-gradient(180deg,rgba(25,21,19,.98),rgba(11,10,9,.99));
+}
+
+body[data-page="admin-rewards"] .monthly-reward-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+body[data-page="admin-rewards"] .monthly-reward-grid>div{
+  min-width:0;
+  padding:18px 20px;
+  border-right:1px solid rgba(255,255,255,.07);
+}
 body[data-page="admin-rewards"] .monthly-reward-grid>div:last-child{border-right:0}
-body[data-page="admin-rewards"] .monthly-reward-grid span{display:block;margin-bottom:7px;color:#a79d96;font:800 10px/1.2 monospace;letter-spacing:1.6px}
-body[data-page="admin-rewards"] .monthly-reward-grid strong{display:block;color:#f3eee8;font-size:17px}
-body[data-page="admin-rewards"] .monthly-reward-grid small{display:block;margin-top:6px;color:#817872;line-height:1.45}
-body[data-page="admin-rewards"] .monthly-reward-state input[type="month"]{width:100%;box-sizing:border-box;margin-top:4px}
-body[data-page="admin-rewards"] .monthly-reward-actions{display:flex;flex-wrap:wrap;gap:10px;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
-body[data-page="admin-rewards"] .monthly-reward-actions .admin-button{margin:0}
-body[data-page="admin-rewards"] .monthly-view-tabs{display:flex;gap:0;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.12)}
-body[data-page="admin-rewards"] .monthly-view-tab{appearance:none;border:0;border-bottom:2px solid transparent;background:transparent;color:#817872;padding:14px 16px 12px;cursor:pointer;font:800 11px/1 monospace;letter-spacing:1.1px;text-transform:uppercase}
-body[data-page="admin-rewards"] .monthly-view-tab:hover{color:#eee7e1}
-body[data-page="admin-rewards"] .monthly-view-tab.is-active{color:#f3eee8;border-bottom-color:#d13d34}
-body[data-page="admin-rewards"] .monthly-view-panel{padding:0}
-body[data-page="admin-rewards"] .monthly-reward-preview{display:flex;flex-direction:column}
-body[data-page="admin-rewards"] .monthly-ranking-row{display:grid;grid-template-columns:72px minmax(250px,1.5fr) 130px minmax(180px,1fr) 140px;align-items:center;gap:14px;min-height:72px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.012)}
-body[data-page="admin-rewards"] .monthly-ranking-row:hover{background:rgba(255,255,255,.025)}
-body[data-page="admin-rewards"] .monthly-ranking-row>strong{color:#ef3d35;font:900 18px/1 monospace}
+body[data-page="admin-rewards"] .monthly-reward-grid span{
+  display:block;color:#9c918a;font:800 9px/1.2 monospace;letter-spacing:1.6px
+}
+body[data-page="admin-rewards"] .monthly-reward-grid strong{
+  display:block;margin-top:7px;color:#f4eee8;font-size:17px
+}
+body[data-page="admin-rewards"] .monthly-reward-grid small{
+  display:block;margin-top:5px;color:#786f69;line-height:1.4
+}
+body[data-page="admin-rewards"] .monthly-reward-actions{
+  display:flex;flex-wrap:wrap;gap:10px;padding:14px 18px;
+  border-bottom:1px solid rgba(255,255,255,.07)
+}
+body[data-page="admin-rewards"] .monthly-view-tabs{
+  display:flex;padding:0 18px;border-bottom:1px solid rgba(255,255,255,.07);
+  background:rgba(0,0,0,.18)
+}
+body[data-page="admin-rewards"] .monthly-view-tab{
+  border:0;border-bottom:2px solid transparent;background:transparent;color:#736b66;
+  padding:13px 16px 11px;cursor:pointer;font:800 9px monospace;letter-spacing:1.4px;text-transform:uppercase
+}
+body[data-page="admin-rewards"] .monthly-view-tab.is-active{color:#eee7e1;border-bottom-color:#ef3d35}
+
+/* Menu déroulant du classement */
+body[data-page="admin-rewards"] .monthly-ranking-disclosure{
+  border:0;background:#0d0c0b
+}
+body[data-page="admin-rewards"] .monthly-ranking-disclosure>summary{
+  list-style:none;display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:17px 20px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.07);
+  background:linear-gradient(90deg,rgba(28,23,20,.96),rgba(14,13,12,.96))
+}
+body[data-page="admin-rewards"] .monthly-ranking-disclosure>summary::-webkit-details-marker{display:none}
+body[data-page="admin-rewards"] .monthly-ranking-disclosure>summary span{
+  display:block;color:#ef3d35;font:800 9px monospace;letter-spacing:1.6px
+}
+body[data-page="admin-rewards"] .monthly-ranking-disclosure>summary strong{
+  display:block;margin-top:5px;color:#e8e1db;font-size:14px
+}
+body[data-page="admin-rewards"] .monthly-ranking-disclosure__meta{
+  display:flex;align-items:center;gap:14px
+}
+body[data-page="admin-rewards"] .monthly-ranking-disclosure__meta b{
+  color:#d9c6a0;font:800 11px monospace
+}
+body[data-page="admin-rewards"] .monthly-ranking-disclosure__meta i{
+  width:30px;height:30px;display:grid;place-items:center;border:1px solid #463732;
+  color:#ef3d35;font-style:normal;font-size:20px;transition:transform .2s ease
+}
+body[data-page="admin-rewards"] .monthly-ranking-disclosure[open] .monthly-ranking-disclosure__meta i{
+  transform:rotate(180deg)
+}
+body[data-page="admin-rewards"] .monthly-reward-preview{
+  max-height:620px;overflow:auto
+}
+body[data-page="admin-rewards"] .monthly-ranking-row{
+  display:grid;grid-template-columns:62px minmax(250px,1.6fr) 120px minmax(180px,.9fr) 122px;
+  align-items:center;gap:14px;min-height:60px;padding:10px 18px;
+  border-bottom:1px solid rgba(255,255,255,.055);background:#121110
+}
+body[data-page="admin-rewards"] .monthly-ranking-row:nth-child(even){background:#0f0e0d}
+body[data-page="admin-rewards"] .monthly-ranking-row:hover{background:#181513}
+body[data-page="admin-rewards"] .monthly-ranking-row>strong{color:#ef3d35;font:900 15px monospace}
 body[data-page="admin-rewards"] .monthly-ranking-row__player{min-width:0}
-body[data-page="admin-rewards"] .monthly-ranking-row__player b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f4eee8;font-size:15px}
-body[data-page="admin-rewards"] .monthly-ranking-row__player small{display:block;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#7f7670;font:700 10px/1.35 monospace}
-body[data-page="admin-rewards"] .monthly-ranking-row__votes{color:#f2c36b;font-weight:800;white-space:nowrap}
-body[data-page="admin-rewards"] .monthly-ranking-row__reward{color:#d4ccc6;font-size:13px}
-body[data-page="admin-rewards"] .monthly-ranking-row__state{justify-self:end;min-width:112px;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(72,210,127,.28);background:rgba(72,210,127,.08);color:#61df93;text-align:center;font:900 9px/1 monospace;letter-spacing:1px}
-body[data-page="admin-rewards"] .monthly-ranking-row__state.is-warning{border-color:rgba(236,174,74,.30);background:rgba(236,174,74,.08);color:#efbd63}
-body[data-page="admin-rewards"] .monthly-ranking-row__state.is-error{border-color:rgba(239,61,53,.34);background:rgba(239,61,53,.09);color:#ff655d}
-body[data-page="admin-rewards"] .monthly-history__toolbar{display:grid;grid-template-columns:minmax(220px,320px) 1fr auto;align-items:end;gap:16px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
-body[data-page="admin-rewards"] .monthly-history__toolbar label span,body[data-page="admin-rewards"] .monthly-history__summary strong{display:block}
-body[data-page="admin-rewards"] .monthly-history__toolbar label span{margin-bottom:7px;color:#a79d96;font:800 10px/1.2 monospace;letter-spacing:1.4px}
-body[data-page="admin-rewards"] .monthly-history__summary small{display:block;margin-top:5px;color:#817872}
-body[data-page="admin-rewards"] #monthlyRewardFeedback{margin:14px 20px 0}
-@media (max-width:1100px){body[data-page="admin-rewards"] .monthly-reward-grid{grid-template-columns:1fr 1fr}body[data-page="admin-rewards"] .monthly-reward-grid>div:nth-child(2){border-right:0}body[data-page="admin-rewards"] .monthly-ranking-row{grid-template-columns:58px minmax(180px,1fr) 110px 130px}body[data-page="admin-rewards"] .monthly-ranking-row__state{grid-column:2/-1;justify-self:start}}
-@media (max-width:720px){body[data-page="admin-rewards"] .monthly-reward-grid{grid-template-columns:1fr}body[data-page="admin-rewards"] .monthly-reward-grid>div{border-right:0}body[data-page="admin-rewards"] .monthly-ranking-row{grid-template-columns:52px 1fr;gap:8px 12px;padding:14px 16px}body[data-page="admin-rewards"] .monthly-ranking-row__votes,body[data-page="admin-rewards"] .monthly-ranking-row__reward,body[data-page="admin-rewards"] .monthly-ranking-row__state{grid-column:2;justify-self:start}body[data-page="admin-rewards"] .monthly-history__toolbar{grid-template-columns:1fr}}
+body[data-page="admin-rewards"] .monthly-ranking-row__player b{
+  display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#f0e9e3;font-size:14px
+}
+body[data-page="admin-rewards"] .monthly-ranking-row__player small{
+  display:block;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#706863;font:700 9px monospace
+}
+body[data-page="admin-rewards"] .monthly-ranking-row__votes{color:#efc25f;font-weight:900;white-space:nowrap}
+body[data-page="admin-rewards"] .monthly-ranking-row__reward{color:#c7beb7;font-size:12px}
+body[data-page="admin-rewards"] .monthly-ranking-row__state{
+  justify-self:end;min-width:98px;padding:7px 8px;border:1px solid rgba(74,200,120,.35);
+  background:rgba(35,120,65,.10);color:#5fe091;text-align:center;font:900 8px monospace;letter-spacing:1px
+}
+body[data-page="admin-rewards"] .monthly-ranking-row__state.is-warning{
+  border-color:rgba(211,154,54,.42);background:rgba(142,92,15,.10);color:#efbd58
+}
+body[data-page="admin-rewards"] .monthly-ranking-row__state.is-error{
+  border-color:rgba(224,67,57,.45);background:rgba(135,31,25,.12);color:#ff7168
+}
+
+/* Gestionnaire de packs */
+body[data-page="admin-rewards"] .rewards-layout--explorer{
+  grid-template-columns:minmax(430px,.78fr) minmax(640px,1.22fr);
+  gap:18px;margin-top:20px
+}
+body[data-page="admin-rewards"] .rewards-explorer,
+body[data-page="admin-rewards"] .rewards-editor-card{
+  border-color:#302722;background:linear-gradient(180deg,#151312,#0c0b0a)
+}
+body[data-page="admin-rewards"] .rewards-explorer__header{
+  padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.07)
+}
+body[data-page="admin-rewards"] .rewards-explorer__filters{
+  display:grid;grid-template-columns:minmax(0,1fr) 190px 44px;gap:8px;padding:12px;
+  background:#0d0c0b;border-bottom:1px solid rgba(255,255,255,.06)
+}
+body[data-page="admin-rewards"] .rewards-list{
+  max-height:650px;overflow:auto;padding:10px;background:#0a0908
+}
+body[data-page="admin-rewards"] .reward-tree-group{
+  margin:0 0 8px;border:1px solid #2b2420;background:#100f0e
+}
+body[data-page="admin-rewards"] .reward-tree-group>summary{
+  list-style:none;display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:8px;
+  padding:12px 13px;cursor:pointer;background:#171412;border-bottom:1px solid transparent
+}
+body[data-page="admin-rewards"] .reward-tree-group[open]>summary{border-bottom-color:#29221e}
+body[data-page="admin-rewards"] .reward-tree-group>summary::-webkit-details-marker{display:none}
+body[data-page="admin-rewards"] .reward-tree-group>summary span{font-size:15px}
+body[data-page="admin-rewards"] .reward-tree-group>summary strong{
+  color:#eee7e1;font-size:13px;letter-spacing:.2px
+}
+body[data-page="admin-rewards"] .reward-tree-group>summary b{
+  min-width:28px;padding:4px 7px;border:1px solid #40332d;color:#bdb1a9;text-align:center;font:800 9px monospace
+}
+body[data-page="admin-rewards"] .reward-tree-group__body{padding:4px}
+body[data-page="admin-rewards"] .reward-tree-row{
+  display:grid;grid-template-columns:12px 24px minmax(120px,.8fr) minmax(180px,1.25fr) auto;
+  align-items:center;gap:8px;padding:10px 9px;margin:2px 0;border:1px solid transparent;
+  background:#0d0c0b;cursor:pointer;transition:border-color .15s ease,background .15s ease
+}
+body[data-page="admin-rewards"] .reward-tree-row:hover{background:#171311;border-color:#3b2b25}
+body[data-page="admin-rewards"] .reward-tree-row.is-selected{
+  background:linear-gradient(90deg,rgba(122,29,24,.22),#15110f);
+  border-color:#6e2823
+}
+body[data-page="admin-rewards"] .reward-tree-row__chevron{color:#ef3d35;font-size:9px}
+body[data-page="admin-rewards"] .reward-tree-row__medal{font-size:14px;text-align:center}
+body[data-page="admin-rewards"] .reward-tree-row__name{
+  color:#f1e9e3;font-weight:800;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+body[data-page="admin-rewards"] .reward-tree-row__summary{
+  color:#8f847d;font:700 9px monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+body[data-page="admin-rewards"] .reward-tree-row em{
+  padding:5px 7px;border:1px solid rgba(70,190,110,.28);color:#62d889;font:900 8px monospace;font-style:normal
+}
+body[data-page="admin-rewards"] .reward-tree-row.is-inactive{opacity:.55}
+body[data-page="admin-rewards"] .reward-tree-row.is-inactive em{border-color:#572725;color:#d46b64}
+body[data-page="admin-rewards"] .rewards-explorer__footer{
+  display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-top:1px solid #2b2420;
+  background:#100f0e;color:#746b65;font:800 9px monospace;text-transform:uppercase;letter-spacing:1px
+}
+body[data-page="admin-rewards"] .rewards-explorer__footer strong{color:#e9e1da}
+
+/* Editeur plus propre */
+body[data-page="admin-rewards"] .rewards-editor-heading{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:18px 20px
+}
+body[data-page="admin-rewards"] .rewards-editor-heading__actions{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end
+}
+body[data-page="admin-rewards"] .reward-toggle--header{
+  padding:9px 11px;margin:0;background:#0d0c0b
+}
+body[data-page="admin-rewards"] .rewards-editor-card form{padding:20px}
+body[data-page="admin-rewards"] .reward-grid{gap:12px}
+body[data-page="admin-rewards"] .reward-main-values{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px
+}
+body[data-page="admin-rewards"] .reward-main-value{
+  padding:13px;border:1px solid rgba(255,255,255,.07);background:#0e0d0c
+}
+body[data-page="admin-rewards"] .reward-main-value>span{
+  display:block;margin-bottom:8px;color:#c8beb7;font-weight:800;font-size:11px
+}
+body[data-page="admin-rewards"] .reward-main-value small{
+  display:block;margin-top:5px;color:#746b65;font-size:10px
+}
+body[data-page="admin-rewards"] .admin-items__heading{
+  display:flex;align-items:center;justify-content:space-between;gap:16px
+}
+body[data-page="admin-rewards"] .admin-items__heading h3{margin:4px 0}
+body[data-page="admin-rewards"] .reward-items-table__head{
+  display:grid;grid-template-columns:1fr 100px 90px;gap:8px;margin-top:12px;padding:0 8px 7px;
+  color:#756c66;font:800 8px monospace;letter-spacing:1.2px;text-transform:uppercase
+}
+
+@media(max-width:1200px){
+  body[data-page="admin-rewards"] .rewards-layout--explorer{grid-template-columns:1fr}
+  body[data-page="admin-rewards"] .rewards-editor-card{position:relative;top:auto}
+}
+@media(max-width:900px){
+  body[data-page="admin-rewards"] .monthly-reward-grid{grid-template-columns:1fr 1fr}
+  body[data-page="admin-rewards"] .monthly-ranking-row{
+    grid-template-columns:50px minmax(180px,1fr) 100px
+  }
+  body[data-page="admin-rewards"] .monthly-ranking-row__reward,
+  body[data-page="admin-rewards"] .monthly-ranking-row__state{grid-column:2/-1;justify-self:start}
+  body[data-page="admin-rewards"] .reward-main-values{grid-template-columns:1fr}
+}
+@media(max-width:650px){
+  body[data-page="admin-rewards"] .monthly-reward-grid{grid-template-columns:1fr}
+  body[data-page="admin-rewards"] .monthly-ranking-row{grid-template-columns:42px 1fr}
+  body[data-page="admin-rewards"] .monthly-ranking-row__votes,
+  body[data-page="admin-rewards"] .monthly-ranking-row__reward,
+  body[data-page="admin-rewards"] .monthly-ranking-row__state{grid-column:2;justify-self:start}
+  body[data-page="admin-rewards"] .rewards-explorer__filters{grid-template-columns:1fr}
+  body[data-page="admin-rewards"] .reward-tree-row{
+    grid-template-columns:12px 22px 1fr auto
+  }
+  body[data-page="admin-rewards"] .reward-tree-row__summary{grid-column:3/-1}
+}
+
