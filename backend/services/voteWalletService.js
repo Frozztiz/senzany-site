@@ -23,7 +23,13 @@ async function getWalletRow(steamId) {
 
 async function getActiveOwnership(aliasEntry) {
   const normalized = voteAliasService.normalizeAlias(aliasEntry.alias);
-  const rows = await supabaseService.request(`vote_alias_ownerships?normalized_alias=eq.${encodeURIComponent(normalized)}&ended_at=is.null&select=id,steam_id,alias,normalized_alias,baseline_period,baseline_votes&limit=1`, {method:'GET'});
+  const rows = await supabaseService.request(`vote_alias_ownerships?normalized_alias=eq.${encodeURIComponent(normalized)}&ended_at=is.null&select=id,alias_id,steam_id,alias,normalized_alias,baseline_period,baseline_votes,ended_at&limit=1`, {method:'GET'});
+  return Array.isArray(rows) && rows.length ? rows[0] : null;
+}
+
+async function getLatestOwnership(aliasEntry) {
+  const normalized = voteAliasService.normalizeAlias(aliasEntry.alias);
+  const rows = await supabaseService.request(`vote_alias_ownerships?normalized_alias=eq.${encodeURIComponent(normalized)}&select=id,alias_id,steam_id,alias,normalized_alias,baseline_period,baseline_votes,ended_at,started_at&order=started_at.desc&limit=1`, {method:'GET'});
   return Array.isArray(rows) && rows.length ? rows[0] : null;
 }
 
@@ -46,6 +52,24 @@ async function createOwnership({ aliasEntry, steamId, baselineVotes = 0, migrate
 async function registerAlias({ aliasEntry, steamId, baselineVotes }) {
   const existing = await getActiveOwnership(aliasEntry);
   if (existing) return existing;
+
+  // Si le joueur supprime puis réajoute le même pseudo, on réactive son
+  // ownership précédent au lieu d'en créer un nouveau. Cela conserve le même
+  // historique de crédit et empêche de recréditer les mêmes votes.
+  const previous = await getLatestOwnership(aliasEntry);
+  if (previous && String(previous.steam_id) === String(steamId)) {
+    const rows = await supabaseService.request(`vote_alias_ownerships?id=eq.${encodeURIComponent(previous.id)}`, {
+      method:'PATCH',
+      headers:{Prefer:'return=representation'},
+      body:JSON.stringify({
+        alias_id: aliasEntry.id || previous.alias_id || null,
+        alias: aliasEntry.alias,
+        ended_at:null
+      })
+    });
+    return Array.isArray(rows) ? rows[0] : rows;
+  }
+
   return createOwnership({ aliasEntry, steamId, baselineVotes, migrated:false });
 }
 
@@ -63,14 +87,15 @@ async function syncForPlayer({ steamId, aliases, aliasDetails }) {
   let creditedAmount = 0;
 
   for (const aliasEntry of Array.isArray(aliases)?aliases:[]) {
-    let ownership = await getActiveOwnership(aliasEntry);
-    if (!ownership) {
-      // Sécurité : un pseudo ancien sans historique est traité comme migration et conserve ses votes actuels.
-      ownership = await createOwnership({ aliasEntry, steamId, baselineVotes:0, migrated:true });
-    }
-    if (String(ownership.steam_id) !== String(steamId)) continue;
     const detail = detailMap.get(voteAliasService.normalizeAlias(aliasEntry.alias));
     const currentVotes = Math.max(0, Number(detail?.votes)||0);
+    let ownership = await getActiveOwnership(aliasEntry);
+    if (!ownership) {
+      // Fail-safe : si un alias existe sans ownership actif, ses votes actuels
+      // deviennent le baseline. Ils ne peuvent donc jamais être recrédités.
+      ownership = await createOwnership({ aliasEntry, steamId, baselineVotes:currentVotes, migrated:true });
+    }
+    if (String(ownership.steam_id) !== String(steamId)) continue;
     const result = await supabaseService.request('rpc/credit_vote_wallet_alias', {
       method:'POST', body:JSON.stringify({
         p_ownership_id: ownership.id,
@@ -149,13 +174,4 @@ async function claimAll({ steamId, playerName }) {
   }
 }
 
-async function getHistory(steamId, limit = 500) {
-  const safeLimit = Math.max(1, Math.min(1000, Number.parseInt(limit, 10) || 500));
-  const rows = await supabaseService.request(
-    `vote_wallet_ledger?steam_id=eq.${encodeURIComponent(String(steamId))}&select=id,steam_id,kind,amount,period,ownership_id,votes,claim_id,idempotency_key,metadata,created_at&order=created_at.desc&limit=${safeLimit}`,
-    { method:'GET' }
-  );
-  return Array.isArray(rows) ? rows : [];
-}
-
-module.exports = { AMOUNT_PER_VOTE, currentPeriod, milestones, registerAlias, closeAliasOwnership, syncForPlayer, getSummary, getHistory, claimAll };
+module.exports = { AMOUNT_PER_VOTE, currentPeriod, milestones, registerAlias, closeAliasOwnership, syncForPlayer, getSummary, claimAll };
