@@ -156,6 +156,19 @@ async function getSummary(steamId, monthlyVotes = 0) {
   };
 }
 
+
+async function getHistory(steamId, limit = 100) {
+  const safeLimit = Math.min(500, Math.max(1, Number.parseInt(limit, 10) || 100));
+  const operations = await supabaseService.request(
+    `vote_wallet_ledger?steam_id=eq.${encodeURIComponent(String(steamId))}` +
+    `&select=id,steam_id,kind,amount,period,ownership_id,votes,claim_id,metadata,created_at` +
+    `&order=created_at.desc&limit=${safeLimit}`,
+    { method:'GET' }
+  );
+
+  return Array.isArray(operations) ? operations : [];
+}
+
 async function claimAll({ steamId, playerName }) {
   await voteSuspensionService.assertRewardsAllowed(steamId);
   const wallet = await getWalletRow(steamId);
@@ -180,4 +193,4 @@ async function claimAll({ steamId, playerName }) {
   }
 }
 
-module.exports = { AMOUNT_PER_VOTE, currentPeriod, milestones, registerAlias, closeAliasOwnership, syncForPlayer, getSummary, claimAll };
+module.exports = { AMOUNT_PER_VOTE, currentPeriod, milestones, registerAlias, closeAliasOwnership, syncForPlayer, getSummary, getHistory, claimAll };
