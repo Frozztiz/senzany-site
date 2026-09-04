@@ -76,7 +76,14 @@ router.post('/claim', async(req,res)=>{
 
     const claim=await voteWalletService.claimAll({steamId,playerName});
     res.status(201).json({...claim,summary:await voteWalletService.getSummary(steamId,result.votes)});
-  }catch(error){console.error('[VOTE WALLET] claim',error);res.status(error.status||500).json({error:error.message||'Impossible de réclamer la cagnotte.',code:error.code||null});}
+  }catch(error){
+    console.error('[VOTE WALLET] claim',error);
+    res.status(error.status||500).json({
+      error:error.message||'Impossible de réclamer la cagnotte.',
+      code:error.code||null,
+      suspension:error.suspension||null
+    });
+  }
 });
 
 module.exports=router;

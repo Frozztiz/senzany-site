@@ -3,6 +3,7 @@ const topServeursService = require("./topServeursService");
 const voteAliasService = require("./voteAliasService");
 const rewardRuleService = require("./rewardRuleService");
 const deliveryService = require("./deliveryService");
+const voteSuspensionService = require("./voteSuspensionService");
 
 const RUNS_TABLE = "monthly_vote_runs";
 const RANKINGS_TABLE = "monthly_vote_rankings";
@@ -383,6 +384,21 @@ async function approve(runId, actorSteamId) {
     }
     if (row.delivery_id) {
       skipped += 1;
+      continue;
+    }
+
+    const activeSuspension = await voteSuspensionService.getActive(row.steam_id);
+    if (activeSuspension?.block_rewards) {
+      skipped += 1;
+      await supabaseService.request(`${RANKINGS_TABLE}?id=eq.${encodeURIComponent(row.id)}`, {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({
+          status: "no_reward",
+          error_message: `Récompenses suspendues jusqu’au ${activeSuspension.ends_at}.`,
+          updated_at: new Date().toISOString(),
+        }),
+      });
       continue;
     }
 

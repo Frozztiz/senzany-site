@@ -1,6 +1,7 @@
 const supabaseService = require('./supabaseService');
 const deliveryService = require('./deliveryService');
 const voteAliasService = require('./voteAliasService');
+const voteSuspensionService = require('./voteSuspensionService');
 
 const AMOUNT_PER_VOTE = Math.max(1, Number.parseInt(process.env.VOTE_WALLET_AMOUNT_PER_VOTE || '1000', 10) || 1000);
 const DEFAULT_MILESTONES = Array.from({ length: 10 }, (_, i) => (i + 1) * 50);
@@ -134,7 +135,10 @@ function buildCurrencyItems(amount) {
 
 
 async function getSummary(steamId, monthlyVotes = 0) {
-  const wallet = await getWalletRow(steamId);
+  const [wallet, activeSuspension] = await Promise.all([
+    getWalletRow(steamId),
+    voteSuspensionService.getActive(steamId),
+  ]);
   const tiers = milestones();
   const votes = Math.max(0,Number(monthlyVotes)||0);
   const next = tiers.find(v=>v>votes) || (Math.floor(votes/50)+1)*50;
@@ -147,11 +151,26 @@ async function getSummary(steamId, monthlyVotes = 0) {
     milestones:tiers.map(value=>({ value, unlocked:votes>=value })),
     nextMilestone:next,
     votesToNext:Math.max(0,next-votes),
-    claimConfigured:true
+    claimConfigured:true,
+    suspension: voteSuspensionService.publicView(activeSuspension)
   };
 }
 
+
+async function getHistory(steamId, limit = 100) {
+  const safeLimit = Math.min(500, Math.max(1, Number.parseInt(limit, 10) || 100));
+  const operations = await supabaseService.request(
+    `vote_wallet_ledger?steam_id=eq.${encodeURIComponent(String(steamId))}` +
+    `&select=id,steam_id,kind,amount,period,ownership_id,votes,claim_id,metadata,created_at` +
+    `&order=created_at.desc&limit=${safeLimit}`,
+    { method:'GET' }
+  );
+
+  return Array.isArray(operations) ? operations : [];
+}
+
 async function claimAll({ steamId, playerName }) {
+  await voteSuspensionService.assertRewardsAllowed(steamId);
   const wallet = await getWalletRow(steamId);
   const amount = Number(wallet.balance||0);
   if (amount <= 0) { const e=new Error('Ta cagnotte est vide.'); e.status=409; throw e; }
@@ -174,4 +193,4 @@ async function claimAll({ steamId, playerName }) {
   }
 }
 
-module.exports = { AMOUNT_PER_VOTE, currentPeriod, milestones, registerAlias, closeAliasOwnership, syncForPlayer, getSummary, claimAll };
+module.exports = { AMOUNT_PER_VOTE, currentPeriod, milestones, registerAlias, closeAliasOwnership, syncForPlayer, getSummary, getHistory, claimAll };
