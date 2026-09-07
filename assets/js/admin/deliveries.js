@@ -36,6 +36,7 @@ const elements = {
     playerName: document.getElementById("deliveryPlayerName"),
     title: document.getElementById("deliveryTitle"),
     message: document.getElementById("deliveryMessage"),
+    bankAmount: document.getElementById("deliveryBankAmount"),
 
     itemsList: document.getElementById("deliveryItemsList"),
     addItemButton: document.getElementById("addDeliveryItem"),
@@ -265,6 +266,16 @@ function renderDelivery(delivery) {
                 Number(item.qty) ||
                 1;
 
+            const className = item.className || item.classname || "";
+
+            if (className === "SenzanyBankCredit") {
+                return `
+                    <span class="admin-delivery__item">
+                        Crédit bancaire : ${Number(quantity).toLocaleString("fr-FR")} $
+                    </span>
+                `;
+            }
+
             return `
                 <span class="admin-delivery__item">
                     ${escapeHtml(itemName)} × ${quantity}
@@ -429,6 +440,9 @@ async function handleDeliverySubmit(event) {
     const items =
         getItemsFromContainer(elements.itemsList);
 
+    const rawBankAmount = String(elements.bankAmount?.value ?? "0").trim();
+    const bankAmount = rawBankAmount === "" ? 0 : Number(rawBankAmount);
+
     if (!validateSteamId(steamId)) {
         showFeedback(
             elements.feedback,
@@ -449,14 +463,33 @@ async function handleDeliverySubmit(event) {
         return;
     }
 
-    if (!items.length) {
+    if (!Number.isInteger(bankAmount) || bankAmount < 0 || bankAmount > 2000000000) {
         showFeedback(
             elements.feedback,
-            "Ajoute au moins un objet à la livraison.",
+            "Le crédit bancaire doit être un montant entier compris entre 0 et 2 000 000 000 $.",
             "error"
         );
 
         return;
+    }
+
+    if (!items.length && bankAmount <= 0) {
+        showFeedback(
+            elements.feedback,
+            "Ajoute au moins un objet ou renseigne un crédit bancaire.",
+            "error"
+        );
+
+        return;
+    }
+
+    if (bankAmount > 0) {
+        items.push({
+            className: "SenzanyBankCredit",
+            name: "Crédit bancaire",
+            quantity: bankAmount,
+            metadata: { virtual: true, type: "bank_credit" }
+        });
     }
 
     const payload = {
