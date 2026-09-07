@@ -7,7 +7,8 @@
   <title>Commandement — Récompenses — SENZANY</title>
   <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
   <link rel="stylesheet" href="assets/css/pages/admin-deliveries.css?v=4.8.0" />
-  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=11.1.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-rewards.css?v=11.3.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-ranking-distribution.css?v=1.0.0" />
 </head>
 <body data-page="admin-rewards">
   <div data-site-header></div>
@@ -34,68 +35,40 @@
         <div><span>MODULE 05</span><strong>Gestion des packs</strong><small>Configure les packs qui seront transformés en livraisons automatiques.</small></div>
       </div>
 
-      <section class="admin-card monthly-reward-automation" aria-labelledby="monthlyRewardTitle">
-        <div class="admin-card__header">
-          <div><span>AUTOMATISATION MENSUELLE</span><h2 id="monthlyRewardTitle">Classement et livraisons du 1er</h2></div>
-          <b>00</b>
-        </div>
-        <div class="monthly-reward-grid">
-          <div class="monthly-reward-state">
-            <span>PÉRIODE À TRAITER</span>
-            <input id="monthlyRewardPeriod" type="month" />
-            <small>Une capture automatique est préparée le dernier jour du mois à 23:55.</small>
+      <section class="admin-card ranking-distribution" aria-labelledby="rankingDistributionTitle">
+        <div class="admin-card__header ranking-distribution__header">
+          <div>
+            <span>DISTRIBUTION DU CLASSEMENT MENSUEL</span>
+            <h2 id="rankingDistributionTitle">Envoyer les récompenses du Top 10</h2>
+            <small>Utilise uniquement les packs « Classement mensuel ». Les paliers de votes déjà envoyés ne sont jamais recréés.</small>
           </div>
-          <div><span>STATUT</span><strong id="monthlyRewardStatus">Aucun classement</strong><small id="monthlyRewardSchedule">Validation manuelle le 1er du mois</small></div>
-          <div><span>VOTANTS CLASSÉS</span><strong id="monthlyRewardPlayers">0</strong><small id="monthlyRewardIdentifiedNote">0 compte Senzany identifié</small></div>
-          <div><span>LIVRAISONS CRÉÉES</span><strong id="monthlyRewardDeliveries">0</strong><small id="monthlyRewardDeliveryNote">Aucune distribution lancée</small></div>
-        </div>
-        <div class="monthly-reward-actions">
-          <button id="prepareMonthlyRanking" class="admin-button" type="button">Préparer / recalculer</button>
-          <button id="approveMonthlyRewards" class="admin-button admin-button--primary" type="button" disabled>Valider et créer les livraisons</button>
-          <button id="refreshMonthlyRewards" class="admin-button admin-button--small" type="button">Actualiser</button>
-        </div>
-        <div id="monthlyRewardFeedback" class="admin-feedback" hidden></div>
-
-        <div class="monthly-view-tabs" role="tablist" aria-label="Classements mensuels">
-          <button id="monthlyCurrentTab" class="monthly-view-tab is-active" type="button" role="tab" aria-selected="true">Classement actuel</button>
-          <button id="monthlyHistoryTab" class="monthly-view-tab" type="button" role="tab" aria-selected="false">Historique</button>
+          <b>TOP 10</b>
         </div>
 
-        <div id="monthlyCurrentPanel" class="monthly-view-panel">
-          <details id="monthlyRankingDisclosure" class="monthly-ranking-disclosure">
-            <summary>
-              <div>
-                <span>CLASSEMENT COMPLET</span>
-                <strong>Afficher / masquer la liste des votants</strong>
-              </div>
-              <div class="monthly-ranking-disclosure__meta">
-                <b id="monthlyRankingCount">0 joueur</b>
-                <i aria-hidden="true">⌄</i>
-              </div>
-            </summary>
-            <div id="monthlyRewardPreview" class="monthly-reward-preview">
-              <div class="admin-list-message">Aucun classement mensuel préparé.</div>
-            </div>
-          </details>
+        <div class="ranking-distribution__toolbar">
+          <label class="admin-field ranking-distribution__period">
+            <span>MOIS ARCHIVÉ</span>
+            <input id="rankingDistributionPeriod" type="month" value="2026-08" />
+          </label>
+          <div class="ranking-distribution__stats">
+            <div><span>JOUEURS</span><strong id="rankingDistributionPlayers">0 / 10</strong></div>
+            <div><span>PRÊTS</span><strong id="rankingDistributionReady">0</strong></div>
+            <div><span>DÉJÀ ENVOYÉS</span><strong id="rankingDistributionSent">0</strong></div>
+          </div>
+          <button id="rankingDistributionLoad" class="admin-button" type="button">Vérifier le Top 10</button>
         </div>
 
-        <div id="monthlyHistoryPanel" class="monthly-view-panel monthly-history" hidden>
-          <div class="monthly-history__toolbar">
-            <label>
-              <span>MOIS ARCHIVÉ</span>
-              <select id="monthlyHistorySelect" aria-label="Choisir un ancien classement">
-                <option value="">Aucun classement archivé</option>
-              </select>
-            </label>
-            <div class="monthly-history__summary">
-              <strong id="monthlyHistoryStatus">—</strong>
-              <small id="monthlyHistorySummary">Sélectionne un mois pour afficher son classement.</small>
-            </div>
-            <button id="monthlyHistoryExport" class="admin-button admin-button--small" type="button" disabled>Exporter CSV</button>
+        <div id="rankingDistributionFeedback" class="admin-feedback" hidden></div>
+        <div id="rankingDistributionPreview" class="ranking-distribution__preview">
+          <div class="admin-list-message">Choisis un mois puis vérifie le Top 10 avant l’envoi.</div>
+        </div>
+
+        <div class="ranking-distribution__footer">
+          <div>
+            <strong>Distribution séparée des paliers</strong>
+            <small>Cette action ne touche qu’aux règles <code>votes_ranking</code> (Top 1 à Top 10).</small>
           </div>
-          <div id="monthlyHistoryPreview" class="monthly-reward-preview">
-            <div class="admin-list-message">Aucun ancien classement sélectionné.</div>
-          </div>
+          <button id="rankingDistributionApprove" class="admin-button admin-button--primary" type="button" disabled>ENVOYER LES RÉCOMPENSES DU TOP 10</button>
         </div>
       </section>
 
@@ -212,6 +185,7 @@
   <div data-site-footer></div>
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
-  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=11.1.0"></script>
+  <script type="module" src="assets/js/admin/admin-rewards-page.js?v=11.3.0"></script>
+  <script type="module" src="assets/js/admin/admin-ranking-distribution.js?v=1.0.0"></script>
 </body>
 </html>

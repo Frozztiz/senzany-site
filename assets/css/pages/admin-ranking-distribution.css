@@ -1,0 +1,32 @@
+/* === V11.3 — Distribution séparée du classement mensuel Top 10 === */
+.ranking-distribution{margin-bottom:22px;overflow:hidden;border:1px solid #3a2d29;background:linear-gradient(145deg,rgba(24,19,17,.98),rgba(10,9,8,.99))}
+.ranking-distribution__header{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.ranking-distribution__header small{display:block;margin-top:5px;color:#91867f;max-width:820px}
+.ranking-distribution__header>b{padding:9px 12px;border:1px solid #81312c;color:#ef4941;background:rgba(129,49,44,.08);font:900 11px monospace;letter-spacing:1.8px;white-space:nowrap}
+.ranking-distribution__toolbar{display:grid;grid-template-columns:minmax(190px,260px) minmax(360px,1fr) auto;gap:14px;align-items:end;padding:18px 20px;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.18)}
+.ranking-distribution__period{margin:0}
+.ranking-distribution__period>span{display:block;margin-bottom:7px;color:#8e847d;font:800 9px monospace;letter-spacing:1.5px}
+.ranking-distribution__stats{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid rgba(255,255,255,.08);background:#0d0b0a}
+.ranking-distribution__stats>div{padding:10px 14px;border-right:1px solid rgba(255,255,255,.08)}
+.ranking-distribution__stats>div:last-child{border-right:0}
+.ranking-distribution__stats span{display:block;color:#81766f;font:800 8px monospace;letter-spacing:1.2px}
+.ranking-distribution__stats strong{display:block;margin-top:5px;color:#f1ece7;font-size:18px}
+.ranking-distribution__preview{max-height:470px;overflow:auto;padding:10px 18px;background:#0b0908}
+.ranking-distribution-row{display:grid;grid-template-columns:70px minmax(180px,1.25fr) 130px minmax(230px,1.4fr) minmax(150px,.8fr);gap:12px;align-items:center;min-height:66px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.075);background:rgba(255,255,255,.008)}
+.ranking-distribution-row:hover{background:rgba(255,255,255,.025)}
+.ranking-distribution-row__rank{font:900 18px monospace;color:#e23b34}
+.ranking-distribution-row__player,.ranking-distribution-row__votes,.ranking-distribution-row__pack,.ranking-distribution-row__status{min-width:0;display:flex;flex-direction:column;gap:4px}
+.ranking-distribution-row strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ranking-distribution-row small{color:#857a73;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ranking-distribution-row__status span{width:max-content;max-width:100%;padding:5px 7px;border:1px solid #62544d;color:#bcb1aa;font:900 8px monospace;letter-spacing:.7px}
+.ranking-distribution-row.is-ready .ranking-distribution-row__status span{border-color:#287045;color:#63dc91}
+.ranking-distribution-row.is-sent .ranking-distribution-row__status span{border-color:#28597a;color:#69bde8}
+.ranking-distribution-row.is-warning .ranking-distribution-row__status span{border-color:#7b342e;color:#ef7770}
+.ranking-distribution__footer{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.ranking-distribution__footer>div{display:flex;flex-direction:column;gap:3px}
+.ranking-distribution__footer strong{font-size:13px}
+.ranking-distribution__footer small{color:#8a8079}
+.ranking-distribution__footer code{color:#e45750}
+.ranking-distribution__footer .admin-button--primary:disabled{opacity:.38;cursor:not-allowed}
+@media(max-width:1100px){.ranking-distribution__toolbar{grid-template-columns:1fr 1fr}.ranking-distribution__stats{grid-column:1/-1;order:3}.ranking-distribution-row{grid-template-columns:55px 1fr 110px 1fr}.ranking-distribution-row__status{grid-column:2/-1}}
+@media(max-width:720px){.ranking-distribution__header,.ranking-distribution__footer{align-items:flex-start;flex-direction:column}.ranking-distribution__toolbar{grid-template-columns:1fr}.ranking-distribution__stats{grid-column:auto;grid-template-columns:1fr}.ranking-distribution__stats>div{border-right:0;border-bottom:1px solid rgba(255,255,255,.08)}.ranking-distribution-row{grid-template-columns:45px 1fr}.ranking-distribution-row__votes,.ranking-distribution-row__pack,.ranking-distribution-row__status{grid-column:2}.ranking-distribution__footer .admin-button--primary{width:100%}}
