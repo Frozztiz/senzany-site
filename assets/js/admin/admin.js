@@ -3,7 +3,7 @@
  * Centre de commandement Staff
  */
 
-import { loadDeliveries } from "./deliveries.js";
+import { loadDeliveries } from "./deliveries.js?v=5.1.0";
 import { initializeCatalog, openCatalog } from "./catalog.js";
 import { initializePlayers, openPlayers, stopPlayersAutoRefresh, loadPlayers } from "./players.js?v=4.8.0";
 

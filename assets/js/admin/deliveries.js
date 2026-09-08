@@ -463,7 +463,7 @@ async function handleDeliverySubmit(event) {
         return;
     }
 
-    if (!Number.isInteger(bankAmount) || bankAmount < 0 || bankAmount > 2000000000) {
+    if (!Number.isInteger(bankAmount) || bankAmount < 0 || bankAmount > 100000000) {
         showFeedback(
             elements.feedback,
             "Le crédit bancaire doit être un montant entier compris entre 0 et 2 000 000 000 $.",
