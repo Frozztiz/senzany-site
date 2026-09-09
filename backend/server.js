@@ -36,22 +36,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-    const startedAt = Date.now();
+  const startedAt = Date.now();
 
-    res.on("finish", () => {
-        console.log(
-            new Date().toISOString(),
-            req.method,
-            req.url,
-            "STATUS:",
-            res.statusCode,
-            "DUREE:",
-            Date.now() - startedAt,
-            "ms"
-        );
-    });
+  res.on("finish", () => {
+    console.log(
+      new Date().toISOString(),
+      req.method,
+      req.url,
+      "STATUS:",
+      res.statusCode,
+      "DUREE:",
+      Date.now() - startedAt,
+      "ms"
+    );
+  });
 
-    next();
+  next();
 });
 
 app.get("/api/health", (req, res) => {
@@ -68,27 +68,33 @@ app.use("/api/discord", require("./routes/discord"));
 app.use("/api/game", require("./routes/game"));
 app.use("/api/steam", require("./routes/steam"));
 app.use("/api/commandement", require("./routes/commandement"));
+
 app.use(
   "/api/rcon",
   require("./middleware/commandAuth"),
   require("./routes/rcon")
 );
+
 app.use("/api/delivery-agent", require("./routes/deliveryAgent"));
+
 app.use(
   "/api/admin/deliveries",
   require("./middleware/commandAuth"),
   require("./routes/adminDeliveries")
 );
+
 app.use(
   "/api/admin/items",
   require("./middleware/commandAuth"),
   require("./routes/adminItems")
 );
+
 app.use(
   "/api/admin/rewards",
   require("./middleware/commandAuth"),
   require("./routes/adminRewards")
 );
+
 app.use(
   "/api/admin/monthly-votes",
   require("./middleware/commandAuth"),
@@ -108,6 +114,13 @@ app.use(
 );
 
 app.use("/api/battle-pass", require("./routes/battlePass"));
+
+// Battle Pass DayZ -> Senzany
+// Claim des récompenses + synchronisation du statut Premium.
+app.use(
+  "/api/battle-pass-delivery",
+  require("./routes/battlePassDelivery")
+);
 
 app.use("/api/map/requests", require("./routes/mapRequests"));
 app.use("/api/map", require("./routes/mapPublic"));
