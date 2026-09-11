@@ -15,7 +15,12 @@ function normalizeClaim(body) {
   if (body.SeasonId !== 'S01') invalid('INVALID_SEASON');
   if (!Number.isInteger(body.Level) || body.Level < 1 || body.Level > 200 ||
       !Number.isInteger(body.PlayerLevel) || body.PlayerLevel < 1 || body.PlayerLevel > 200 ||
-      typeof body.Premium !== 'boolean') invalid();
+      !(typeof body.Premium === 'boolean' || body.Premium === 0 || body.Premium === 1)) invalid();
+
+  // DayZ/Enforce can serialize a boolean as 0/1.
+  // Normalize it before building the ClaimKey and backend request.
+  body.Premium = body.Premium === true || body.Premium === 1;
+
   const claimKey = `${body.SeasonId}|${body.SteamId}|${body.Level}|${body.Premium ? 'premium' : 'free'}`;
   if (body.ClaimKey !== claimKey) invalid();
   if (typeof body.PlayerName !== 'string' || body.PlayerName.length > 128 ||
