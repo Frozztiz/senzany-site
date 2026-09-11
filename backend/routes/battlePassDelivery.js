@@ -47,4 +47,24 @@ router.post('/claim', authenticate, async (req, res) => {
     return res.status(200).json({ success: false, claimKey: keyValue, deliveryCreated: false, errorCode: code });
   }
 });
+
+router.post('/lbmaster-skins/poll', authenticate, async (req, res) => {
+  try {
+    const grant = await require('../services/battlePassSkinGrantService').poll(req.body);
+    return res.status(200).json({ success: true, grant });
+  } catch (error) {
+    console.warn('[ABP][LBMASTER] poll failed');
+    return res.status(503).json({ success: false, errorCode: 'SKIN_GRANT_UNAVAILABLE' });
+  }
+});
+
+router.post('/lbmaster-skins/complete', authenticate, async (req, res) => {
+  try {
+    const result = await require('../services/battlePassSkinGrantService').complete(req.body);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.warn('[ABP][LBMASTER] completion failed');
+    return res.status(503).json({ success: false, errorCode: 'SKIN_GRANT_UNAVAILABLE' });
+  }
+});
 module.exports = router;
