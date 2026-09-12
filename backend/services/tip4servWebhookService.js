@@ -79,6 +79,24 @@ function normalizeStableId(value, code) {
   return String(value);
 }
 
+function getProductSteamId(product) {
+  const customFields = product && product.custom_fields;
+  if (!customFields || typeof customFields !== "object" || Array.isArray(customFields)) {
+    return undefined;
+  }
+
+  for (const field of Object.values(customFields)) {
+    if (!field || typeof field !== "object" || field.name !== "SteamID64") continue;
+
+    if (typeof field.value === "string") return field.value;
+    if (field.value && typeof field.value === "object" &&
+        typeof field.value.value === "string") {
+      return field.value.value;
+    }
+  }
+  return undefined;
+}
+
 function extractPayment(payload) {
   if (payload.event !== "payment.success") {
     return { ignored: true, code: "EVENT_NOT_HANDLED" };
@@ -93,7 +111,10 @@ function extractPayment(payload) {
   const product = basket.find((item) => item && String(item.id) === PRODUCT_ID);
   if (!product) return { ignored: true, code: "PRODUCT_NOT_FOUND" };
 
-  const steamId = data.user && data.user.steam_id;
+  const userSteamId = data.user && data.user.steam_id;
+  const steamId = typeof userSteamId === "string" && STEAM_ID_64.test(userSteamId)
+    ? userSteamId
+    : getProductSteamId(product);
   if (typeof steamId !== "string" || !STEAM_ID_64.test(steamId)) {
     fail("INVALID_STEAM_ID", 200);
   }
