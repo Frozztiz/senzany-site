@@ -72,11 +72,37 @@ function parsePayload(rawBody) {
 }
 
 function normalizeStableId(value, code) {
-  if ((typeof value !== "string" && typeof value !== "number") ||
-      !/^[A-Za-z0-9_.:-]{1,160}$/.test(String(value))) {
+  if (typeof value === "number") {
+    if (!Number.isSafeInteger(value) || value < 0) fail(code, 200);
+    return String(value);
+  }
+
+  if (typeof value !== "string" || value.length > 160 ||
+      value.trim().length === 0 || /[\u0000-\u001f\u007f]/.test(value)) {
     fail(code, 200);
   }
-  return String(value);
+  return value;
+}
+
+function logIdentifierShapes(payload, data) {
+  if (process.env.TIP4SERV_ID_DIAGNOSTICS !== "true") return;
+
+  const shape = (owner, key) => {
+    const present = Object.prototype.hasOwnProperty.call(owner, key);
+    const value = present ? owner[key] : undefined;
+    return {
+      present,
+      type: typeof value,
+      stringLength: typeof value === "string" ? value.length : undefined
+    };
+  };
+
+  console.info("[TIP4SERV] Identifier shapes:", {
+    request_id: shape(payload, "request_id"),
+    data_id: shape(data, "id"),
+    transaction_id: shape(data, "transaction_id"),
+    store_id: shape(payload, "store_id")
+  });
 }
 
 function getProductSteamId(product) {
@@ -118,6 +144,8 @@ function extractPayment(payload) {
   if (typeof steamId !== "string" || !STEAM_ID_64.test(steamId)) {
     fail("INVALID_STEAM_ID", 200);
   }
+
+  logIdentifierShapes(payload, data);
 
   return {
     ignored: false,
