@@ -4,55 +4,68 @@ require("dotenv").config();
 
 const app = express();
 
-const localDevEnabled = process.env.SENZANY_LOCAL_DEV === "true";
-const localDevOrigins = new Set([
-  "http://localhost:8888",
-  "http://127.0.0.1:8888",
-]);
-
-// Développement local uniquement : autorise le frontend Netlify Dev à lire
-// l'API Express locale. Cette branche reste inactive en production.
-if (localDevEnabled) {
-  app.use((req, res, next) => {
-    const origin = String(req.headers.origin || "");
-
-    if (localDevOrigins.has(origin)) {
-      res.setHeader("Access-Control-Allow-Origin", origin);
-      res.setHeader("Vary", "Origin");
-      res.setHeader("Access-Control-Allow-Headers", "Accept, Content-Type");
-      res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    }
-
-    if (req.method === "OPTIONS") {
-      return res.sendStatus(204);
-    }
-
-    next();
-  });
-}
+// Tip4Serv signs the exact bytes received. This route must therefore run before
+// express.json(), which would replace the raw request body with a parsed object.
+app.use(
+  "/api/tip4serv/webhook",
+  express.raw({ type: "application/json", limit: "256kb" }),
+  require("./routes/tip4servWebhook")
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-  const startedAt = Date.now();
+    const startedAt = Date.now();
 
-  res.on("finish", () => {
-    console.log(
-      new Date().toISOString(),
-      req.method,
-      req.url,
-      "STATUS:",
-      res.statusCode,
-      "DUREE:",
-      Date.now() - startedAt,
-      "ms"
-    );
-  });
+    res.on("finish", () => {
+        console.log(
+            new Date().toISOString(),
+            req.method,
+            req.url,
+            "STATUS:",
+            res.statusCode,
+            "DUREE:",
+            Date.now() - startedAt,
+            "ms"
+        );
+    });
 
-  next();
+    next();
 });
+
+
+// Présence web anonyme : un identifiant temporaire par navigateur.
+// Aucune IP ni donnée personnelle n'est conservée.
+const PRESENCE_TTL_MS = 60 * 1000;
+const presenceVisitors = new Map();
+
+function cleanupPresence() {
+  const cutoff = Date.now() - PRESENCE_TTL_MS;
+  for (const [visitorId, lastSeen] of presenceVisitors.entries()) {
+    if (lastSeen < cutoff) presenceVisitors.delete(visitorId);
+  }
+}
+
+app.post("/api/presence/ping", (req, res) => {
+  const visitorId = String(req.body?.visitorId || "").trim();
+  if (!/^[a-zA-Z0-9_-]{16,80}$/.test(visitorId)) {
+    return res.status(400).json({ error: "Identifiant de présence invalide." });
+  }
+  cleanupPresence();
+  presenceVisitors.set(visitorId, Date.now());
+  res.set("Cache-Control", "no-store");
+  res.json({ ok: true, online: presenceVisitors.size, ttlSeconds: Math.floor(PRESENCE_TTL_MS / 1000) });
+});
+
+app.get("/api/presence", (req, res) => {
+  cleanupPresence();
+  res.set("Cache-Control", "no-store");
+  res.json({ ok: true, online: presenceVisitors.size });
+});
+
+setInterval(cleanupPresence, 30 * 1000).unref();
 
 app.get("/api/health", (req, res) => {
   res.json({
@@ -68,38 +81,34 @@ app.use("/api/discord", require("./routes/discord"));
 app.use("/api/game", require("./routes/game"));
 app.use("/api/steam", require("./routes/steam"));
 app.use("/api/commandement", require("./routes/commandement"));
-
 app.use(
   "/api/rcon",
   require("./middleware/commandAuth"),
   require("./routes/rcon")
 );
-
 app.use("/api/delivery-agent", require("./routes/deliveryAgent"));
-
 app.use(
   "/api/admin/deliveries",
   require("./middleware/commandAuth"),
   require("./routes/adminDeliveries")
 );
-
 app.use(
   "/api/admin/items",
   require("./middleware/commandAuth"),
   require("./routes/adminItems")
 );
-
 app.use(
   "/api/admin/rewards",
   require("./middleware/commandAuth"),
   require("./routes/adminRewards")
 );
-
 app.use(
   "/api/admin/monthly-votes",
   require("./middleware/commandAuth"),
   require("./routes/adminMonthlyVotes")
 );
+
+app.use("/api/events", require("./routes/events"));
 
 app.use(
   "/api/admin/events",
@@ -115,14 +124,6 @@ app.use(
 
 app.use("/api/battle-pass", require("./routes/battlePass"));
 
-// Battle Pass DayZ -> Senzany
-// Claim des récompenses + synchronisation du statut Premium.
-app.use(
-  "/api/battle-pass-delivery",
-  require("./routes/battlePassDelivery")
-);
-
-app.use("/api/map/requests", require("./routes/mapRequests"));
 app.use("/api/map", require("./routes/mapPublic"));
 
 app.use(
@@ -149,11 +150,5 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "127.0.0.1", () => {
   console.log(`Senzany API démarrée sur le port ${PORT}`);
-
-  if (localDevEnabled) {
-    console.log("[LOCAL DEV] Mode lecture seule actif — scheduler mensuel désactivé.");
-    return;
-  }
-
   require("./services/monthlyVoteRewardService").startScheduler();
 });
