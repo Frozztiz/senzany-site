@@ -123,7 +123,12 @@ function extractPayment(payload) {
     ignored: false,
     requestId: normalizeStableId(payload.request_id, "INVALID_REQUEST_ID"),
     paymentId: normalizeStableId(data.id, "INVALID_PAYMENT_ID"),
-    transactionId: normalizeStableId(data.transaction_id, "INVALID_TRANSACTION_ID"),
+    transactionId: normalizeStableId(
+      data.transaction_id === undefined || data.transaction_id === null || data.transaction_id === ""
+        ? data.id
+        : data.transaction_id,
+      "INVALID_TRANSACTION_ID"
+    ),
     storeId: normalizeStableId(payload.store_id, "INVALID_STORE_ID"),
     mode: payload.mode === "live" || payload.mode === "test"
       ? payload.mode
