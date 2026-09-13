@@ -199,3 +199,28 @@ repeating-linear-gradient(115deg,rgba(255,255,255,.015) 0 1px,transparent 1px 9p
   .bp-inspect small{font-size:9px}
   .bp-inspect__qty strong{font-size:42px}
 }
+
+/* V8 — HARD OVERRIDE: genuinely large desktop reward cards */
+@media (min-width: 761px){
+  :root{--bp-cell:280px !important;--bp-row:245px !important}
+  .bp-track-frame{grid-template-columns:205px minmax(0,1fr) !important}
+  .bp-lane-labels{grid-template-rows:58px 245px 16px 245px !important;height:auto !important;overflow:visible !important}
+  .bp-level-row{height:58px !important;grid-template-columns:repeat(50,280px) !important}
+  .bp-reward-row{height:245px !important;grid-template-columns:repeat(50,280px) !important;min-height:245px !important;overflow:visible !important}
+  .bp-track-grid{height:auto !important;overflow:visible !important}
+  .bp-track-scroll{overflow-x:auto !important;overflow-y:visible !important}
+  .bp-reward-cell{width:280px !important;min-width:280px !important;height:245px !important;min-height:245px !important;overflow:visible !important}
+  .bp-reward-cell:before{inset:12px !important}
+  .bp-reward-icons{padding:16px !important;gap:12px !important;height:100% !important}
+  .bp-item{min-height:205px !important;padding:10px 8px 44px !important}
+  .bp-item img{max-width:195px !important;max-height:178px !important}
+  .bp-reward-icons:has(.bp-item:nth-child(2)) .bp-item img{max-width:118px !important;max-height:142px !important}
+  .bp-item__name{font-size:12px !important;line-height:1.2 !important;bottom:10px !important;min-height:29px !important}
+  .bp-item b{font-size:12px !important;padding:5px 7px !important}
+  .bp-level-node strong{font-size:34px !important}
+  .bp-level-node small{font-size:9px !important}
+  .bp-lane-label{padding:0 22px !important}
+  .bp-lane-label>span{font-size:42px !important}
+  .bp-lane-label strong{font-size:31px !important}
+  .bp-lane-label small{font-size:12px !important}
+}
