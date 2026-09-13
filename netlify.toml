@@ -52,3 +52,9 @@
   from = "/api/discord/unlink"
   to = "/.netlify/functions/discord-unlink"
   status = 200
+
+[[redirects]]
+  from = "/api/battle-pass/*"
+  to = "https://senzany.com/api/battle-pass/:splat"
+  status = 200
+  force = true

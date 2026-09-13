@@ -1,0 +1,14 @@
+SENZANY — CORRECTIF DEPLOY PREVIEW BATTLE PASS
+
+1. Remplacer netlify.toml à la racine par celui fourni.
+2. Ajouter à la fin de assets/css/pages/battlepass.css :
+
+[hidden] {
+  display: none !important;
+}
+
+Ce patch :
+- proxifie /api/battle-pass/* vers https://senzany.com/api/battle-pass/:splat
+- corrige l'affichage simultané Chargement / Connexion / Erreur.
+
+Ne pas merger sur main avant validation du Deploy Preview.
