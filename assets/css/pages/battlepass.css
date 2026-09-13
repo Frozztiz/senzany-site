@@ -84,3 +84,8 @@ body{margin:0;background:var(--bp-bg);color:var(--bp-text);font-family:Inter,Ari
 @media(max-width:1080px){.bp-levels-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.bp-dashboard{grid-template-columns:1fr 1fr}.bp-next-card{grid-column:1/-1}.bp-info-strip{grid-template-columns:1fr 1fr}.bp-info-strip>div:nth-child(2){border-right:0}.bp-info-strip>div:nth-child(-n+2){border-bottom:1px solid var(--bp-line)}}
 @media(max-width:760px){.wrap{width:min(100% - 24px,1240px)}.bp-hero{padding:82px 0 42px}.bp-hero__inner{grid-template-columns:1fr;gap:28px}.bp-hero h1{font-size:66px}.bp-season-card>strong{font-size:52px}.bp-dashboard{grid-template-columns:1fr}.bp-next-card{grid-column:auto}.bp-info-strip{grid-template-columns:1fr}.bp-info-strip>div{border-right:0;border-bottom:1px solid var(--bp-line)}.bp-info-strip>div:last-child{border-bottom:0}.bp-section-head,.bp-premium-cta,.bp-login{align-items:stretch;flex-direction:column}.bp-levels-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){.bp-levels-grid{grid-template-columns:1fr}.bp-player-card{align-items:flex-start;flex-direction:column}.bp-hero h1{font-size:54px}}
+
+/* Respecte l'état hidden des panneaux Chargement / Connexion / Erreur */
+[hidden] {
+  display: none !important;
+}

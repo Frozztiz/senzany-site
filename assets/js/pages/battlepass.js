@@ -182,16 +182,16 @@
   async function load() {
     show("loading");
     try {
-      const [steam, battlePass] = await Promise.all([
-        window.SenzanyAPI.steam.getMe(),
-        window.SenzanyAPI.battlePass.getMe()
-      ]);
+      // Vérifier d'abord la session Steam. Ne pas appeler le Battle Pass
+      // tant que le joueur n'est pas authentifié, sinon /me répond 401.
+      const steam = await window.SenzanyAPI.steam.getMe();
 
       if (!steam?.loggedIn) {
         show("loggedOut");
         return;
       }
 
+      const battlePass = await window.SenzanyAPI.battlePass.getMe();
       render(battlePass, steam);
     } catch (error) {
       if (error?.status === 401) {
