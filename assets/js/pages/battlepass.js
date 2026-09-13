@@ -27,18 +27,37 @@
     TWXToken_Baril:{name:"Token Baril",image:"TWXToken_Baril.png",description:"Token Premium échangeable selon le système de récompenses Senzany."},
     TWXToken_Crate:{name:"Token Caisse",image:"TWXToken_Crate.png",description:"Token Premium échangeable selon le système de récompenses Senzany."},
     TWXToken_SeaChest:{name:"Token SeaChest",image:"TWXToken_SeaChest.png",description:"Token Premium échangeable selon le système de récompenses Senzany."},
-    TWXToken_Gold:{name:"Token Gold",image:"TWXToken_Gold.png",description:"Token Premium rare obtenu sur certains paliers de saison."}
+    TWXToken_Gold:{name:"Token Gold",image:"TWXToken_Gold.png",description:"Token Premium rare obtenu sur certains paliers de saison."},
+    TWXToken_Arme:{name:"Token Arme",image:"TWXToken_Arme.png",description:"Token Premium permettant d'obtenir une récompense arme."},
+    TWXToken_Vetement:{name:"Token Vêtement",image:"TWXToken_Vetement.png",description:"Token Premium permettant d'obtenir une récompense vêtement."},
+    CJ_Materials_Conden:{name:"Condensateurs",image:"CJ_Materials_Conden.png",description:"Composants CJ Materials obtenus via le Battle Pass."},
+    CJ_Materials_nuts:{name:"Écrous",image:"CJ_Materials_nuts.png",description:"Composants CJ Materials obtenus via le Battle Pass."},
+    CJ_Materials_threads:{name:"Fil",image:"CJ_Materials_threads.png",description:"Composant textile CJ Materials obtenu via le Battle Pass."},
+    CJ_Materials_Fabric_Green:{name:"Tissu vert",image:"CJ_Materials_Fabric_Green.png",description:"Matériau textile CJ Materials obtenu via le Battle Pass."},
+    CJ_Materials_Fabric_Reinforced:{name:"Tissu renforcé",image:"CJ_Materials_Fabric_Reinforced.png",description:"Matériau textile renforcé obtenu via le Battle Pass."},
+    CJ_Materials_Fabric_Black:{name:"Tissu noir",image:"CJ_Materials_Fabric_Black.png",description:"Matériau textile obtenu via le Battle Pass."},
+    CJ_Materials_Fabric_Simple:{name:"Tissu simple",image:"CJ_Materials_Fabric_Simple.png",description:"Matériau textile obtenu via le Battle Pass."},
+    CJ_Materials_Fabric_Camouflage:{name:"Tissu camouflage",image:"CJ_Materials_Fabric_Camouflage.png",description:"Matériau textile camouflage obtenu via le Battle Pass."},
+    CJ_Materials_Scrap:{name:"Ferraille",image:"CJ_Materials_Scrap.png",description:"Matériau de récupération CJ Materials obtenu via le Battle Pass."},
+    CJ_Materials_magnet:{name:"Aimant",image:"CJ_Materials_magnet.png",description:"Composant CJ Materials obtenu via le Battle Pass."},
+    CJ_Materials_plastic:{name:"Plastique",image:"CJ_Materials_plastic.png",description:"Matériau CJ Materials obtenu via le Battle Pass."},
+    CJ_Materials_winch:{name:"Treuil",image:"CJ_Materials_winch.png",description:"Composant CJ Materials obtenu via le Battle Pass."}
   };
 
   function itemInfo(classname) {
     if (ITEM_CATALOG[classname]) return ITEM_CATALOG[classname];
-    if (/^CJ_Materials_plate/i.test(classname)) return {name:classname.replace(/^CJ_Materials_/,"").replace(/_/g," "),image:"CJ_Materials_plate_generic.png",description:"Plaque CJ Materials obtenue via le Battle Pass."};
-    if (/^CJ_Materials_Fabric/i.test(classname)) return {name:classname.replace(/^CJ_Materials_/,"").replace(/_/g," "),image:"Fabric.png",description:"Matériau textile CJ Materials obtenu via le Battle Pass."};
-    if (/^CJ_Materials_threads/i.test(classname)) return {name:"Fil",image:"SewingKit.png",description:"Composant textile obtenu via le Battle Pass."};
-    if (/^CJ_Materials_Scrap/i.test(classname)) return {name:"Ferraille",image:"CJ_Materials_bolts.png",description:"Matériau de récupération obtenu via le Battle Pass."};
-    if (/^CJ_Materials_magnet/i.test(classname)) return {name:"Aimant",image:"CJ_Materials_plate_generic.png",description:"Composant CJ Materials obtenu via le Battle Pass."};
-    if (/^CJ_Materials_plastic/i.test(classname)) return {name:"Plastique",image:"CJ_Materials_plate_generic.png",description:"Matériau CJ Materials obtenu via le Battle Pass."};
-    return {name:classname.replace(/_/g," "),image:null,description:"Récompense Battle Pass récupérable en jeu."};
+    const plate = String(classname).match(/^CJ_Materials_plate(\d+)?$/i);
+    if (plate) {
+      const suffix = plate[1] || "";
+      return {name:`Plaque ${suffix || "métallique"}`.trim(),image:suffix && ["2","3","4","5","6","8"].includes(suffix)?`CJ_Materials_plate${suffix}.png`:"CJ_Materials_plate_generic.png",description:"Plaque CJ Materials obtenue via le Battle Pass."};
+    }
+    if (/^CJ_Materials_Fabric/i.test(classname)) return {name:classname.replace(/^CJ_Materials_/i,"").replace(/_/g," "),image:"Fabric.png",description:"Matériau textile CJ Materials obtenu via le Battle Pass."};
+    if (/^CJ_Materials_threads/i.test(classname)) return {name:"Fil",image:"CJ_Materials_threads.png",description:"Composant textile obtenu via le Battle Pass."};
+    if (/^CJ_Materials_Scrap/i.test(classname)) return {name:"Ferraille",image:"CJ_Materials_Scrap.png",description:"Matériau de récupération obtenu via le Battle Pass."};
+    if (/^CJ_Materials_magnet/i.test(classname)) return {name:"Aimant",image:"CJ_Materials_magnet.png",description:"Composant CJ Materials obtenu via le Battle Pass."};
+    if (/^CJ_Materials_plastic/i.test(classname)) return {name:"Plastique",image:"CJ_Materials_plastic.png",description:"Matériau CJ Materials obtenu via le Battle Pass."};
+    if (/^CJ_Materials_winch/i.test(classname)) return {name:"Treuil",image:"CJ_Materials_winch.png",description:"Composant CJ Materials obtenu via le Battle Pass."};
+    return {name:classname.replace(/_/g," "),image:"SenzanyReward.png",description:"Récompense Battle Pass récupérable en jeu."};
   }
 
   function rewardRows(rewards) {
@@ -61,7 +80,7 @@
       <div class="bp-reward-icons">${rows.slice(0,4).map((row,index) => `<button class="bp-item" type="button"
         data-track="${type}" data-level="${level}" data-label="${escapeHtml(row.label)}" data-classname="${escapeHtml(row.classname)}"
         data-description="${escapeHtml(row.description)}" data-qty="${escapeHtml(row.value)}" data-image="${escapeHtml(row.image||"")}" aria-label="${escapeHtml(row.label)} ${escapeHtml(row.value)}">
-        ${row.image?`<img src="assets/images/battlepass/items/${escapeHtml(row.image)}" alt="${escapeHtml(row.label)}" loading="lazy">`:`<span class="bp-item__fallback">?</span>`}
+        ${row.image?`<img src="assets/images/battlepass/items/${escapeHtml(row.image)}" alt="${escapeHtml(row.label)}" loading="lazy">`:`<img src="assets/images/battlepass/items/SenzanyReward.png" alt="${escapeHtml(row.label)}" loading="lazy">`}
         <span class="bp-item__name">${escapeHtml(row.label)}</span>
         <b>${escapeHtml(row.value)}</b>
         <i class="bp-item__shine" aria-hidden="true"></i>
@@ -83,7 +102,7 @@
     if (visual) {
       const image=item.dataset.image;
       visual.classList.toggle("is-premium", item.dataset.track==="premium");
-      visual.innerHTML=image?`<img src="assets/images/battlepass/items/${escapeHtml(image)}" alt="">`:`<span>?</span>`;
+      visual.innerHTML=`<img src="assets/images/battlepass/items/${escapeHtml(image||"SenzanyReward.png")}" alt="">`;
     }
     document.querySelectorAll(".bp-item.is-selected").forEach(el=>el.classList.remove("is-selected"));
     item.classList.add("is-selected");
@@ -147,6 +166,7 @@
     text("bpNextLevel",isMax?"NIVEAU MAXIMUM":`NIVEAU ${Math.min(maxLevel,level+1)}`); text("bpNextXp",isMax?"Progression de saison complétée":`${number(Math.max(0,xpPerLevel-xpInLevel))} XP restantes`);
     const badge=$("bpPremiumBadge"); if (badge){badge.textContent=premium?"PREMIUM":"FREE";badge.classList.toggle("is-premium",premium);}
     const premiumButton=$("bpPremiumButton"); if (premiumButton) premiumButton.hidden=premium;
+    const sidebarPremiumButton=$("bpSidebarPremiumButton"); if (sidebarPremiumButton) sidebarPremiumButton.hidden=premium;
     const cta=$("bpPremiumCta"); if (cta&&premium){cta.classList.add("is-owned"); const h=cta.querySelector("h2"),p=cta.querySelector("p"); if(h)h.textContent="PASS PREMIUM ACTIF"; if(p)p.textContent="Ton accès Premium est synchronisé. Les paliers Premium atteints sont accessibles depuis le Battle Pass en jeu.";}
     renderLevels(data); show("content");
   }
