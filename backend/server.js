@@ -124,6 +124,11 @@ app.use(
 
 app.use("/api/battle-pass", require("./routes/battlePass"));
 
+app.use(
+  "/api/battle-pass-delivery",
+  require("./routes/battlePassDelivery")
+);
+
 app.use("/api/map", require("./routes/mapPublic"));
 
 app.use(
