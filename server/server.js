@@ -4,6 +4,14 @@ require("dotenv").config();
 
 const app = express();
 
+// Tip4Serv signs the exact bytes received. This route must therefore run before
+// express.json(), which would replace the raw request body with a parsed object.
+app.use(
+  "/api/tip4serv/webhook",
+  express.raw({ type: "application/json", limit: "256kb" }),
+  require("./routes/tip4servWebhook")
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -115,6 +123,11 @@ app.use(
 );
 
 app.use("/api/battle-pass", require("./routes/battlePass"));
+
+app.use(
+  "/api/battle-pass-delivery",
+  require("./routes/battlePassDelivery")
+);
 
 app.use("/api/map", require("./routes/mapPublic"));
 
