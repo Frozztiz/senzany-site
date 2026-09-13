@@ -36,32 +36,60 @@
     return ({ active: "ACTIVE", draft: "PRÉPARATION", ended: "TERMINÉE" })[value] || String(value || "—").toUpperCase();
   }
 
+  const ITEM_CATALOG = {
+    BurlapSack: { name: "Sac en toile de jute", image: "BurlapSack.png" },
+    Netting: { name: "Filet", image: "Netting.png" },
+    SewingKit: { name: "Kit de couture", image: "SewingKit.png" },
+    TannedLeather: { name: "Cuir tanné", image: "TannedLeather.png" },
+    Fabric: { name: "Tissu", image: "Fabric.png" },
+    CJ_Materials_bolts: { name: "Boulons", image: "CJ_Materials_bolts.png" },
+    CJ_Materials_Fuse: { name: "Fusible", image: "CJ_Materials_Fuse.png" },
+    CJ_Materials_CalibrationTools: { name: "Outils de calibration", image: "CJ_Materials_CalibrationTools.png" },
+    CJ_Materials_Copper: { name: "Cuivre", image: "CJ_Materials_Copper.png" },
+    TWXToken_Couteau: { name: "Token Couteau", image: "TWXToken_Couteau.png" },
+    TWXToken_Baril: { name: "Token Baril", image: "TWXToken_Baril.png" },
+    TWXToken_Crate: { name: "Token Caisse", image: "TWXToken_Crate.png" },
+    TWXToken_SeaChest: { name: "Token SeaChest", image: "TWXToken_SeaChest.png" },
+    TWXToken_Gold: { name: "Token Gold", image: "TWXToken_Gold.png" }
+  };
+
+  function itemInfo(classname) {
+    if (ITEM_CATALOG[classname]) return ITEM_CATALOG[classname];
+    if (/^CJ_Materials_plate/i.test(classname)) return { name: classname.replace(/^CJ_Materials_/, "").replace(/_/g, " "), image: "CJ_Materials_plate_generic.png" };
+    if (/^CJ_Materials_Fabric/i.test(classname)) return { name: classname.replace(/^CJ_Materials_/, "").replace(/_/g, " "), image: "Fabric.png" };
+    if (/^CJ_Materials_threads/i.test(classname)) return { name: "Fil", image: "SewingKit.png" };
+    if (/^CJ_Materials_Scrap/i.test(classname)) return { name: "Ferraille", image: "CJ_Materials_bolts.png" };
+    if (/^CJ_Materials_magnet/i.test(classname)) return { name: "Aimant", image: "CJ_Materials_plate_generic.png" };
+    if (/^CJ_Materials_plastic/i.test(classname)) return { name: "Plastique", image: "CJ_Materials_plate_generic.png" };
+    return { name: classname.replace(/_/g, " "), image: null };
+  }
+
   function rewardRows(rewards) {
     const rows = [];
     const payload = rewards && typeof rewards === "object" ? rewards : {};
     const items = Array.isArray(payload.items) ? payload.items : [];
-
     items.forEach(item => {
       const classname = String(item?.classname || "").trim();
       if (!classname) return;
-      rows.push({ label: classname, value: `×${Math.max(1, Number(item?.quantity) || 1)}` });
+      const info = itemInfo(classname);
+      rows.push({ classname, label: info.name, image: info.image, value: `×${Math.max(1, Number(item?.quantity) || 1)}` });
     });
-
-    if (Number(payload.roubles) > 0) rows.push({ label: "Roubles", value: number(payload.roubles) });
-    if (Number(payload.bitcoin) > 0) rows.push({ label: "Bitcoin", value: number(payload.bitcoin) });
-
+    if (Number(payload.roubles) > 0) rows.push({ classname:"roubles", label:"Roubles", image:null, value:number(payload.roubles) });
+    if (Number(payload.bitcoin) > 0) rows.push({ classname:"bitcoin", label:"Bitcoin", image:null, value:number(payload.bitcoin) });
     return rows;
   }
 
-  function renderRewardBlock(rewards) {
+  function renderRewardBlock(rewards, locked) {
     const rows = rewardRows(rewards);
-    if (!rows.length) return '<div class="bp-empty">Aucune récompense configurée</div>';
-    return rows.map(row => `
-      <div class="bp-reward">
-        <span>${escapeHtml(row.label)}</span>
-        <b>${escapeHtml(row.value)}</b>
-      </div>
-    `).join("");
+    if (!rows.length) return '<div class="bp-reward-empty">—</div>';
+    return `<div class="bp-reward-stack">${rows.map(row => `
+      <div class="bp-reward-card${locked ? " is-locked" : ""}" title="${escapeHtml(row.classname)}">
+        <div class="bp-reward-card__visual">
+          ${row.image ? `<img src="assets/images/battlepass/items/${escapeHtml(row.image)}" alt="${escapeHtml(row.label)}" loading="lazy">` : '<span class="bp-reward-card__fallback">?</span>'}
+          <b>${escapeHtml(row.value)}</b>
+        </div>
+        <small>${escapeHtml(row.label)}</small>
+      </div>`).join("")}</div>`;
   }
 
   function escapeHtml(value) {
@@ -73,45 +101,37 @@
   function renderLevels(data) {
     const grid = $("bpLevelsGrid");
     if (!grid) return;
-
     const progress = data.progress || {};
     const season = data.season || {};
     const current = Math.max(1, Number(progress.level) || 1);
     const isPremium = progress.is_premium === true;
+    const levels = (Array.isArray(data.levels) ? data.levels : []).filter(level => Number(level.level) <= 50);
 
-    grid.innerHTML = (Array.isArray(data.levels) ? data.levels : []).map(level => {
+    grid.innerHTML = levels.map(level => {
       const n = Number(level.level) || 1;
       const unlocked = n <= current;
       const currentClass = n === current ? " is-current" : "";
       const statusClass = unlocked ? " is-unlocked" : " is-locked";
-      const status = n === current ? "NIVEAU ACTUEL" : unlocked ? "DÉBLOQUÉ" : "VERROUILLÉ";
-      const premiumStatus = !season.premium_enabled
-        ? "DÉSACTIVÉ"
-        : isPremium
-          ? (unlocked ? "ACCESSIBLE" : "VERROUILLÉ")
-          : "PREMIUM REQUIS";
-
+      const premiumLocked = !season.premium_enabled || !isPremium || !unlocked;
       return `
         <article class="bp-tier${statusClass}${currentClass}" data-level="${n}">
           <header class="bp-tier__head">
-            <strong class="bp-tier__number">${String(n).padStart(2, "0")}</strong>
-            <span class="bp-tier__xp">${number(level.xp_required)} XP</span>
+            <span>NIVEAU</span><strong>${String(n).padStart(2,"0")}</strong><small>${number(level.xp_required)} XP</small>
           </header>
-          <span class="bp-tier__status">${status}</span>
-          <section class="bp-track">
-            <div class="bp-track__head"><span>FREE</span><em>${unlocked ? "ACCESSIBLE" : "VERROUILLÉ"}</em></div>
-            <div class="bp-rewards">${renderRewardBlock(level.free_rewards)}</div>
-          </section>
           <section class="bp-track bp-track--premium">
-            <div class="bp-track__head"><span>PREMIUM</span><em>${premiumStatus}</em></div>
-            <div class="bp-rewards">${renderRewardBlock(level.premium_rewards)}</div>
+            <div class="bp-track__label"><span>PREMIUM</span><em>${premiumLocked ? (!isPremium ? "PREMIUM" : "VERROUILLÉ") : "DÉBLOQUÉ"}</em></div>
+            ${renderRewardBlock(level.premium_rewards, premiumLocked)}
           </section>
-        </article>
-      `;
+          <section class="bp-track bp-track--free">
+            <div class="bp-track__label"><span>FREE</span><em>${unlocked ? "DÉBLOQUÉ" : "VERROUILLÉ"}</em></div>
+            ${renderRewardBlock(level.free_rewards, !unlocked)}
+          </section>
+        </article>`;
     }).join("");
 
     requestAnimationFrame(() => {
-      grid.querySelector(".bp-tier.is-current")?.scrollIntoView({ block: "nearest", inline: "nearest" });
+      const currentTier = grid.querySelector(".bp-tier.is-current");
+      if (currentTier) grid.scrollLeft = Math.max(0, currentTier.offsetLeft - grid.clientWidth / 2 + currentTier.clientWidth / 2);
     });
   }
 
