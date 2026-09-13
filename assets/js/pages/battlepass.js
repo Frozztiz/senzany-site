@@ -14,24 +14,31 @@
   function seasonStatus(value) { return ({active:"ACTIVE",draft:"PRÉPARATION",ended:"TERMINÉE"})[value] || String(value || "—").toUpperCase(); }
 
   const ITEM_CATALOG = {
-    BurlapSack:{name:"Sac en toile de jute",image:"BurlapSack.png"}, Netting:{name:"Filet",image:"Netting.png"},
-    SewingKit:{name:"Kit de couture",image:"SewingKit.png"}, TannedLeather:{name:"Cuir tanné",image:"TannedLeather.png"},
-    Fabric:{name:"Tissu",image:"Fabric.png"}, CJ_Materials_bolts:{name:"Boulons",image:"CJ_Materials_bolts.png"},
-    CJ_Materials_Fuse:{name:"Fusible",image:"CJ_Materials_Fuse.png"}, CJ_Materials_CalibrationTools:{name:"Outils de calibration",image:"CJ_Materials_CalibrationTools.png"},
-    CJ_Materials_Copper:{name:"Cuivre",image:"CJ_Materials_Copper.png"}, TWXToken_Couteau:{name:"Token Couteau",image:"TWXToken_Couteau.png"},
-    TWXToken_Baril:{name:"Token Baril",image:"TWXToken_Baril.png"}, TWXToken_Crate:{name:"Token Caisse",image:"TWXToken_Crate.png"},
-    TWXToken_SeaChest:{name:"Token SeaChest",image:"TWXToken_SeaChest.png"}, TWXToken_Gold:{name:"Token Gold",image:"TWXToken_Gold.png"}
+    BurlapSack:{name:"Sac en toile de jute",image:"BurlapSack.png",description:"Objet de récompense du Battle Pass, livré en jeu."},
+    Netting:{name:"Filet",image:"Netting.png",description:"Matériau de survie obtenu via la piste FREE."},
+    SewingKit:{name:"Kit de couture",image:"SewingKit.png",description:"Matériel de réparation et de fabrication récupérable en jeu."},
+    TannedLeather:{name:"Cuir tanné",image:"TannedLeather.png",description:"Matériau de fabrication obtenu comme récompense de palier."},
+    Fabric:{name:"Tissu",image:"Fabric.png",description:"Matériau de fabrication obtenu comme récompense de palier."},
+    CJ_Materials_bolts:{name:"Boulons",image:"CJ_Materials_bolts.png",description:"Composant CJ Materials livré directement sur le serveur."},
+    CJ_Materials_Fuse:{name:"Fusible",image:"CJ_Materials_Fuse.png",description:"Composant CJ Materials livré directement sur le serveur."},
+    CJ_Materials_CalibrationTools:{name:"Outils de calibration",image:"CJ_Materials_CalibrationTools.png",description:"Outils CJ Materials obtenus via la progression du Battle Pass."},
+    CJ_Materials_Copper:{name:"Cuivre",image:"CJ_Materials_Copper.png",description:"Matériau CJ Materials obtenu comme récompense de palier."},
+    TWXToken_Couteau:{name:"Token Couteau",image:"TWXToken_Couteau.png",description:"Token Premium échangeable selon le système de récompenses Senzany."},
+    TWXToken_Baril:{name:"Token Baril",image:"TWXToken_Baril.png",description:"Token Premium échangeable selon le système de récompenses Senzany."},
+    TWXToken_Crate:{name:"Token Caisse",image:"TWXToken_Crate.png",description:"Token Premium échangeable selon le système de récompenses Senzany."},
+    TWXToken_SeaChest:{name:"Token SeaChest",image:"TWXToken_SeaChest.png",description:"Token Premium échangeable selon le système de récompenses Senzany."},
+    TWXToken_Gold:{name:"Token Gold",image:"TWXToken_Gold.png",description:"Token Premium rare obtenu sur certains paliers de saison."}
   };
 
   function itemInfo(classname) {
     if (ITEM_CATALOG[classname]) return ITEM_CATALOG[classname];
-    if (/^CJ_Materials_plate/i.test(classname)) return {name:classname.replace(/^CJ_Materials_/,"").replace(/_/g," "),image:"CJ_Materials_plate_generic.png"};
-    if (/^CJ_Materials_Fabric/i.test(classname)) return {name:classname.replace(/^CJ_Materials_/,"").replace(/_/g," "),image:"Fabric.png"};
-    if (/^CJ_Materials_threads/i.test(classname)) return {name:"Fil",image:"SewingKit.png"};
-    if (/^CJ_Materials_Scrap/i.test(classname)) return {name:"Ferraille",image:"CJ_Materials_bolts.png"};
-    if (/^CJ_Materials_magnet/i.test(classname)) return {name:"Aimant",image:"CJ_Materials_plate_generic.png"};
-    if (/^CJ_Materials_plastic/i.test(classname)) return {name:"Plastique",image:"CJ_Materials_plate_generic.png"};
-    return {name:classname.replace(/_/g," "),image:null};
+    if (/^CJ_Materials_plate/i.test(classname)) return {name:classname.replace(/^CJ_Materials_/,"").replace(/_/g," "),image:"CJ_Materials_plate_generic.png",description:"Plaque CJ Materials obtenue via le Battle Pass."};
+    if (/^CJ_Materials_Fabric/i.test(classname)) return {name:classname.replace(/^CJ_Materials_/,"").replace(/_/g," "),image:"Fabric.png",description:"Matériau textile CJ Materials obtenu via le Battle Pass."};
+    if (/^CJ_Materials_threads/i.test(classname)) return {name:"Fil",image:"SewingKit.png",description:"Composant textile obtenu via le Battle Pass."};
+    if (/^CJ_Materials_Scrap/i.test(classname)) return {name:"Ferraille",image:"CJ_Materials_bolts.png",description:"Matériau de récupération obtenu via le Battle Pass."};
+    if (/^CJ_Materials_magnet/i.test(classname)) return {name:"Aimant",image:"CJ_Materials_plate_generic.png",description:"Composant CJ Materials obtenu via le Battle Pass."};
+    if (/^CJ_Materials_plastic/i.test(classname)) return {name:"Plastique",image:"CJ_Materials_plate_generic.png",description:"Matériau CJ Materials obtenu via le Battle Pass."};
+    return {name:classname.replace(/_/g," "),image:null,description:"Récompense Battle Pass récupérable en jeu."};
   }
 
   function rewardRows(rewards) {
@@ -40,10 +47,10 @@
     (Array.isArray(payload.items) ? payload.items : []).forEach(item => {
       const classname = String(item?.classname || "").trim(); if (!classname) return;
       const info = itemInfo(classname);
-      rows.push({classname,label:info.name,image:info.image,value:`×${Math.max(1,Number(item?.quantity)||1)}`});
+      rows.push({classname,label:info.name,image:info.image,description:info.description,value:`×${Math.max(1,Number(item?.quantity)||1)}`});
     });
-    if (Number(payload.roubles)>0) rows.push({classname:"roubles",label:"Roubles",image:null,value:number(payload.roubles)});
-    if (Number(payload.bitcoin)>0) rows.push({classname:"bitcoin",label:"Bitcoin",image:null,value:number(payload.bitcoin)});
+    if (Number(payload.roubles)>0) rows.push({classname:"roubles",label:"Roubles",image:null,description:"Crédit de monnaie en jeu associé à ce palier.",value:number(payload.roubles)});
+    if (Number(payload.bitcoin)>0) rows.push({classname:"bitcoin",label:"Bitcoin",image:null,description:"Récompense monétaire associée à ce palier.",value:number(payload.bitcoin)});
     return rows;
   }
 
@@ -51,12 +58,47 @@
     const rows = rewardRows(rewards);
     if (!rows.length) return `<div class="bp-reward-cell bp-reward-cell--${type} is-empty${locked?" is-locked":""}" data-level="${level}"><span>—</span></div>`;
     return `<div class="bp-reward-cell bp-reward-cell--${type}${locked?" is-locked":""}" data-level="${level}">
-      <div class="bp-reward-icons">${rows.slice(0,4).map(row => `<div class="bp-item" title="${escapeHtml(row.label)} — ${escapeHtml(row.classname)}">
+      <div class="bp-reward-icons">${rows.slice(0,4).map((row,index) => `<button class="bp-item" type="button"
+        data-track="${type}" data-level="${level}" data-label="${escapeHtml(row.label)}" data-classname="${escapeHtml(row.classname)}"
+        data-description="${escapeHtml(row.description)}" data-qty="${escapeHtml(row.value)}" data-image="${escapeHtml(row.image||"")}" aria-label="${escapeHtml(row.label)} ${escapeHtml(row.value)}">
         ${row.image?`<img src="assets/images/battlepass/items/${escapeHtml(row.image)}" alt="${escapeHtml(row.label)}" loading="lazy">`:`<span class="bp-item__fallback">?</span>`}
+        <span class="bp-item__name">${escapeHtml(row.label)}</span>
         <b>${escapeHtml(row.value)}</b>
-      </div>`).join("")}</div>
+        <i class="bp-item__shine" aria-hidden="true"></i>
+      </button>`).join("")}</div>
       ${locked?'<span class="bp-lock">LOCK</span>':''}
     </div>`;
+  }
+
+  function selectItem(item) {
+    if (!item) return;
+    const track=(item.dataset.track||"free").toUpperCase();
+    text("bpInspectTrack", track);
+    text("bpInspectLevel", `NIVEAU ${String(item.dataset.level||"—").padStart(2,"0")}`);
+    text("bpInspectName", item.dataset.label||"Récompense");
+    text("bpInspectDescription", item.dataset.description||"Récompense Battle Pass récupérable en jeu.");
+    text("bpInspectClassname", `Classname : ${item.dataset.classname||"—"}`);
+    text("bpInspectQty", item.dataset.qty||"—");
+    const visual=$("bpInspectVisual");
+    if (visual) {
+      const image=item.dataset.image;
+      visual.classList.toggle("is-premium", item.dataset.track==="premium");
+      visual.innerHTML=image?`<img src="assets/images/battlepass/items/${escapeHtml(image)}" alt="">`:`<span>?</span>`;
+    }
+    document.querySelectorAll(".bp-item.is-selected").forEach(el=>el.classList.remove("is-selected"));
+    item.classList.add("is-selected");
+  }
+
+  function bindItemInspector() {
+    const items=[...document.querySelectorAll(".bp-item")];
+    items.forEach(item=>{
+      item.addEventListener("mouseenter",()=>selectItem(item));
+      item.addEventListener("focus",()=>selectItem(item));
+      item.addEventListener("click",()=>selectItem(item));
+    });
+    const currentLevel=Number($("bpCurrentLevel")?.textContent||1);
+    const preferred=document.querySelector(`.bp-reward-cell[data-level="${currentLevel}"] .bp-item`) || items[0];
+    if (preferred) selectItem(preferred);
   }
 
   function renderLevels(data) {
@@ -67,7 +109,7 @@
 
     const headers = levels.map(level => {
       const n=Number(level.level)||1, unlocked=n<=current, currentClass=n===current?" is-current":"", unlockedClass=unlocked?" is-unlocked":" is-locked";
-      return `<div class="bp-level-node${currentClass}${unlockedClass}" data-level="${n}"><strong>${String(n).padStart(2,"0")}</strong><small>${number(level.xp_required)} XP</small></div>`;
+      return `<div class="bp-level-node${currentClass}${unlockedClass}" data-level="${n}"><strong>${String(n).padStart(2,"0")}</strong><small>${number(level.xp_required)} XP</small><i aria-hidden="true"></i></div>`;
     }).join("");
 
     const premium = levels.map(level => {
@@ -80,11 +122,12 @@
       return rewardCell(level.free_rewards, !unlocked, "free", n);
     }).join("");
 
-    grid.innerHTML = `<div class="bp-level-row">${headers}</div><div class="bp-reward-row bp-reward-row--premium">${premium}</div><div class="bp-reward-row bp-reward-row--free">${free}</div>`;
+    grid.innerHTML = `<div class="bp-level-row">${headers}</div><div class="bp-reward-row bp-reward-row--premium">${premium}</div><div class="bp-xp-rail" aria-hidden="true"><i></i></div><div class="bp-reward-row bp-reward-row--free">${free}</div>`;
 
     requestAnimationFrame(() => {
       const scroll=$("bpTrackScroll"), node=grid.querySelector('.bp-level-node.is-current');
       if (scroll && node) scroll.scrollLeft=Math.max(0,node.offsetLeft-scroll.clientWidth/2+node.clientWidth/2);
+      bindItemInspector();
     });
   }
 
@@ -110,8 +153,8 @@
 
   function setupTrackControls(){
     const scroll=$("bpTrackScroll"); if(!scroll)return;
-    $("bpPrev")?.addEventListener("click",()=>scroll.scrollBy({left:-520,behavior:"smooth"}));
-    $("bpNext")?.addEventListener("click",()=>scroll.scrollBy({left:520,behavior:"smooth"}));
+    $("bpPrev")?.addEventListener("click",()=>scroll.scrollBy({left:-650,behavior:"smooth"}));
+    $("bpNext")?.addEventListener("click",()=>scroll.scrollBy({left:650,behavior:"smooth"}));
     scroll.addEventListener("wheel",e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){e.preventDefault();scroll.scrollLeft+=e.deltaY;}},{passive:false});
   }
 
