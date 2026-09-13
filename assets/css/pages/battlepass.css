@@ -86,3 +86,116 @@ repeating-linear-gradient(115deg,rgba(255,255,255,.015) 0 1px,transparent 1px 9p
   .bp-inspect__badges b,.bp-inspect__badges span{font-size:8px;padding:4px 8px}
   .bp-inspect__qty strong{font-size:38px}
 }
+
+/* V7 — EXTRA LARGE REWARD CARDS + FREE LANE ALIGNMENT FIX */
+@media (min-width: 761px){
+  :root{
+    --bp-cell:220px;
+    --bp-row:205px;
+  }
+
+  .bp-command{
+    grid-template-columns:300px minmax(0,1fr);
+    gap:24px;
+  }
+
+  .bp-track-frame{
+    grid-template-columns:190px minmax(0,1fr);
+  }
+
+  /* The labels MUST mirror the four visual rows of the scrolling track:
+     level header / premium / XP rail / free. */
+  .bp-lane-labels{
+    grid-template-rows:50px var(--bp-row) 14px var(--bp-row);
+  }
+  .bp-lane-labels:before{grid-row:1}
+  .bp-lane-label--premium{grid-row:2}
+  .bp-lane-label--free{grid-row:4}
+
+  .bp-level-row,
+  .bp-reward-row{
+    grid-template-columns:repeat(50,var(--bp-cell));
+  }
+
+  .bp-level-row{height:50px}
+  .bp-reward-row{height:var(--bp-row)}
+  .bp-xp-rail{height:14px}
+
+  .bp-level-node strong{font-size:29px}
+  .bp-level-node small{font-size:8px}
+
+  .bp-lane-label{
+    padding:0 20px;
+    gap:14px;
+  }
+  .bp-lane-label>span{font-size:38px}
+  .bp-lane-label strong{font-size:29px}
+  .bp-lane-label small{font-size:11px;line-height:1.3}
+
+  .bp-reward-cell:before{inset:10px}
+  .bp-reward-icons{
+    padding:14px;
+    gap:10px;
+  }
+  .bp-reward-icons:has(.bp-item:only-child){padding:15px 20px}
+
+  .bp-item{
+    min-height:0;
+    padding:8px 7px 38px;
+    border-width:1px;
+  }
+  .bp-item img{
+    max-width:158px;
+    max-height:148px;
+  }
+  .bp-reward-icons:has(.bp-item:nth-child(2)) .bp-item img{
+    max-width:94px;
+    max-height:112px;
+  }
+  .bp-item__name{
+    left:7px;
+    right:7px;
+    bottom:8px;
+    min-height:22px;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    white-space:normal;
+    overflow:hidden;
+    line-height:1.15;
+    font-size:10px;
+    color:#e5ddd3;
+  }
+  .bp-item b{
+    right:8px;
+    top:8px;
+    padding:4px 6px;
+    font-size:11px;
+  }
+  .bp-lock{top:9px;right:9px}
+
+  .bp-track-controls button{
+    width:48px;
+    height:48px;
+    font-size:32px;
+  }
+
+  .bp-inspect{
+    grid-template-columns:210px minmax(0,1fr) 130px;
+    min-height:190px;
+    padding:20px 24px;
+    gap:26px;
+  }
+  .bp-inspect__visual{
+    width:190px;
+    height:150px;
+  }
+  .bp-inspect__visual img{
+    max-width:174px;
+    max-height:140px;
+  }
+  .bp-inspect h3{font-size:36px}
+  .bp-inspect p{font-size:14px;line-height:1.55}
+  .bp-inspect small{font-size:9px}
+  .bp-inspect__qty strong{font-size:42px}
+}
