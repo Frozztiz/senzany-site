@@ -44,6 +44,9 @@
     }),
     steam: Object.freeze({
       getMe: () => request('/api/steam/me')
+    }),
+    battlePass: Object.freeze({
+      getMe: () => request('/api/battle-pass/me')
     })
   });
 })();

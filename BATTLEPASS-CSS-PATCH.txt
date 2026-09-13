@@ -1,0 +1,4 @@
+/* Battle Pass: respect HTML hidden state */
+[hidden] {
+  display: none !important;
+}

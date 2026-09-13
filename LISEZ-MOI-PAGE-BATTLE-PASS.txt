@@ -1,0 +1,15 @@
+SENZANY — PAGE BATTLE PASS JOUEUR
+
+Fichiers à remplacer/ajouter :
+- senzany-battlepass.html                         NOUVEAU
+- assets/css/pages/battlepass.css                NOUVEAU
+- assets/js/pages/battlepass.js                  NOUVEAU
+- assets/js/components.js                        MODIFIÉ (navigation + footer)
+- assets/js/api.js                               MODIFIÉ (GET /api/battle-pass/me)
+
+Aucune modification backend nécessaire : la page utilise la route existante /api/battle-pass/me.
+
+Important :
+- La page affiche niveau, XP, saison, FREE/PREMIUM et récompenses configurées.
+- Elle n'invente pas de statut « réclamé » car /api/battle-pass/me ne fournit pas encore cet historique.
+- Les récompenses sont indiquées comme accessibles/verrouillées et la récupération reste en jeu.
