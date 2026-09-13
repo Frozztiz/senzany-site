@@ -43,6 +43,7 @@
     ['faq','senzany-faq.html','FAQ'],
     ['evenements','senzany-evenements.html','Événements'],
     ['boutique','senzany-boutique.html','Boutique'],
+    ['battlepass','senzany-battlepass.html','Battle Pass'],
     ['profil','senzany-profil.html','Mon profil'],
     ['staff','senzany-staff.html','Staff']
   ];
@@ -119,6 +120,7 @@
               <a href="senzany-evenements.html">Événements</a>
               <a href="senzany-faq.html">FAQ</a>
               <a href="senzany-boutique.html">Boutique</a>
+              <a href="senzany-battlepass.html">Battle Pass</a>
               <a href="senzany-profil.html">Mon profil</a>
             </div>
 

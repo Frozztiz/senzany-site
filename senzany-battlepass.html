@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Consulte ta progression, tes niveaux et les récompenses FREE et PREMIUM du Battle Pass Senzany."/>
+  <title>Battle Pass — SENZANY</title>
+  <link rel="stylesheet" href="assets/css/pages/battlepass.css?v=1.0.0"/>
+</head>
+<body data-page="battlepass">
+  <div data-site-header></div>
+
+  <main class="bp-page">
+    <section class="bp-hero">
+      <div class="bp-hero__grid" aria-hidden="true"></div>
+      <div class="wrap bp-hero__inner">
+        <div class="bp-hero__copy">
+          <span class="bp-kicker">SENZANY // PROGRESSION SAISONNIÈRE</span>
+          <h1>BATTLE <b>PASS</b></h1>
+          <p>Progresse sur Senzany, débloque les paliers de la saison et retrouve tes récompenses FREE et PREMIUM directement en jeu.</p>
+          <div class="bp-hero__actions">
+            <a class="bp-button bp-button--primary" href="#bpLevels">Voir les récompenses</a>
+            <a id="bpPremiumButton" class="bp-button bp-button--gold" href="https://senzany.tip4serv.com/" target="_blank" rel="noopener noreferrer">Passer Premium <span>↗</span></a>
+          </div>
+        </div>
+
+        <aside class="bp-season-card">
+          <span class="bp-season-card__eyebrow">SAISON ACTIVE</span>
+          <strong id="bpSeasonCode">—</strong>
+          <h2 id="bpSeasonName">Chargement…</h2>
+          <div class="bp-season-card__meta">
+            <div><span>DÉBUT</span><b id="bpSeasonStart">—</b></div>
+            <div><span>FIN</span><b id="bpSeasonEnd">—</b></div>
+            <div><span>STATUT</span><b id="bpSeasonStatus">—</b></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="wrap bp-shell">
+      <div id="bpLoading" class="bp-state bp-state--loading">
+        <span></span>
+        <div><strong>Synchronisation du Battle Pass</strong><small>Lecture de ta progression Senzany…</small></div>
+      </div>
+
+      <section id="bpLoggedOut" class="bp-login" hidden>
+        <div>
+          <span class="bp-kicker">AUTHENTIFICATION REQUISE</span>
+          <h2>Connecte-toi avec Steam</h2>
+          <p>Ton Battle Pass est lié à ton SteamID64. Connecte-toi pour afficher ta progression réelle et les paliers accessibles.</p>
+        </div>
+        <a class="bp-button bp-button--primary" href="/api/steam/login">Connexion Steam <span>↗</span></a>
+      </section>
+
+      <div id="bpContent" hidden>
+        <section class="bp-dashboard">
+          <article class="bp-player-card">
+            <div class="bp-player-card__identity">
+              <img id="bpAvatar" src="assets/images/branding/logo.png" alt="Avatar Steam"/>
+              <div>
+                <span>PROFIL SYNCHRONISÉ</span>
+                <h2 id="bpPlayerName">Survivant</h2>
+                <small id="bpSteamId">SteamID64 —</small>
+              </div>
+            </div>
+            <div id="bpPremiumBadge" class="bp-premium-badge">FREE</div>
+          </article>
+
+          <article class="bp-level-card">
+            <span>NIVEAU ACTUEL</span>
+            <div class="bp-level-card__value"><strong id="bpCurrentLevel">1</strong><small id="bpMaxLevel">/ 50</small></div>
+            <div class="bp-xp-row"><b id="bpXpText">0 / 1 000 XP</b><span id="bpXpPercent">0%</span></div>
+            <div class="bp-progress"><i id="bpProgressBar"></i></div>
+            <small id="bpTotalXp">XP TOTAL // 0</small>
+          </article>
+
+          <article class="bp-next-card">
+            <span>PROCHAIN OBJECTIF</span>
+            <strong id="bpNextLevel">NIVEAU 2</strong>
+            <p id="bpNextXp">1 000 XP restantes</p>
+            <small>Les récompenses débloquées sont récupérables depuis le Battle Pass en jeu.</small>
+          </article>
+        </section>
+
+        <section class="bp-info-strip">
+          <div><span>PISTE FREE</span><strong>ACTIVE</strong><small>Accessible à tous</small></div>
+          <div><span>PISTE PREMIUM</span><strong id="bpPremiumState">NON ACTIVE</strong><small id="bpPremiumHint">Activation via Tip4Serv</small></div>
+          <div><span>SAISON</span><strong id="bpSeasonMini">—</strong><small id="bpSeasonWindow">Dates en cours de lecture</small></div>
+          <div><span>RÉCUPÉRATION</span><strong>EN JEU</strong><small>Système de livraison Senzany</small></div>
+        </section>
+
+        <section id="bpLevels" class="bp-levels-section">
+          <header class="bp-section-head">
+            <div>
+              <span class="bp-kicker">50 PALIERS // DEUX PISTES</span>
+              <h2>Récompenses de la saison</h2>
+              <p>Les niveaux déjà atteints sont signalés comme accessibles. Le statut de récupération définitif reste géré par le Battle Pass en jeu.</p>
+            </div>
+            <div class="bp-legend" aria-label="Légende">
+              <span><i class="is-unlocked"></i> Débloqué</span>
+              <span><i class="is-current"></i> Niveau actuel</span>
+              <span><i class="is-locked"></i> Verrouillé</span>
+            </div>
+          </header>
+
+          <div id="bpLevelsGrid" class="bp-levels-grid" aria-live="polite"></div>
+        </section>
+
+        <section class="bp-premium-cta" id="bpPremiumCta">
+          <div>
+            <span class="bp-kicker">PISTE PREMIUM</span>
+            <h2>Débloque la piste Premium</h2>
+            <p>Une fois ton achat validé sur Tip4Serv avec ton SteamID64, l’accès Premium est synchronisé automatiquement avec ton Battle Pass sans remettre ton niveau ou ton XP à zéro.</p>
+          </div>
+          <a class="bp-button bp-button--gold" href="https://senzany.tip4serv.com/" target="_blank" rel="noopener noreferrer">Accéder à Tip4Serv <span>↗</span></a>
+        </section>
+      </div>
+
+      <div id="bpError" class="bp-state bp-state--error" hidden>
+        <strong>Battle Pass indisponible</strong>
+        <p id="bpErrorText">Impossible de récupérer les données pour le moment.</p>
+        <button id="bpRetry" class="bp-button" type="button">Réessayer</button>
+      </div>
+    </section>
+  </main>
+
+  <div data-site-footer></div>
+
+  <script src="assets/js/components.js?v=1.0.1"></script>
+  <script src="assets/js/api.js?v=1.0.1"></script>
+  <script src="assets/js/pages/battlepass.js?v=1.0.0"></script>
+</body>
+</html>
