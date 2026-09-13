@@ -113,16 +113,51 @@ async function getDeliveryById(id) {
   return mapDelivery(data);
 }
 
-async function createDelivery({
-  steamId,
-  playerName,
-  title,
-  message,
-  items,
-  createdBy = null,
-  createdByName = null
-}) {
+async function createDelivery(options = {}) {
+  const {
+    battlePassClaim = null,
+    steamId,
+    playerName,
+    title,
+    message,
+    items,
+    createdBy = null,
+    createdByName = null
+  } = options;
+
   const supabase = getSupabaseClient();
+
+  if (battlePassClaim) {
+    try {
+      const { data, error } = await supabase.rpc(
+        "create_battle_pass_delivery",
+        {
+          p_claim: battlePassClaim
+        }
+      );
+
+      if (error) {
+        console.error(
+          "[ABP][RPC ERROR] create_battle_pass_delivery:",
+          error
+        );
+        throw error;
+      }
+
+      console.log(
+        "[ABP][RPC] create_battle_pass_delivery:",
+        data
+      );
+
+      return data;
+    } catch (error) {
+      console.error(
+        "[ABP][RPC ERROR] create_battle_pass_delivery:",
+        error
+      );
+      throw error;
+    }
+  }
 
   const { data: delivery, error: deliveryError } = await supabase
     .from("deliveries")
@@ -153,11 +188,12 @@ async function createDelivery({
         item.name || item.displayName || className
       ).trim();
 
-        const requestedQuantity = Math.floor(Number(item.quantity) || 1);
-        const quantity =
-          className === "SenzanyBankCredit"
-            ? Math.max(1, Math.min(100000000, requestedQuantity))
-            : Math.max(1, Math.min(1000, requestedQuantity));
+      const requestedQuantity = Math.floor(Number(item.quantity) || 1);
+
+      const quantity =
+        className === "SenzanyBankCredit"
+          ? Math.max(1, Math.min(100000000, requestedQuantity))
+          : Math.max(1, Math.min(1000, requestedQuantity));
 
       return {
         delivery_id: delivery.id,
