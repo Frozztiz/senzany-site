@@ -54,3 +54,35 @@ repeating-linear-gradient(115deg,rgba(255,255,255,.015) 0 1px,transparent 1px 9p
 @keyframes bpBackgroundSweep{to{background-position:760px 0}}@keyframes bpNoise{0%,100%{transform:translate(0)}25%{transform:translate(-1px,1px)}50%{transform:translate(1px,-1px)}75%{transform:translate(1px,1px)}}@keyframes bpFlare{from{transform:translate3d(-8px,-5px,0) scale(.95);opacity:.55}to{transform:translate3d(12px,8px,0) scale(1.08);opacity:.9}}@keyframes bpSpark{0%{transform:translateY(0) translateX(0) scale(.5);opacity:0}10%{opacity:.9}60%{opacity:.55}100%{transform:translateY(-740px) translateX(35px) scale(1.8);opacity:0}}@keyframes bpGoldText{to{background-position:-240% 0}}@keyframes bpPanelBreath{50%{box-shadow:0 24px 72px rgba(0,0,0,.48),inset 0 0 55px rgba(255,142,27,.04),0 0 22px rgba(255,166,42,.06)}}@keyframes bpPanelShine{0%,64%{transform:translateX(-75%)}82%,100%{transform:translateX(75%)}}@keyframes bpPremiumBadge{50%{box-shadow:0 0 10px rgba(255,196,71,.26),0 0 26px rgba(255,160,34,.20)}}@keyframes bpXpSpark{50%{transform:scale(1.35);box-shadow:0 0 8px #fff,0 0 20px #ffc44f,0 0 42px rgba(255,164,31,.76)}}@keyframes bpBorderFlow{to{background-position:300% 0}}@keyframes bpPremiumLane{50%{box-shadow:inset 0 0 52px rgba(163,51,255,.16),0 0 16px rgba(163,51,255,.08)}}@keyframes bpFreeLane{50%{box-shadow:inset 0 0 52px rgba(34,208,255,.14),0 0 16px rgba(34,208,255,.08)}}@keyframes bpCurrentHeader{50%{filter:brightness(1.17)}}@keyframes bpCurrentRing{50%{inset:-6px;opacity:.45}}@keyframes bpRailSweep{to{left:calc(100% - 70px)}}@keyframes bpCurrentCell{50%{box-shadow:inset 0 0 0 2px rgba(255,218,109,1),inset 0 0 48px rgba(255,177,45,.19),0 0 32px rgba(255,157,26,.38)}}@keyframes bpItemShine{to{left:150%}}@keyframes bpInspectFloat{50%{transform:translateY(-4px) scale(1.025)}}@keyframes bpFeatureSweep{0%,72%{left:-45%}100%{left:135%}}@keyframes bpCtaSweep{0%,68%{transform:translateX(-65%)}90%,100%{transform:translateX(65%)}}
 @media(max-width:760px){:root{--bp-cell:112px;--bp-row:116px}.bp-inspect{grid-template-columns:88px 1fr}.bp-inspect__visual{width:80px;height:76px}.bp-inspect__visual img{max-width:70px;max-height:68px}.bp-inspect__qty{grid-column:1/-1;border-left:0;border-top:1px solid rgba(255,255,255,.08);padding:8px 0 0;display:flex;justify-content:space-between}.bp-item img{max-width:70px;max-height:64px}}
 @media(prefers-reduced-motion:reduce){.bp-cinematic:after,.bp-cinematic__noise,.bp-cinematic__flare,.bp-sparks i,.bp-titleblock h1 em,.bp-progress-panel,.bp-progress-panel:after,.bp-premium-badge.is-premium,.bp-progressbar i:after,.bp-track-frame:before,.bp-lane-label--premium,.bp-lane-label--free,.bp-level-node.is-current,.bp-level-node.is-current:after,.bp-xp-rail i,.bp-reward-cell[data-level="5"],.bp-inspect__visual img,.bp-feature-strip article:after,.bp-premium-cta:after{animation:none!important}}
+
+/* V6 — LARGE REWARD CARDS / SHOWCASE MODE */
+@media (min-width: 761px){
+  :root{--bp-cell:184px;--bp-row:174px}
+  .bp-command{grid-template-columns:285px minmax(0,1fr);gap:22px}
+  .bp-track-frame{grid-template-columns:178px minmax(0,1fr)}
+  .bp-lane-labels{grid-template-rows:42px var(--bp-row) 12px var(--bp-row)}
+  .bp-level-row{height:42px}
+  .bp-level-node strong{font-size:24px}
+  .bp-level-node small{font-size:7px}
+  .bp-lane-label{padding:0 17px}
+  .bp-lane-label>span{font-size:32px}
+  .bp-lane-label strong{font-size:25px}
+  .bp-lane-label small{font-size:10px}
+  .bp-reward-icons{padding:12px;gap:9px}
+  .bp-reward-icons:has(.bp-item:only-child){padding:12px 18px}
+  .bp-item{padding:7px 5px 27px;border-width:1px}
+  .bp-item img{max-width:122px;max-height:116px}
+  .bp-reward-icons:has(.bp-item:nth-child(2)) .bp-item img{max-width:78px;max-height:92px}
+  .bp-item__name{left:6px;right:6px;bottom:7px;font-size:9px;color:#d3cbc2}
+  .bp-item b{right:6px;top:6px;padding:3px 5px;font-size:10px}
+  .bp-lock{top:7px;right:7px}
+  .bp-track-controls button{width:44px;height:44px}
+  .bp-inspect{grid-template-columns:176px minmax(0,1fr) 120px;min-height:170px;padding:18px 22px;gap:24px}
+  .bp-inspect__visual{width:158px;height:132px}
+  .bp-inspect__visual img{max-width:142px;max-height:122px}
+  .bp-inspect h3{font-size:32px}
+  .bp-inspect p{font-size:13px;line-height:1.55}
+  .bp-inspect small{font-size:9px}
+  .bp-inspect__badges b,.bp-inspect__badges span{font-size:8px;padding:4px 8px}
+  .bp-inspect__qty strong{font-size:38px}
+}
