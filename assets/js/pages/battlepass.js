@@ -165,9 +165,29 @@
     const bar=$("bpProgressBar"); if (bar) bar.style.width=`${percent}%`;
     text("bpNextLevel",isMax?"NIVEAU MAXIMUM":`NIVEAU ${Math.min(maxLevel,level+1)}`); text("bpNextXp",isMax?"Progression de saison complétée":`${number(Math.max(0,xpPerLevel-xpInLevel))} XP restantes`);
     const badge=$("bpPremiumBadge"); if (badge){badge.textContent=premium?"PREMIUM":"FREE";badge.classList.toggle("is-premium",premium);}
-    const premiumButton=$("bpPremiumButton"); if (premiumButton) premiumButton.hidden=premium;
-    const sidebarPremiumButton=$("bpSidebarPremiumButton"); if (sidebarPremiumButton) sidebarPremiumButton.hidden=premium;
-    const cta=$("bpPremiumCta"); if (cta&&premium){cta.classList.add("is-owned"); const h=cta.querySelector("h2"),p=cta.querySelector("p"); if(h)h.textContent="PASS PREMIUM ACTIF"; if(p)p.textContent="Ton accès Premium est synchronisé. Les paliers Premium atteints sont accessibles depuis le Battle Pass en jeu.";}
+    const premiumButton=$("bpPremiumButton");
+    if (premiumButton) {
+      premiumButton.hidden = false;
+      premiumButton.innerHTML = premium
+        ? 'VOIR / GÉRER MON ABONNEMENT <span>↗</span>'
+        : "S'ABONNER AU PASS PREMIUM <span>↗</span>";
+    }
+
+    const sidebarPremiumButton=$("bpSidebarPremiumButton");
+    if (sidebarPremiumButton) {
+      sidebarPremiumButton.hidden = false;
+      sidebarPremiumButton.innerHTML = premium
+        ? 'GÉRER LE PREMIUM <span>↗</span>'
+        : 'PASS PREMIUM <span>↗</span>';
+    }
+
+    const cta=$("bpPremiumCta");
+    if (cta&&premium){
+      cta.classList.add("is-owned");
+      const h=cta.querySelector("h2"),p=cta.querySelector("p");
+      if(h)h.textContent="PASS PREMIUM ACTIF";
+      if(p)p.textContent="Ton accès Premium est synchronisé. Tu peux consulter ou gérer ton abonnement depuis la boutique.";
+    }
     renderLevels(data); show("content");
   }
 
