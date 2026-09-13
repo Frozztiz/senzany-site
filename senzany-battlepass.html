@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="Battle Pass Senzany : progression, récompenses FREE et PREMIUM et suivi de saison."/>
   <title>Battle Pass — SENZANY</title>
-  <link rel="stylesheet" href="assets/css/pages/battlepass.css?v=4.0.0"/>
+  <link rel="stylesheet" href="assets/css/pages/battlepass.css?v=5.0.0"/>
 </head>
 <body data-page="battlepass">
   <div data-site-header></div>
@@ -15,6 +15,7 @@
       <div class="bp-cinematic__noise" aria-hidden="true"></div>
       <div class="bp-cinematic__flare bp-cinematic__flare--one" aria-hidden="true"></div>
       <div class="bp-cinematic__flare bp-cinematic__flare--two" aria-hidden="true"></div>
+      <div class="bp-sparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
       <div class="wrap bp-cinematic__top">
         <div class="bp-titleblock">
@@ -101,6 +102,17 @@
                   <div class="bp-track-grid" id="bpLevelsGrid" aria-live="polite"></div>
                 </div>
               </div>
+
+              <section class="bp-inspect" id="bpInspect" aria-live="polite">
+                <div class="bp-inspect__visual" id="bpInspectVisual"><span>?</span></div>
+                <div class="bp-inspect__copy">
+                  <div class="bp-inspect__badges"><b id="bpInspectTrack">RÉCOMPENSE</b><span id="bpInspectLevel">NIVEAU —</span></div>
+                  <h3 id="bpInspectName">Sélectionne une récompense</h3>
+                  <p id="bpInspectDescription">Passe la souris ou clique sur un objet pour afficher son nom, sa quantité et son identifiant en jeu.</p>
+                  <small id="bpInspectClassname">Classname : —</small>
+                </div>
+                <div class="bp-inspect__qty"><span>QUANTITÉ</span><strong id="bpInspectQty">—</strong></div>
+              </section>
             </div>
           </section>
 
@@ -133,6 +145,6 @@
   <div data-site-footer></div>
   <script src="assets/js/components.js?v=1.0.1"></script>
   <script src="assets/js/api.js?v=1.0.1"></script>
-  <script src="assets/js/pages/battlepass.js?v=4.0.0"></script>
+  <script src="assets/js/pages/battlepass.js?v=5.0.0"></script>
 </body>
 </html>
