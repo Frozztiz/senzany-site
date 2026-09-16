@@ -88,7 +88,7 @@
       <div class="bp-reward-icons">${rows.slice(0,4).map((row,index) => `<button class="bp-item" type="button"
         data-track="${type}" data-level="${level}" data-label="${escapeHtml(row.label)}" data-classname="${escapeHtml(row.classname)}"
         data-description="${escapeHtml(row.description)}" data-qty="${escapeHtml(row.value)}" data-image="${escapeHtml(row.image||"")}" aria-label="${escapeHtml(row.label)} ${escapeHtml(row.value)}">
-        ${row.image?`<img src="assets/images/battlepass/items/${escapeHtml(row.image)}" alt="${escapeHtml(row.label)}" loading="lazy">`:`<img src="assets/images/battlepass/items/SenzanyReward.png" alt="${escapeHtml(row.label)}" loading="lazy">`}
+        ${row.image?`<img src="assets/images/battlepass/items/${escapeHtml(row.image)}?v=3" alt="${escapeHtml(row.label)}" loading="lazy">`:`<img src="assets/images/battlepass/items/SenzanyReward.png" alt="${escapeHtml(row.label)}" loading="lazy">`}
         <span class="bp-item__name">${escapeHtml(row.label)}</span>
         <b>${escapeHtml(row.value)}</b>
         <i class="bp-item__shine" aria-hidden="true"></i>
@@ -110,7 +110,7 @@
     if (visual) {
       const image=item.dataset.image;
       visual.classList.toggle("is-premium", item.dataset.track==="premium");
-      visual.innerHTML=`<img src="assets/images/battlepass/items/${escapeHtml(image||"SenzanyReward.png")}" alt="">`;
+      visual.innerHTML=`<img src="assets/images/battlepass/items/${escapeHtml(image||"SenzanyReward.png")}?v=3" alt="">`;
     }
     document.querySelectorAll(".bp-item.is-selected").forEach(el=>el.classList.remove("is-selected"));
     item.classList.add("is-selected");
