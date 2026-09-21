@@ -1,0 +1,50 @@
+SENZANY SERVER V1.1 - CREDIT BANCAIRE DIRECT
+
+CE DOSSIER EST RECONSTRUIT A PARTIR DU VRAI Senzany_Server.pbo DU FTP.
+
+IMPORTANT :
+- Le vrai Delivery serveur est dans scripts/4_World/SenzanyDelivery/
+- SZD_MissionServer.c est seulement l'accroche Mission.
+- Ne compile PAS le dossier 5_Mission seul.
+
+ADDON BUILDER
+1. Source directory :
+   le dossier Senzany_Server_V1.1_BankCredit_SOURCE (celui qui contient config.cpp)
+2. Destination :
+   un dossier vide, par exemple C:\Users\nicol\Desktop\PBO_COMPILE
+3. Clear temp folder : OUI
+4. Binarize : NON
+5. PACK
+
+Le fichier genere doit s'appeler :
+Senzany_Server_V1.1_BankCredit_SOURCE.pbo
+ou selon le nom de dossier choisi.
+
+Renomme-le avant envoi FTP en :
+Senzany_Server.pbo
+
+FTP :
+@Senzany_Server/Addons/Senzany_Server.pbo
+
+Fais une sauvegarde de l'ancien PBO avant remplacement.
+
+APRES REDEMARRAGE SERVEUR :
+Dans script_*.log, chercher :
+[SenzanyDelivery] Manager construit - version 1.1.0-bank-credit
+
+TEST CLAIM :
+Le backend V1.4 doit creer :
+SenzanyBankCredit x <montant>
+
+Lors du claim, le log doit afficher par exemple :
+[SenzanyDelivery] LB BANK 7656... : 60100 -> 61100 (+1000)
+[SenzanyDelivery] BANK CREDIT OK : +1000 $
+
+AUCUN ExpansionBanknoteHryvnia ne doit etre cree.
+
+SECURITES :
+- compte bancaire absent = livraison en erreur
+- SteamID incoherent = livraison en erreur
+- plafond 20 000 000 $ + maxMoneyBonus respecte
+- relecture du fichier apres ecriture avant confirmation
+- les livraisons normales restent identiques

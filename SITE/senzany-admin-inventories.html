@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <title>Inventaires joueurs — SENZANY</title>
+  <link rel="stylesheet" href="assets/css/pages/profil-terminal-v5.css?v=5.0.0" />
+  <link rel="stylesheet" href="assets/css/pages/admin-inventories.css?v=1.0.0" />
+</head>
+<body>
+  <div data-site-header></div>
+  <main class="inv-main">
+    <section class="inv-hero">
+      <div>
+        <span>SENZANY // COMMANDEMENT // MODULE 07</span>
+        <h1>INVENTAIRES <strong>JOUEURS</strong></h1>
+        <p>Consultation en lecture seule des inventaires remontés par le serveur DayZ.</p>
+      </div>
+      <a class="inv-btn inv-btn--ghost" href="senzany-admin.html">← Retour au commandement</a>
+    </section>
+
+    <section class="inv-layout">
+      <aside class="inv-panel">
+        <div class="inv-panel__head">
+          <div><span>SURVIVANTS</span><strong id="inventoryPlayerCount">0 joueur</strong></div>
+          <button id="refreshInventories" class="inv-btn" type="button">Actualiser</button>
+        </div>
+        <input id="inventoryPlayerSearch" class="inv-search" type="search" placeholder="Rechercher un joueur…" autocomplete="off" />
+        <div id="inventoryPlayers" class="inv-players">
+          <div class="inv-empty">Chargement des inventaires…</div>
+        </div>
+      </aside>
+
+      <section class="inv-panel inv-panel--inventory">
+        <div id="inventoryEmptyState" class="inv-empty inv-empty--large">
+          Sélectionne un joueur pour consulter son inventaire.
+        </div>
+
+        <div id="inventoryDetail" hidden>
+          <div class="inv-player-head">
+            <div>
+              <span>INVENTAIRE ACTUEL</span>
+              <h2 id="inventoryPlayerName">—</h2>
+              <small id="inventorySteamId">—</small>
+            </div>
+            <div class="inv-sync">
+              <span>DERNIER SNAPSHOT</span>
+              <strong id="inventoryCapturedAt">—</strong>
+              <small id="inventoryFreshness">—</small>
+            </div>
+          </div>
+
+          <div class="inv-toolbar">
+            <input id="inventoryItemSearch" class="inv-search" type="search" placeholder="Rechercher un classname…" autocomplete="off" />
+            <button id="selectAllInventory" class="inv-btn" type="button">Tout sélectionner</button>
+            <button id="clearInventorySelection" class="inv-btn inv-btn--ghost" type="button">Tout désélectionner</button>
+          </div>
+
+          <div class="inv-table-head">
+            <span></span><span>OBJET</span><span>QTÉ</span><span>ÉTAT</span>
+          </div>
+          <div id="inventoryItems" class="inv-items"></div>
+
+          <section class="inv-delivery-box">
+            <div>
+              <span>CRÉER UNE LIVRAISON</span>
+              <strong id="inventorySelectionCount">0 objet sélectionné</strong>
+              <small>Les objets sont copiés. Rien n’est retiré de l’inventaire du joueur.</small>
+            </div>
+            <label>
+              <span>Titre</span>
+              <input id="inventoryDeliveryTitle" type="text" maxlength="150" value="Copie d’inventaire" />
+            </label>
+            <label>
+              <span>Message</span>
+              <input id="inventoryDeliveryMessage" type="text" maxlength="1000" value="Livraison créée depuis le module Inventaires." />
+            </label>
+            <button id="createInventoryDelivery" class="inv-btn inv-btn--primary" type="button" disabled>CRÉER LA LIVRAISON</button>
+            <div id="inventoryFeedback" class="inv-feedback" hidden></div>
+          </section>
+        </div>
+      </section>
+    </section>
+  </main>
+  <div data-site-footer></div>
+  <script defer src="assets/js/components.js"></script>
+  <script defer src="assets/js/app.js"></script>
+  <script type="module" src="assets/js/admin/inventories.js?v=1.0.0"></script>
+</body>
+</html>

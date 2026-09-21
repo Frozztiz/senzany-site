@@ -1,0 +1,22 @@
+SENZANY SERVER 1.1.2 - CREDIT BANCAIRE + MESSAGE PRIVE
+
+Nouveau :
+- Apres un credit bancaire reussi, seul le joueur concerne recoit :
+  "SENZANY - Transfert bancaire : 1000 $ ont ete credites sur votre compte."
+- Aucun message n'est envoye aux autres joueurs.
+- Le log generique n'affiche plus "1000 objets crees" pour un credit bancaire.
+
+Addon Builder :
+- Addon source directory : ce dossier complet
+- Addon prefix : Senzany_Server
+- Clear temp folder : coche
+- Binarize : decoche
+- Sign output PBO file : decoche
+
+Apres PACK :
+1. Renommer le PBO genere en Senzany_Server.pbo
+2. Remplacer : @Senzany_Server/Addons/Senzany_Server.pbo
+3. Redemarrer completement le serveur
+
+Log attendu :
+[SenzanyDelivery] Manager construit - version 1.1.2-bank-credit-message
