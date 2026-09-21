@@ -137,6 +137,17 @@ app.use(
   require("./routes/adminMap")
 );
 
+app.use(
+  "/api/admin/inventories",
+  require("./middleware/commandAuth"),
+  require("./routes/adminInventories")
+);
+
+app.use(
+  "/api/delivery-agent/inventory",
+  require("./routes/inventoryAgent")
+);
+
 app.use((req, res) => {
   res.status(404).json({
     error: "Route API introuvable."
