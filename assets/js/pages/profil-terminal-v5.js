@@ -16,6 +16,24 @@
   function renderDiscord(discord){const state=document.getElementById("discordState"),unlinked=document.getElementById("discordUnlinked"),linked=document.getElementById("discordLinked"),linkButton=document.getElementById("discordLinkButton"),unlinkButtons=document.querySelectorAll(".js-discord-unlink"),rolesBox=document.getElementById("discordRoles");state.classList.remove("panel-state--online","panel-state--pending");if(discord&&discord.linked){state.textContent="Associé";state.classList.add("panel-state--online");unlinked.hidden=true;linked.hidden=false;linkButton.hidden=true;unlinkButtons.forEach(button=>button.hidden=false);document.getElementById("discordUsername").textContent=discord.username||"Compte Discord";document.getElementById("discordId").textContent=discord.id||"—";const avatar=document.getElementById("discordAvatar");if(discord.avatar){avatar.src=discord.avatar;avatar.hidden=false}else avatar.hidden=true;const list=document.getElementById("discordRolesList"),empty=document.getElementById("discordRolesEmpty");list.innerHTML="";if(discord.rolesAvailable){rolesBox.hidden=false;const roles=Array.isArray(discord.roles)?discord.roles:[];empty.hidden=roles.length>0;roles.slice(0,6).forEach(role=>{const badge=document.createElement("span");badge.className="discord-role-badge";badge.textContent=role.name;list.appendChild(badge)});if(roles.length>6){const more=document.createElement("span");more.className="discord-role-badge";more.textContent="+ "+(roles.length-6);list.appendChild(more)}}else rolesBox.hidden=true;updateDiscordService(true);return}state.textContent="Non associé";state.classList.add("panel-state--pending");unlinked.hidden=false;linked.hidden=true;rolesBox.hidden=true;linkButton.hidden=false;unlinkButtons.forEach(button=>button.hidden=true);updateDiscordService(false)}
   function showDiscordFeedback(){const code=new URLSearchParams(location.search).get("discord");if(!code)return;const messages={linked:"Compte Discord associé avec succès.",cancelled:"Association Discord annulée.",already_linked:"Ce compte Discord est déjà lié à un autre compte Steam.",steam_required:"Reconnecte-toi à Steam avant d’associer Discord.",invalid_state:"La demande a expiré. Recommence.",invalid_callback:"Réponse Discord invalide.",token_error:"Discord n’a pas finalisé l’autorisation.",user_error:"Impossible de lire le profil Discord.",server_error:"Impossible d’enregistrer l’association."};const feedback=document.getElementById("discordFeedback");feedback.textContent=messages[code]||"État Discord mis à jour.";feedback.hidden=false;feedback.classList.toggle("discord-feedback--error",code!=="linked");history.replaceState({},document.title,location.pathname)}
   function updateTerminalTime(){const now=new Intl.DateTimeFormat("fr-FR",{dateStyle:"short",timeStyle:"short"}).format(new Date());document.getElementById("terminalUpdatedAt").textContent="MISE À JOUR — "+now}
+  async function loadBattlePassProfile(){
+    const rank=document.getElementById("battlePassRank"),levelEl=document.getElementById("battlePassLevel"),progressEl=document.getElementById("battlePassProgress");
+    try{
+      const data=await window.SenzanyAPI.battlePass.getMe();
+      const season=data?.season||{},progress=data?.progress||{};
+      const level=Math.max(1,Number(progress.level)||1),maxLevel=Math.max(1,Number(season.max_level)||50);
+      if(rank)rank.textContent=`BATTLE PASS // ${progress.is_premium===true?"PREMIUM":"FREE"}`;
+      if(levelEl)levelEl.textContent=`NIV. ${level}`;
+      if(progressEl)progressEl.textContent=level>=maxLevel?`SAISON ${season.code||"ACTIVE"} // NIVEAU MAXIMUM`:`SAISON ${season.code||"ACTIVE"} // ${Math.max(0,Number(progress.xp)||0).toLocaleString("fr-FR")} XP`;
+      appendLog(`Battle Pass synchronisé // niveau ${level}`,1050);
+    }catch(error){
+      if(rank)rank.textContent="BATTLE PASS // INDISPONIBLE";
+      if(levelEl)levelEl.textContent="NIV. —";
+      if(progressEl)progressEl.textContent="PROGRESSION TEMPORAIREMENT INDISPONIBLE";
+      appendLog("Battle Pass indisponible",1050);
+      console.warn("Battle Pass profil indisponible",error);
+    }
+  }
 
   let voteAliasesLimit=20;
   let voteAliasDetails=new Map();
@@ -296,7 +314,7 @@
 
 
   document.querySelectorAll(".js-discord-unlink").forEach(button=>button.addEventListener("click",function(){if(!confirm("Dissocier ton compte Discord de ton compte Steam Senzany ?"))return;const buttons=document.querySelectorAll(".js-discord-unlink");buttons.forEach(item=>{item.disabled=true;item.textContent="Dissociation…"});window.SenzanyAPI.discord.unlink().then(()=>{renderDiscord({linked:false});const feedback=document.getElementById("discordFeedback");feedback.textContent="Compte Discord dissocié avec succès.";feedback.hidden=false;feedback.classList.remove("discord-feedback--error")}).catch(()=>{const feedback=document.getElementById("discordFeedback");feedback.textContent="Impossible de dissocier Discord pour le moment.";feedback.hidden=false;feedback.classList.add("discord-feedback--error")}).finally(()=>{buttons.forEach(item=>{item.disabled=false;item.textContent="Dissocier Discord"})})}));
-  window.SenzanyAPI.steam.getMe().then(data=>{if(!data.loggedIn){reveal("out");return}document.getElementById("profileTag").textContent="ACCÈS PERSONNEL // IDENTITÉ SYNCHRONISÉE";document.getElementById("steamAvatar").src=data.avatar||"";document.getElementById("steamName").textContent=data.name||"Survivant";document.getElementById("identityName").textContent=data.name||"—";document.getElementById("steamIdValue").textContent=data.steamId||"—";document.getElementById("steamStatusValue").textContent=personaStates[data.personaState]||"Statut inconnu";document.getElementById("lastLogoffValue").textContent=formatLastActivity(data.lastLogoff);document.getElementById("steamProfileLink").href=data.profileUrl||("https://steamcommunity.com/profiles/"+data.steamId);renderDayz(data.dayz);renderDiscord(data.discord);refreshVoteAliasesAndTotal();updateTerminalTime();appendLog("Steam synchronisé",120);appendLog(data.discord&&data.discord.linked?"Discord synchronisé":"Discord en attente",430);appendLog("API OVH opérationnelle",740);appendLog("Battle Pass en attente de données serveur",1050);reveal("in");showDiscordFeedback()}).catch(()=>reveal("out"));
+  window.SenzanyAPI.steam.getMe().then(data=>{if(!data.loggedIn){reveal("out");return}document.getElementById("profileTag").textContent="ACCÈS PERSONNEL // IDENTITÉ SYNCHRONISÉE";document.getElementById("steamAvatar").src=data.avatar||"";document.getElementById("steamName").textContent=data.name||"Survivant";document.getElementById("identityName").textContent=data.name||"—";document.getElementById("steamIdValue").textContent=data.steamId||"—";document.getElementById("steamStatusValue").textContent=personaStates[data.personaState]||"Statut inconnu";document.getElementById("lastLogoffValue").textContent=formatLastActivity(data.lastLogoff);document.getElementById("steamProfileLink").href=data.profileUrl||("https://steamcommunity.com/profiles/"+data.steamId);renderDayz(data.dayz);renderDiscord(data.discord);refreshVoteAliasesAndTotal();updateTerminalTime();appendLog("Steam synchronisé",120);appendLog(data.discord&&data.discord.linked?"Discord synchronisé":"Discord en attente",430);appendLog("API OVH opérationnelle",740);loadBattlePassProfile();reveal("in");showDiscordFeedback()}).catch(()=>reveal("out"));
 
 
   const moduleToast=document.getElementById("moduleToast");
@@ -321,7 +339,7 @@
     "Lecture Supabase... OK",
     "Chargement des votes... EN ATTENTE",
     "Chargement de l’expérience... EN ATTENTE",
-    "Battle Pass... DONNÉES SERVEUR REQUISES"
+    "Battle Pass... SYNCHRONISÉ"
   ];
   let sequenceIndex=0;
   setInterval(()=>{
