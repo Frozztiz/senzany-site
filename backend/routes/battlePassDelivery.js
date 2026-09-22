@@ -68,38 +68,31 @@ router.post('/lbmaster-skins/complete', authenticate, async (req, res) => {
   }
 });
 // Native LBmaster Api.json bridge.
-// Authentication is intentionally separate from the DayZ AgentKey contract.
+// LBmaster does not send Api.json's apiKey as a normal header/body/query field.
+// The bridge therefore authenticates with a secret token embedded in the URL.
+// Expected URLs:
+//   /lbmaster-native/poll/<token>?id=...&port=...
+//   /lbmaster-native/response/<token>?id=...&port=...
 function authenticateLBmaster(req, res, next) {
   res.set('Cache-Control', 'no-store');
+
   const expected = String(process.env.LBMASTER_BATTLEPASS_API_KEY || '').trim();
-  if (!expected) return res.status(503).json({ errorCode: 'LBMASTER_UNAVAILABLE' });
+  const provided = String(req.params?.token || '').trim();
 
-  const provided = String(
-    req.get('x-api-key') ||
-    req.get('authorization')?.replace(/^Bearer\s+/i, '') ||
-    req.query?.apiKey ||
-    req.body?.apiKey ||
-    ''
-  ).trim();
-
-
-  console.log(
-  '[LBMASTER-AUTH-DEBUG]',
-  'method=' + req.method,
-  'queryKeys=' + Object.keys(req.query || {}).join(','),
-  'bodyKeys=' + Object.keys(req.body || {}).join(','),
-  'headerKeys=' + Object.keys(req.headers || {}).join(',')
-);
+  if (!expected) {
+    return res.status(503).json({ errorCode: 'LBMASTER_UNAVAILABLE' });
+  }
 
   if (!keyMatches(provided, expected)) {
     return res.status(401).json({ errorCode: 'UNAUTHORIZED' });
   }
+
   return next();
 }
 
 // LBmaster polls this endpoint. It receives a command it can execute itself.
-// This does not call LBAPIManager from Senzany_Server.
-router.all('/lbmaster-native/poll', authenticateLBmaster, async (req, res) => {
+// The id and port query parameters added by LBmaster are intentionally preserved.
+router.all('/lbmaster-native/poll/:token', authenticateLBmaster, async (req, res) => {
   try {
     const agentId = String(process.env.LBMASTER_BATTLEPASS_AGENT_ID || 'senzany-battlepass').trim();
     const grant = await require('../services/battlePassSkinGrantService').poll({ AgentId: agentId });
@@ -114,7 +107,7 @@ router.all('/lbmaster-native/poll', authenticateLBmaster, async (req, res) => {
 });
 
 // LBmaster reports the result here after executing the command.
-router.all('/lbmaster-native/response', authenticateLBmaster, async (req, res) => {
+router.all('/lbmaster-native/response/:token', authenticateLBmaster, async (req, res) => {
   try {
     const agentId = String(process.env.LBMASTER_BATTLEPASS_AGENT_ID || 'senzany-battlepass').trim();
     const normalized = require('../services/battlePassSkinGrantService').fromLBmasterResponse(
