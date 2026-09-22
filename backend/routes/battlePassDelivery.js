@@ -82,6 +82,15 @@ function authenticateLBmaster(req, res, next) {
     ''
   ).trim();
 
+
+  console.log(
+  '[LBMASTER-AUTH-DEBUG]',
+  'method=' + req.method,
+  'queryKeys=' + Object.keys(req.query || {}).join(','),
+  'bodyKeys=' + Object.keys(req.body || {}).join(','),
+  'headerKeys=' + Object.keys(req.headers || {}).join(',')
+);
+
   if (!keyMatches(provided, expected)) {
     return res.status(401).json({ errorCode: 'UNAUTHORIZED' });
   }
