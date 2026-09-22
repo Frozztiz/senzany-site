@@ -117,9 +117,19 @@ router.all('/lbmaster-native/response/:token', authenticateLBmaster, async (req,
     const result = await require('../services/battlePassSkinGrantService').complete(normalized);
     return res.status(200).json(result);
   } catch (error) {
-    console.warn('[ABP][LBMASTER-NATIVE] completion failed');
-    return res.status(503).json({ success: false, errorCode: 'SKIN_GRANT_UNAVAILABLE' });
-  }
+  const payload = req.method === 'GET' ? req.query : req.body;
+
+  console.warn('[ABP][LBMASTER-NATIVE] completion failed', {
+    method: req.method,
+    payload: payload,
+    error: error?.message || String(error)
+  });
+
+  return res.status(503).json({
+    success: false,
+    errorCode: 'SKIN_GRANT_UNAVAILABLE'
+  });
+}
 });
 
 module.exports = router;
