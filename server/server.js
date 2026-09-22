@@ -20,10 +20,15 @@ app.use((req, res, next) => {
     const startedAt = Date.now();
 
     res.on("finish", () => {
+        const safeUrl = req.url.replace(
+            /(\/lbmaster-native\/(?:poll|response)\/)[^?&\s]+/i,
+            '$1[REDACTED]'
+        );
+
         console.log(
             new Date().toISOString(),
             req.method,
-            req.url,
+            safeUrl,
             "STATUS:",
             res.statusCode,
             "DUREE:",
