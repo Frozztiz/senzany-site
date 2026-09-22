@@ -20,10 +20,15 @@ app.use((req, res, next) => {
     const startedAt = Date.now();
 
     res.on("finish", () => {
+        const safeUrl = req.url.replace(
+            /(\/lbmaster-native\/(?:poll|response)\/)[^?&\s]+/i,
+            '$1[REDACTED]'
+        );
+
         console.log(
             new Date().toISOString(),
             req.method,
-            req.url,
+            safeUrl,
             "STATUS:",
             res.statusCode,
             "DUREE:",
@@ -135,6 +140,17 @@ app.use(
   "/api/admin/map",
   require("./middleware/commandAuth"),
   require("./routes/adminMap")
+);
+
+app.use(
+  "/api/admin/inventories",
+  require("./middleware/commandAuth"),
+  require("./routes/adminInventories")
+);
+
+app.use(
+  "/api/delivery-agent/inventory",
+  require("./routes/inventoryAgent")
 );
 
 app.use((req, res) => {
