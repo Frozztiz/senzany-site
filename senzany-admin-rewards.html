@@ -75,6 +75,32 @@
         </div>
       </section>
 
+      <section class="admin-card ranking-distribution" aria-labelledby="thresholdDistributionTitle">
+        <div class="admin-card__header ranking-distribution__header">
+          <div>
+            <span>DISTRIBUTION DES PALIERS MENSUELS</span>
+            <h2 id="thresholdDistributionTitle">Envoyer les récompenses des paliers de votes</h2>
+            <small>Utilise uniquement les packs « Palier de votes ». Les paliers atteints sont cumulatifs et les récompenses déjà envoyées ne sont jamais recréées.</small>
+          </div>
+          <b>PALIERS</b>
+        </div>
+        <div class="ranking-distribution__toolbar">
+          <label class="admin-field ranking-distribution__period"><span>MOIS DES VOTES</span><input id="thresholdDistributionPeriod" type="month" /></label>
+          <div class="ranking-distribution__stats">
+            <div><span>JOUEURS</span><strong id="thresholdDistributionPlayers">0</strong></div>
+            <div><span>PRÊTS</span><strong id="thresholdDistributionReady">0</strong></div>
+            <div><span>DÉJÀ ENVOYÉS</span><strong id="thresholdDistributionSent">0</strong></div>
+          </div>
+          <div class="ranking-distribution__actions"><button id="thresholdDistributionLoad" class="admin-button" type="button">Vérifier les paliers</button></div>
+        </div>
+        <div id="thresholdDistributionFeedback" class="admin-feedback" hidden></div>
+        <div id="thresholdDistributionPreview" class="ranking-distribution__preview"><div class="admin-list-message">Vérifie les paliers atteints avant de créer les livraisons.</div></div>
+        <div class="ranking-distribution__footer">
+          <div><strong>Distribution cumulative des paliers</strong><small>Cette action ne touche qu’aux règles <code>votes_threshold</code>. Un joueur reçoit chaque palier atteint qui n’a pas déjà été distribué.</small></div>
+          <button id="thresholdDistributionApprove" class="admin-button admin-button--primary" type="button" disabled>ENVOYER LES RÉCOMPENSES DES PALIERS</button>
+        </div>
+      </section>
+
       <div class="rewards-layout rewards-layout--explorer">
         <section class="admin-card rewards-list-card rewards-explorer">
           <div class="admin-card__header rewards-explorer__header">
@@ -189,6 +215,6 @@
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
   <script type="module" src="assets/js/admin/admin-rewards-page.js?v=11.3.0"></script>
-  <script type="module" src="assets/js/admin/admin-ranking-distribution.js?v=1.1.0"></script>
+  <script type="module" src="assets/js/admin/admin-ranking-distribution.js?v=1.2.0"></script>
 </body>
 </html>
