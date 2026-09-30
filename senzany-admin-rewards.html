@@ -80,23 +80,36 @@
           <div>
             <span>DISTRIBUTION DES PALIERS MENSUELS</span>
             <h2 id="thresholdDistributionTitle">Envoyer les récompenses des paliers de votes</h2>
-            <small>Utilise uniquement les packs « Palier de votes ». Les paliers atteints sont cumulatifs et les récompenses déjà envoyées ne sont jamais recréées.</small>
+            <small>Utilise uniquement les packs « Palier de votes ». Les récompenses sont cumulées jusqu’au plus haut palier atteint.</small>
           </div>
           <b>PALIERS</b>
         </div>
+
         <div class="ranking-distribution__toolbar">
-          <label class="admin-field ranking-distribution__period"><span>MOIS DES VOTES</span><input id="thresholdDistributionPeriod" type="month" /></label>
+          <label class="admin-field ranking-distribution__period">
+            <span>MOIS DES VOTES</span>
+            <input id="thresholdDistributionPeriod" type="month" />
+          </label>
           <div class="ranking-distribution__stats">
             <div><span>JOUEURS</span><strong id="thresholdDistributionPlayers">0</strong></div>
             <div><span>PRÊTS</span><strong id="thresholdDistributionReady">0</strong></div>
             <div><span>DÉJÀ ENVOYÉS</span><strong id="thresholdDistributionSent">0</strong></div>
           </div>
-          <div class="ranking-distribution__actions"><button id="thresholdDistributionLoad" class="admin-button" type="button">Vérifier les paliers</button></div>
+          <div class="ranking-distribution__actions">
+            <button id="thresholdDistributionLoad" class="admin-button" type="button">Vérifier les paliers</button>
+          </div>
         </div>
+
         <div id="thresholdDistributionFeedback" class="admin-feedback" hidden></div>
-        <div id="thresholdDistributionPreview" class="ranking-distribution__preview"><div class="admin-list-message">Vérifie les paliers atteints avant de créer les livraisons.</div></div>
+        <div id="thresholdDistributionPreview" class="ranking-distribution__preview">
+          <div class="admin-list-message">Vérifie le snapshot mensuel et les paliers atteints avant l’envoi.</div>
+        </div>
+
         <div class="ranking-distribution__footer">
-          <div><strong>Distribution cumulative des paliers</strong><small>Cette action ne touche qu’aux règles <code>votes_threshold</code>. Un joueur reçoit chaque palier atteint qui n’a pas déjà été distribué.</small></div>
+          <div>
+            <strong>Distribution cumulative des paliers</strong>
+            <small>Cette action utilise uniquement les règles <code>votes_threshold</code>. Le Top 10 déjà distribué n’est pas renvoyé.</small>
+          </div>
           <button id="thresholdDistributionApprove" class="admin-button admin-button--primary" type="button" disabled>ENVOYER LES RÉCOMPENSES DES PALIERS</button>
         </div>
       </section>
