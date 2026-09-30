@@ -1,6 +1,7 @@
 const byId = (id) => document.getElementById(id);
 const els = {
   period: byId("rankingDistributionPeriod"),
+  calculate: byId("rankingDistributionCalculate"),
   load: byId("rankingDistributionLoad"),
   approve: byId("rankingDistributionApprove"),
   feedback: byId("rankingDistributionFeedback"),
@@ -32,14 +33,17 @@ function formatPeriodLabel(period) {
     .format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1)));
 }
 
-function previousMonthPeriod() {
+function currentMonthPeriod() {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Paris", year: "numeric", month: "2-digit"
   }).formatToParts(new Date());
-  const year = Number(parts.find((part) => part.type === "year")?.value);
-  const month = Number(parts.find((part) => part.type === "month")?.value);
-  const previous = new Date(Date.UTC(year, month - 2, 1));
-  return `${previous.getUTCFullYear()}-${String(previous.getUTCMonth() + 1).padStart(2, "0")}`;
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  return `${year}-${month}`;
+}
+
+function isCurrentPeriod(period) {
+  return String(period || "") === currentMonthPeriod();
 }
 
 function setFeedback(message = "", state = "") {
@@ -89,8 +93,24 @@ function stateLabel(row) {
   })[row?.status] || String(row?.status || "").toUpperCase();
 }
 
+function syncCalculateState(data = currentData) {
+  if (!els.calculate || !els.period) return;
+  const period = els.period.value;
+  const sent = Number(data?.summary?.sent || 0);
+  const completed = data?.run?.status === "completed";
+  els.calculate.disabled = !isCurrentPeriod(period) || sent > 0 || completed;
+  els.calculate.title = !isCurrentPeriod(period)
+    ? "Le calcul est autorisé uniquement pour le mois en cours."
+    : sent > 0
+      ? "Le Top 10 a déjà commencé à être distribué : le snapshot est figé."
+      : completed
+        ? "Les récompenses mensuelles ont déjà été distribuées : le snapshot est figé."
+        : "Recalcule le classement du mois en cours à partir des votes Top-Serveurs.";
+}
+
 function render(data) {
   currentData = data || null;
+  syncCalculateState(currentData);
   const rows = Array.isArray(data?.rankings) ? data.rankings : [];
   const summary = data?.summary || {};
   if (els.players) els.players.textContent = `${rows.length} / 10`;
@@ -134,7 +154,7 @@ function render(data) {
 
 async function load({ manual = false } = {}) {
   if (!els.period || !els.load) return;
-  if (!els.period.value) els.period.value = previousMonthPeriod();
+  if (!els.period.value) els.period.value = currentMonthPeriod();
   const period = els.period.value;
   setLoading(els.load, true, "Vérification…");
   setFeedback(`Chargement du Top 10 ${period}…`, "loading");
@@ -150,6 +170,53 @@ async function load({ manual = false } = {}) {
     setFeedback(error.message, "error");
   } finally {
     setLoading(els.load, false);
+  }
+}
+
+async function calculate() {
+  if (!els.period || !els.calculate) return;
+  const period = els.period.value || currentMonthPeriod();
+  els.period.value = period;
+
+  if (!isCurrentPeriod(period)) {
+    setFeedback("Le calcul est autorisé uniquement pour le mois en cours. Les anciens mois restent consultables mais ne sont jamais recalculés.", "error");
+    syncCalculateState();
+    return;
+  }
+
+  if (Number(currentData?.summary?.sent || 0) > 0 || currentData?.run?.status === "completed") {
+    setFeedback("Ce classement a déjà été distribué : le snapshot est figé et ne peut plus être recalculé.", "error");
+    syncCalculateState();
+    return;
+  }
+
+  if (!confirm([
+    `Calculer ou mettre à jour le classement de ${formatPeriodLabel(period)} ?`,
+    "",
+    "Le snapshot sera remplacé par les votes actuellement disponibles sur Top-Serveurs.",
+    "Aucune récompense ne sera distribuée pendant ce calcul.",
+    "Les paliers de votes et le Top 10 resteront deux systèmes de récompenses séparés."
+  ].join("\n"))) return;
+
+  setLoading(els.calculate, true, "CALCUL EN COURS…");
+  setFeedback("Synchronisation des votes Top-Serveurs et mise à jour du snapshot mensuel…", "loading");
+  try {
+    await api("/api/admin/monthly-votes/prepare", {
+      method: "POST",
+      body: { period, force: true },
+    });
+    const data = await api(`/api/admin/monthly-votes/ranking-rewards/${encodeURIComponent(period)}/preview?refresh=${Date.now()}`);
+    render(data);
+    const summary = data.summary || {};
+    setFeedback(
+      `${formatPeriodLabel(period)} recalculé : ${(data.rankings || []).length} joueur(s) dans le Top 10, ${summary.ready || 0} prêt(s), ${summary.blocked || 0} bloqué(s). Aucune récompense n’a encore été envoyée.`,
+      "success"
+    );
+  } catch (error) {
+    setFeedback(error.message, "error");
+  } finally {
+    setLoading(els.calculate, false);
+    syncCalculateState();
   }
 }
 
@@ -184,10 +251,15 @@ async function approve() {
   }
 }
 
-if (els.period && !els.period.value) els.period.value = previousMonthPeriod();
+if (els.period && !els.period.value) els.period.value = currentMonthPeriod();
+if (els.period) els.period.max = currentMonthPeriod();
+els.calculate?.addEventListener("click", calculate);
 els.load?.addEventListener("click", () => load({ manual: true }));
-els.period?.addEventListener("change", () => load({ manual: true }));
+els.period?.addEventListener("change", () => {
+  syncCalculateState(null);
+  load({ manual: true });
+});
 els.approve?.addEventListener("click", approve);
 
-// Le mois précédent est chargé automatiquement dès que le module est présent.
+// Le mois courant est chargé automatiquement. Les anciens mois restent consultables sans recalcul.
 if (els.period) load();
