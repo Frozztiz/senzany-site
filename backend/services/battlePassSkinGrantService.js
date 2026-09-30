@@ -37,4 +37,58 @@ async function complete(body) {
   });
 }
 
-module.exports = { create, poll, complete };
+function firstString(obj, names) {
+  for (const name of names) {
+    if (typeof obj?.[name] === 'string' && obj[name].trim()) return obj[name].trim();
+  }
+  return '';
+}
+
+function toLBmasterCommand(grant) {
+  if (!grant || typeof grant !== 'object') throw new Error('INVALID_GRANT');
+
+  const claimId = firstString(grant, ['id', 'claim_id', 'claimId', 'ClaimId']);
+  const claimToken = firstString(grant, ['claim_token', 'claimToken', 'ClaimToken']);
+  const steamId = firstString(grant, ['steam_id', 'steamId', 'SteamId']);
+  const permission = firstString(grant, ['permission_name', 'permission', 'Permission']);
+
+  if (!claimId || !claimToken || !/^\d{17}$/.test(steamId) ||
+      !/^[A-Za-z_][A-Za-z0-9_]{0,127}$/.test(permission)) {
+    throw new Error('INVALID_GRANT');
+  }
+
+  return {
+    id: claimId,
+    token: claimToken,
+    command: `/skinpermissions add player ${steamId} ${permission}`,
+    steamId,
+    permission
+  };
+}
+
+function fromLBmasterResponse(body, agentId) {
+  if (!body || typeof body !== 'object') throw new Error('INVALID_REQUEST');
+
+  const claimId = firstString(body, ['id', 'claimId', 'ClaimId']);
+  const claimToken = firstString(body, ['token', 'claimToken', 'ClaimToken']);
+  const rawResult = firstString(body, ['result', 'Result', 'status', 'Status']).toLowerCase();
+  const rawCode = body.code ?? body.Code ?? body.lbmasterCode ?? body.LBmasterCode ?? 0;
+  const code = Number(rawCode);
+
+  let result = 'retry';
+  if (['success', 'ok', 'completed'].includes(rawResult)) result = 'success';
+  else if (['alreadyexists', 'already_exists', 'exists'].includes(rawResult)) result = 'alreadyExists';
+  else if (['permanenterror', 'permanent_error', 'invalid', 'failed'].includes(rawResult)) result = 'permanentError';
+
+  if (!claimId || !claimToken || !Number.isInteger(code)) throw new Error('INVALID_REQUEST');
+
+  return {
+    AgentId: agentId,
+    ClaimId: claimId,
+    ClaimToken: claimToken,
+    Result: result,
+    LBmasterCode: code
+  };
+}
+
+module.exports = { create, poll, complete, toLBmasterCommand, fromLBmasterResponse };

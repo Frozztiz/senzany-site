@@ -47,20 +47,23 @@
 
         <div class="ranking-distribution__toolbar">
           <label class="admin-field ranking-distribution__period">
-            <span>MOIS ARCHIVÉ</span>
-            <input id="rankingDistributionPeriod" type="month" value="2026-08" />
+            <span>MOIS DU CLASSEMENT</span>
+            <input id="rankingDistributionPeriod" type="month" />
           </label>
           <div class="ranking-distribution__stats">
             <div><span>JOUEURS</span><strong id="rankingDistributionPlayers">0 / 10</strong></div>
             <div><span>PRÊTS</span><strong id="rankingDistributionReady">0</strong></div>
             <div><span>DÉJÀ ENVOYÉS</span><strong id="rankingDistributionSent">0</strong></div>
           </div>
-          <button id="rankingDistributionLoad" class="admin-button" type="button">Vérifier le Top 10</button>
+          <div class="ranking-distribution__actions">
+            <button id="rankingDistributionCalculate" class="admin-button admin-button--primary" type="button">CALCULER / METTRE À JOUR LES VOTES</button>
+            <button id="rankingDistributionLoad" class="admin-button" type="button">Vérifier le Top 10</button>
+          </div>
         </div>
 
         <div id="rankingDistributionFeedback" class="admin-feedback" hidden></div>
         <div id="rankingDistributionPreview" class="ranking-distribution__preview">
-          <div class="admin-list-message">Choisis un mois puis vérifie le Top 10 avant l’envoi.</div>
+          <div class="admin-list-message">Calcule le mois en cours pour créer ou mettre à jour le snapshot, puis vérifie le Top 10 avant l’envoi.</div>
         </div>
 
         <div class="ranking-distribution__footer">
@@ -186,6 +189,6 @@
   <script defer src="assets/js/components.js"></script>
   <script defer src="assets/js/app.js"></script>
   <script type="module" src="assets/js/admin/admin-rewards-page.js?v=11.3.0"></script>
-  <script type="module" src="assets/js/admin/admin-ranking-distribution.js?v=1.0.0"></script>
+  <script type="module" src="assets/js/admin/admin-ranking-distribution.js?v=1.1.0"></script>
 </body>
 </html>
