@@ -224,3 +224,48 @@ repeating-linear-gradient(115deg,rgba(255,255,255,.015) 0 1px,transparent 1px 9p
   .bp-lane-label strong{font-size:31px !important}
   .bp-lane-label small{font-size:12px !important}
 }
+
+
+/* =========================================================
+   V9 — WIDE DESKTOP LAYOUT
+   - Utilise presque toute la largeur de l'écran
+   - Supprime la bande 01 / 02 / 03 / 04 devenue inutile
+   - Agrandit la zone Battle Pass horizontalement
+   ========================================================= */
+@media (min-width: 1200px){
+  .bp-cinematic .wrap{
+    width:calc(100% - 48px) !important;
+    max-width:1920px !important;
+  }
+
+  .bp-command{
+    grid-template-columns:300px minmax(0,1fr) !important;
+    gap:24px !important;
+  }
+
+  .bp-track-stage{
+    min-width:0 !important;
+    width:100% !important;
+  }
+
+  .bp-track-frame,
+  .bp-inspect,
+  .bp-premium-cta{
+    width:100% !important;
+  }
+
+  .bp-feature-strip{
+    display:none !important;
+  }
+
+  .bp-premium-cta{
+    margin-top:18px !important;
+  }
+}
+
+@media (min-width: 1800px){
+  .bp-cinematic .wrap{
+    width:calc(100% - 64px) !important;
+    max-width:2200px !important;
+  }
+}
