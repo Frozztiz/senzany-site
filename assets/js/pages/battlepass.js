@@ -31,6 +31,13 @@
     BP_SeaChest_NecroArcane:{name:"Sea Chest NecroArcane",image:"BP_SeaChest_NecroArcane.png",description:"Sea Chest exclusif NecroArcane de la piste Premium."},
     BP_Crate_NecroArcane:{name:"Wooden Crate NecroArcane",image:"BP_Crate_NecroArcane.png",description:"Caisse en bois exclusive NecroArcane de la piste Premium."},
     Storm2:{name:"NBC Storm2",image:"Storm2.png",description:"Tenue NBC Storm2 exclusive du niveau 50 Premium."},
+    BP_Weapon_CyberSamurai:{name:"Arme CyberSamurai",image:"BP_Weapon_CyberSamurai.png",description:"Arme exclusive CyberSamurai de la piste Premium Saison 2."},
+    BP_Barrel_CyberSamurai:{name:"Baril CyberSamurai",image:"BP_Barrel_CyberSamurai.png",description:"Baril exclusif CyberSamurai de la piste Premium Saison 2."},
+    BP_CyberSamurai:{name:"Tenue CyberSamurai",image:"BP_CyberSamurai.png",description:"Tenue exclusive CyberSamurai de la piste Premium Saison 2."},
+    a2:{name:"Cape Premium",image:"a2.png",description:"Cape exclusive de la piste Premium Saison 2."},
+    BP_SeaChest_CyberSamurai:{name:"Sea Chest CyberSamurai",image:"BP_SeaChest_CyberSamurai.png",description:"Sea Chest exclusif CyberSamurai de la piste Premium Saison 2."},
+    BP_Crate_CyberSamurai:{name:"Wooden Crate CyberSamurai",image:"BP_Crate_CyberSamurai.png",description:"Caisse en bois exclusive CyberSamurai de la piste Premium Saison 2."},
+    NBC_BP:{name:"Tenue NBC Premium",image:"NBC_BP.png",description:"Tenue NBC rouge et noire exclusive du niveau 50 Premium Saison 2."},
     TWXToken_Couteau:{name:"Token Couteau",image:"TWXToken_Couteau.png",description:"Token Premium échangeable selon le système de récompenses Senzany."},
     TWXToken_Baril:{name:"Token Baril",image:"TWXToken_Baril.png",description:"Token Premium échangeable selon le système de récompenses Senzany."},
     TWXToken_Crate:{name:"Token Caisse",image:"TWXToken_Crate.png",description:"Token Premium échangeable selon le système de récompenses Senzany."},
@@ -76,6 +83,11 @@
       const info = itemInfo(classname);
       rows.push({classname,label:info.name,image:info.image,description:info.description,value:`×${Math.max(1,Number(item?.quantity)||1)}`});
     });
+    (Array.isArray(payload.skins) ? payload.skins : []).forEach(skin => {
+      const permission = String(skin?.permission || "").trim(); if (!permission) return;
+      const info = itemInfo(permission);
+      rows.push({classname:permission,label:info.name,image:info.image,description:info.description,value:"×1"});
+    });
     if (Number(payload.roubles)>0) rows.push({classname:"roubles",label:"Roubles",image:null,description:"Crédit de monnaie en jeu associé à ce palier.",value:number(payload.roubles)});
     if (Number(payload.bitcoin)>0) rows.push({classname:"bitcoin",label:"Bitcoin",image:null,description:"Récompense monétaire associée à ce palier.",value:number(payload.bitcoin)});
     return rows;
@@ -88,7 +100,7 @@
       <div class="bp-reward-icons">${rows.slice(0,4).map((row,index) => `<button class="bp-item" type="button"
         data-track="${type}" data-level="${level}" data-label="${escapeHtml(row.label)}" data-classname="${escapeHtml(row.classname)}"
         data-description="${escapeHtml(row.description)}" data-qty="${escapeHtml(row.value)}" data-image="${escapeHtml(row.image||"")}" aria-label="${escapeHtml(row.label)} ${escapeHtml(row.value)}">
-        ${row.image?`<img src="assets/images/battlepass/items/${escapeHtml(row.image)}?v=3" alt="${escapeHtml(row.label)}" loading="lazy">`:`<img src="assets/images/battlepass/items/SenzanyReward.png" alt="${escapeHtml(row.label)}" loading="lazy">`}
+        ${row.image?`<img src="assets/images/battlepass/items/${escapeHtml(row.image)}?v=4" alt="${escapeHtml(row.label)}" loading="lazy">`:`<img src="assets/images/battlepass/items/SenzanyReward.png" alt="${escapeHtml(row.label)}" loading="lazy">`}
         <span class="bp-item__name">${escapeHtml(row.label)}</span>
         <b>${escapeHtml(row.value)}</b>
         <i class="bp-item__shine" aria-hidden="true"></i>
@@ -110,7 +122,7 @@
     if (visual) {
       const image=item.dataset.image;
       visual.classList.toggle("is-premium", item.dataset.track==="premium");
-      visual.innerHTML=`<img src="assets/images/battlepass/items/${escapeHtml(image||"SenzanyReward.png")}?v=3" alt="">`;
+      visual.innerHTML=`<img src="assets/images/battlepass/items/${escapeHtml(image||"SenzanyReward.png")}?v=4" alt="">`;
     }
     document.querySelectorAll(".bp-item.is-selected").forEach(el=>el.classList.remove("is-selected"));
     item.classList.add("is-selected");

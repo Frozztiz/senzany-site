@@ -3,16 +3,23 @@ const deliveryService = require('./deliveryService');
 
 const failureCodes = new Set(['INVALID_SEASON', 'INVALID_REWARD', 'LEVEL_REQUIRED',
   'PREMIUM_REQUIRED', 'UNSUPPORTED_REWARD', 'DELIVERY_FAILED', 'INVALID_REQUEST']);
+
 function invalid(code = 'INVALID_REQUEST') {
   const error = new Error(code); error.code = code; throw error;
 }
+
+function isValidSeasonCode(value) {
+  // Dynamic Battle Pass season code: S01, S02, S03, ...
+  return typeof value === 'string' && /^S\d{2,}$/.test(value);
+}
+
 function normalizeClaim(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) invalid();
   const fields = new Set(['AgentKey', 'AgentId', 'SteamId', 'PlayerName', 'SeasonId',
     'Level', 'Premium', 'PlayerLevel', 'ClaimKey', 'Rewards']);
   if (Object.keys(body).some(k => !fields.has(k))) invalid();
   if (typeof body.SteamId !== 'string' || !/^\d{17}$/.test(body.SteamId)) invalid();
-  if (body.SeasonId !== 'S01') invalid('INVALID_SEASON');
+  if (!isValidSeasonCode(body.SeasonId)) invalid('INVALID_SEASON');
   if (!Number.isInteger(body.Level) || body.Level < 1 || body.Level > 200 ||
       !Number.isInteger(body.PlayerLevel) || body.PlayerLevel < 1 || body.PlayerLevel > 200 ||
       !(typeof body.Premium === 'boolean' || body.Premium === 0 || body.Premium === 1)) invalid();
