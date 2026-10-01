@@ -189,10 +189,15 @@ async function getDiscordMemberRoles(discordId) {
       color: Number(role.color || 0),
     }));
 
+  const currentAvatar = member.user?.avatar
+    ? `https://cdn.discordapp.com/avatars/${member.user.id}/${member.user.avatar}.png?size=256`
+    : null;
+
   return {
     available: true,
     member: true,
     nickname: member.nick || null,
+    avatar: currentAvatar,
     roles,
   };
 }
@@ -267,7 +272,7 @@ async function getProfile(apiKey, steamId) {
           linked: true,
           id: discordLink.discord_id,
           username: discordLink.discord_username,
-          avatar: discordLink.discord_avatar,
+          avatar: discordGuild?.avatar || discordLink.discord_avatar,
           linkedAt: discordLink.created_at,
           serverMember: discordGuild?.member === true,
           nickname: discordGuild?.nickname || null,
